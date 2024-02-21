@@ -1,0 +1,559 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Projet Lino">
+	<main>
+		<header>
+			<img class="logo" src={`logo.png`} height="60" alt="">
+	
+			<div class="intro">
+				<p>
+					<strong>Lino</strong> est un projet visant à 
+					<b>bonifier l'initiative des boîtes à livres et encadrer les activités littéraires de la communauté étudiante.</b>
+				</p>
+				<div class="context">
+					<div class="context-image">
+						<img class="boite-img" src="https://static.wixstatic.com/media/7cb0d5_449b207510f440369b9b0413ba22d19b~mv2.jpg/v1/fill/w_666,h_465,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/Image-place-holder.jpg" alt="Photo d'une boite à livres">
+						<img class="clum-logo" src={`clum-logo.png`} alt="Photo d'une boîte à livres">
+					</div>
+					
+					<div class="context-text">
+						Initié par le <a href="https://www.clubdelectureudem.com/" title="club de lecture de l'Université de Montréal">CLUM</a> à l'automne 2023, 
+						le projet des boîtes à livres sert à promouvoir les échanges et partages au sein de la communauté étudiante. 
+						Au total, il y a présentement 7 boîtes à livres installés dans plusieurs pavillons du campus.
+
+						<div style="margin-top:2px">
+							<b>Une transaction simple</b> <br>
+							Vous y déposez un ou plusieurs livres et en échange, vous pouvez prendre les livres qui vous intéressent.
+						</div>
+
+						<div style="margin-top:2px">
+							<b>De nombreux avantages</b>
+							<ol class="bare-list check-list advantages">
+								<li data-num="1">Permettre à tous de trouver et se procurer des livres gratuitement</li>
+								<li data-num="2">Réduire le gaspillage en encourageant les étudiants à échanger leurs livres</li>
+								<li data-num="3">Faire découvrir de nouveaux ouvrages au reste de la communauté étudiante</li>
+							</ol>
+						</div>
+
+						<div style="margin-top:2px">
+							<b style="color: #F43B56">...mais, certaines questions demeurent</b>
+							<ol class="bare-list num-list issues">
+								<li>Où se trouvent les boîtes à livres?</li>
+								<li>Quels livres s'y trouvent?</li>
+								<li>Qui voudrait de mon livre?</li>
+								<li>Quelqu'un a le livre que je cherche?</li>
+								<li>Qui partagent les mêmes gouts littéraires que moi?</li>
+							</ol>						
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<section class="feature-section">
+			<h2>Projet</h2>
+			<p class="section-intro">
+				Concevoir une solution (application) <br> avec les <strong class="font-lino">objectifs</strong> suivants
+			</p>
+
+			<ul class="bare-list features">
+				<li class="feature-group">
+					<h3>Faciliter le repérage des boîtes à livre</h3>
+					<p>
+						L'application doit fournir une carte avec des mécanismes de recherche et tri
+						facilitant le repérage des boîtes à livre.
+					</p>
+				</li>
+
+	
+				<li class="feature-group">
+					<h3>Assurer les échanges et la recherche de livre</h3>
+					<p>
+						L'application doit permettre aux étudiants de soumettre des requêtes et notifier le réseau lors de l'ajout d'un livre.
+					</p>
+				</li>
+	
+				<li class="feature-group">
+					<h3>Développer la structure du réseau</h3>
+					<p>
+						L'application doit permettre aux étudiants d'exprimer leurs préférences littéraires et simplifier leur mise en relation.
+					</p>
+				</li>
+	
+				<li class="feature-group">
+					<h3>Encadrer l'organisation d'activités littéraires</h3>
+					<p>
+						L'application doit faciliter l'organisation et la communication d'activités et d'évènements littéraires.
+					</p>
+				</li>
+			</ul>
+
+			<div class="application-form">
+				<div class="application-content">
+					<h3 class="font-lino title">
+						<svg class="img-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" overflow="hidden" viewBox="0 0 38 31">
+							<g>
+								<path d="M34.1479 13.3932 28.2356 13.5782C27.8078 13.2391 26.9368 12.7727 25.4375 12.8074 23.4295 12.8691 22.4775 14.299 20.6506 15.9216 19.1475 12.5415 16.3648 8.8376 13.875 6.86042 13.6221 6.66212 13.2562 6.70644 13.0579 6.95943 12.9832 7.05474 12.9401 7.17106 12.9346 7.29208 12.9256 8.99458 13.1118 10.6925 13.4896 12.3526 15.8021 13.7478 17.9026 15.4359 19.0897 17.1819 18.8854 17.3245 18.6657 17.4671 18.4383 17.6058 16.1528 14.3336 10.0864 10.8687 5.8699 9.99385 5.55489 9.92999 5.24776 10.1336 5.18385 10.4486 5.1605 10.5638 5.1726 10.6834 5.21854 10.7917 6.40948 13.4433 9.92062 17.8756 13.1967 20.3654L3.66146 29.8544C3.53422 29.9947 3.54485 30.2117 3.68521 30.3389 3.78349 30.428 3.92431 30.4524 4.04688 30.4017 6.77562 28.9602 11.5818 26.6978 15.4591 26.3162 22.9092 25.584 27.0216 21.09 28.4283 14.6034L34.1633 13.5821C34.2147 13.5682 34.245 13.5153 34.2311 13.4639 34.2207 13.4254 34.1876 13.3973 34.1479 13.3932Z" fill="currentColor" />
+							</g>
+						</svg>
+						Réaliser ce projet
+											
+					</h3>
+					<p>
+						Si tu souhaites acquérir une expérience pratique dans la réalisation de projets, expérimenter et mettre à l'épreuve tes compétences, alors ce projet est fait pour toi! <br>
+						Ce projet est destiné aux <b>finissants</b> (étudiants) du <b>baccalauréat en informatique</b> et pourra être réalisé au <b>trimestre d'été 2024</b>. 
+					</p>
+					<a class="btn btn-apply" href="mailto:louis.edouard.lafontant@umontreal.ca?subject=IFT3150: Projet Lino">
+						Contacter le responsable
+					</a>
+				</div>				
+			</div>
+		</section>
+
+	</main>
+</Layout>
+
+<style>                
+	main {
+		position: relative;
+		display: flex; flex-direction: column;
+	}
+		main:before {
+			content: "";
+			position: absolute;
+			top: 0; right: 0; bottom: 0; left: 0;
+			background: url('/images/boite-a-livres.jpeg') 10% 40%/cover no-repeat fixed;
+			z-index: -2;
+		}
+
+	header {
+		position: relative;
+		display: flex; flex-direction: column;
+		place-items: center;
+		padding-top: 30px; 
+		/* padding-left: 2vw;  */
+		color: white;
+		font-size: 1.4em;
+		z-index: 10;
+	}
+	
+	@media screen and (min-width: 54em) {
+		header {
+			font-size: 1.5em;
+			padding-left: 2vw; 
+			place-items: start;
+		}
+
+		main:after {
+			content: "";
+			position: absolute;
+			top: 0; right: 0; bottom: 0; left: 0;
+			background: linear-gradient(135deg, #fff 10%, transparent 50%);
+			z-index: -1;
+		}
+	}
+
+	.logo {
+		height: 120px;
+		width: auto;
+	}
+
+	@media screen and (min-width: 36em) {
+		.logo {
+			height: 150px;
+		}
+	}
+
+	@media screen and (min-width: 54em) {
+		.logo {
+			height: 180px;
+		}
+	}
+	
+	.intro {
+		position: relative;
+		padding: 12px 2vw 24px;
+		margin-top: -60px;
+		padding-top: 60px;
+		color: #1b1b1b;
+		text-align: justify;
+		overflow: hidden;
+	}
+		.intro:after {
+			content: "";
+			position: absolute;
+			top: 150px; right: 4vw;
+			width: 60px; height: 60px;
+			border-radius: 180px;
+			box-shadow:  0 0 0 2000px #fff;
+			z-index: -1;
+		}
+
+		.intro h2 {
+			margin-top: 12px;
+			margin-bottom: 6px;
+		}
+
+
+		.intro strong {
+			color: rgb(var(--accent));
+			font-family: 'Forte', 'Forte MT Std', sans-serif; font-size: 1.1em;
+			letter-spacing: 0.8px;
+		}
+
+		.intro a {
+			color: rgb(var(--accent));
+			font-weight: bold; font-size: 1em;
+		}
+
+		.context {
+			display: flex; flex-direction: column;
+			place-items: center;
+		}
+
+		.context-image {
+			display: flex; 
+			place-items: center; justify-content: center;
+			max-width: 300px;
+			margin-bottom: 12px;
+		}
+
+			.context-image .boite-img {
+				border-radius: 180px;
+				/* width: 70%;  */
+				/* max-width: 300px; */
+				width: 60%;
+				height: auto;
+			}
+
+			.context-image .clum-logo {
+				width: 40%;
+				height: auto;
+				margin-left: 12px;
+			}
+		
+		.context-text {
+			flex-grow: 2;
+			margin: 0; 
+			font-style: italic;
+			font-size: 1.3em;
+			line-height: 1.5;
+		}
+
+		.context-text li {
+			font-size: 1em;
+		}
+
+		@media screen and (min-width: 36em) {
+			.context-image .boite-img {
+				width: 100%;
+			}
+
+			.context-image .clum-logo {
+				width: 80%;
+			}
+		}
+		
+		@media screen and (min-width: 54em) {
+			.intro {
+				position: relative;
+				margin-top: -60px;
+				margin-left: 10vw;
+				padding: 48px 6vw;
+				color: #1b1b1b;
+				text-align: justify;
+				overflow: hidden;
+			}
+			
+			.intro:after {
+				top: 42vh; right: 4vw;
+				width: 60px; height: 300px;
+			}
+
+				
+			.intro p {
+				font-size: 1.6em;
+			}
+		
+			.context {
+				flex-direction: column;
+				padding-right: 6vw;
+			}
+
+			.context-image {
+				display: flex; flex-direction: row; 
+				flex-grow: 1;
+				justify-content: center;
+				align-items: flex-start;
+				width: 300px;
+			}
+			
+			.context-image .clum-logo {
+				margin-left: 24px;
+				width: 70%;
+			}
+		}
+		
+		@media screen and (min-width: 66em) {
+			.intro:after {
+				top: 24vh; right: 4vw;
+			}
+
+			.context {
+				flex-direction: row;
+				padding-right: 6vw;
+			}
+
+			.context-image {
+				display: flex; flex-direction: column; 
+				place-items: center; flex-grow: 1;
+				/* width: 100%; */
+				min-width: 300px;
+				margin-bottom: 0;
+			}
+
+			.context-text {
+				margin-left: 24px;
+			}
+
+			.context-image .clum-logo {
+				margin-left: 0;
+			}
+		}
+
+	.feature-section {
+		position: relative;
+		padding-top: 24px; 
+		/* padding-bottom: 60px; */
+		padding-left: 3vw; 
+		padding-right: 3vw;
+		overflow: hidden;
+		z-index: 2;
+	}
+		.feature-section:after {
+			content: "";
+			position: absolute;
+			top: 24px; right: 4vw;
+			width: 60px; height: 60px;
+			border-radius: 50%;
+			box-shadow:  0 0 0 2000px rgb(var(--accent-dark));
+			z-index: -1;
+		}
+
+		.feature-section h2 {
+			position: relative;
+			margin: 0; margin-bottom: 6px;
+			font-size: 5em;
+			text-align: center;
+			color: #fff;
+			z-index: 10;
+		}
+
+		.feature-section > p {
+			margin-top: 0;
+			font-size: 2.4rem; font-weight: 500;
+			text-align: center;
+			line-height: 1.25;
+			color: #f5f5f5;
+		}
+
+		.feature-section strong {
+			color: rgb(var(--accent-light));
+			font-size: 1.3em; font-weight: 400;
+			text-transform: capitalize;
+		}
+
+	@media screen and (min-width: 54em) {
+		.feature-section {
+			margin-left: 12vw;
+			padding-left: 4vw;
+			padding-right: 4vw;
+		}
+		
+		.feature-section:after {
+			content: "";
+			position: absolute;
+			top: 60px; right: 4vw;
+			width: 60px; height: 60px;
+			border-radius: 50%;
+			box-shadow:  0 0 0 2000px rgb(var(--accent-dark));
+			z-index: -1;
+		}
+
+	}
+
+	.features {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(40ch, 1fr));
+		gap: 2rem;
+		padding: 0;
+	}
+
+	.feature-group {
+		display: flex; flex-direction: column;
+		background-color: rgb(var(--accent-light));
+		padding: 12px 2rem 6px;
+		border-radius: 24px;
+	}
+
+		.feature-group h3 {
+			margin: 0;
+			font-size: 1.3em; font-weight: 400;
+			line-height: 1.35;
+			text-align: center;
+			color: #222;
+		}
+
+		.feature-group p {
+			font-size: 1.6rem;
+			line-height: 1.5;
+		}
+
+	.section-intro {
+		font-size: 2em;
+		line-height: 1.5;
+	}
+
+	.check-list {
+		/* counter-reset: orderedlist; */
+		margin: 0;
+	}
+
+	.check-list li::before {
+		display: inline-block;
+		content: "✓";
+		width: 24px; height: 24px;
+		margin-right: 6px;
+		font-size: 0.8em; font-weight: bold; font-style: normal;
+		text-align: center;
+		color: #fff;
+		border-radius: 50%;
+		background-color: rgb(var(--accent));
+	}
+
+	.num-list {
+		counter-reset: orderedlist;
+		margin: 0;
+	}
+
+		.num-list li::before {
+			display: inline-block;
+			margin-right: 6px;
+			width: 24px; height: 24px;
+			font-size: 0.8em; font-weight: 500; font-style: normal;
+			text-align: center;
+			color: #fff;
+			background-color: rgb(var(--accent));
+			border-radius: 50%;
+			counter-increment: orderedlist;
+			content: counter(orderedlist);
+		}
+
+		.issues li::before {
+			color: #fff;
+			background-color: #F43B56;
+		}
+
+	.feature-section .title {
+		text-align: center;
+		color: #fff;
+		top: 24px; right: 4%;
+		padding: 8px 12px;
+		font-weight: 500; font-size: 3em;
+	}
+
+	.application-form {
+		position: relative;
+		display: flex; justify-content: center; align-items: flex-start;
+		margin-top: 30px;
+		z-index: 10;
+		padding-bottom: 120px;
+	}
+		.application-form:before {
+			content: "";
+			position: absolute;
+			bottom: 0; right: 0;
+			height: 120px;
+			width: 120px;
+			background-color: rgb(var(--accent-light));
+			transform: rotate(342deg) scale(1.5) skew(2deg);
+			box-shadow: 1px -2px 2px -2px #111;
+			z-index: -1;
+		}
+		.application-form:after {
+			content: "";
+			position: absolute;
+			bottom: 0; right: 0;
+			height: 120px;
+			width: 120px;
+			background-color: rgb(var(--accent));
+			transform: rotate(315deg) scale(1.5) skew(-2deg);
+			box-shadow: 2px -1px 5px -3px #222;
+			z-index: -2;
+		}
+		
+
+		.application-content {
+			display: flex; flex-direction: column; justify-content: center; align-items: center;
+			width: 100%; max-width: 600px;
+			/* text-align: center; */
+			/* height: 200px; */
+			padding: 12px 24px 18px;
+			border-radius: 24px;
+			box-shadow: inset 0 2px 4px -1px #555;
+			background-color: #fff;
+		}
+
+		.application-form .img-icon {
+			position: relative;
+			display: block;
+			height: 24px; 
+		}
+
+		.application-form .title {
+			color: rgb(var(--accent-dark));
+			display: flex; place-items: center;
+			margin: 0;
+		}
+
+		.application-content p {
+			font-size: 1.7em;
+			line-height: 1.35;
+			text-align: justify;
+			font-style: italic;
+			color: #555;
+			margin: 0;
+		}
+
+	.btn-apply {
+		display: flex; flex-direction: column; place-items: center;
+		padding: 8px 12px;
+		margin-top: 24px;
+		font-weight: 500; font-size: 1.8em;
+		border-radius: 4px;
+		color: rgb(var(--accent-dark));
+		color: #fff;
+		background-color: rgb(var(--accent));
+		transition: .5s;
+	}
+		.btn-apply:hover {
+			border-radius: 180px;
+			background-color: rgb(var(--accent-dark));
+		}
+
+		@media screen and (min-width: 54em) {
+			.application-form:before {
+				height: 120px;
+				width: 120px;
+				transform: rotate(342deg) scale(2) skew(2deg);
+			}
+			.application-form:after {
+				height: 120px;
+				width: 120px;
+				transform: rotate(315deg) scale(2) skew(-2deg);
+			}
+		}
+
+</style>

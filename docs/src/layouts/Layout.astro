@@ -1,0 +1,31 @@
+---
+import '../styles/normalize.css'
+import '../styles/base.css'
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Lino est un projet pilote visant à améliorer le service des cafés étudiants de l'UdeM." />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/x-icon" href="favicon.ico" />
+		<meta property="og:title" content={title}>
+		<meta property="og:description" content="Lino est un projet pilote visant à améliorer le service des cafés étudiants de l'UdeM.">
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://ceduni.github.io/lino/">
+		<meta property="og:site_name" content="Lino">
+		<meta property="og:image" content="https://ceduni.github.io/lino/logo.png">
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
