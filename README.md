@@ -34,6 +34,7 @@ Qui partagent les mêmes gouts littéraires que moi?
 
 Ce projet pourra être réalisé (prototypé) cet été par des étudiants (finissants) du bacc. au département d'informatique.
 
+
 <!-- ## 📅 Échéancier
 
 Le projet se découpe en plusieurs phases. La phase 1 commence à l'automne 2023 et se concentre sur le prototypage de l'application et le développement de l'API.
@@ -45,10 +46,30 @@ Le projet se découpe en plusieurs phases. La phase 1 commence à l'automne 2023
 
 # 🌟 Réaliser le projet
 
-Si tu souhaites acquérir une expérience pratique dans la réalisation de projets, expérimenter et mettre à l'épreuve tes compétences, alors ce projet est fait pour toi!  
-Ce projet est destiné aux finissants (étudiants) du baccalauréat en informatique et pourra être réalisé au **trimestre d'été 2024**.
+> Ce projet peut être réalisé par 1 ou 2 étudiants (finissants)  
+> Début: **Trimestre d'été 2024**  
 
-Si vous êtes intéressé à participer au projet, veuillez prendre contact avec [Louis-Edouard LAFONTANT](mailto:louis.edouard.lafontant@umontreal.ca).
+Si tu souhaites acquérir une expérience pratique dans la réalisation de projets, expérimenter et mettre à l'épreuve tes compétences, alors ce projet est fait pour toi!  
+
+## Profil attendu
+
+> 💡*Pour assurer le succès et la qualité du projet et maximiser votre expérience, nous vous recommandons de vous engager pleinement et de limiter, idéalement à zéro, le nombre de cours supplémentaires que vous suivez en parallèle.*
+
+- Familiarité avec le développement d'application mobile
+- Familiarité avec la conception d'interface
+- Affinité pour le design
+- Connaissance en base de données
+- Connaissance en développement d'API
+
+## Points clés
+
+- Prototypage et développement de maquettes ([Figma](https://www.figma.com/))
+- Développement d'application mobile ([Flutter](https://flutter.dev/))
+- Développement de l'infrastructure
+- Expérimentation avec des capteurs NFC
+
+
+Si vous êtes intéressé à réaliser ce projet, veuillez prendre contact avec [Louis-Edouard LAFONTANT](mailto:louis.edouard.lafontant@umontreal.ca).
 
 <!-- ## Contributeurs -->
 
