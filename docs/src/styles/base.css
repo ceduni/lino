@@ -47,8 +47,6 @@ h4 {
     margin-bottom: 0.5em;
 }
 
-body { position: relative; margin: 0; padding: 0;}
-
 p, li, a, td { font-size: 1.5em ; }
 
 li li, li p, li a, li label, 
