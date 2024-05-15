@@ -64,7 +64,7 @@ L'infrastructure de l'application est basée sur...
 # 📘 Documentation
 
 <!-- - Dossier Drive: Contient la documentation du projet -->
-- [Wiki](https://github.com/ceduni/picto360/wiki): Contient la documentation de l'application et de l'infrastructure développée (Services, API, Base de données...)
+- [Wiki](https://github.com/ceduni/lino/wiki): Contient la documentation de l'application et de l'infrastructure développée (Services, API, Base de données...)
 
 # 🗂️ Organisation
 
