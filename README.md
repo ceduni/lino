@@ -3,27 +3,11 @@
     <img src="assets/logo.png" width="300">
 </p>
 
-
 # Lino
 
+> **Page web du projet:** https://ceduni.github.io/lino/
+
 Lino est un projet visant à **bonifier l'initiative des boîtes à livres et encadrer les activités littéraires de la communauté étudiante**.
->Initié par le CLUM à l'automne 2023, le projet des boîtes à livres vise à promouvoir les échanges et le partage au sein de la communauté étudiante. Actuellement, sept boîtes à livres sont installées dans différents pavillons du campus.
-
-**Une transaction simple 👌**  
-Vous déposez un ou plusieurs livres et en échange, vous pouvez prendre les livres qui vous intéressent..
-
-**De nombreux avantages 👍**  
-Permettre à tous de trouver et se procurer des livres gratuitement.  
-Réduire le gaspillage en encourageant les étudiants à échanger leurs livres.  
-Faire découvrir de nouveaux ouvrages au reste de la communauté étudiante.
-
-**...mais, certaines questions demeurent ✋**  
-Où se trouvent les boîtes à livres?  
-Quels livres s'y trouvent?  
-Qui voudrait de mon livre?  
-Quelqu'un a le livre que je cherche?  
-Qui partagent les mêmes gouts littéraires que moi?
-
 
 ## Objectifs 🎯
 
@@ -33,41 +17,68 @@ Qui partagent les mêmes gouts littéraires que moi?
 - **Encadrer l'organisation d'activités littéraires**: L'application doit faciliter l'organisation et la communication d'activités et d'évènements littéraires.
 
 
-<!-- ## 📅 Échéancier
+## 📅 Échéancier
 
-Le projet se découpe en plusieurs phases. La phase 1 commence à l'automne 2023 et se concentre sur le prototypage de l'application et le développement de l'API.
+> Début du projet: 6 mai 2024  
+> Fin du projet: 19 aout 2024
 
-> **Phase 1**  
-> Début: 1er septembre 2023  
-> Fin: 11 décembre 2023 -->
+Le développement du projet sera divisé en plusieurs phases:
+
+### Phase 1: Élaboration des exigences
+
+- Semaine 1
+- Semaine 2
+
+### Phase 2: Prototypage et conception
+
+- Semaine 3
+- Semaine 4
+- Semaine 5
+- Semaine 6
+
+### Phase 3: Développement 
+
+- Semaine 7
+- Semaine 8
+- Semaine 9
+- Semaine 10
+- Semaine 11
+- Semaine 12
+
+### Phase 4: Tests & Rapports
+
+- Semaine 13
+- Semaine 14
+- Semaine 15
+- Semaine 16
+
+Le suivi du projet est présenté dans le fichier [**TIMELINE**](TIMELINE.md).
 
 
-# 🌟 Réaliser le projet
+## 🌐 Infrastructure
 
-> Ce projet peut être réalisé par **1 ou 2 étudiants** (en 3e année ou finissant)  
-> Début: **Trimestre d'été 2024**  
+L'infrastructure de l'application est basée sur...
 
-Si tu souhaites acquérir une expérience pratique dans la réalisation de projets, expérimenter et mettre à l'épreuve tes compétences, alors ce projet est fait pour toi!  
+<!-- TODO -->
 
-## Profil attendu
+# 📘 Documentation
 
-> 💡*Pour assurer le succès et la qualité du projet et maximiser ton expérience, nous te recommandons de t'engager pleinement et de limiter le nombre de cours supplémentaires (idéalement 0) que tu suis en parallèle.*
+<!-- - Dossier Drive: Contient la documentation du projet -->
+- [Wiki](https://github.com/ceduni/picto360/wiki): Contient la documentation de l'application et de l'infrastructure développée (Services, API, Base de données...)
 
-- Familiarité avec le développement d'application mobile
-- Familiarité avec la conception d'interface
-- Affinité pour le design
-- Connaissance en base de données
-- Connaissance en développement d'API
+# 🗂️ Organisation
 
-## Points clés
+Les documents associés au projet se trouvent dans le 
+Les dossiers du répertoire sont organisés comme suit:
 
-- Prototypage et développement de maquettes ([Figma](https://www.figma.com/)).
-- Développement d'application mobile hybride ([Flutter](https://flutter.dev/)).
-- Développement de l'infrastructure.
-- Expérimentation avec des capteurs NFC.
+<!-- TODO -->
 
+# 🌟 Contribution
 
-Si vous êtes intéressé à réaliser ce projet, veuillez prendre contact avec [Louis-Edouard LAFONTANT](mailto:louis.edouard.lafontant@umontreal.ca).
+Si vous êtes intéressé à participer au projet, contactez [Louis-Edouard LAFONTANT](mailto:louis.edouard.lafontant@umontreal.ca).
 
-<!-- ## Contributeurs -->
+## Contributeurs
 
+- Hoang Quan Tran [@benhoangquan](https://github.com/benhoangquan)
+- Oscar Lavolet [@Gelehead](https://github.com/Gelehead)
+- Nathan Riantsoa Razafindrakoto [@NathanRazaf](https://github.com/NathanRazaf)
