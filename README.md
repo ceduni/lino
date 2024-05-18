@@ -5,7 +5,7 @@
 
 # Lino
 
-> **Page web du projet:** https://ceduni.github.io/lino/
+> **Page web du projet (IFT3150):** https://ift3150-lino.netlify.app/
 
 Lino est un projet visant à **bonifier l'initiative des boîtes à livres et encadrer les activités littéraires de la communauté étudiante**.
 
