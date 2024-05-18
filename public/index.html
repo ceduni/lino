@@ -4,49 +4,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IFT3150: Lino</title>
-
+    <title>Projet IFT3150 | Lino</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <header>
-
+    <header class="page-header">
+        <img style="display: block" src="images/logo.png" height="150" alt="Logo Lino" />
+        <h1 class="page-title">
+            IFT3150 &ndash; Projet informatique
+        </h1>
+        <ul class="bare-list contributors" style="font-size: 1.1em;">
+            <li class="contributor">Hoang QUAN TRAN</li>
+            <li class="contributor">Oscar LAVOLET</li>
+            <li class="contributor">Nathan Riantsoa RAZAFINDRAKOTO</li>
+            
+        </ul>
+        
+        <ul class="bare-list docs">
+            <li class="doc">
+                <a target="_blank" href="https://github.com/ceduni/lino">Répertoire GitHub <img src="images/github-mark-white.svg" alt="Logo GitHub"></a>
+            </li>
+            <!-- <li>
+                <a class="bare-link doc-link" href="https://ceduni.github.io/cafe-sans-fil/livrables/presentation.pdf">
+                    Présentation
+                </a>
+            </li> -->
+            <!-- <li>
+                <a class="bare-link doc-link"
+                    href="https://ceduni.github.io/cafe-sans-fil/livrables/rapport.pdf">Rapport</a>
+            </li> -->
+        </ul>
     </header>
 
-    <main>
-        <header>
-
-            <h1>Lino</h1>
-
+    <main class="page-body">
+        <header class="content-wrapper">
+            <h2>Description du projet</h2>
+            
             <p>
                 Lino est un projet visant à
                 <strong>
                     bonifier l'initiative des boîtes à livres et encadrer les activités littéraires de la communauté
-                    étudiante</strong>
+                    étudiante</strong>.Initié par le <a href="https://www.clubdelectureudem.com/" title="club de lecture de l'Université de Montréal">CLUM</a> à l'automne 2023, 
+                    le projet des boîtes à livres sert à promouvoir les échanges et partages au sein de la communauté étudiante. 
+                    Installés dans plusieurs pavillons du campus, elles permettent à tous de trouver et se procurer des livres gratuitement et 
+                    réduisent potentiellement le gaspillage en encourageant les étudiants à échanger leurs livres.
             </p>
 
-            <h2>Contexte</h2>
+            <!-- Problématique -->
             <p>
-                Initié par le <a href="https://www.clubdelectureudem.com/" title="club de lecture de l'Université de Montréal">CLUM</a> à l'automne 2023, 
-                le projet des boîtes à livres sert à promouvoir les échanges et partages au sein de la communauté étudiante. 
-                Installés dans plusieurs pavillons du campus, elles permettent à tous de trouver et se procurer des livres gratuitement et 
-                réduisent potentiellement le gaspillage en encourageant les étudiants à échanger leurs livres.
-                Vous y déposez un ou plusieurs livres et en échange, vous pouvez prendre les livres qui vous intéressent.
-            </p>
+                Cependant, l'infrastructure actuelle limite la portée de l'initiative...
+            </p>		
 
-            <h2>Problématique</h2>
-            <p>
-                Cependant, l'infrastructure actuelle soulève quelques questions actuellement sans réponse
-            </p>
-            <ol class="bare-list num-list issues">
-                <li>Où se trouvent les boîtes à livres?</li>
-                <li>Quels livres s'y trouvent?</li>
-                <li>Qui voudrait de mon livre?</li>
-                <li>Quelqu'un a le livre que je cherche?</li>
-                <li>Qui partagent les mêmes gouts littéraires que moi?</li>
-            </ol>			
-
-            <h2>Objectifs</h2>
+            <!-- Proposition -->
             <p>Ce projet consiste à concevoir une application répondant aux objectifs suivants:</p>
             <ul>
                 <li>
@@ -68,11 +80,79 @@
             </ul>
 
         </header>
+
+        
+        <section class="content-wrapper">
+            <h2>Exigences</h2>
+
+            <h3>Besoins fonctionnels</h3>
+            <!-- TODO: Ajouter la liste des besoins fonctionnels de l'application -->
+
+            <h3>Besoins non-fonctionnels</h3>
+
+            <!-- TODO: Ajouter la liste des besoins non-fonctionnels de l'application -->
+
+        </section>
+
+        <section class="content-wrapper">
+            <h2>Infrastructure</h2>
+
+            <!-- TODO: Décrire l'infrastructure de l'application -->
+        </section>
+
+        <section class="content-wrapper progress-section">
+            <header class="progress-section-header">
+                <h2 style="font-size: 3.3em; font-weight: 800;">Rapport d'avancement</h2>
+                <ul class="bare-list phases">
+                    <li class="phase fit-content current" title="Exigences & Analyse">Exigences & Analyse</li>
+                    <li class="phase fit-content" title="Prototypage & Conception">Prototypage & Conception</li>
+                    <li class="phase fit-content" title="Implémentation: Infrastructure & Application">Implémentation: Infrastructure & Application</li>
+                    <li class="phase fit-content" title="Validation">Validation</li>
+                </ul>
+                <div class="timeline"></div>
+            </header>
+
+            <section class="week">
+                <header class="week-header">
+                    <h3 class="week-title">Semaine 1 &ndash;
+                        <time datetime="2024-05-06">Lundi 6 mai 2024</time>
+                    </h3>
+                    <p>Ouverture de projet & Élaboration des exigences</p>
+                </header>
+                <div class="week-content">
+                    <h4 class="title">Objectifs</h4>
+                    <ul>
+                        <li>Prendre en main les outils qui seront utilisés pour le projet</li>
+                        <li>Produire une première version de l'échéancier</li>
+                        <li>Déterminer les exigences du projet</li>
+                        <li>Étudier le domaine, les notions et outils envisagés pour le projet</li>
+                    </ul>
+
+                    <h4 class="title">Réalisations</h4>
+                    <ul>
+                    </ul>
+
+                    <h4 class="title">Notes</h4>
+                    <p></p>
+                </div>
+            </section>
+        </section>
     </main>
 
-    <footer>
-
+    <footer class="page-footer">
+        <a href="https://github.com/ceduni/lino" target="_blank">Répertoire GitHub</a>
+        <p>Dernière mise à jour: 17 mai 2024</p>
     </footer>
+
+    <script>
+        const NB_WEEK = 15;
+        let projetStart = new Date("2024-05-06");
+        let current = (Date.now() - projetStart) / 1000 / 60 / 60 / 24 / 7;
+        let progress = Math.round((current/NB_WEEK) * 100);
+
+        let timeline = document.querySelector('.timeline');
+        timeline.style.background = `linear-gradient(to right,rgb(var(--accent)), rgb(var(--accent-light)) ${progress}%, #d5d5d5 0%)`;
+    </script>
 </body>
 
 </html>
