@@ -156,6 +156,7 @@
 ### Observations
 
 <!-- Description des observations importantes (ex: remarque ou trouvaille intéressante, difficultés rencontrées) de la semaine -->
+- Besoin d'une API key pour utiliser Google Books quand on va chercher les livres via leur ISBN
 
 ### Ressources
 
