@@ -128,17 +128,26 @@
 
 ### Observations
 
-### Ressources
+### Ressources -->
 
 ## Semaine 2 (2024-05-13)
 
 ### Objectifs
 
+- Identifier la public ciblée
+- Élaborer les exigences: fonctionnelles et d'environnement
+  
 ### Réalisations
+- Comme les objectifs
 
 ### Observations
+- Feel de l'application: type snapchat, ressenti ephemere, les discussions ne durent pas
+- Analyse de risque
+- Usage NFT
+- Scanner: pour scanner le code ISBN (code barre) (peut se situer en dessous de la boite)
+Trop complique a entretenir + a implementer dans chaque boite a livre
 
-### Ressources -->
+### Ressources
 
 ## Semaine 1 (2024-05-06)
 
