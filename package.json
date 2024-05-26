@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "fastify": "^4.27.0",
-    "mongodb": "^6.6.2"
-  }
-}

@@ -7,9 +7,9 @@
     <schema id="2" parent="1" name="Main">
       <LastIntrospectionLocalTimestamp>2024-05-23.22:40:21</LastIntrospectionLocalTimestamp>
     </schema>
-    <schema id="3" parent="1" name="admin"/>
-    <schema id="4" parent="1" name="local"/>
-    <schema id="5" parent="1" name="sample_mflix"/>
+    <schema id="3" parent="1" name="sample_mflix"/>
+    <schema id="4" parent="1" name="admin"/>
+    <schema id="5" parent="1" name="local"/>
     <table id="6" parent="2" name="bookboxes"/>
     <table id="7" parent="2" name="books"/>
     <table id="8" parent="2" name="threads"/>
