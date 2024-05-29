@@ -5,21 +5,38 @@ import fastifyJwt from '@fastify/jwt';
 import bookRoutes from './routes/book.route';
 import userRoutes from './routes/user.route';
 import threadRoutes from "./routes/thread.routes";
+import fastifyCors from "@fastify/cors";
+
 
 dotenv.config();
 const server = Fastify({ logger: true });
+server.register(fastifyCors, {
+    origin: true,
+});
 
 // Register JWT plugin
 // @ts-ignore
 server.register(fastifyJwt, { secret: process.env.JWT_SECRET_KEY });
 
-// Authentication hook
+// Authentication hook, request must have an Authorization header with a valid JWT
 // @ts-ignore
 server.decorate('authenticate', async (request, reply) => {
     try {
         await request.jwtVerify();
     } catch (err) {
-        reply.send(err);
+        reply.send(err); // will send an error 401
+    }
+});
+
+// Optional authentication hook, request can have an Authorization header with a valid JWT
+// If not, the user will be null
+// @ts-ignore
+server.decorate('optionalAuthenticate', async (request) => {
+   try {
+        // @ts-ignore
+       request.user = await server.jwt.verify(request.headers.authorization.split(' ')[1]);
+   } catch (error) {
+       request.user = null;
     }
 });
 

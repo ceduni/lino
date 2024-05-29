@@ -61,5 +61,5 @@ async function sendMessage(loginData, threadId, message) {
         return;
     }
 
-    await sendMessage(loginData, '665390530f9fe267f046aff5', 'Hello, world!');
+    await createThread(loginData, '9782075046480', '664f81b402a48f9eaaf35eab');
 })();

@@ -24,6 +24,7 @@ export default async function userRoutes(server: FastifyInstance) {
         }
     });
 
+
     // API Endpoint: Refresh Access Token
     server.post('/user/refresh-token', async (request, reply) => {
         try {

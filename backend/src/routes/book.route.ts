@@ -7,19 +7,21 @@ import UserService from "../services/user.service";
 export default async function bookRoutes(server: FastifyInstance) {
     // API Endpoint: Add Book to Bookbox
     // @ts-ignore
-    server.post('/book/:isbn/:bookboxId/:action', { preValidation: [server.authenticate] }, async (request, reply) => {
+    server.post('/book/:isbn/:bookboxId/:action', { preValidation: [server.optionalAuthenticate] }, async (request, reply) => {
         const { isbn, bookboxId, action } = request.params as { isbn: string; bookboxId: string; action: string };
 
         try {
+            // Fetch or create the book
             const book = await bookService.fetchOrCreateBook(isbn);
 
+            // Fetch the bookbox
             let bookbox = await BookBox.findById(bookboxId);
             if (!bookbox) {
                 reply.code(404).send({ error: 'Bookbox not found' });
                 return;
             }
 
-            if (request.user) {
+            if (request.user) { // Updates the user's ecological impact if the user is authenticated
                 // @ts-ignore
                 const userId = request.user.id;
                 let user = await User.findById(userId);
@@ -44,6 +46,7 @@ export default async function bookRoutes(server: FastifyInstance) {
                 reply.code(400).send({ error: 'Invalid action' });
                 return;
             }
+            book.date_last_action = new Date();
 
             await book.save();
             await bookbox.save();
