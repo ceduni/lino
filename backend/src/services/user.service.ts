@@ -22,9 +22,11 @@ const UserService = {
         return user;
     },
 
-    // User service to login a user if they exist
+    // User service to login a user if they exist (can log with either a username or an email)
     async loginUser(credentials: any) {
-        const user = await User.findOne({ username: credentials.username });
+        const username = credentials.username;
+        const email = credentials.email;
+        const user = await User.findOne({ $or: [{ username }, { email }] });
         if (!user) {
             throw new Error('User not found');
         }

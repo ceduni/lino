@@ -8,7 +8,7 @@ const bookboxSchema = new mongoose.Schema({
         coordinates: [Number]
     },
     infoText: String,
-    books: { type: [String], default: [] } // Array of ISBNs
+    books: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }], // Array of book _ids
 });
 
 const BookBox = mongoose.model('BookBox', bookboxSchema, "bookboxes");

@@ -11,10 +11,7 @@ export default async function threadRoutes(server: FastifyInstance) {
     // @ts-ignore
     server.post('/threads', { preHandler: server.authenticate }, async (request, reply) => {
         // @ts-ignore
-        request.body.user_id = request.user.id; // Add this line
-        // @ts-ignore
-        console.log(request.user.id);
-        console.log(request.body);
+        request.body.user_id = request.user.id;
         const thread = new Thread(request.body);
         try {
             await thread.save();
@@ -34,11 +31,7 @@ export default async function threadRoutes(server: FastifyInstance) {
             return;
         }
         // @ts-ignore
-        console.log(request.body.content);
-        console.log(request.user);
-        // @ts-ignore
         const message = { content: request.body.content, user_id: request.user.id };
-        console.log(message);
         // @ts-ignore
         thread.messages.push(message);
         await thread.save();
