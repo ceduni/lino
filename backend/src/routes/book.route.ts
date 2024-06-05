@@ -1,12 +1,7 @@
 import { FastifyInstance } from "fastify";
 import BookBox from "../models/bookbox.model";
-import bookService from "../services/book.service";
-import User from "../models/user.model";
-import UserService from "../services/user.service";
 import Book from "../models/book.model";
-import * as http from "node:http";
 import mongoose from "mongoose";
-import BookModel from "../models/book.model";
 import BookService from "../services/book.service";
 
 export default async function bookRoutes(server: FastifyInstance) {
@@ -17,7 +12,7 @@ export default async function bookRoutes(server: FastifyInstance) {
 
         try {
             // Fetch or create the book
-            const book = await bookService.fetchOrCreateBook(new mongoose.Types.ObjectId(''), isbn);
+            const book = await BookService.fetchOrCreateBook(new mongoose.Types.ObjectId(''), isbn);
 
             // Fetch the bookbox
             let bookbox = await BookBox.findById(bookboxId);
@@ -101,34 +96,23 @@ export default async function bookRoutes(server: FastifyInstance) {
     });
 
 
-    // API Endpoint: Add Book to Favorites (protected route)
-    // @ts-ignore
-    server.post('/books/favorites/:isbn', { preValidation: [server.authenticate] }, async (request, reply) => {
-        try {
-            // @ts-ignore
-            const userId = request.user.id;  // Extract user ID from JWT token
-            // @ts-ignore
-            const { isbn } = request.params;
-            const user = await UserService.addToFavorites(userId, isbn);
-            reply.send(user);
-        } catch (error) {
-            console.error('Error adding book to favorites:', error);
-            reply.code(500).send({ error: 'Internal server error' });
-        }
-    });
 
-    // API Endpoint: Remove Book from Favorites (protected route)
+
+    // API Endpoint: Research all books of the database (with optional genre query)
     // @ts-ignore
-    server.delete('/books/favorites/:isbn', { preValidation: [server.authenticate] }, async (request, reply) => {
+    server.get('/books', async (request, reply) => {
         try {
             // @ts-ignore
-            const userId = request.user.id;  // Extract user ID from JWT token
-            // @ts-ignore
-            const { isbn } = request.params;
-            const user = await UserService.removeFromFavorites(userId, isbn);
-            reply.send(user);
+            const genre = request.query.genre;
+            let books;
+            if (genre) {
+                books = await Book.find({ categories: genre });
+            } else {
+                books = await Book.find();
+            }
+            reply.send(books);
         } catch (error) {
-            console.error('Error removing book from favorites:', error);
+            console.error('Error getting books:', error);
             reply.code(500).send({ error: 'Internal server error' });
         }
     });

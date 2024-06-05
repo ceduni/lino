@@ -8,16 +8,25 @@ dotenv.config();
 const UserService = {
     // User service to register a new user's account
     async registerUser(userData: any) {
-        const { username, password } = userData;
+        const { username, email, phone, password } = userData;
 
-        // Check if user already exists
+        // Check if username already exists
         const existingUser = await User.findOne({ username });
         if (existingUser) {
             throw new Error('Username already taken');
         }
+        // Check if email already exists
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) {
+            throw new Error('Email already taken');
+        }
 
         const hashedPassword = await argon2.hash(password);
-        const user = new User({ username, password: hashedPassword });
+        const user = new User(
+            { username : username,
+                email : email,
+                phone : phone,
+                password: hashedPassword });
         await user.save();
         return user;
     },
