@@ -1,9 +1,9 @@
 import Thread from "../models/thread.model";
 
 const ThreadService = {
-    async createThread(bookId : String, userId : String, title : String) {
+    async createThread(book_title : string, userId : string, title : string) {
         const thread = new Thread({
-            book_id: bookId,
+            book_title: book_title,
             user_id: userId,
             title: title,
             messages: []
@@ -12,7 +12,7 @@ const ThreadService = {
         return thread;
     },
 
-    async addThreadMessage(threadId : String, userId : String, content : String, respondsTo : String) {
+    async addThreadMessage(threadId : string, userId : string, content : string, respondsTo : string) {
         const thread = await Thread.findById(threadId);
         if (!thread) {
             throw new Error('Thread not found');
@@ -25,10 +25,14 @@ const ThreadService = {
         };
         thread.messages.push(message);
         await thread.save();
-        return message;
+
+        // Get the _id of the newly created message
+        const messageId = thread.messages[thread.messages.length - 1]._id;
+
+        return { ...message, _id: messageId };
     },
 
-    async toggleMessageReaction(threadId : String, messageId : String, userId : String, reactIcon : String) {
+    async toggleMessageReaction(threadId : string, messageId : string, userId : string, reactIcon : string) {
         // Find the thread that contains the message
         const thread = await Thread.findById(threadId);
         if (!thread) {
@@ -51,7 +55,7 @@ const ThreadService = {
         }
 
         await thread.save();
-        return message;
+        return message.reactions[message.reactions.length - 1];
     }
 
 }

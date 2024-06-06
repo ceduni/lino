@@ -2,38 +2,71 @@ import axios from 'axios';
 import Book from "../models/book.model";
 import mongoose from "mongoose";
 import User from "../models/user.model";
+import BookBox from "../models/bookbox.model";
 
 const bookService = {
     // Helper function to fetch or create a book
     // This function tries to find a book in the database. If not found, it gets info from Google Books API and creates a new book entry.
-    async fetchOrCreateBook(id : mongoose.Types.ObjectId, isbn: string) {
-        let book = await Book.findOne(id); // Look for the book by its ID
-        if (!book) { // If book doesn't exist
-            // Make an API call to Google Books for the book details with the given ISBN
-            const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
-            const data = response.data;
-
-            if (data.totalItems === 0) { // If Google Books doesn't find it either
-                throw new Error('Book not found');
-            }
-
-            const volumeInfo = data.items[0].volumeInfo; // Get the book details
-
-            // Create a new book document based on the API data (will create a unique _id)
-            book = new Book({
-                isbn: isbn,
-                title: volumeInfo.title,
-                authors: volumeInfo.authors,
-                description: volumeInfo.description,
-                coverImage: volumeInfo.imageLinks?.thumbnail,
-                publisher: volumeInfo.publisher,
-                categories: volumeInfo.categories,
-                taken_history: [],
-                given_history: []
-            });
-            await book.save(); // Save the new book to the database
+    async addNewBook(request: any, bookboxId: string) {
+        let book = new Book({
+            isbn: request.body.isbn,
+            title: request.body.title,
+            authors: request.body.authors,
+            description: request.body.description,
+            coverImage: request.body.coverImage,
+            publisher: request.body.publisher,
+            parutionYear: request.body.parutionYear,
+            pages: request.body.pages,
+            categories: request.body.categories,
+        });
+        let bookBox = await BookBox.findById(bookboxId);
+        if (!bookBox) {
+            throw new Error('Bookbox not found');
         }
-        return book; // Return the book (either found or newly created)
+        bookBox.books.push(book._id);
+        await this.updateBooks(book, request, true);
+        await book.save();
+        await bookBox.save();
+        await this.updateUserEcoImpact(request, book._id.toString());
+        return book._id;
+    },
+
+    async addExistingBook(id: string, request: any, bookboxId: string) {
+        let book = await Book.findById(id);
+        if (!book) {
+            throw new Error('Book not found');
+        }
+        await this.updateBooks(book, request, true);
+        let bookBox = await BookBox.findById(bookboxId);
+        if (!bookBox) {
+            throw new Error('Bookbox not found');
+        }
+        bookBox.books.push(book._id);
+        await book.save();
+        await bookBox.save();
+        await this.updateUserEcoImpact(request, book._id.toString());
+        return book;
+    },
+
+    async getBookFromBookBox(id: string, request: any, bookboxId: string) {
+        let book = await Book.findById(id);
+        if (!book) {
+            throw new Error('Book not found');
+        }
+        await this.updateBooks(book, request, false);
+        let bookBox = await BookBox.findById(bookboxId);
+        if (!bookBox) {
+            throw new Error('Bookbox not found');
+        }
+        if (bookBox.books.includes(book._id)) {
+            bookBox.books.splice(bookBox.books.indexOf(book._id), 1);
+        } else {
+            throw new Error('Book not found in bookbox');
+        }
+        await book.save();
+        await bookBox.save();
+        await this.updateUserEcoImpact(request, book._id.toString());
+        return book;
     },
 
     async updateUserEcoImpact(request: any, bookId: string) {
@@ -60,6 +93,48 @@ const bookService = {
             }
         }
     },
+
+    async updateBooks(book: any, request: any, given: boolean) {
+        if (request.user) {
+            // @ts-ignore
+            const userId = request.user.id;
+            if (given) {
+                book.given_history.push({user_id: userId, timestamp: new Date()});
+            } else {
+                book.taken_history.push({user_id: userId, timestamp: new Date()});
+            }
+        } else {
+            if (given) {
+                book.given_history.push({user_id: "guest", timestamp: new Date()});
+            } else {
+                book.taken_history.push({user_id: "guest", timestamp: new Date()});
+            }
+        }
+        const books : any = await Book.find({isbn: book.isbn});
+        for (let i = 0; i < books.length; i++) {
+            // Update the date_last_action field for all books with the same ISBN
+            // to indicate that this book has been looked at recently
+            books[i].date_last_action = new Date();
+        }
+    },
+
+    async getBookInfoFromISBN(isbn: string) {
+        const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+        if (response.data.totalItems === 0) {
+            throw new Error('Book not found');
+        }
+        const bookInfo = response.data.items[0].volumeInfo;
+        return new Book({
+            isbn: isbn,
+            title: bookInfo.title,
+            authors: bookInfo.authors,
+            description: bookInfo.description,
+            coverImage: bookInfo.imageLinks.thumbnail,
+            publisher: bookInfo.publisher,
+            parutionYear: bookInfo.publishedDate,
+            categories: bookInfo.categories,
+        });
+    }
 };
 
 export default bookService;

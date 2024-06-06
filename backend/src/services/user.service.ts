@@ -31,11 +31,11 @@ const UserService = {
         return user;
     },
 
-    // User service to login a user if they exist (can log with either a username or an email)
+    // User service to log in a user if they exist (can log with either a username or an email)
     async loginUser(credentials: any) {
-        const username = credentials.username;
-        const email = credentials.email;
-        const user = await User.findOne({ $or: [{ username }, { email }] });
+        const identifier = credentials.identifier;
+        console.log(credentials.identifier);
+        const user = await User.findOne({ $or: [{ username : identifier }, { email : identifier }]});
         if (!user) {
             throw new Error('User not found');
         }
@@ -45,54 +45,34 @@ const UserService = {
         }
         // User authenticated successfully, generate tokens
         // @ts-ignore
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
-        // @ts-ignore
-        const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET_KEY, { expiresIn: '7d' });
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY);
 
-        return { user, token, refreshToken };
-    },
-
-
-    // User service to automatically refresh the access token
-    async refreshAccessToken(refreshToken: string) {
-        try {
-            // @ts-ignore
-            const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET_KEY);
-            const user = await User.findById(decoded.id);
-            if (!user) {
-                throw new Error('User not found');
-            }
-            // @ts-ignore
-            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
-            return { token };
-        } catch (error) {
-            throw new Error('Invalid refresh token');
-        }
+        return { user, token };
     },
 
 
     // User service to add a book's ISBN to a user's favorites
-    async addToFavorites(userId: string, isbn: string) {
+    async addToFavorites(userId: string, id: string) {
         const user = await User.findById(userId);
         if (!user) {
             throw new Error('User not found');
         }
-        if (user.favoriteBooks.includes(isbn)) {
+        if (user.favoriteBooks.includes(id)) {
             throw new Error('Book already in favorites');
         }
-        user.favoriteBooks.push(isbn);
+        user.favoriteBooks.push(id);
         await user.save();
         return user;
     },
 
 
     // User service to remove a book's ISBN from a user's favorites
-    async removeFromFavorites(userId: string, isbn: string) {
+    async removeFromFavorites(userId: string, id: string) {
         const user = await User.findById(userId);
         if (!user) {
             throw new Error('User not found');
         }
-        const index = user.favoriteBooks.indexOf(isbn);
+        const index = user.favoriteBooks.indexOf(id);
         if (index === -1) {
             throw new Error('Book not in favorites');
         }

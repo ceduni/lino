@@ -14,7 +14,7 @@ const messageSchema = new mongoose.Schema({
 });
 
 const threadSchema = new mongoose.Schema({
-    book_id: { type: String, required: true },
+    book_title: { type: String, required: true },
     user_id: { type: String, required: true },
     title: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },

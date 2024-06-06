@@ -10,7 +10,7 @@ export default async function threadRoutes(server: FastifyInstance) {
     });
 
     // @ts-ignore
-    server.post('/threads', { preHandler: server.authenticate }, async (request, reply) => {
+    server.post('/threads/new', { preHandler: server.authenticate }, async (request, reply) => {
         // @ts-ignore
         const userId = request.user.id;
         if (!userId) {
@@ -18,10 +18,9 @@ export default async function threadRoutes(server: FastifyInstance) {
             return;
         }
         // @ts-ignore
-        const { book_id, title } = request.body;
-        const thread = await ThreadService.createThread(book_id, userId, title);
-        reply.send(thread);
-
+        const { book_title, title } = request.body;
+        const thread = await ThreadService.createThread(book_title, userId, title);
+        reply.send(thread._id);
     });
 
     // @ts-ignore
@@ -42,8 +41,8 @@ export default async function threadRoutes(server: FastifyInstance) {
         const { content, responds_to } = request.body;
         // @ts-ignore
         const threadId = request.params.thread_id;
-        const updatedThread = await ThreadService.addThreadMessage(threadId, userId, content, responds_to);
-        reply.send(updatedThread);
+        const message = await ThreadService.addThreadMessage(threadId, userId, content, responds_to);
+        reply.send(message._id);
     });
 
     // API Endpoint: Toggle Reaction to Message
@@ -60,8 +59,8 @@ export default async function threadRoutes(server: FastifyInstance) {
         // @ts-ignore
         const { thread_id, message_id } = request.params;
         try {
-            await ThreadService.toggleMessageReaction(thread_id, message_id, userId, react_icon);
-            reply.send({ message: 'Success' });
+            const reaction = await ThreadService.toggleMessageReaction(thread_id, message_id, userId, react_icon);
+            reply.send(reaction);
         } catch (error) {
             console.error('Error adding reaction:', error);
             reply.code(500).send({ error: 'Internal server error' });

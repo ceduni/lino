@@ -22,7 +22,7 @@ server.register(fastifyJwt, { secret: process.env.JWT_SECRET_KEY });
 // @ts-ignore
 server.decorate('authenticate', async (request, reply) => {
     try {
-        await request.jwtVerify();
+        request.jwtVerify();
     } catch (err) {
         reply.send(err); // will send an error 401
     }
