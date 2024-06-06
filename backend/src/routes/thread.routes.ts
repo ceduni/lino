@@ -1,25 +1,26 @@
 import { FastifyInstance } from 'fastify';
 import Thread from '../models/thread.model';
 import ThreadService from '../services/thread.service';
+import UserService from "../services/user.service";
 
 export default async function threadRoutes(server: FastifyInstance) {
-    server.get('/threads/:book_id', async (request, reply) => {
+    server.get('/threads/search', async (request, reply) => {
         // @ts-ignore
-        const threads = await Thread.find({ book_id: request.params.book_id });
+        const threads = await ThreadService.searchThreads(request);
         reply.send(threads);
     });
 
     // @ts-ignore
     server.post('/threads/new', { preHandler: server.authenticate }, async (request, reply) => {
         // @ts-ignore
-        const userId = request.user.id;
-        if (!userId) {
+        const username = await UserService.getUserName(request.user.id);
+        if (!username) {
             reply.code(401).send({ error: 'Unauthorized' });
             return;
         }
         // @ts-ignore
         const { book_title, title } = request.body;
-        const thread = await ThreadService.createThread(book_title, userId, title);
+        const thread = await ThreadService.createThread(book_title, username, title);
         reply.send(thread._id);
     });
 
@@ -32,8 +33,8 @@ export default async function threadRoutes(server: FastifyInstance) {
             return;
         }
         // @ts-ignore
-        const userId = request.user.id;
-        if (!userId) {
+        const username = await UserService.getUserName(request.user.id);
+        if (!username) {
             reply.code(401).send({ error: 'Unauthorized' });
             return;
         }
@@ -41,7 +42,7 @@ export default async function threadRoutes(server: FastifyInstance) {
         const { content, responds_to } = request.body;
         // @ts-ignore
         const threadId = request.params.thread_id;
-        const message = await ThreadService.addThreadMessage(threadId, userId, content, responds_to);
+        const message = await ThreadService.addThreadMessage(threadId, username, content, responds_to);
         reply.send(message._id);
     });
 
@@ -49,8 +50,8 @@ export default async function threadRoutes(server: FastifyInstance) {
     // @ts-ignore
     server.post('/threads/:thread_id/messages/:message_id/reactions', { preHandler: server.authenticate }, async (request, reply) => {
         // @ts-ignore
-        const userId = request.user.id;
-        if (!userId) {
+        const username = await UserService.getUserName(request.user.id);
+        if (!username) {
             reply.code(401).send({ error: 'Unauthorized' });
             return;
         }
@@ -59,7 +60,7 @@ export default async function threadRoutes(server: FastifyInstance) {
         // @ts-ignore
         const { thread_id, message_id } = request.params;
         try {
-            const reaction = await ThreadService.toggleMessageReaction(thread_id, message_id, userId, react_icon);
+            const reaction = await ThreadService.toggleMessageReaction(thread_id, message_id, username, react_icon);
             reply.send(reaction);
         } catch (error) {
             console.error('Error adding reaction:', error);

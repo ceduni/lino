@@ -55,32 +55,12 @@ export default async function bookRoutes(server: FastifyInstance) {
     });
 
 
-    // @ts-ignore
-    // API Endpoint: Get Books by ISBN
-    server.get('/books/:isbn', async (request, reply) => {
-        try {
-            // @ts-ignore
-            const books = await Book.find({ isbn: request.params.isbn });
-            reply.send(books);
-        } catch (error) {
-            console.error('Error getting books:', error);
-            reply.code(500).send({ error: 'Internal server error' });
-        }
-    });
-
 
     // API Endpoint: Research all books of the database (with optional genre query)
     // @ts-ignore
-    server.get('/books', async (request, reply) => {
+    server.get('/books/search', async (request, reply) => {
         try {
-            // @ts-ignore
-            const genre = request.query.genre;
-            let books;
-            if (genre) {
-                books = await Book.find({ categories: genre });
-            } else {
-                books = await Book.find();
-            }
+            const books = await BookService.searchBooks(request);
             reply.send(books);
         } catch (error) {
             console.error('Error getting books:', error);

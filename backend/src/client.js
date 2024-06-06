@@ -184,7 +184,7 @@ async function testReactToMessage(token, threadId, messageId) {
 }
 
 
-async function test() {
+async function gigaMainTest() {
     // Register a new user
     await testRegister();
     console.log('Registration successful!');
@@ -236,8 +236,36 @@ async function test() {
 
 }
 
-test();
+async function testSearchBooks() {
+    try {
+        const bf = encodeURIComponent(true);
+        const py = encodeURIComponent(1900);
+        const cls = encodeURIComponent('by year');
+        const asc = encodeURIComponent(false);
+        const response = await axios.get(`${BASE_URL}/books/search?cls=${cls}&asc=${asc}`);
+        console.log(response.data);
+    } catch (error) {
+        console.error(error.response.data);
+    }
+}
 
+async function testSearchThreads() {
+    try {
+        const q = encodeURIComponent('Spoilers');
+        const response = await axios.get(`${BASE_URL}/threads/search?q=${q}`);
+        console.log(response.data);
+    } catch (error) {
+        console.error(error.response.data);
+    }
+}
+
+async function smolTest() {
+    await testSearchBooks();
+    await testSearchThreads();
+    console.log('Search successful!');
+}
+
+smolTest();
 
 
 

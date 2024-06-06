@@ -2,11 +2,11 @@ import mongoose from 'mongoose';
 
 const reactSchema = new mongoose.Schema({
     react_icon : {type: String, required: true}, // The path to the icon of the reaction
-    user_id : {type: String, required: true},
+    username : {type: String, required: true},
 });
 
 const messageSchema = new mongoose.Schema({
-    user_id: { type: String, required: true }, // The id of the user who sent the message
+    username: { type: String, required: true }, // The username of the user who sent the message
     timestamp: { type: Date, default: Date.now },
     content: { type: String, required: true },
     reactions : {type: [reactSchema], default: []}, // Array of reactions
@@ -15,7 +15,7 @@ const messageSchema = new mongoose.Schema({
 
 const threadSchema = new mongoose.Schema({
     book_title: { type: String, required: true },
-    user_id: { type: String, required: true },
+    username: { type: String, required: true },
     title: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
     messages: { type: [messageSchema], default: [] }

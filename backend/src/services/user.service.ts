@@ -9,6 +9,9 @@ const UserService = {
     // User service to register a new user's account
     async registerUser(userData: any) {
         const { username, email, phone, password } = userData;
+        if (username === 'guest') {
+            throw new Error('Username not allowed');
+        }
 
         // Check if username already exists
         const existingUser = await User.findOne({ username });
@@ -108,6 +111,14 @@ const UserService = {
             throw new Error('User not found');
         }
         return user.ecologicalImpact;
+    },
+
+    async getUserName(userId: string) {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        return user.username;
     }
 };
 

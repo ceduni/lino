@@ -10,8 +10,8 @@ const bookSchema = new mongoose.Schema({
     categories: [String],
     parutionYear: Number,
     pages: Number,
-    taken_history: [{ user_id: String, timestamp: { type: Date, default: Date.now } }],
-    given_history: [{ user_id: String, timestamp: { type: Date, default: Date.now } }],
+    taken_history: [{ username: String, timestamp: { type: Date, default: Date.now } }],
+    given_history: [{ username: String, timestamp: { type: Date, default: Date.now } }],
     date_last_action: { type: Date, default: Date.now }
 });
 

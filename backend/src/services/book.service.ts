@@ -98,16 +98,21 @@ const bookService = {
         if (request.user) {
             // @ts-ignore
             const userId = request.user.id;
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
+            const username = user.username;
             if (given) {
-                book.given_history.push({user_id: userId, timestamp: new Date()});
+                book.given_history.push({username: username, timestamp: new Date()});
             } else {
-                book.taken_history.push({user_id: userId, timestamp: new Date()});
+                book.taken_history.push({username: username, timestamp: new Date()});
             }
         } else {
             if (given) {
-                book.given_history.push({user_id: "guest", timestamp: new Date()});
+                book.given_history.push({username: "guest", timestamp: new Date()});
             } else {
-                book.taken_history.push({user_id: "guest", timestamp: new Date()});
+                book.taken_history.push({username: "guest", timestamp: new Date()});
             }
         }
         const books : any = await Book.find({isbn: book.isbn});
@@ -134,7 +139,109 @@ const bookService = {
             parutionYear: bookInfo.publishedDate,
             categories: bookInfo.categories,
         });
-    }
+    },
+
+
+    // Helper function to get specific books from the database
+    async searchBooks(request : any) {
+        const categories = request.query.cat;
+        let books;
+        if (categories) {
+            books = await Book.find({ categories: categories });
+        } else {
+            books = await Book.find();
+        }
+        const keywords = request.query.kw;
+        if (keywords) {
+            books = books.filter((book) => {
+                return book.title.includes(keywords) || book.authors.includes(keywords);
+            });
+        }
+        const pmt = request.query.pmt; // a bool to determine whether we want the books with more or less than X pages
+        const pg = request.query.pg; // the number of pages
+        if (pmt && pg) {
+            if (pmt) {
+                books = books.filter((book) => {
+                    // @ts-ignore
+                    return book.pages >= pg;
+                });
+            } else {
+                books = books.filter((book) => {
+                    // @ts-ignore
+                    return book.pages <= pg;
+                });
+            }
+        }
+        const bf = request.query.bf; // a bool to determine whether we want the books before or after X year
+        const py = request.query.py; // the year
+        if (bf && py) {
+            if (bf) {
+                books = books.filter((book) => {
+                    // @ts-ignore
+                    return book.parutionYear <= py;
+                });
+            } else {
+                books = books.filter((book) => {
+                    // @ts-ignore
+                    return book.parutionYear >= py;
+                });
+            }
+        }
+        const pub = request.query.pub; // the publisher
+        if (pub) {
+            books = books.filter((book) => {
+                // @ts-ignore
+                return book.publisher === pub;
+            });
+        }
+        // classify : ['by title', 'by author', 'by year', 'by most recent activity']
+        let classify = request.query.cls;
+        if (!classify) {
+            classify = 'by recent activity';
+        }
+        let asc = request.query.asc === 'true';
+        if (classify === 'by title') {
+            books.sort((a, b) => {
+                if (asc) {
+                    return a.title.localeCompare(b.title);
+                } else {
+                    return -a.title.localeCompare(b.title);
+                }
+            });
+        } else if (classify === 'by author') {
+            books.sort((a, b) => {
+                const aAuthor = a.authors[0] ?? 'anon';
+                const bAuthor = b.authors[0] ?? 'anon';
+                if (asc) {
+                    return aAuthor.localeCompare(bAuthor);
+                } else {
+                    return bAuthor.localeCompare(aAuthor);
+                }
+            });
+        } else if (classify === 'by year') {
+            books.sort((a, b) => {
+                const aYear = a.parutionYear ?? 0;
+                const bYear = b.parutionYear ?? 0;
+                if (asc) {
+                    return aYear - bYear;
+                } else {
+                    return bYear - aYear;
+                }
+            });
+        } else if (classify === 'by recent activity') {
+            books.sort((a, b) => {
+                const aDate = a.date_last_action?.getTime() ?? 0;
+                const bDate = b.date_last_action?.getTime() ?? 0;
+                if (asc) {
+                    return aDate - bDate;
+                } else {
+                    return bDate - aDate;
+                }
+            });
+        }
+        return books;
+    },
+
 };
 
 export default bookService;
