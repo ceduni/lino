@@ -57,7 +57,7 @@ a p { font-size: 1em; }
 
 li h3 { font-size: 1.2em; }
 
-a { text-decoration: none; }
+
 
 button { cursor: pointer; border: 0 none; background: none; outline: none; }
     button:disabled { cursor: default; }   

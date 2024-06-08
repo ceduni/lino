@@ -234,6 +234,175 @@
                 </div>
             </section>
 
+            <section class="week">
+                <header class="week-header">
+                    <h3 class="week-title">Semaine 4 &ndash;
+                        <time datetime="2024-05-13">mercredi 29 mai 2024</time>
+                    </h3>
+                    <p> Première itération du design et backend </p>
+                </header>
+                <div class="week-content">
+                    <h4 class="title">Design</h4>
+                    <ul>
+                        <li> METTRE PHOTO DU TABLEAU ICI </li>
+                    </ul>
+                    <p> 
+                        <a href="https://miro.com/app/board/uXjVKEYr8RA=/"> lien vers le Miro du design</a>
+                    </p>
+
+                    <h4 class="title"> schemas Backend </h4>
+                    <p>
+                        Nathan a implémenté différents schémas de donnés sur divers objets, voir la liste ci-dessous
+                    </p>
+
+
+                    <h5 class="title"> Livres </h5>
+                    <ul> 
+                        <li> ISBN - String </li>
+                        <li> Titre - String, required  </li>
+                        <li> description - String </li>
+                        <li> coverImage - String </li>
+                        <li> Authors - [String] </li>
+                        <li> publisher - String </li>
+                        <li> Categories - [String] </li>
+                        <li> parutionYear - Number </li>
+                        <li> pataken_history : [{ username: String, timestamp: { type: Date, default: Date.now}] </li>
+                        <li> given_history: [{ username: String, timestamp: { type: Date, default: Date.now } }] </li>
+                        <li> date_last_action: { type: Date, default: Date.now } </li>
+                    </ul>
+
+                    <h5 class="title"> Livres </h5>
+                    <ul> 
+                        <li> location - Number </li>
+                        <li> infoText - String  </li>
+                        <li> books: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }] </li>
+                    </ul>
+
+                    <h5 class="title"> Réaction </h5>
+                    <p>
+                        Les réactions sont prévues pour ajouter de la saveur et de la vie aux messages des threads, l'icône de la réaction est une String car c'est un path vers le fichier de l'icône de la réaction
+                    </p>
+                    <ul> 
+                        <li> react_icon : {type: String, required: true} </li>
+                        <li> username : {type: String, required: true} </li>
+                    </ul>
+
+                    <h5 class="title"> Message </h5>
+                    <p>
+                        Utilisé dans les threads aussi, la structure des messages : 
+                    </p>
+                    <ul> 
+                        <li> username: { type: String, required: true } </li>
+                        <li> timestamp: { type: Date, default: Date.now } </li>
+                        <li> content: { type: String, required: true }   </li>
+                        <li> reactions : {type: [reactSchema], default: []} </li>
+                        <li> responds_to : {type: String, default: ''} </li>
+                    </ul>
+                    
+                    <h5 class="title"> Thread </h5>
+                    <p>
+                        Un thread doit absolument contenir <b> le nom de l'utilisateur qui a posté le thread </b>, <b> le nom du livre concerné </b> et <b> un titre </b>, comme détaillé dans la structure plus bas
+                    </p>
+                    <ul> 
+                        <li> book_title: { type: String, required: true } </li>
+                        <li> username: { type: String, required: true } </li>
+                        <li> title: { type: String, required: true }   </li>
+                        <li> timestamp: { type: Date, default: Date.now } </li>
+                        <li> messages: { type: [messageSchema], default: [] </li>
+                    </ul>
+
+                    <h5 class="title"> Utilisateur </h5>
+                    <ul> 
+                        <li> username: { type: String, required: true, unique: true } </li>
+                        <li> email : { type: String, required: true, unique: true } </li>
+                        <li> phone: {type: String}  </li>
+                        <li> favoriteBooks: [String] </li>
+                        <li> trackedBooks: [mongoose.Schema.Types.ObjectId] </li>
+                        <li> preferredCategories: [String], </li>
+                        <li> preferredAuthors: [String] </li>
+                        <li> ecologicalImpact </li>
+                        <ul>
+                            <li> carbonSavings: { type: Number, default: 0 } </li>
+                            <li> savedWater: { type: Number, default: 0 } </li>
+                            <li> savedTrees: { type: Number, default: 0 } </li>
+                        </ul>
+                    </ul>
+                    <p>
+                        Le mot de passe sera hashé selon l'algorythme ...  
+                            <br>
+                        Le "savedTrees" est discuté car avec un arbre, on peut produire en moyenne 196 livre par arbre 
+                        (<a href="https://www.recyclivre.com/page/chiffres"> source </a>), ce n'est donc pas un indicateur pertinent
+                            <br>
+                        "Tracked books" sont les livres que l'utilisateur a demandé à la communauté ou marqué comme étant désiré, une notification apparaîtra sur son 
+                        appareil quand ce livre arrivera dans une boîte à livre
+                    </p>
+
+                    <br>
+
+                    <h5 class="title"> Fonctions implémentées (livres) </h5>
+                    <ul> 
+                        <li> getBookfromBookBox </li>
+                        <p> recupère livre d'une des bookBoxs en utilisant son id </p>
+
+                        <li> addExistingBook </li>
+                        <p> Ajoute un livre en utilisat son id </p>
+
+                        <li> updateEcoImpact </li>
+                        <p> ajoute au compte de l'utilisateur l'eau, les arbres et l'impact carbone sauvé par le livre qu'il a emprunté ou déposé, il ne peut pas utiliser deux fois le même livre </p>
+
+                        <li> updateBooks </li>
+                        <p> Met à jour les livres dans une BookBox </p>
+
+                        <li> getBooksFromISbn </li>
+                        <p> fetch un livre avec googleAPI et l'ISBN donné  </p>
+
+                        <li> searchBooks </li>
+                        <p> filtre les livres selon plusieurs critères </p>
+                    </ul>          
+                    
+                    <h5 class="title"> Fonctions implémentées (threads) </h5>
+                    <ul> 
+                        <li> getBookfromBookBox </li>
+                        <p> recupère livre d'une des bookBoxs en utilisant son id </p>
+
+                        <li> addExistingBook </li>
+                        <p> Ajoute un livre en utilisat son id </p>
+
+                        <li> updateEcoImpact </li>
+                        <p> ajoute au compte de l'utilisateur l'eau, les arbres et l'impact carbone sauvé par le livre qu'il a emprunté ou déposé, il ne peut pas utiliser deux fois le même livre </p>
+
+                        <li> updateBooks </li>
+                        <p> Met à jour les livres dans une BookBox </p>
+
+                        <li> getBooksFromISbn </li>
+                        <p> fetch un livre avec googleAPI et l'ISBN donné  </p>
+
+                        <li> searchBooks </li>
+                        <p> filtre les livres selon plusieurs critères </p>
+                    </ul>      
+
+                    <br>
+                    <br>
+
+                    <h4 class="title"> Première itération du design </h4>
+                    <img style="display:-ms-grid" src="images/design_version_1.png" width="1000"  alt="Logo Lino" />
+
+                    <br>
+                    <br>    
+
+                    <h4 class="title">Notes</h4>
+                    <p> 
+                        Refresh tokens
+                            <br>
+                        Ne pas oublier la technologie NFC 
+                            <br>
+                        Ajouter des recommendations quand l'on emprunte un livre ou quand l'on en recherche un
+                            <br>
+                        Ajouter un feedback après le fetch des informations du livres avec google lens
+                    </p>
+                </div>
+            </section>
+
         </section>
     </main>
 
