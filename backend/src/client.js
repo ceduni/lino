@@ -259,6 +259,10 @@ async function testSearchThreads() {
     }
 }
 
+async function testSendNotification() {
+
+}
+
 async function smolTest() {
     await testSearchBooks();
     await testSearchThreads();

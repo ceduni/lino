@@ -3,6 +3,8 @@ import Book from "../models/book.model";
 import mongoose from "mongoose";
 import User from "../models/user.model";
 import BookBox from "../models/bookbox.model";
+import {notifyUser} from "./user.service";
+import BookModel from "../models/book.model";
 
 const bookService = {
     // Helper function to fetch or create a book
@@ -25,6 +27,7 @@ const bookService = {
         }
         bookBox.books.push(book._id);
         await this.updateBooks(book, request, true);
+        await this.notifyAllUsers(book, 'added to', bookBox.name);
         await book.save();
         await bookBox.save();
         await this.updateUserEcoImpact(request, book._id.toString());
@@ -41,6 +44,7 @@ const bookService = {
         if (!bookBox) {
             throw new Error('Bookbox not found');
         }
+        await this.notifyAllUsers(book, 'added to', bookBox.name);
         bookBox.books.push(book._id);
         await book.save();
         await bookBox.save();
@@ -63,6 +67,7 @@ const bookService = {
         } else {
             throw new Error('Book not found in bookbox');
         }
+        await this.notifyAllUsers(book, 'removed from', bookBox.name);
         await book.save();
         await bookBox.save();
         await this.updateUserEcoImpact(request, book._id.toString());
@@ -241,6 +246,47 @@ const bookService = {
         }
         return books;
     },
+
+    async getBookRelevance(book: any, user: any) {
+        const keywords = user.notificationKeyWords;
+        // check keywords in book title
+        let relevance = 0;
+        for (let i = 0; i < keywords.length; i++) {
+            const keywordRegex = new RegExp(keywords[i], 'i');
+            if (keywordRegex.test(book.title)) {
+                relevance++;
+            }
+        }
+        // check keywords in book authors
+        for (let i = 0; i < keywords.length; i++) {
+            const keywordRegex = new RegExp(keywords[i], 'i');
+            for (let j = 0; j < book.authors.length; j++) {
+                if (keywordRegex.test(book.authors[j])) {
+                    relevance++;
+                }
+            }
+        }
+        // check keywords in book categories
+        for (let i = 0; i < keywords.length; i++) {
+            const keywordRegex = new RegExp(keywords[i], 'i');
+            for (let j = 0; j < book.categories.length; j++) {
+                if (keywordRegex.test(book.categories[j])) {
+                    relevance++;
+                }
+            }
+        }
+        return relevance;
+    },
+
+    async notifyAllUsers(book: any, action: string, bookBoxName: string) {
+        const users = await User.find();
+        for (let i = 0; i < users.length; i++) {
+            const relevance = await this.getBookRelevance(book, users[i]);
+            if (relevance > 0) {
+                await notifyUser(users[i].username, `The book "${book.title}" has been ${action} the bookbox ${bookBoxName}.`);
+            }
+        }
+    }
 
 };
 

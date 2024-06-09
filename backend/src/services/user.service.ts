@@ -56,12 +56,15 @@ const UserService = {
 
     // User service to add a book's ISBN to a user's favorites
     async addToFavorites(userId: string, id: string) {
-        const user = await User.findById(userId);
+        let user = await User.findById(userId);
+        if (!user) {
+            user = await User.findOne({ username: userId });
+        }
         if (!user) {
             throw new Error('User not found');
         }
         if (user.favoriteBooks.includes(id)) {
-            throw new Error('Book already in favorites');
+            return;
         }
         user.favoriteBooks.push(id);
         await user.save();
@@ -71,13 +74,16 @@ const UserService = {
 
     // User service to remove a book's ISBN from a user's favorites
     async removeFromFavorites(userId: string, id: string) {
-        const user = await User.findById(userId);
+        let user = await User.findById(userId);
+        if (!user) {
+            user = await User.findOne({ username: userId });
+        }
         if (!user) {
             throw new Error('User not found');
         }
         const index = user.favoriteBooks.indexOf(id);
         if (index === -1) {
-            throw new Error('Book not in favorites');
+            return;
         }
         user.favoriteBooks.splice(index, 1);
         await user.save();
@@ -87,15 +93,18 @@ const UserService = {
 
     // User service to get the infos of the user's favorite books thanks to their ISBN
     async getFavorites(userId: string) {
-        const user = await User.findById(userId);
+        let user = await User.findById(userId);
+        if (!user) {
+            user = await User.findOne({ username: userId });
+        }
         if (!user) {
             throw new Error('User not found');
         }
         // array to store the favorite books
         const favoriteBooks = [];
-        for (const isbn of user.favoriteBooks) {
+        for (const bookId of user.favoriteBooks) {
             // @ts-ignore
-            const book = await Book.findOne({ isbn });
+            const book = await Book.findById(bookId);
             if (book) {
                 favoriteBooks.push(book);
             }
@@ -119,7 +128,22 @@ const UserService = {
             throw new Error('User not found');
         }
         return user.username;
-    }
+    },
+
+
 };
+
+export async function notifyUser(userId: string, message: string) {
+    let user = await User.findById(userId);
+    if (!user) {
+        user = await User.findOne({ username: userId });
+    }
+    if (!user) {
+        throw new Error('User not found');
+    }
+    // @ts-ignore
+    const notification = { content: message };
+    user.notifications.push(notification);
+}
 
 export default UserService;

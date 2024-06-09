@@ -1,4 +1,5 @@
 import Thread from "../models/thread.model";
+import {notifyUser} from "./user.service";
 
 const ThreadService = {
     async createThread(book_title : string, username : string, title : string) {
@@ -25,6 +26,20 @@ const ThreadService = {
         };
         thread.messages.push(message);
         await thread.save();
+
+        // Notify the user that their message has been added
+        if (respondsTo) {
+            // Notify the user that their message has been added
+            // @ts-ignore
+            const parentMessage = thread.messages.id(respondsTo);
+            if (!parentMessage) {
+                throw new Error('Parent message not found');
+            }
+            if (parentMessage.username !== username) {
+                // @ts-ignore
+                await notifyUser(parentMessage.username, `${username} responded to your message in the thread "${thread.title}"`);
+            }
+        }
 
         // Get the _id of the newly created message
         const messageId = thread.messages[thread.messages.length - 1]._id;
