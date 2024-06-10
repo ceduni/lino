@@ -17,7 +17,8 @@ export default async function bookRoutes(server: FastifyInstance) {
             }
         } catch (error) {
             console.error('Error adding book:', error);
-            reply.code(500).send({ error: 'Internal server error' });
+            // @ts-ignore
+            reply.code(400).send({ error: error.message });
         }
     });
 
@@ -68,4 +69,15 @@ export default async function bookRoutes(server: FastifyInstance) {
         }
     });
 
+    // API Endpoint: Clear collection
+    // @ts-ignore
+    server.delete('/books/clear', async (request, reply) => {
+        try {
+            await BookService.clearCollection();
+            reply.send({ message: 'Collection cleared' });
+        } catch (error) {
+            console.error('Error clearing collection:', error);
+            reply.code(500).send({ error: 'Internal server error' });
+        }
+    });
 }

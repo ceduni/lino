@@ -1,5 +1,6 @@
 import Thread from "../models/thread.model";
 import {notifyUser} from "./user.service";
+import User from "../models/user.model";
 
 const ThreadService = {
     async createThread(book_title : string, username : string, title : string) {
@@ -36,8 +37,12 @@ const ThreadService = {
                 throw new Error('Parent message not found');
             }
             if (parentMessage.username !== username) {
+                const userParent = await User.findOne({ username: parentMessage.username });
+                if (!userParent) {
+                    throw new Error('User not found');
+                }
                 // @ts-ignore
-                await notifyUser(parentMessage.username, `${username} responded to your message in the thread "${thread.title}"`);
+                await notifyUser(userParent.id, `${username} responded to your message in the thread "${thread.title}"`);
             }
         }
 
@@ -102,8 +107,11 @@ const ThreadService = {
         }
 
         return threads;
-    }
+    },
 
+    async clearCollection() {
+        await Thread.deleteMany({});
+    }
 }
 
 

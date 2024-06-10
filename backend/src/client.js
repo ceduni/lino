@@ -18,6 +18,70 @@ async function testRegister() {
     }
 }
 
+async function testRegister2() {
+    const username = 'Nathan';
+    const email = 'natrazaf2022@gmail.com';
+    const password = 'J2s3jAsd';
+    try {
+        const response = await axios.post(`${BASE_URL}/user/register`, {
+            username,
+            email,
+            password
+        });
+        console.log(response.data);
+    } catch (error) {
+        console.error(error.response.data);
+    }
+}
+
+async function testLogin2() {
+    const identifier = 'Nathan';
+    const password = 'J2s3jAsd';
+    try {
+        const response = await axios.post(`${BASE_URL}/user/login`, {
+            identifier,
+            password
+        });
+        console.log(response.data);
+        return response.data.token;
+    } catch (error) {
+        console.error(error.response.data);
+        return null;
+
+    }
+}
+
+async function testAddKeyWords(token) {
+    try {
+        const response = await axios.post(`${BASE_URL}/user/keywords`,
+            {
+                keywords : "gatsby,charles,harry potter"
+            }
+            , {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        console.log(response.data);
+    } catch (error) {
+        console.error(error.response.data);
+    }
+}
+
+async function testRemoveKeyWord(token) {
+    try {
+        const response = await axios.delete(`${BASE_URL}/user/keywords/charles`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+        console.log(response.data);
+    } catch (error) {
+        console.error(error.response.data);
+    }
+}
+
 async function testLogin() {
     const identifier = 'Asp3rity';
     const password = 'J2s3jAsd';
@@ -185,12 +249,32 @@ async function testReactToMessage(token, threadId, messageId) {
 
 
 async function gigaMainTest() {
+    await clearCollections();
     // Register a new user
     await testRegister();
     console.log('Registration successful!');
     await delay(1000);
+    // Register another user
+    await testRegister2();
+    console.log('Registration successful!');
+    await delay(1000);
     // Log in with the registered user
-    const token = await testLogin();
+    let token = await testLogin2();
+    if (!token) {
+        console.error('Login failed, exiting...');
+        return;
+    }
+    console.log('Login successful! : ', token);
+    await delay(1000);
+    // Add keywords to the user's profile
+    await testAddKeyWords(token);
+    console.log('Keywords added successfully!');
+    await delay(1000);
+    // Remove a keyword from the user's profile
+    await testRemoveKeyWord(token);
+    console.log('Keyword removed successfully!');
+    // Log in with the registered user
+    token = await testLogin();
     if (!token) {
         console.error('Login failed, exiting...');
         return;
@@ -225,6 +309,12 @@ async function gigaMainTest() {
     const messageId = await testAddMessage(token, threadId);
     console.log('Message added successfully!');
     await delay(1000);
+    // Log in with the registered user
+    token = await testLogin2();
+    if (!token) {
+        console.error('Login failed, exiting...');
+        return;
+    }
     // Respond to the message
     const messageToReactId = await testRespondToMessage(token, threadId, messageId);
     console.log('Response added successfully!');
@@ -259,9 +349,6 @@ async function testSearchThreads() {
     }
 }
 
-async function testSendNotification() {
-
-}
 
 async function smolTest() {
     await testSearchBooks();
@@ -269,7 +356,7 @@ async function smolTest() {
     console.log('Search successful!');
 }
 
-smolTest();
+gigaMainTest();
 
 
 
@@ -277,4 +364,15 @@ smolTest();
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function clearCollections() {
+    try {
+        await axios.delete(`${BASE_URL}/user/clear`);
+        await axios.delete(`${BASE_URL}/threads/clear`);
+        await axios.delete(`${BASE_URL}/books/clear`);
+        console.log('Collections cleared successfully!');
+    } catch (error) {
+        console.error('Failed to clear collections:', error.response.data);
+    }
 }

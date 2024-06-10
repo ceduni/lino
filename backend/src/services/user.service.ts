@@ -37,7 +37,6 @@ const UserService = {
     // User service to log in a user if they exist (can log with either a username or an email)
     async loginUser(credentials: any) {
         const identifier = credentials.identifier;
-        console.log(credentials.identifier);
         const user = await User.findOne({ $or: [{ username : identifier }, { email : identifier }]});
         if (!user) {
             throw new Error('User not found');
@@ -58,9 +57,6 @@ const UserService = {
     async addToFavorites(userId: string, id: string) {
         let user = await User.findById(userId);
         if (!user) {
-            user = await User.findOne({ username: userId });
-        }
-        if (!user) {
             throw new Error('User not found');
         }
         if (user.favoriteBooks.includes(id)) {
@@ -75,9 +71,6 @@ const UserService = {
     // User service to remove a book's ISBN from a user's favorites
     async removeFromFavorites(userId: string, id: string) {
         let user = await User.findById(userId);
-        if (!user) {
-            user = await User.findOne({ username: userId });
-        }
         if (!user) {
             throw new Error('User not found');
         }
@@ -94,9 +87,6 @@ const UserService = {
     // User service to get the infos of the user's favorite books thanks to their ISBN
     async getFavorites(userId: string) {
         let user = await User.findById(userId);
-        if (!user) {
-            user = await User.findOne({ username: userId });
-        }
         if (!user) {
             throw new Error('User not found');
         }
@@ -131,19 +121,51 @@ const UserService = {
     },
 
 
+    async parseKeyWords(userId: string, text: string) {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const keyWords = user.notificationKeyWords;
+        const words = text.split(',');
+        for (const word of words) {
+            if (!keyWords.includes(word)) {
+                keyWords.push(word.trim());
+            }
+        }
+        await user.save();
+        return user;
+    },
+
+    async removeKeyWord(userId: string, text: string) {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const keyWords = user.notificationKeyWords;
+        const index = keyWords.indexOf(text);
+        if (index !== -1) {
+            keyWords.splice(index, 1);
+        }
+        await user.save();
+        return user;
+    },
+
+    async clearCollection() {
+        await User.deleteMany({});
+    }
 };
 
 export async function notifyUser(userId: string, message: string) {
     let user = await User.findById(userId);
-    if (!user) {
-        user = await User.findOne({ username: userId });
-    }
     if (!user) {
         throw new Error('User not found');
     }
     // @ts-ignore
     const notification = { content: message };
     user.notifications.push(notification);
+    await user.save();
+    return user;
 }
 
 export default UserService;
