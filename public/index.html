@@ -107,6 +107,10 @@
 
         <section class="content-wrapper">
             <h2>Infrastructure</h2>
+                <h4 class="title">Design</h4>
+                <p> 
+                    <a href="https://miro.com/app/board/uXjVKEYr8RA=/"> lien vers le Miro du design</a>
+                </p>
 
             <!-- TODO: Décrire l'infrastructure de l'application -->
         </section>
@@ -242,13 +246,6 @@
                     <p> Première itération du design et backend </p>
                 </header>
                 <div class="week-content">
-                    <h4 class="title">Design</h4>
-                    <ul>
-                        <li> METTRE PHOTO DU TABLEAU ICI </li>
-                    </ul>
-                    <p> 
-                        <a href="https://miro.com/app/board/uXjVKEYr8RA=/"> lien vers le Miro du design</a>
-                    </p>
 
                     <h4 class="title"> schemas Backend </h4>
                     <p>
@@ -362,17 +359,17 @@
                     
                     <h5 class="title"> Fonctions implémentées (threads) </h5>
                     <ul> 
-                        <li> getBookfromBookBox </li>
-                        <p> recupère livre d'une des bookBoxs en utilisant son id </p>
+                        <li> createThread </li>
+                        <p> Crée un thread avec un titre, un livre, username, etc. </p>
 
-                        <li> addExistingBook </li>
-                        <p> Ajoute un livre en utilisat son id </p>
+                        <li> addThreadMessage </li>
+                        <p> Ajoute un message à un thread </p>
 
-                        <li> updateEcoImpact </li>
-                        <p> ajoute au compte de l'utilisateur l'eau, les arbres et l'impact carbone sauvé par le livre qu'il a emprunté ou déposé, il ne peut pas utiliser deux fois le même livre </p>
+                        <li> toggleMessageReaction </li>
+                        <p> find the thread, message, then add the reaction </p>
 
-                        <li> updateBooks </li>
-                        <p> Met à jour les livres dans une BookBox </p>
+                        <li> searchThreads </li>
+                        <p> Selon des critères,  </p>
 
                         <li> getBooksFromISbn </li>
                         <p> fetch un livre avec googleAPI et l'ISBN donné  </p>
@@ -380,6 +377,27 @@
                         <li> searchBooks </li>
                         <p> filtre les livres selon plusieurs critères </p>
                     </ul>      
+
+                    <h5 class="title"> Fonctions implémentées (utilisateur) </h5>
+                    <ul> 
+                        <li> loginUser </li>
+                        <p> vérifie si l'utilisateur entré correspond au mot de passe et donne log in l'uitlisateur via un token </p>
+
+                        <li> addToFavourites </li>
+                        <p> ajoute un livre aux favoris de l'utilisateur </p>
+
+                        <li> removeFromFavourites </li>
+                        <p> enlève un livre des favoris de l'utilisateur </p>
+
+                        <li> getFavourites </li>
+                        <p> Renvoie les favoris </p>
+
+                        <li> getEcologicalImpacct </li>
+                        <p> renvoie l'impact écologique </p>
+
+                        <li> getUserName </li>
+                        <p> ernvoie le nom d'utilisateur par l'id d'utilisateur </p>
+                    </ul>   
 
                     <br>
                     <br>
