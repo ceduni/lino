@@ -259,80 +259,10 @@
                         Nathan a implémenté différents schémas de donnés sur divers objets, voir la liste ci-dessous
                     </p>
 
+                    <h5>(Image du diagramme de classes simplifié)</h5>
 
-                    <h5 class="title"> Livres </h5>
-                    <ul> 
-                        <li> ISBN - String </li>
-                        <li> Titre - String, required  </li>
-                        <li> description - String </li>
-                        <li> coverImage - String </li>
-                        <li> Authors - [String] </li>
-                        <li> publisher - String </li>
-                        <li> Categories - [String] </li>
-                        <li> parutionYear - Number </li>
-                        <li> pataken_history : [{ username: String, timestamp: { type: Date, default: Date.now}] </li>
-                        <li> given_history: [{ username: String, timestamp: { type: Date, default: Date.now } }] </li>
-                        <li> date_last_action: { type: Date, default: Date.now } </li>
-                    </ul>
-
-                    <h5 class="title"> Livres </h5>
-                    <ul> 
-                        <li> location - Number </li>
-                        <li> infoText - String  </li>
-                        <li> books: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }] </li>
-                    </ul>
-
-                    <h5 class="title"> Réaction </h5>
                     <p>
-                        Les réactions sont prévues pour ajouter de la saveur et de la vie aux messages des threads, l'icône de la réaction est une String car c'est un path vers le fichier de l'icône de la réaction
-                    </p>
-                    <ul> 
-                        <li> react_icon : {type: String, required: true} </li>
-                        <li> username : {type: String, required: true} </li>
-                    </ul>
-
-                    <h5 class="title"> Message </h5>
-                    <p>
-                        Utilisé dans les threads aussi, la structure des messages : 
-                    </p>
-                    <ul> 
-                        <li> username: { type: String, required: true } </li>
-                        <li> timestamp: { type: Date, default: Date.now } </li>
-                        <li> content: { type: String, required: true }   </li>
-                        <li> reactions : {type: [reactSchema], default: []} </li>
-                        <li> responds_to : {type: String, default: ''} </li>
-                    </ul>
-                    
-                    <h5 class="title"> Thread </h5>
-                    <p>
-                        Un thread doit absolument contenir <b> le nom de l'utilisateur qui a posté le thread </b>, <b> le nom du livre concerné </b> et <b> un titre </b>, comme détaillé dans la structure plus bas
-                    </p>
-                    <ul> 
-                        <li> book_title: { type: String, required: true } </li>
-                        <li> username: { type: String, required: true } </li>
-                        <li> title: { type: String, required: true }   </li>
-                        <li> timestamp: { type: Date, default: Date.now } </li>
-                        <li> messages: { type: [messageSchema], default: [] </li>
-                    </ul>
-
-                    <h5 class="title"> Utilisateur </h5>
-                    <ul> 
-                        <li> username: { type: String, required: true, unique: true } </li>
-                        <li> email : { type: String, required: true, unique: true } </li>
-                        <li> phone: {type: String}  </li>
-                        <li> favoriteBooks: [String] </li>
-                        <li> trackedBooks: [mongoose.Schema.Types.ObjectId] </li>
-                        <li> preferredCategories: [String], </li>
-                        <li> preferredAuthors: [String] </li>
-                        <li> ecologicalImpact </li>
-                        <ul>
-                            <li> carbonSavings: { type: Number, default: 0 } </li>
-                            <li> savedWater: { type: Number, default: 0 } </li>
-                            <li> savedTrees: { type: Number, default: 0 } </li>
-                        </ul>
-                    </ul>
-                    <p>
-                        Le mot de passe sera hashé selon l'algorythme ...  
+                        Le mot de passe sera hashé selon l'algorithme de la librairie Argon2
                             <br>
                         Le "savedTrees" est discuté car avec un arbre, on peut produire en moyenne 196 livre par arbre 
                         (<a href="https://www.recyclivre.com/page/chiffres"> source </a>), ce n'est donc pas un indicateur pertinent
@@ -448,8 +378,17 @@
                         <li> condenser le menu </li>
                     </ul>
 
+                    <h4 class="title">Développement de tests unitaires dans l'API</h4>
+                    <ul>
+                        <li>Oui</li>
+                    </ul>
+
+                    <h4 class="title">Architecture de l'application</h4>
+                    <p>Image schématique de l'architecture</p>
+
                     <h4 class="title">Notes</h4>
-                    <p> 
+                    <p>
+                        Abandon de l'idée des refresh tokens
                         Beaucoup de discussions sur le design et un peu sur la portée du projet
                     </p>
                 </div>
