@@ -333,6 +333,17 @@ const bookService = {
 
     },
 
+
+    async alertUsers(username: string, title: string) {
+        const users = await User.find({getAlerted: true});
+        for (let i = 0; i < users.length; i++) {
+            if (users[i].username !== username) {
+                await notifyUser(users[i].id, `The user ${username} wants to get the book "${title}" ! 
+                If you have it, please feel free to add it to one of our book boxes !`);
+            }
+        }
+    },
+
     async clearCollection() {
         await Book.deleteMany({});
         const bookBoxes = await BookBox.find();

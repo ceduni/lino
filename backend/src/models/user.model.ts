@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
         savedTrees: { type: Number, default: 0 } // 0.005 trees per saved book
     },
     notifications: {type: [notificationSchema], default: []},
+    getAlerted: { type: Boolean, default: true },
 });
 
 const User = mongoose.model('User', userSchema, "users");

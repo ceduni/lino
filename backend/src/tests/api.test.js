@@ -26,7 +26,7 @@ beforeAll(async () => {
 
 let portedBookId;
 let token;
-
+let portedBookIds = [];
 
 describe('Test user registration', () => {
 
@@ -327,6 +327,7 @@ describe('Test book actions by connected users', () => {
 
 
 describe('Test book searching among the database', () => {
+
     test('Search all books', async () => {
         const response = await server.inject({
             method: 'GET',
@@ -365,7 +366,7 @@ describe('Test book searching among the database', () => {
                 url: `/book/${isbns[i]}`
             });
             const payload = JSON.parse(book.payload);
-            await server.inject({
+            const response = await server.inject({
                 method: 'POST',
                 url: `/book/${bbids[i%bbids.length]}`, // alternate between the book boxes
                 payload: {
@@ -380,6 +381,10 @@ describe('Test book searching among the database', () => {
                     categories: payload.categories
                 }
             });
+            const responsePayload = JSON.parse(response.payload);
+            expect(response.statusCode).toBe(200);
+            expect(responsePayload).toHaveProperty('bookId');
+            portedBookIds.push(responsePayload.bookId);
         }
     }, 10000);
 
@@ -469,6 +474,14 @@ describe('Test book searching among the database', () => {
             const date2 = new Date(payload.books[i+1].date_last_action);
             expect(date1.getTime()).toBeLessThanOrEqual(date2.getTime());
         }
+    });
+});
+
+
+describe('Tests for thread creation and interaction', () => {
+
+    test('Create a thread on a book', async () => {
+
     });
 });
 
