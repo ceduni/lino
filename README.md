@@ -16,6 +16,7 @@ Lino est un projet visant à **bonifier l'initiative des boîtes à livres et en
 - **Développer la structure du réseau**: L'application doit permettre aux étudiants d'exprimer leurs préférences littéraires et simplifier leur mise en relation.
 - **Encadrer l'organisation d'activités littéraires**: L'application doit faciliter l'organisation et la communication d'activités et d'évènements littéraires.
 
+## Fonctionnalités📱
 
 ## 📅 Échéancier
 
