@@ -1,9 +1,15 @@
 import Thread from "../models/thread.model";
 import {notifyUser} from "./user.service";
 import User from "../models/user.model";
+import BookService from "./book.service";
 
 const ThreadService = {
-    async createThread(book_title : string, username : string, title : string) {
+    async createThread(book_id : string, username : string, title : string) {
+        const book = await BookService.getBook(book_id);
+        if (!book) {
+            throw new Error('Book not found');
+        }
+        const book_title = book.title;
         const thread = new Thread({
             book_title: book_title,
             username: username,
@@ -75,7 +81,11 @@ const ThreadService = {
         }
 
         await thread.save();
-        return message.reactions[message.reactions.length - 1];
+        if (message.reactions.length > 0) {
+            return message.reactions[message.reactions.length - 1];
+        } else {
+            return null;
+        }
     },
 
 

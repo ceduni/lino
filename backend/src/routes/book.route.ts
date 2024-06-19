@@ -85,7 +85,6 @@ export default async function bookRoutes(server: FastifyInstance) {
     });
 
 
-
     // API Endpoint: Research all books of the database (with quite a lot of filter queries)
     // @ts-ignore
     server.get('/books/search', async (request, reply) => {
@@ -97,6 +96,7 @@ export default async function bookRoutes(server: FastifyInstance) {
             reply.code(500).send({ error: 'Internal server error' });
         }
     });
+
 
     // API Endpoint: Clear collection
     // @ts-ignore

@@ -19,9 +19,9 @@ export default async function threadRoute(server: FastifyInstance) {
             return;
         }
         // @ts-ignore
-        const { book_title, title } = request.body;
-        const thread = await ThreadService.createThread(book_title, username, title);
-        reply.send(thread._id);
+        const { book_id, title } = request.body;
+        const thread = await ThreadService.createThread(book_id, username, title);
+        reply.send({threadId: thread._id});
     });
 
     // @ts-ignore
@@ -43,7 +43,7 @@ export default async function threadRoute(server: FastifyInstance) {
         // @ts-ignore
         const threadId = request.params.thread_id;
         const message = await ThreadService.addThreadMessage(threadId, username, content, responds_to);
-        reply.send(message._id);
+        reply.send({messageId: message._id});
     });
 
     // API Endpoint: Toggle Reaction to Message
@@ -61,7 +61,7 @@ export default async function threadRoute(server: FastifyInstance) {
         const { thread_id, message_id } = request.params;
         try {
             const reaction = await ThreadService.toggleMessageReaction(thread_id, message_id, username, react_icon);
-            reply.send(reaction);
+            reply.send({reaction : reaction});
         } catch (error) {
             console.error('Error adding reaction:', error);
             reply.code(500).send({ error: 'Internal server error' });
