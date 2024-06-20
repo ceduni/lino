@@ -25,6 +25,8 @@ beforeAll(async () => {
 });
 
 let portedBookId;
+let portedThreadId;
+let portedMessageId;
 let token;
 let portedBookIds = [];
 
@@ -49,6 +51,25 @@ describe('Test user registration', () => {
         expect(typeof payload.password).toBe('string');
     });
 
+    test('Registering another user', async () => {
+        const response = await server.inject({
+            method: 'POST',
+            url: '/user/register',
+            payload: {
+                email: 'test2@example.com',
+                password: 'password',
+                username: 'testuser2',
+                phone: '1234567890'
+            }
+        });
+        const payload = JSON.parse(response.payload);
+        expect(response.statusCode).toBe(200);
+        expect(payload).toHaveProperty('username');
+        expect(payload).toHaveProperty('password');
+        expect(payload.username).toBe('testuser2');
+        expect(typeof payload.password).toBe('string');
+    });
+
     test('Registering a user with an existing email', async () => {
         const response = await server.inject({
             method: 'POST',
@@ -56,7 +77,7 @@ describe('Test user registration', () => {
             payload: {
                 email: 'test@example.com',
                 password: 'password',
-                username: 'testuser2',
+                username: 'testuser3',
                 phone: '1234567890'
             }
         });
@@ -70,7 +91,7 @@ describe('Test user registration', () => {
             method: 'POST',
             url: '/user/register',
             payload: {
-                email: 'test2@example.com',
+                email: 'test3@example.com',
                 password: 'password',
                 username: 'testuser',
                 phone: '1234567890'
@@ -481,8 +502,101 @@ describe('Test book searching among the database', () => {
 describe('Tests for thread creation and interaction', () => {
 
     test('Create a thread on a book', async () => {
-
+        const response = await server.inject({
+            method: 'POST',
+            url: '/threads/new',
+            payload: {
+                book_id: portedBookId,
+                title: "Discussion about the book",
+                content: "What do you think about the book?"
+            },
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        const payload = JSON.parse(response.payload);
+        expect(response.statusCode).toBe(200);
+        expect(payload).toHaveProperty('threadId');
+        portedThreadId = payload.threadId;
     });
+
+    test('Add a message to a thread', async () => {
+        const response = await server.inject({
+            method: 'POST',
+            url: `/threads/${portedThreadId}/messages`,
+            payload: {
+                content: "I think the book is great!",
+            },
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        const payload = JSON.parse(response.payload);
+        expect(response.statusCode).toBe(200);
+        expect(payload).toHaveProperty('messageId');
+        portedMessageId = payload.messageId;
+    });
+
+    test('Add a message that responds to the precedent message', async () => {
+        const newLogin = await server.inject({
+            method: 'POST',
+            url: '/user/login',
+            payload: {
+                identifier: 'testuser2',
+                password: 'password'
+            }
+        });
+        const newToken = JSON.parse(newLogin.payload).token;
+        const response = await server.inject({
+            method: 'POST',
+            url: `/threads/${portedThreadId}/messages`,
+            payload: {
+                content: "I agree with you!",
+                responds_to: portedMessageId
+            },
+            headers: {
+                Authorization: `Bearer ${newToken}`
+            }
+        });
+        const payload = JSON.parse(response.payload);
+        expect(response.statusCode).toBe(200);
+        expect(payload).toHaveProperty('messageId');
+    });
+
+    test('React to a message', async () => {
+        const response = await server.inject({
+            method: 'POST',
+            url: `/threads/${portedThreadId}/messages/${portedMessageId}/reactions`,
+            payload: {
+                react_icon: 'link/to/like/icon'
+            },
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        const payload = JSON.parse(response.payload);
+        expect(response.statusCode).toBe(200);
+        expect(payload).toHaveProperty('reaction');
+        expect(payload.reaction.username).toBe('testuser');
+    });
+
+    test('Remove the reaction from the message', async () => {
+        const response = await server.inject({
+            method: 'POST',
+            url: `/threads/${portedThreadId}/messages/${portedMessageId}/reactions`,
+            payload: {
+                react_icon: 'link/to/like/icon'
+            },
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        const payload = JSON.parse(response.payload);
+        expect(response.statusCode).toBe(200);
+        expect(payload).toHaveProperty('reaction');
+        expect(payload.reaction).toBe(null);
+    });
+
 });
 
 async function getUser(token) {

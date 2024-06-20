@@ -297,6 +297,10 @@ const bookService = {
         return books;
     },
 
+    async getBook(id: string) {
+        return Book.findById(id);
+    },
+
     // Function that returns 1 if the book is relevant to the user by his keywords, 0 otherwise
     async getBookRelevance(book: any, user: any) {
         // @ts-ignore
