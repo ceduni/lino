@@ -1,6 +1,6 @@
 <br/>
 <p align="center">
-    <img src="assets/logo.png" width="300">
+    <img src="docs/public/logo.png" width="300">
 </p>
 
 # Lino
@@ -18,10 +18,29 @@ Lino est un projet visant à **bonifier l'initiative des boîtes à livres et en
 
 ## Fonctionnalités📱
 
+### Public
+
+- [ ] Localiser les boîtes à livres sur une carte (avec preview) `phase 1`
+- [ ] Voir la liste des boites à livres à proximité `phase 1`
+- [ ] Voir les livres contenus dans les boîtes à livre `phase 1`
+- [ ] Voir les livres contenus dans une boîte à livre spécifique `phase 1`
+- [ ] Chercher des livres disponibles dans les boîtes à livres selon différents critères et mots clés `phase 2`
+- [ ] Ajouter un nouveau livre à une boîte à livre et à la base de données, générer un code QR et le coller su2 le livre `phase 2`
+- [ ] Retirer un livre d'une boîte à livres en scannant son code QR `phase 2`
+
+### Avec compte
+
+- [ ] Créer une alerte pour les utilisateurs pour signaler qu'on souhaite avoir un livre avec un titre spécifique dans une des boîtes à livres
+- [ ] Recevoir une notification quand une action est faite sur un livre qu'on suit ou qu'on a mis en favoris
+- [ ] Consulter l'impact écologique total de nos transactions `phase 3`
+- [ ] Créer des threads de discussion liés à un titre de livre en particulier `phase 2`
+- [ ] Envoyer et répondre à des messages dans des threads `phase 2`
+- [ ] Réagir à des messages `phase 2`
+
 ## 📅 Échéancier
 
 > Début du projet: 6 mai 2024  
-> Fin du projet: 19 aout 2024
+> Fin du projet: 16 aout 2024
 
 Le développement du projet sera divisé en plusieurs phases:
 

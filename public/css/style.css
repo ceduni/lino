@@ -50,10 +50,9 @@
 
 .page-footer {
     padding-top: 24px; padding-bottom: 30px;
-    background-color: rgb(var(--accent-dark));
     color: #fff;
     text-align: center;
-    border-top: 1px solid #d5d5d5;
+    background-color: #404040;
 }
 
     .page-footer a {
