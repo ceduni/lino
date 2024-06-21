@@ -12,7 +12,7 @@ async function clearCollections() {
         });
         await server.inject({
             method: 'DELETE',
-            url: '/user/clear'
+            url: '/users/clear'
         });
         console.log('Collections cleared successfully!');
     } catch (error) {
@@ -29,13 +29,14 @@ let portedThreadId;
 let portedMessageId;
 let token;
 let portedBookIds = [];
+let fakeQRCodeCounter = 0;
 
 describe('Test user registration', () => {
 
     test('Registering a new user', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/user/register',
+            url: '/users/register',
             payload: {
                 email: 'test@example.com',
                 password: 'password',
@@ -54,7 +55,7 @@ describe('Test user registration', () => {
     test('Registering another user', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/user/register',
+            url: '/users/register',
             payload: {
                 email: 'test2@example.com',
                 password: 'password',
@@ -73,7 +74,7 @@ describe('Test user registration', () => {
     test('Registering a user with an existing email', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/user/register',
+            url: '/users/register',
             payload: {
                 email: 'test@example.com',
                 password: 'password',
@@ -89,7 +90,7 @@ describe('Test user registration', () => {
     test('Registering a user with an existing username', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/user/register',
+            url: '/users/register',
             payload: {
                 email: 'test3@example.com',
                 password: 'password',
@@ -109,7 +110,7 @@ describe('Test user login and user specific operations', () => {
     test('Logging in with incorrect credentials', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/user/login',
+            url: '/users/login',
             payload: {
                 identifier: 'testuser',
                 password: 'password2'
@@ -123,7 +124,7 @@ describe('Test user login and user specific operations', () => {
     test('Logging in with correct credentials', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/user/login',
+            url: '/users/login',
             payload: {
                 identifier: 'testuser',
                 password: 'password'
@@ -138,7 +139,7 @@ describe('Test user login and user specific operations', () => {
     test('Adding key words to user for notifications', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/user/keywords',
+            url: '/users/keywords',
             payload: {
                 keywords: "Victor Dixen"
             },
@@ -159,8 +160,10 @@ describe('Test book adding by guest users', () => {
     test('Adding a new book', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/book/6660ec640a7261afb1131165',
+            url: '/books/add',
             payload: {
+                bookboxId: "6660ec640a7261afb1131165",
+                qrCodeId: `b${fakeQRCodeCounter++}`,
                 isbn: "9782075023986",
                 title: "Le cas Jack Spark (Saison 2) - Automne traqué",
                 authors: ["Victor Dixen"],
@@ -185,10 +188,10 @@ describe('Test book adding by guest users', () => {
         expect(userNotifs[userNotifs.length-1].content).toBe('The book "Le cas Jack Spark (Saison 2) - Automne traqué" has been added to the bookbox "Box1" !');
     });
 
-    test('Adding a book without title', async () => {
+    test('Adding a book without a QR code', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/book/6660ec640a7261afb1131165',
+            url: '/books/add',
             payload: { // No title
                 authors: ["J. K. Rowling"],
                 publisher: "Gallimard Jeunesse",
@@ -199,14 +202,16 @@ describe('Test book adding by guest users', () => {
         });
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(400);
-        expect(payload.error).toBe('Book\'s title is required');
+        expect(payload.error).toBe('Book\'s QR code ID is required');
     });
 
     test('Adding a book in an invalid bookBox', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/book/6660ec640a7213afb11a1c65',
+            url: '/books/add',
             payload: { // No title
+                bookboxId: "6660ec640a7213afb11a1c65",
+                qrCodeId: `b${fakeQRCodeCounter++}`,
                 isbn: "9782075023986",
                 title: "Le cas Jack Spark (Saison 2) - Automne traqué",
                 authors: ["Victor Dixen"],
@@ -221,6 +226,7 @@ describe('Test book adding by guest users', () => {
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(400);
         expect(payload.error).toBe('Bookbox not found');
+        fakeQRCodeCounter--;
     });
 });
 
@@ -230,7 +236,7 @@ describe('Test book fetching by guest users', () => {
     test('Getting a book from a book box', async () => {
         const response = await server.inject({
             method: 'GET',
-            url: `/book/${portedBookId}/6660ec640a7261afb1131165`
+            url: `/books/b0/6660ec640a7261afb1131165`
         });
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(200);
@@ -243,7 +249,7 @@ describe('Test book fetching by guest users', () => {
     test('Trying to get the same book from the same book box', async () => {
         const response = await server.inject({
             method: 'GET',
-            url: `/book/${portedBookId}/6660ec640a7261afb1131165`
+            url: `/books/b0/6660ec640a7261afb1131165`
         });
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(400);
@@ -253,20 +259,27 @@ describe('Test book fetching by guest users', () => {
     test('Adding an already registered book in another book box', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: `/book/${portedBookId}/6660ff660a7261afb113117c`
+            url: `/books/add`,
+            payload : {
+                bookboxId: "6660ff660a7261afb113117c",
+                qrCodeId: `b0`,
+            }
         });
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(200);
-        expect(payload).toHaveProperty('book');
-        expect(payload.book.authors[0]).toBe('Victor Dixen');
-        expect(payload).toHaveProperty('books');
+        expect(payload).toHaveProperty('bookId');
+        expect(payload.bookId).toBe(portedBookId);
         expect(payload.books[0]).toBe(portedBookId);
     });
 
     test('Adding a book registered in a book box in another book box', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: `/book/${portedBookId}/6660ec640a7261afb1131165`
+            url: `/books/add`,
+            payload : {
+                bookboxId : "6660ec640a7261afb1131165",
+                qrCodeId: 'b0',
+            }
         });
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(400);
@@ -280,8 +293,10 @@ describe('Test book actions by connected users', () => {
     test('Adding a new book', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/book/6660ec640a7261afb1131165',
+            url: '/books/add',
             payload: {
+                bookboxId : "6660ec640a7261afb1131165",
+                qrCodeId: `b${fakeQRCodeCounter++}`,
                 isbn: "9781781101032",
                 title: "Harry Potter à L'école des Sorciers",
                 authors: ["J.K. Rowling"],
@@ -309,7 +324,10 @@ describe('Test book actions by connected users', () => {
     test('Adding a book to the user\'s favorites', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: `/user/favorites/${portedBookId}`,
+            url: `/users/favorites`,
+            payload: {
+                bookId: portedBookId
+            },
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -323,7 +341,7 @@ describe('Test book actions by connected users', () => {
     test('A guest getting the same book from the book box', async () => {
         const response = await server.inject({
             method: 'GET',
-            url: `/book/${portedBookId}/6660ec640a7261afb1131165`
+            url: `/books/b1/6660ec640a7261afb1131165`
         });
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(200);
@@ -333,15 +351,19 @@ describe('Test book actions by connected users', () => {
         expect(payload.books).toHaveLength(0);
         // check the book's given history and taken history
         const user = await getUser(token);
-        expect(payload.book.given_history[0].username).toBe(user.username);
-        expect(payload.book.taken_history[0].username).toBe('guest');
+        expect(payload.book.givenHistory[0].username).toBe(user.username);
+        expect(payload.book.takenHistory[0].username).toBe('guest');
         expect(user.notifications[user.notifications.length-1].content)
             .toBe('The book "Harry Potter à L\'école des Sorciers" has been removed from the bookbox "Box1" !');
 
         // re-add the book to the book box for next test suite
         await server.inject({
             method: 'POST',
-            url: `/book/${portedBookId}/6660ec640a7261afb1131165`
+            url: `/books/add`,
+            payload : {
+                qrCodeId: `b1`,
+                bookboxId : "6660ec640a7261afb1131165"
+            },
         });
     });
 });
@@ -360,8 +382,8 @@ describe('Test book searching among the database', () => {
         expect(payload.books).toHaveLength(2);
         expect(payload.books[0].authors[0]).toBe('Victor Dixen');
         expect(payload.books[1].authors[0]).toBe('J.K. Rowling');
-        expect(payload.books[0].bookbox_presence[0]).toBe('6660ff660a7261afb113117c');
-        expect(payload.books[1].bookbox_presence[0]).toBe('6660ec640a7261afb1131165');
+        expect(payload.books[0].bookboxPresence[0]).toBe('6660ff660a7261afb113117c');
+        expect(payload.books[1].bookboxPresence[0]).toBe('6660ec640a7261afb1131165');
     });
 
     test('Add quite a lot of books for further testing', async () => {
@@ -384,13 +406,15 @@ describe('Test book searching among the database', () => {
         for (let i = 0; i < isbns.length; i++) {
             const book = await server.inject({
                 method: 'GET',
-                url: `/book/${isbns[i]}`
+                url: `/books/${isbns[i]}`
             });
             const payload = JSON.parse(book.payload);
             const response = await server.inject({
                 method: 'POST',
-                url: `/book/${bbids[i%bbids.length]}`, // alternate between the book boxes
+                url: `/books/add`, // alternate between the book boxes
                 payload: {
+                    qrCodeId: `b${fakeQRCodeCounter++}`,
+                    bookboxId: bbids[i%bbids.length],
                     isbn: payload.isbn,
                     title: payload.title,
                     authors: payload.authors,
@@ -491,8 +515,8 @@ describe('Test book searching among the database', () => {
         expect(payload).toHaveProperty('books');
         for (let i = 0; i < payload.books.length-1; i++) {
             expect(payload.books[i].publisher).toBe('VIZ Media LLC');
-            const date1 = new Date(payload.books[i].date_last_action);
-            const date2 = new Date(payload.books[i+1].date_last_action);
+            const date1 = new Date(payload.books[i].dateLastAction);
+            const date2 = new Date(payload.books[i+1].dateLastAction);
             expect(date1.getTime()).toBeLessThanOrEqual(date2.getTime());
         }
     });
@@ -506,7 +530,7 @@ describe('Tests for thread creation and interaction', () => {
             method: 'POST',
             url: '/threads/new',
             payload: {
-                book_id: portedBookId,
+                bookId: portedBookId,
                 title: "Discussion about the book",
                 content: "What do you think about the book?"
             },
@@ -523,9 +547,10 @@ describe('Tests for thread creation and interaction', () => {
     test('Add a message to a thread', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: `/threads/${portedThreadId}/messages`,
+            url: `/threads/messages`,
             payload: {
                 content: "I think the book is great!",
+                threadId: portedThreadId,
             },
             headers: {
                 Authorization: `Bearer ${token}`
@@ -540,7 +565,7 @@ describe('Tests for thread creation and interaction', () => {
     test('Add a message that responds to the precedent message', async () => {
         const newLogin = await server.inject({
             method: 'POST',
-            url: '/user/login',
+            url: '/users/login',
             payload: {
                 identifier: 'testuser2',
                 password: 'password'
@@ -549,10 +574,11 @@ describe('Tests for thread creation and interaction', () => {
         const newToken = JSON.parse(newLogin.payload).token;
         const response = await server.inject({
             method: 'POST',
-            url: `/threads/${portedThreadId}/messages`,
+            url: `/threads/messages`,
             payload: {
                 content: "I agree with you!",
-                responds_to: portedMessageId
+                respondsTo: portedMessageId,
+                threadId: portedThreadId,
             },
             headers: {
                 Authorization: `Bearer ${newToken}`
@@ -566,9 +592,11 @@ describe('Tests for thread creation and interaction', () => {
     test('React to a message', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: `/threads/${portedThreadId}/messages/${portedMessageId}/reactions`,
+            url: `/threads/messages/reactions`,
             payload: {
-                react_icon: 'link/to/like/icon'
+                reactIcon: 'link/to/like/icon',
+                threadId: portedThreadId,
+                messageId: portedMessageId
             },
             headers: {
                 Authorization: `Bearer ${token}`
@@ -583,9 +611,11 @@ describe('Tests for thread creation and interaction', () => {
     test('Remove the reaction from the message', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: `/threads/${portedThreadId}/messages/${portedMessageId}/reactions`,
+            url: `/threads/messages/reactions`,
             payload: {
-                react_icon: 'link/to/like/icon'
+                reactIcon: 'link/to/like/icon',
+                threadId: portedThreadId,
+                messageId: portedMessageId
             },
             headers: {
                 Authorization: `Bearer ${token}`
@@ -602,7 +632,7 @@ describe('Tests for thread creation and interaction', () => {
 async function getUser(token) {
     const response = await server.inject({
         method: 'GET',
-        url: '/user',
+        url: '/users',
         headers: {
             Authorization: `Bearer ${token}`
         }

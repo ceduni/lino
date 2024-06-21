@@ -31,7 +31,7 @@ const UserService = {
                 phone : phone,
                 password: hashedPassword });
         await user.save();
-        return user;
+        return {username: user.username, password: user.password};
     },
 
     // User service to log in a user if they exist (can log with either a username or an email)
@@ -49,7 +49,7 @@ const UserService = {
         // @ts-ignore
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY);
 
-        return { user, token };
+        return { user: user, token: token };
     },
 
 
