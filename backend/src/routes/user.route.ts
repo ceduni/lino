@@ -58,43 +58,20 @@ async function removeFromFavorites(request : FastifyRequest, reply : FastifyRepl
 }
 
 
-async function addKeyword(request : FastifyRequest, reply : FastifyReply) {
-    try {
-        // @ts-ignore
-        const userId = request.user.id;  // Extract user ID from JWT token
-        // @ts-ignore
-        const keywords = request.body.keywords;
-        const user = await UserService.parseKeyWords(userId, keywords);
-        reply.send({ keywords: user.notificationKeyWords });
-    } catch (error) {
-        console.error('Error adding keywords to notifications:', error);
-        // @ts-ignore
-        reply.code(500).send({ error: error.message });
-    }
-}
-
-async function removeKeyword(request : FastifyRequest, reply : FastifyReply) {
-    try {
-        // @ts-ignore
-        const userId = request.user.id;  // Extract user ID from JWT token
-        // @ts-ignore
-        const { keyword } = request.params;
-        const user = await UserService.removeKeyWord(userId, keyword);
-        // @ts-ignore
-        reply.send(user.notificationKeyWords);
-    } catch (error) {
-        console.error('Error removing keyword from notifications:', error);
-        reply.code(500).send({ error: 'Internal server error' });
-    }
-}
-
-
-
 async function getUser(request : FastifyRequest, reply : FastifyReply) {
     try {
         // @ts-ignore
         const userId = request.user.id;  // Extract user ID from JWT token
         const user = await User.findById(userId);
+        reply.send({ user: user });
+    } catch (error) {
+        reply.code(500).send({ error: 'Internal server error' });
+    }
+}
+
+async function updateUser(request : FastifyRequest, reply : FastifyReply) {
+    try {
+        const user = await UserService.updateUser(request);
         reply.send({ user: user });
     } catch (error) {
         reply.code(500).send({ error: 'Internal server error' });
@@ -111,9 +88,8 @@ export default async function userRoutes(server: MyFastifyInstance) {
     server.post('/users/login', loginUser);
     server.post('/users/favorites', { preValidation: [server.authenticate] }, addToFavorites);
     server.delete('/users/favorites/:id', { preValidation: [server.authenticate] }, removeFromFavorites);
-    server.post('/users/keywords', { preValidation: [server.authenticate] }, addKeyword);
-    server.delete('/users/keywords/:keyword', { preValidation: [server.authenticate] }, removeKeyword);
     server.get('/users', { preValidation: [server.authenticate] }, getUser);
+    server.post('/users/update', { preValidation: [server.authenticate] }, updateUser);
     server.delete('/users/clear', async (request, reply) => {
         await UserService.clearCollection();
         reply.send({message: 'Users cleared'});

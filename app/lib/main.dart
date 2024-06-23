@@ -83,7 +83,7 @@ class MyHomePage extends StatelessWidget {
                   onPressed: (){
                     appState.toggleFavourite();
                   }, 
-                  child: Text('like ' + (appState.favourites.contains(pair) == true ? "♥" : "♡"))
+                  child: Text('like ' + (appState.favourites.contains(pair) == true ? '♥' : '♡'))
                   ),
                         
                 SizedBox(width: 10,),
@@ -98,7 +98,7 @@ class MyHomePage extends StatelessWidget {
                 // make a button to test if setting manually the appState makes the heart whole
                 ElevatedButton(
                 onPressed: (){
-                  appState.setState("broadhour");
+                  appState.setState('broadhour' as WordPair);
                 }, 
                 child: Text('change app state')
                 ),
@@ -138,7 +138,7 @@ class BigCard extends StatelessWidget {
           child: Text(
             pair.asLowerCase, 
             style: style,
-            semanticsLabel: "${pair.first} ${pair.second}",
+            semanticsLabel: '${pair.first} ${pair.second}',
             ),
         ),
       ),

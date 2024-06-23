@@ -41,7 +41,8 @@ describe('Test user registration', () => {
                 email: 'test@example.com',
                 password: 'password',
                 username: 'testuser',
-                phone: '1234567890'
+                phone: '1234567890',
+                getAlerted: true
             }
         });
         const payload = JSON.parse(response.payload);
@@ -60,7 +61,8 @@ describe('Test user registration', () => {
                 email: 'test2@example.com',
                 password: 'password',
                 username: 'testuser2',
-                phone: '1234567890'
+                phone: '1234567890',
+                getAlerted: true
             }
         });
         const payload = JSON.parse(response.payload);
@@ -136,12 +138,12 @@ describe('Test user login and user specific operations', () => {
         token = payload.token;
     });
 
-    test('Adding key words to user for notifications', async () => {
+    test('Update user with some keywords', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/users/keywords',
+            url: '/users/update',
             payload: {
-                keywords: "Victor Dixen"
+                keyWords: "Victor Dixen"
             },
             headers: {
                 Authorization: `Bearer ${token}`
@@ -149,8 +151,7 @@ describe('Test user login and user specific operations', () => {
         });
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(200);
-        expect(payload).toHaveProperty('keywords');
-        expect(payload.keywords).toEqual(["Victor Dixen"]);
+        expect(payload).toHaveProperty('user');
     });
 });
 
@@ -289,6 +290,35 @@ describe('Test book fetching by guest users', () => {
 
 
 describe('Test book actions by connected users', () => {
+
+    test('Send an alert to users', async () => {
+        const response = await server.inject({
+            method: 'POST',
+            url: '/books/alert',
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            payload: {
+                title: 'Harry Potter à l\'école des sorciers',
+            }
+        });
+        const payload = JSON.parse(response.payload);
+        expect(response.statusCode).toBe(200);
+        expect(payload).toHaveProperty('message');
+        expect(payload.message).toBe("Alert sent");
+        const token2 = await server.inject({
+           method: 'POST',
+              url: '/users/login',
+                payload: {
+                    identifier: 'testuser2',
+                    password: 'password'
+                }
+        });
+        const user2 = await getUser(JSON.parse(token2.payload).token);
+        expect(user2.notifications[user2.notifications.length-1].content)
+            .toBe('The user testuser wants to get the book "Harry Potter à l\'école des sorciers" ! If you have it, please feel free to add it to one of our book boxes !');
+
+    });
 
     test('Adding a new book', async () => {
         const response = await server.inject({
@@ -641,5 +671,6 @@ async function getUser(token) {
 }
 
 afterAll(async () => {
+    await clearCollections(); // clear the collections after the tests
     await server.close();
 });

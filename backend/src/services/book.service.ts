@@ -325,14 +325,19 @@ const bookService = {
     },
 
 
-    async alertUsers(username: string, title: string) {
+    async alertUsers(request : any) {
         const users = await User.find({getAlerted: true});
+        const user = await User.findById(request.user.id);
+        if (!user) {
+            throw new Error('User not found');
+        }
         for (let i = 0; i < users.length; i++) {
-            if (users[i].username !== username) {
-                await notifyUser(users[i].id, `The user ${username} wants to get the book "${title}" ! 
-                If you have it, please feel free to add it to one of our book boxes !`);
+            if (users[i].username !== user.username) {
+                await notifyUser(users[i].id, `The user ${user.username} wants to get the book "${request.body.title}" ! If you have it, please feel free to add it to one of our book boxes !`);
             }
         }
+
+        return {message: 'Alert sent'};
     },
 
     async clearCollection() {

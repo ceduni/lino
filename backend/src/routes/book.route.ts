@@ -46,15 +46,22 @@ async function searchBooks(request: FastifyRequest, reply: FastifyReply) {
     reply.send({books : books});
 }
 
+async function sendAlert(request: FastifyRequest, reply: FastifyReply) {
+    const response = await BookService.alertUsers(request);
+    reply.send(response);
+}
+
 
 interface MyFastifyInstance extends FastifyInstance {
     optionalAuthenticate: (request: FastifyRequest) => void;
+    authenticate: (request: FastifyRequest) => void;
 }
 export default async function bookRoutes(server: MyFastifyInstance) {
     server.post('/books/add', { preValidation: [server.optionalAuthenticate] }, addBookToBookbox);
     server.get('/books/:bookQRCode/:bookboxId', { preValidation: [server.optionalAuthenticate] }, getBookFromBookBox);
     server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate] }, getBookInfoFromISBN);
     server.get('/books/search', searchBooks);
+    server.post('/books/alert', { preValidation: [server.authenticate] }, sendAlert);
     server.delete('/books/clear', async (request, reply) => {
         await BookService.clearCollection();
         reply.send({message: 'Books cleared'});
