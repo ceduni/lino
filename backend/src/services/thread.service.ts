@@ -4,14 +4,14 @@ import User from "../models/user.model";
 import BookService from "./book.service";
 
 const ThreadService = {
-    async createThread(book_id : string, username : string, title : string) {
-        const book = await BookService.getBook(book_id);
+    async createThread(bookId : string, username : string, title : string) {
+        const book = await BookService.getBook(bookId);
         if (!book) {
             throw new Error('Book not found');
         }
-        const book_title = book.title;
+        const bookTitle = book.title;
         const thread = new Thread({
-            book_title: book_title,
+            bookTitle: bookTitle,
             username: username,
             title: title,
             messages: []
@@ -28,7 +28,7 @@ const ThreadService = {
         const message = {
             username: username,
             content: content,
-            responds_to: respondsTo,
+            respondsTo: respondsTo,
             reactions: []
         };
         thread.messages.push(message);
@@ -71,13 +71,13 @@ const ThreadService = {
         }
 
         // Check if the user has already reacted to this message with the same icon
-        if (message.reactions.find(r => r.username === username && r.react_icon === reactIcon)) {
+        if (message.reactions.find(r => r.username === username && r.reactIcon === reactIcon)) {
             // Remove the reaction
             // @ts-ignore
-            message.reactions = message.reactions.filter(r => r.username !== username || r.react_icon !== reactIcon);
+            message.reactions = message.reactions.filter(r => r.username !== username || r.reactIcon !== reactIcon);
         } else {
             // Add the reaction
-            message.reactions.push({ username: username, react_icon: reactIcon });
+            message.reactions.push({ username: username, reactIcon: reactIcon });
         }
 
         await thread.save();

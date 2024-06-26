@@ -1,77 +1,95 @@
-import { FastifyInstance } from 'fastify';
-import Thread from '../models/thread.model';
+import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} from 'fastify';
 import ThreadService from '../services/thread.service';
 import UserService from "../services/user.service";
+import Thread from "../models/thread.model";
 
-export default async function threadRoute(server: FastifyInstance) {
-    server.get('/threads/search', async (request, reply) => {
-        // @ts-ignore
-        const threads = await ThreadService.searchThreads(request);
-        reply.send(threads);
-    });
 
+interface MyFastifyInstance extends FastifyInstance {
+    authenticate: (request : FastifyRequest, reply: FastifyReply) => void;
+}
+export default async function threadRoutes(server: MyFastifyInstance) {
+    server.post('/threads/new', { preValidation: [server.authenticate] }, createThread);
+    server.post('/threads/messages', { preValidation: [server.authenticate] }, addThreadMessage);
+    server.post('/threads/messages/reactions', { preValidation: [server.authenticate] }, toggleMessageReaction);
+    server.get('/threads/search', searchThreads);
+    server.delete('/threads/clear', clearCollection);
+}
+
+interface CreateThreadParams extends RouteGenericInterface {
+    Body: {
+        bookId: string,
+        title: string
+    }
+
+}
+async function createThread(request : FastifyRequest<CreateThreadParams>, reply : FastifyReply) {
     // @ts-ignore
-    server.post('/threads/new', { preHandler: server.authenticate }, async (request, reply) => {
-        // @ts-ignore
-        const username = await UserService.getUserName(request.user.id);
-        if (!username) {
-            reply.code(401).send({ error: 'Unauthorized' });
-            return;
-        }
-        // @ts-ignore
-        const { book_id, title } = request.body;
-        const thread = await ThreadService.createThread(book_id, username, title);
-        reply.send({threadId: thread._id});
-    });
+    const username = await UserService.getUserName(request.user.id);
+    if (!username) {
+        reply.code(401).send({ error: 'Unauthorized' });
+        return;
+    }
+    const { bookId, title } = request.body;
+    const thread = await ThreadService.createThread(bookId, username, title);
+    reply.send({threadId: thread._id});
+}
 
+interface AddThreadMessageParams extends RouteGenericInterface {
+    Body: {
+        threadId: string,
+        content: string,
+        respondsTo: string
+    }
+}
+async function addThreadMessage(request : FastifyRequest<AddThreadMessageParams>, reply : FastifyReply) {
+    const thread = await Thread.findById(request.body.threadId);
+    if (!thread) {
+        reply.code(404).send({ error: 'Thread not found' });
+        return;
+    }
     // @ts-ignore
-    server.post('/threads/:thread_id/messages', { preHandler: server.authenticate }, async (request, reply) => {
-        // @ts-ignore
-        const thread = await Thread.findById(request.params.thread_id);
-        if (!thread) {
-            reply.code(404).send({ error: 'Thread not found' });
-            return;
-        }
-        // @ts-ignore
-        const username = await UserService.getUserName(request.user.id);
-        if (!username) {
-            reply.code(401).send({ error: 'Unauthorized' });
-            return;
-        }
-        // @ts-ignore
-        const { content, responds_to } = request.body;
-        // @ts-ignore
-        const threadId = request.params.thread_id;
-        const message = await ThreadService.addThreadMessage(threadId, username, content, responds_to);
-        reply.send({messageId: message._id});
-    });
+    const username = await UserService.getUserName(request.user.id);
+    if (!username) {
+        reply.code(401).send({ error: 'Unauthorized' });
+        return;
+    }
+    const { content, respondsTo } = request.body;
+    const threadId = request.body.threadId;
+    const message = await ThreadService.addThreadMessage(threadId, username, content, respondsTo);
+    reply.send({messageId: message._id});
+}
 
-    // API Endpoint: Toggle Reaction to Message
-    // @ts-ignore
-    server.post('/threads/:thread_id/messages/:message_id/reactions', { preHandler: server.authenticate }, async (request, reply) => {
-        // @ts-ignore
-        const username = await UserService.getUserName(request.user.id);
-        if (!username) {
-            reply.code(401).send({ error: 'Unauthorized' });
-            return;
-        }
-        // @ts-ignore
-        const { react_icon } = request.body;
-        // @ts-ignore
-        const { thread_id, message_id } = request.params;
-        try {
-            const reaction = await ThreadService.toggleMessageReaction(thread_id, message_id, username, react_icon);
-            reply.send({reaction : reaction});
-        } catch (error) {
-            console.error('Error adding reaction:', error);
-            reply.code(500).send({ error: 'Internal server error' });
-        }
-    });
 
-    // API Endpoint: Clear collection
+interface ToggleMessageReactionParams extends RouteGenericInterface {
+    Body: {
+        reactIcon: string,
+        threadId: string,
+        messageId: string
+    }
+}
+async function toggleMessageReaction(request : FastifyRequest<ToggleMessageReactionParams>, reply : FastifyReply) {
     // @ts-ignore
-    server.delete('/threads/clear', async (request, reply) => {
-        await ThreadService.clearCollection();
-        reply.send({ message: 'Threads collection cleared' });
-    });
+    const username = await UserService.getUserName(request.user.id);
+    if (!username) {
+        reply.code(401).send({ error: 'Unauthorized' });
+        return;
+    }
+    const { reactIcon, messageId, threadId } = request.body;
+    try {
+        const reaction = await ThreadService.toggleMessageReaction(threadId, messageId, username, reactIcon);
+        reply.send({reaction : reaction});
+    } catch (error) {
+        console.error('Error adding reaction:', error);
+        reply.code(500).send({ error: 'Internal server error' });
+    }
+}
+
+async function searchThreads(request : FastifyRequest, reply : FastifyReply) {
+    const threads = await ThreadService.searchThreads(request);
+    reply.send(threads);
+}
+
+async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
+    await ThreadService.clearCollection();
+    reply.send({ message: 'Threads collection cleared' });
 }

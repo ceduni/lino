@@ -12,10 +12,8 @@ const userSchema = new mongoose.Schema({
     email : { type: String, required: true, unique: true },
     phone: {type: String},
     favoriteBooks: [String], // Array of book _ids
-    trackedBooks: [String], // Array of book _ids
+    trackedBooks: [String], // Array of book _ids, inaccessible for the user, only for the system
     notificationKeyWords: [String],  // Array of key words
-    preferredCategories: [String],
-    preferredAuthors: [String],
     ecologicalImpact: {
         carbonSavings: { type: Number, default: 0 }, // 27.71 kg CO2 per saved book
         savedWater: { type: Number, default: 0 }, // 2000 liters per saved book
