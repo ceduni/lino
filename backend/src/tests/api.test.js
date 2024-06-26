@@ -46,7 +46,7 @@ describe('Test user registration', () => {
             }
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201);
         expect(payload).toHaveProperty('username');
         expect(payload).toHaveProperty('password');
         expect(payload.username).toBe('testuser');
@@ -66,7 +66,7 @@ describe('Test user registration', () => {
             }
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201);
         expect(payload).toHaveProperty('username');
         expect(payload).toHaveProperty('password');
         expect(payload.username).toBe('testuser2');
@@ -177,7 +177,7 @@ describe('Test book adding by guest users', () => {
             }
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201);
         expect(payload).toHaveProperty('bookId');
         expect(typeof payload.bookId).toBe('string');
         portedBookId = payload.bookId;
@@ -267,7 +267,7 @@ describe('Test book fetching by guest users', () => {
             }
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201);
         expect(payload).toHaveProperty('bookId');
         expect(payload.bookId).toBe(portedBookId);
         expect(payload.books[0]).toBe(portedBookId);
@@ -457,7 +457,7 @@ describe('Test book searching among the database', () => {
                 }
             });
             const responsePayload = JSON.parse(response.payload);
-            expect(response.statusCode).toBe(200);
+            expect(response.statusCode).toBe(201);
             expect(responsePayload).toHaveProperty('bookId');
             portedBookIds.push(responsePayload.bookId);
         }
@@ -671,6 +671,5 @@ async function getUser(token) {
 }
 
 afterAll(async () => {
-    await clearCollections(); // clear the collections after the tests
     await server.close();
 });

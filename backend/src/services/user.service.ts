@@ -55,7 +55,7 @@ const UserService = {
     },
 
 
-    // User service to add a book's ISBN to a user's favorites
+    // User service to add a book's ID to a user's favorites
     async addToFavorites(userId: string, id: string) {
         let user = await User.findById(userId);
         if (!user) {
@@ -70,7 +70,7 @@ const UserService = {
     },
 
 
-    // User service to remove a book's ISBN from a user's favorites
+    // User service to remove a book's ID from a user's favorites
     async removeFromFavorites(userId: string, id: string) {
         let user = await User.findById(userId);
         if (!user) {
@@ -86,7 +86,7 @@ const UserService = {
     },
 
 
-    // User service to get the infos of the user's favorite books thanks to their ISBN
+    // User service to get the infos of the user's favorite books
     async getFavorites(userId: string) {
         let user = await User.findById(userId);
         if (!user) {

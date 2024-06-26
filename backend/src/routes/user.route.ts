@@ -8,7 +8,7 @@ import User from "../models/user.model";
 async function registerUser(request : FastifyRequest, reply : FastifyReply) {
     try {
         const response = await userService.registerUser(request.body);
-        reply.send(response);
+        reply.code(201).send(response);
     } catch (error : any) {
         reply.code(400).send({ error: error.message });
     }
@@ -34,7 +34,7 @@ async function addToFavorites(request : FastifyRequest, reply : FastifyReply) {
         if (!user) {
             return;
         }
-        reply.send({ favorites : user.favoriteBooks });
+        reply.code(200).send({ favorites : user.favoriteBooks });
     } catch (error) {
         console.error('Error adding book to favorites:', error);
         reply.code(500).send({ error: 'Internal server error' });

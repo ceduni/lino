@@ -3,7 +3,6 @@ import Book from "../models/book.model";
 import User from "../models/user.model";
 import BookBox from "../models/bookbox.model";
 import {notifyUser} from "./user.service";
-import BookModel from "../models/book.model";
 
 const bookService = {
     // Helper function to fetch or create a book
@@ -61,8 +60,8 @@ const bookService = {
             throw new Error('Bookbox not found');
         }
         // check if the book is in the bookbox
-        if (bookBox.books.includes(book._id)) {
-            bookBox.books.splice(bookBox.books.indexOf(book._id), 1);
+        if (bookBox.books.includes(book.id)) {
+            bookBox.books.splice(bookBox.books.indexOf(book.id), 1);
         } else {
             throw new Error('Book not found in bookbox');
         }
@@ -71,7 +70,7 @@ const bookService = {
         await this.notifyAllUsers(book, 'removed from', bookBox.name);
         await book.save();
         await bookBox.save();
-        await this.updateUserEcoImpact(request, book._id.toString());
+        await this.updateUserEcoImpact(request, book.id);
         return {book: book, books: bookBox.books};
     },
 
@@ -209,7 +208,7 @@ const bookService = {
                 throw new Error('Bookbox not found');
             }
             books = books.filter((book) => {
-                return bookBox.books.includes(book._id);
+                return bookBox.books.includes(book.id);
             });
         }
 
@@ -268,7 +267,7 @@ const bookService = {
             // @ts-ignore
             books[i].bookboxPresence = [];
             for (let j = 0; j < bookBoxes.length; j++) {
-                if (bookBoxes[j].books.includes(books[i]._id)) {
+                if (bookBoxes[j].books.includes(books[i]._id.toString())) {
                     // @ts-ignore
                     books[i].bookboxPresence.push(bookBoxes[j]._id);
                 }

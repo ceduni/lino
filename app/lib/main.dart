@@ -1,6 +1,5 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -83,7 +82,7 @@ class MyHomePage extends StatelessWidget {
                   onPressed: (){
                     appState.toggleFavourite();
                   }, 
-                  child: Text('like ' + (appState.favourites.contains(pair) == true ? '♥' : '♡'))
+                  child: Text('like ${appState.favourites.contains(pair) == true ? '♥' : '♡'}')
                   ),
                         
                 SizedBox(width: 10,),
