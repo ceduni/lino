@@ -18,7 +18,9 @@ dependencies:
   shared_preferences: ^2.2.3
   http: ^1.2.1
 
+  http: any
 dev_dependencies:
+  test: any
   flutter_test:
     sdk: flutter
 
