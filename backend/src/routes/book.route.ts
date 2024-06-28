@@ -1,5 +1,6 @@
 import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} from "fastify";
 import BookService from "../services/book.service";
+import BookBox from "../models/bookbox.model";
 
 
 
@@ -57,9 +58,23 @@ interface GetUniqueBookParams extends RouteGenericInterface {
     }
 }
 async function getBook(request: FastifyRequest<GetUniqueBookParams>, reply: FastifyReply) {
-    const response = await BookService.getBook(request.params.id);
-    reply.send(response);
+    const book = await BookService.getBook(request.params.id);
+    reply.send(book);
+}
 
+interface GetBookBoxParams extends RouteGenericInterface {
+    Params: {
+        bookboxId: string
+    }
+}
+async function getBookbox(request: FastifyRequest<GetBookBoxParams>, reply: FastifyReply) {
+    const response = await BookBox.findById(request.params.bookboxId);
+    reply.send(response);
+}
+
+async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
+    const response = await BookService.addNewBookbox(request);
+    reply.code(201).send(response);
 }
 
 
@@ -73,7 +88,9 @@ export default async function bookRoutes(server: MyFastifyInstance) {
     server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate] }, getBookInfoFromISBN);
     server.get('/books/search', searchBooks);
     server.post('/books/alert', { preValidation: [server.authenticate] }, sendAlert);
-    server.get('/books/:id', getBook);
+    server.get('/books/get/:id', getBook);
+    server.get('/books/bookbox/:bookboxId', getBookbox);
+    server.post('/books/bookbox/new', addNewBookbox);
     server.delete('/books/clear', async (request, reply) => {
         await BookService.clearCollection();
         reply.send({message: 'Books cleared'});

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:Lino_app/classes/user_model.dart';
 import 'package:http/http.dart' as http;
 
 class UserService {
@@ -25,10 +24,10 @@ class UserService {
       }),
     );
     final data = jsonDecode(userData.body);
-    if (data['statusCode'] != 201) {
-      throw Exception(data['payload']['error']);
+    if (userData.statusCode != 201) {
+      throw Exception(data['error']);
     }
-    final token = await loginUser(data['username'], data['password']);
+    final token = await loginUser(username, password);
     return token;
   }
 
@@ -48,8 +47,8 @@ class UserService {
       }),
     );
     final response = jsonDecode(r.body);
-    if (response['statusCode'] != 200) {
-      throw Exception(response['payload']['error']);
+    if (r.statusCode != 200) {
+      throw Exception(response['error']);
     }
     final token = response['token'];
     return token;
@@ -71,8 +70,8 @@ class UserService {
       }),
     );
     final response = jsonDecode(r.body);
-    if (response['statusCode'] != 200) {
-      throw Exception(response['payload']['error']);
+    if (r.statusCode != 200) {
+      throw Exception(response['error']);
     }
     final data = response['payload']['favorites'];
     return List<String>.from(data);
@@ -91,14 +90,14 @@ class UserService {
       },
     );
     final response = jsonDecode(r.body);
-    if (response['statusCode'] != 200) {
-      throw Exception(response['payload']['error']);
+    if (r.statusCode != 200) {
+      throw Exception(response['error']);
     }
-    final data = response['payload']['favorites'];
+    final data = response['favorites'];
     return List<String>.from(data);
   }
 
-  Future<User> getUser(String token) async {
+  Future<Map<String, dynamic>> getUser(String token) async {
     // Make a GET request to the server
     // Send the token to the server
     // If the server returns a 200 status code, the user is returned
@@ -111,13 +110,13 @@ class UserService {
       },
     );
     final data = jsonDecode(response.body);
-    if (data['statusCode'] != 200) {
-      throw Exception(data['payload']['error']);
+    if (response.statusCode != 200) {
+      throw Exception(data['error']);
     }
-    return User.fromJson(data);
+    return data;
   }
 
-  Future<User> updateUser(String token, {String? username, String? password, String? email, String? phone, bool? getAlerted, String? keyWords}) async {
+  Future<Map<String, dynamic>> updateUser(String token, {String? username, String? password, String? email, String? phone, bool? getAlerted, String? keyWords}) async {
     // Make a PUT request to the server
     // Send the token and the updated user information to the server
     // If the server returns a 200 status code, the user is updated
@@ -138,9 +137,9 @@ class UserService {
       }),
     );
     final data = jsonDecode(response.body);
-    if (data['statusCode'] != 200) {
-      throw Exception(data['payload']['error']);
+    if (response.statusCode != 200) {
+      throw Exception(data['error']);
     }
-    return User.fromJson(data);
+    return data;
   }
 }

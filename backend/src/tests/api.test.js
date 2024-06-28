@@ -569,7 +569,7 @@ describe('Tests for thread creation and interaction', () => {
             }
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201);
         expect(payload).toHaveProperty('threadId');
         portedThreadId = payload.threadId;
     });
@@ -587,7 +587,7 @@ describe('Tests for thread creation and interaction', () => {
             }
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201);
         expect(payload).toHaveProperty('messageId');
         portedMessageId = payload.messageId;
     });
@@ -615,7 +615,7 @@ describe('Tests for thread creation and interaction', () => {
             }
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201);
         expect(payload).toHaveProperty('messageId');
     });
 
@@ -671,5 +671,6 @@ async function getUser(token) {
 }
 
 afterAll(async () => {
+    await clearCollections();
     await server.close();
 });

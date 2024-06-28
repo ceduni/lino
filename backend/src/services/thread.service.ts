@@ -35,7 +35,7 @@ const ThreadService = {
         await thread.save();
 
         // Notify the user that their message has been added
-        if (respondsTo) {
+        if (respondsTo != null) {
             // Notify the user that their message has been added
             // @ts-ignore
             const parentMessage = thread.messages.id(respondsTo);
