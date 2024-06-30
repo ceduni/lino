@@ -72,4 +72,23 @@ class ThreadService {
     }
     return response;
   }
+
+  Future<Map<String, dynamic>> searchThreads({String? q, String? cls, bool? asc}) async {
+    var queryParams = {
+      if (q != null) 'q': q,
+      if (cls != null) 'cls': cls,
+      if (asc != null) 'asc': asc.toString(),
+    };
+
+    final r = await http.get(Uri.http('localhost:3000', '/threads/search', queryParams),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    final response = jsonDecode(r.body);
+    if (r.statusCode != 200) {
+      throw Exception(response['error']);
+    }
+    return response;
+  }
 }

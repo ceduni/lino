@@ -5,6 +5,21 @@ import BookBox from "../models/bookbox.model";
 import {notifyUser} from "./user.service";
 
 const bookService = {
+    async getBookBoxBooks(bookboxId: string) {
+        const bookBox = await BookBox.findById(bookboxId);
+        if (!bookBox) {
+            throw new Error('Bookbox not found');
+        }
+        const books = [];
+        for (const bookId of bookBox.books) {
+            const book = await Book.findById(bookId);
+            if (book) {
+                books.push(book);
+            }
+        }
+        return books;
+    },
+
     // Helper function to fetch or create a book
     async addBook(request: any) {
         let book = await Book.findOne({qrCodeId: request.body.qrCodeId});
@@ -332,21 +347,12 @@ const bookService = {
 
     async notifyAllUsers(book: any, action: string, bookBoxName: string) {
         const users = await User.find();
-        // Notify all users who have notification keywords corresponding to the book
         for (let i = 0; i < users.length; i++) {
             const relevance = await this.getBookRelevance(book, users[i]);
-            if (relevance > 0) {
+            if (relevance > 0 || users[i].favoriteBooks.includes(book.id)) {
                 await notifyUser(users[i].id, `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
             }
         }
-
-        // Notify all users who have the book in their favorites
-        for (let i = 0; i < users.length; i++) {
-            if (users[i].favoriteBooks.includes(book.id)) {
-                await notifyUser(users[i].id, `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
-            }
-        }
-
     },
 
     async clearCollection() {

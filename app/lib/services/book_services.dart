@@ -115,26 +115,26 @@ class BookService {
     return response;
   }
 
-  Future<Map<String, dynamic>> searchBooks({List<String>? cat, String? kw, bool? pmt, int? pg, bool? bf, int? py, String? pub, String? bbid, String? cls, String? asc}) async {
+  Future<Map<String, dynamic>> searchBooks({List<String>? cat, String? kw, bool? pmt, int? pg, bool? bf, int? py, String? pub, String? bbid, String? cls, bool? asc}) async {
     // Make a GET request to the server
     // Send the parameters to the server
     // If the server returns a 200 status code, the books are found
     // If the server returns another status code, the books are not found
     var queryParams = {
-      if (cat != null) 'cat': cat.join(','),
-      if (kw != null) 'kw': kw,
-      if (pmt != null) 'pmt': pmt.toString(),
-      if (pg != null) 'pg': pg.toString(),
-      if (bf != null) 'bf': bf.toString(),
-      if (py != null) 'py': py.toString(),
-      if (pub != null) 'pub': pub,
-      if (bbid != null) 'bbid': bbid,
-      if (cls != null) 'cls': cls,
-      if (asc != null) 'asc': asc,
+      if (cat != null) 'cat': cat.join(','),  // the list of categories, separated by commas
+      if (kw != null) 'kw': kw,  // the keywords
+      if (pmt != null) 'pmt': pmt.toString(),  // the bool to determine if we want the books with more or less than X pages
+      if (pg != null) 'pg': pg.toString(),  // the page number
+      if (bf != null) 'bf': bf.toString(),  // the bool to determine if we want the books published before or after the year
+      if (py != null) 'py': py.toString(),  // the year
+      if (pub != null) 'pub': pub,  // the publisher
+      if (bbid != null) 'bbid': bbid,  // the bookbox id
+      if (cls != null) 'cls': cls,  // the classificator : ['by title', 'by author', 'by year', 'by most recent activity']
+      if (asc != null) 'asc': asc.toString(),  // the bool to determine if we want the books in ascending or descending order of the cls
     };
 
     final r = await http.get(
-      Uri.https(url, '/books/search', queryParams),
+      Uri.http('localhost:3000', '/books/search', queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

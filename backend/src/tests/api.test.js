@@ -657,6 +657,28 @@ describe('Tests for thread creation and interaction', () => {
         expect(payload.reaction).toBe(null);
     });
 
+    test('Search all threads', async () => {
+        const response = await server.inject({
+            method: 'GET',
+            url: `/threads/search`
+        });
+        const payload = JSON.parse(response.payload);
+        expect(response.statusCode).toBe(200);
+        expect(payload).toHaveProperty('threads');
+        expect(payload.threads).toHaveLength(1);
+        expect(payload.threads[0].title).toBe('Discussion about the book');
+    });
+
+    test('Search a specific thread', async () => {
+        const response = await server.inject({
+            method: 'GET',
+            url: `/threads/search?q=inexistence`
+        });
+        const payload = JSON.parse(response.payload);
+        expect(response.statusCode).toBe(200);
+        expect(payload).toHaveProperty('threads');
+        expect(payload.threads).toHaveLength(0);
+    });
 });
 
 async function getUser(token) {

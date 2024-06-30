@@ -90,9 +90,13 @@ const ThreadService = {
 
 
     async searchThreads(request: any) {
-        const query = request.query.q;
+        let query = request.query.q;
+        if (!query) {
+            query = '';
+        }
         let threads = await Thread.find({
             $or: [
+                {bookTitle: {$regex: query, $options: 'i'}},
                 {title: {$regex: query, $options: 'i'}},
                 {username: {$regex: query, $options: 'i'}}
             ]
@@ -116,7 +120,7 @@ const ThreadService = {
             });
         }
 
-        return threads;
+        return {threads: threads};
     },
 
     async clearCollection() {

@@ -77,6 +77,11 @@ async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
     reply.code(201).send(response);
 }
 
+async function clearCollection(request: FastifyRequest, reply: FastifyReply) {
+    await BookService.clearCollection();
+    reply.send({message: 'Books cleared'});
+
+}
 
 interface MyFastifyInstance extends FastifyInstance {
     optionalAuthenticate: (request: FastifyRequest) => void;
@@ -91,8 +96,5 @@ export default async function bookRoutes(server: MyFastifyInstance) {
     server.get('/books/get/:id', getBook);
     server.get('/books/bookbox/:bookboxId', getBookbox);
     server.post('/books/bookbox/new', addNewBookbox);
-    server.delete('/books/clear', async (request, reply) => {
-        await BookService.clearCollection();
-        reply.send({message: 'Books cleared'});
-    });
+    server.delete('/books/clear', clearCollection);
 }

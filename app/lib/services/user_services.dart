@@ -66,14 +66,14 @@ class UserService {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode(<String, String>{
-        'id': id,
+        'bookId': id,
       }),
     );
     final response = jsonDecode(r.body);
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    final data = response['payload']['favorites'];
+    final data = response['favorites'];
     return List<String>.from(data);
   }
 
@@ -121,7 +121,7 @@ class UserService {
     // Send the token and the updated user information to the server
     // If the server returns a 200 status code, the user is updated
     // If the server returns another status code, the user is not updated
-    final response = await http.put(
+    final response = await http.post(
       Uri.parse('$url/users/update'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

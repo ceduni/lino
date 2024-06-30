@@ -5,6 +5,8 @@ Ce dossier contient le code source du backend de l'application. On a décidé d'
 ## Fonctionnalités :
 * * *
 ### Utilisateurs
+- [x] Avoir les infos d'un utilisateur à partir de son ID
+- [x] Avoir une liste des livres favoris d'un utilisateur
 - [x] Créer un compte utilisateur : l'utilisateur s'inscrit en fournissant un nom d'utilisateur, un email, un mot de passe et optionnellement son numéro de téléphone. TODO(?) : envoyer un email de confirmation.
 - [x] Se connecter : l'utilisateur se connecte en fournissant son email/son nom d'utilisateur et son mot de passe. Cela retourne un token JWT qui est enregistré sur son appareil jusqu'à ce qu'il se déconnecte et lui permet d'accéder à des fonctionnalités qui nécessitent une authentification.
 - [x] Ajouter/retirer un livre à ses favoris : si l'utilisateur a un compte, il peut ajouter/retirer un livre à ses favoris. Cela lui permet d'avoir une notification à chaque fois qu'une action est faite sur un de ses livres favoris.
@@ -12,6 +14,8 @@ Ce dossier contient le code source du backend de l'application. On a décidé d'
 
 * * *
 ### Livres
+- [x] Avoir les infos d'un livre à partir de son ID
+- [x] Avoir une liste des livres d'une boîte à livres
 - [x] Ajouter/retirer un livre d'une boîte à livres : si l'utilisateur a un compte, son empreinte écologique est mise à jour pour montrer son impact sur l'environnement.
 - [x] Obtenir les infos d'un livre via son ISBN : l'utilisateur peut obtenir les informations d'un livre en fournissant son ISBN. Cela permet de remplir automatiquement les champs lors de l'ajout d'un livre via les infos données par Google Books si elles existent.
 - [x] Rechercher des livres : l'utilisateur peut rechercher des livres par titre, auteur, ISBN, etc. pour trouver un livre qui l'intéresse.
@@ -19,6 +23,8 @@ Ce dossier contient le code source du backend de l'application. On a décidé d'
 
 * * *
 ### Threads
+- [x] Avoir les infos d'un thread à partir de son ID
+- [x] Rechercher des threads : l'utilisateur peut rechercher des threads par titre, auteur, etc. pour trouver un thread qui l'intéresse.
 - [x] Créer un thread : l'utilisateur peut créer un thread sur un livre précis pour en discuter.
 - [x] Répondre à un thread : l'utilisateur peut envoyer des messages dans un thread pour discuter avec les autres utilisateurs. Il a l'option de répondre à un message en particulier.
 - [x] Réagir à un message : l'utilisateur peut réagir à un message avec un emoji.
