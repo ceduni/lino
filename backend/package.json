@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "npx ts-node src/index.ts",
     "test": "cross-env TS_NODE_COMPILER_OPTIONS=\"{\\\"module\\\": \\\"commonjs\\\" }\" jest --runInBand --forceExit"
   },
   "keywords": [],
