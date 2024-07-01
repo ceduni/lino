@@ -53,29 +53,14 @@ server.register(threadRoutes);
 
 
 // Start the server
-server.listen({ port: 3000 }, (err: any, address: any) => {
+const port = process.env.PORT || 3000;
+server.listen({ port: port }, (err: any, address: any) => {
     if (err) {
         console.error(err);
         process.exit(1);
     }
 });
 
-// Handle SIGINT and SIGTERM signals
-process.on('SIGINT', () => {
-    console.log('Received SIGINT. Shutting down...');
-    server.close(() => {
-        console.log('Server shut down. Exiting...');
-        process.exit(0);
-    });
-});
-
-process.on('SIGTERM', () => {
-    console.log('Received SIGTERM. Shutting down...');
-    server.close(() => {
-        console.log('Server shut down. Exiting...');
-        process.exit(0);
-    });
-});
 
 // Export the server for testing
 module.exports = server;
