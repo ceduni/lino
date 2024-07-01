@@ -59,6 +59,7 @@ server.listen({ port: port }, (err: any, address: any) => {
         console.error(err);
         process.exit(1);
     }
+    console.log(`Server started on port ${port}`);
 });
 
 
