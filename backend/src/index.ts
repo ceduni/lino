@@ -54,8 +54,9 @@ server.register(threadRoutes);
 
 // Start the server
 const port = process.env.PORT || 3000;
+const host = ("RENDER" in process.env) ? '0.0.0.0' : 'localhost';
 console.log(`Starting server on port ${port}`);
-server.listen(port, '0.0.0.0', (err: any, address: any) => {
+server.listen({host: host, port: port}, (err: any, address: any) => {
     if (err) {
         console.error(err);
         process.exit(1);
