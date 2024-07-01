@@ -44,6 +44,7 @@ server.decorate('optionalAuthenticate', async (request) => {
 const mongoURI = process.env.MONGODB_URI;
 // @ts-ignore
 mongoose.connect(mongoURI)
+    .then(() => console.log('MongoDB connected...'))
     .catch((err: any) => console.error('MongoDB connection error:', err));
 
 // Register routes
