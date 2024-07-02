@@ -1,70 +1,71 @@
 import axios from 'axios';
 import Book from "../models/book.model";
-import mongoose from "mongoose";
 import User from "../models/user.model";
 import BookBox from "../models/bookbox.model";
 import {notifyUser} from "./user.service";
 
 const bookService = {
+    async getBookBoxBooks(bookboxId: string) {
+        const bookBox = await BookBox.findById(bookboxId);
+        if (!bookBox) {
+            throw new Error('Bookbox not found');
+        }
+        const books = [];
+        for (const bookId of bookBox.books) {
+            const book = await Book.findById(bookId);
+            if (book) {
+                books.push(book);
+            }
+        }
+        return books;
+    },
+
     // Helper function to fetch or create a book
-    // This function tries to find a book in the database. If not found, it gets info from Google Books API and creates a new book entry.
-    async addNewBook(request: any, bookboxId: string) {
-        let book = new Book({
-            isbn: request.body.isbn,
-            title: request.body.title,
-            authors: request.body.authors,
-            description: request.body.description,
-            coverImage: request.body.coverImage,
-            publisher: request.body.publisher,
-            parutionYear: request.body.parutionYear,
-            pages: request.body.pages,
-            categories: request.body.categories,
-        });
+    async addBook(request: any) {
+        let book = await Book.findOne({qrCodeId: request.body.qrCodeId});
+        if (!book) {
+            book = new Book({
+                qrCodeId: request.body.qrCodeId,
+                isbn: request.body.isbn,
+                title: request.body.title,
+                authors: request.body.authors,
+                description: request.body.description,
+                coverImage: request.body.coverImage,
+                publisher: request.body.publisher,
+                parutionYear: request.body.parutionYear,
+                pages: request.body.pages,
+                categories: request.body.categories,
+            });
+        }
+        if (!book.qrCodeId) {
+            throw new Error('Book\'s QR code ID is required');
+        }
         if (!book.title) {
             throw new Error('Book\'s title is required');
         }
-        let bookBox = await BookBox.findById(bookboxId);
+        let bookBox = await BookBox.findById(request.body.bookboxId);
         if (!bookBox) {
             throw new Error('Bookbox not found');
         }
-        bookBox.books.push(book.id);
-        await this.updateBooks(book, request, true);
-        await this.notifyAllUsers(book, 'added to', bookBox.name);
-        await book.save();
-        await bookBox.save();
-        await this.updateUserEcoImpact(request, book.id);
-        return book.id;
-    },
 
-    async addExistingBook(id: string, request: any, bookboxId: string) {
-        // check if the book exists
-        let book = await Book.findById(id);
-        if (!book) {
-            throw new Error('Book not found');
-        }
-        // check if the bookbox exists
-        let bookBox = await BookBox.findById(bookboxId);
-        if (!bookBox) {
-            throw new Error('Bookbox not found');
-        }
         // check if the book is already in a bookbox somewhere
         const bookBoxes = await BookBox.find({ books: book.id });
         if (bookBoxes.length > 0) {
             throw new Error('Book is supposed to be in the book box ' + bookBoxes[0].name);
         }
 
+        bookBox.books.push(book.id);
         await this.updateBooks(book, request, true);
         await this.notifyAllUsers(book, 'added to', bookBox.name);
-        bookBox.books.push(book._id);
         await book.save();
         await bookBox.save();
-        await this.updateUserEcoImpact(request, book._id.toString());
-        return book;
+        await this.updateUserEcoImpact(request, book.id);
+        return {bookId : book.id, books : bookBox.books};
     },
 
-    async getBookFromBookBox(id: string, request: any, bookboxId: string) {
+    async getBookFromBookBox(qrCode: string, request: any, bookboxId: string) {
         // check if the book exists
-        let book = await Book.findById(id);
+        let book = await Book.findOne({qrCodeId: qrCode});
         if (!book) {
             throw new Error('Book not found');
         }
@@ -74,8 +75,8 @@ const bookService = {
             throw new Error('Bookbox not found');
         }
         // check if the book is in the bookbox
-        if (bookBox.books.includes(book._id)) {
-            bookBox.books.splice(bookBox.books.indexOf(book._id), 1);
+        if (bookBox.books.includes(book.id)) {
+            bookBox.books.splice(bookBox.books.indexOf(book.id), 1);
         } else {
             throw new Error('Book not found in bookbox');
         }
@@ -84,8 +85,8 @@ const bookService = {
         await this.notifyAllUsers(book, 'removed from', bookBox.name);
         await book.save();
         await bookBox.save();
-        await this.updateUserEcoImpact(request, book._id.toString());
-        return book;
+        await this.updateUserEcoImpact(request, book.id);
+        return {book: book, books: bookBox.books};
     },
 
     async updateUserEcoImpact(request: any, bookId: string) {
@@ -124,22 +125,22 @@ const bookService = {
             }
             const username = user.username;
             if (given) { // if the book is given
-                book.given_history.push({username: username, timestamp: new Date()});
+                book.givenHistory.push({username: username, timestamp: new Date()});
             } else { // if the book is taken
-                book.taken_history.push({username: username, timestamp: new Date()});
+                book.takenHistory.push({username: username, timestamp: new Date()});
             }
         } else { // if the user is not authenticated, username is 'guest'
             if (given) { // if the book is given
-                book.given_history.push({username: "guest", timestamp: new Date()});
+                book.givenHistory.push({username: "guest", timestamp: new Date()});
             } else { // if the book is taken
-                book.taken_history.push({username: "guest", timestamp: new Date()});
+                book.takenHistory.push({username: "guest", timestamp: new Date()});
             }
         }
         const books : any = await Book.find({title: book.title});
         for (let i = 0; i < books.length; i++) {
-            // Update the date_last_action field for all books with the same title
+            // Update the dateLastAction field for all books with the same title
             // to indicate that this book has been looked at recently
-            books[i].date_last_action = Date.now;
+            books[i].dateLastAction = Date.now;
         }
     },
 
@@ -222,7 +223,7 @@ const bookService = {
                 throw new Error('Bookbox not found');
             }
             books = books.filter((book) => {
-                return bookBox.books.includes(book._id);
+                return bookBox.books.includes(book.id);
             });
         }
 
@@ -262,8 +263,8 @@ const bookService = {
             });
         } else if (classify === 'by recent activity') {
             books.sort((a, b) => {
-                const aDate = a.date_last_action?.getTime() ?? 0;
-                const bDate = b.date_last_action?.getTime() ?? 0;
+                const aDate = a.dateLastAction?.getTime() ?? 0;
+                const bDate = b.dateLastAction?.getTime() ?? 0;
                 if (asc) {
                     return aDate - bDate;
                 } else {
@@ -279,16 +280,16 @@ const bookService = {
             // @ts-ignore
             books[i] = books[i].toObject(); // Convert document to a plain JavaScript object
             // @ts-ignore
-            books[i].bookbox_presence = [];
+            books[i].bookboxPresence = [];
             for (let j = 0; j < bookBoxes.length; j++) {
-                if (bookBoxes[j].books.includes(books[i]._id)) {
+                if (bookBoxes[j].books.includes(books[i]._id.toString())) {
                     // @ts-ignore
-                    books[i].bookbox_presence.push(bookBoxes[j]._id);
+                    books[i].bookboxPresence.push(bookBoxes[j]._id);
                 }
             }
             // Remove the books that are not present in any bookbox
             // @ts-ignore
-            if (books[i].bookbox_presence.length === 0) {
+            if (books[i].bookboxPresence.length === 0) {
                 books.splice(i, 1);
                 i--;
             }
@@ -299,6 +300,21 @@ const bookService = {
 
     async getBook(id: string) {
         return Book.findById(id);
+    },
+
+    async alertUsers(request : any) {
+        const user = await User.findById(request.user.id);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const users = await User.find({getAlerted: true});
+        for (let i = 0; i < users.length; i++) {
+            if (users[i].username !== user.username) {
+                await notifyUser(users[i].id, `The user ${user.username} wants to get the book "${request.body.title}" ! If you have it, please feel free to add it to one of our book boxes !`);
+            }
+        }
+
+        return {message: 'Alert sent'};
     },
 
     // Function that returns 1 if the book is relevant to the user by his keywords, 0 otherwise
@@ -318,32 +334,23 @@ const bookService = {
         return 0;
     },
 
-    async notifyAllUsers(book: any, action: string, bookBoxName: string) {
-        const users = await User.find();
-        // Notify all users who have notification keywords corresponding to the book
-        for (let i = 0; i < users.length; i++) {
-            const relevance = await this.getBookRelevance(book, users[i]);
-            if (relevance > 0) {
-                await notifyUser(users[i].id, `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
-            }
-        }
-
-        // Notify all users who have the book in their favorites
-        for (let i = 0; i < users.length; i++) {
-            if (users[i].favoriteBooks.includes(book.id)) {
-                await notifyUser(users[i].id, `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
-            }
-        }
-
+    async addNewBookbox(request: any) {
+        const bookBox = new BookBox({
+            name: request.body.name,
+            books: [],
+            location: [request.body.longitude, request.body.latitude],
+            infoText: request.body.infoText,
+        });
+        await bookBox.save();
+        return bookBox;
     },
 
-
-    async alertUsers(username: string, title: string) {
-        const users = await User.find({getAlerted: true});
+    async notifyAllUsers(book: any, action: string, bookBoxName: string) {
+        const users = await User.find();
         for (let i = 0; i < users.length; i++) {
-            if (users[i].username !== username) {
-                await notifyUser(users[i].id, `The user ${username} wants to get the book "${title}" ! 
-                If you have it, please feel free to add it to one of our book boxes !`);
+            const relevance = await this.getBookRelevance(book, users[i]);
+            if (relevance > 0 || users[i].favoriteBooks.includes(book.id)) {
+                await notifyUser(users[i].id, `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
             }
         }
     },

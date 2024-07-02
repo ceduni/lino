@@ -8,7 +8,7 @@ dotenv.config();
 const UserService = {
     // User service to register a new user's account
     async registerUser(userData: any) {
-        const { username, email, phone, password } = userData;
+        const { username, email, phone, password, getAlerted } = userData;
         if (username === 'guest') {
             throw new Error('Username not allowed');
         }
@@ -29,9 +29,11 @@ const UserService = {
             { username : username,
                 email : email,
                 phone : phone,
-                password: hashedPassword });
+                password: hashedPassword,
+                getAlerted: getAlerted
+            });
         await user.save();
-        return user;
+        return {username: user.username, password: user.password};
     },
 
     // User service to log in a user if they exist (can log with either a username or an email)
@@ -49,11 +51,11 @@ const UserService = {
         // @ts-ignore
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY);
 
-        return { user, token };
+        return { user: user, token: token };
     },
 
 
-    // User service to add a book's ISBN to a user's favorites
+    // User service to add a book's ID to a user's favorites
     async addToFavorites(userId: string, id: string) {
         let user = await User.findById(userId);
         if (!user) {
@@ -68,7 +70,7 @@ const UserService = {
     },
 
 
-    // User service to remove a book's ISBN from a user's favorites
+    // User service to remove a book's ID from a user's favorites
     async removeFromFavorites(userId: string, id: string) {
         let user = await User.findById(userId);
         if (!user) {
@@ -84,7 +86,7 @@ const UserService = {
     },
 
 
-    // User service to get the infos of the user's favorite books thanks to their ISBN
+    // User service to get the infos of the user's favorite books
     async getFavorites(userId: string) {
         let user = await User.findById(userId);
         if (!user) {
@@ -121,31 +123,40 @@ const UserService = {
     },
 
 
-    async parseKeyWords(userId: string, text: string) {
-        const user = await User.findById(userId);
-        if (!user) {
-            throw new Error('User not found');
-        }
-        const keyWords = user.notificationKeyWords;
-        const words = text.split(',');
-        for (const word of words) {
-            if (!keyWords.includes(word)) {
-                keyWords.push(word.trim());
-            }
-        }
-        await user.save();
-        return user;
+   async parseKeyWords(text: string) {
+        return text.split(',');
     },
 
-    async removeKeyWord(userId: string, text: string) {
-        const user = await User.findById(userId);
+    async updateUser(request: any) {
+        const user = await User.findById(request.user.id);
         if (!user) {
             throw new Error('User not found');
         }
-        const keyWords = user.notificationKeyWords;
-        const index = keyWords.indexOf(text);
-        if (index !== -1) {
-            keyWords.splice(index, 1);
+        if (request.body.username) {
+            const check = await User.findOne({ username: request.body.username });
+            if (check) {
+                throw new Error('Username already taken');
+            }
+            user.username = request.body.username;
+        }
+        if (request.body.password) {
+            user.password = await argon2.hash(request.body.password);
+        }
+        if (request.body.email) {
+            const check = await User.findOne({ email: request.body.email });
+            if (check) {
+                throw new Error('Email already taken');
+            }
+            user.email = request.body.email;
+        }
+        if (request.body.phone) {
+            user.phone = request.body.phone;
+        }
+        if (request.body.getAlerted) {
+            user.getAlerted = request.body.getAlerted;
+        }
+        if (request.body.keyWords) {
+            user.notificationKeyWords = await this.parseKeyWords(request.body.keyWords);
         }
         await user.save();
         return user;
@@ -167,5 +178,7 @@ export async function notifyUser(userId: string, message: string) {
     await user.save();
     return user;
 }
+
+
 
 export default UserService;
