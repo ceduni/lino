@@ -63,7 +63,7 @@ function randomMessage(threadId: string, respondsTo: string | null = null) {
 async function populateUsers() {
     for (let i = 0; i < 10; i++) {
         const user = randomUser();
-        const response = await fetch(url + "/users/register", {
+        await fetch(url + "/users/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json; charset=UTF-8",
@@ -73,7 +73,6 @@ async function populateUsers() {
         const { username, password } = user;
         userIdentifiers.push({ identifier: username, password: password });
     }
-    console.log(userIdentifiers);
     console.log("Users created");
 }
 
@@ -154,12 +153,11 @@ async function populateThreads() {
             });
             const { threadId } = await response.json();
 
-
             // add between 1 and 5 messages to each thread, which responds to the previous message with a probability of 0.5
             const nMessages = faker.number.int({min: 3, max: 7});
             let respondsTo = null;
             for (let j = 0; j < nMessages; j++) {
-                if (faker.number.float({min: 0, max: 1}) < 0.5) {
+                if (faker.number.float({min: 0, max: 1}) < 0.6) {
                     respondsTo = null;
                 }
                 // connect a random user
