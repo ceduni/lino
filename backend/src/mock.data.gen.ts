@@ -1,7 +1,9 @@
 import { faker } from '@faker-js/faker';
 
 
-const url = "https://lino-1.onrender.com";
+const url = "http://localhost:3000";
+const bookBoxIds: string[] = [];
+const bookIds: string[] = [];
 
 function randomUser() {
     return {
@@ -15,9 +17,9 @@ function randomUser() {
 function randomBookBox() {
     return {
         name: faker.lorem.word(),
-        location: [faker.location.latitude(), faker.location.longitude()],
+        longitude: faker.location.longitude(),
+        latitude: faker.location.latitude(),
         infoText: faker.lorem.sentence(),
-        books: [],
     }
 }
 
@@ -53,8 +55,62 @@ async function populateUsers() {
             body: JSON.stringify(randomUser())
         });
     }
+    console.log("Users created");
+}
+
+async function populateBookBoxes() {
+    // first connect as the administrator
+    const init = await fetch(url + "/users/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+        },
+        body: JSON.stringify({
+            identifier: process.env.ADMIN_USERNAME,
+            password: process.env.ADMIN_PASSWORD,
+        })
+    });
+    const { token } = await init.json();
+
+    // then create the book boxes
+    for (let i = 0; i < 10; i++) {
+        const response = await fetch(url + "/books/bookbox/new", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8",
+                "Authorization": "Bearer " + token,
+            },
+            body: JSON.stringify(randomBookBox())
+        });
+        const { _id } = await response.json();
+        bookBoxIds.push(_id.toString());
+    }
+    console.log("Book boxes created");
+}
+
+async function populateBooks() {
+    // add 8 books to each book box
+    for (let bookBoxId of bookBoxIds) {
+        for (let i = 0; i < 8; i++) {
+            const response = await fetch(url + "/books/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json; charset=UTF-8",
+                },
+                body: JSON.stringify({
+                    bookboxId: bookBoxId,
+                    ...randomBook(),
+                })
+            });
+            const { bookId } = await response.json();
+            bookIds.push(bookId.toString());
+        }
+    }
+    console.log("Books created");
 }
 
 export async function populateDatabase() {
     await populateUsers();
+    await populateBookBoxes();
+    await populateBooks();
 }

@@ -16,6 +16,7 @@ const bookRoutes = require('./routes/book.route');
 const userRoutes = require('./routes/user.route');
 const threadRoutes = require('./routes/thread.route');
 const fastifyCors = require('@fastify/cors');
+const dataGenerator = require('./mock.data.gen');
 dotenv.config();
 const server = Fastify({ logger: { level: 'error' } });
 server.register(fastifyCors, {
@@ -71,6 +72,8 @@ mongoose.connect(mongoURI)
     try {
         yield clearCollections();
         yield createAdminUser();
+        console.log('Database initialized...');
+        yield dataGenerator.populateDatabase();
     }
     catch (err) {
         console.error('Error during initialization:', err.message);

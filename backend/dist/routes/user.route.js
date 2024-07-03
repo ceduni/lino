@@ -110,8 +110,13 @@ function updateUser(request, reply) {
 }
 function clearCollection(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield user_service_2.default.clearCollection();
-        reply.send({ message: 'Users cleared' });
+        try {
+            yield user_service_2.default.clearCollection();
+            reply.send({ message: 'Users cleared' });
+        }
+        catch (error) {
+            reply.code(500).send({ error: error.message });
+        }
     });
 }
 function userRoutes(server) {

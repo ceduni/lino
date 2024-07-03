@@ -41,10 +41,15 @@ function addThreadMessage(request, reply) {
             reply.code(401).send({ error: 'Unauthorized' });
             return;
         }
-        const { content, respondsTo } = request.body;
-        const threadId = request.body.threadId;
-        const message = yield thread_service_1.default.addThreadMessage(threadId, username, content, respondsTo);
-        reply.code(201).send({ messageId: message._id });
+        try {
+            const { content, respondsTo } = request.body;
+            const threadId = request.body.threadId;
+            const message = yield thread_service_1.default.addThreadMessage(threadId, username, content, respondsTo);
+            reply.code(201).send({ messageId: message._id });
+        }
+        catch (error) {
+            reply.code(500).send({ error: 'Internal server error' });
+        }
     });
 }
 function toggleMessageReaction(request, reply) {
@@ -85,8 +90,13 @@ function getThread(request, reply) {
 }
 function clearCollection(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield thread_service_1.default.clearCollection();
-        reply.send({ message: 'Threads collection cleared' });
+        try {
+            yield thread_service_1.default.clearCollection();
+            reply.send({ message: 'Threads collection cleared' });
+        }
+        catch (error) {
+            reply.code(500).send({ error: error.message });
+        }
     });
 }
 function threadRoutes(server) {

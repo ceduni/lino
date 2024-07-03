@@ -68,6 +68,7 @@ mongoose.connect(mongoURI)
         try {
             await clearCollections();
             await createAdminUser();
+            console.log('Database initialized...');
             await dataGenerator.populateDatabase();
         } catch (err : any) {
             console.error('Error during initialization:', err.message);

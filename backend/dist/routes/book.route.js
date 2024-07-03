@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const book_service_1 = __importDefault(require("../services/book.service"));
-const bookbox_model_1 = __importDefault(require("../models/bookbox.model"));
 function addBookToBookbox(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -40,58 +39,86 @@ function getBookFromBookBox(request, reply) {
 }
 function getBookInfoFromISBN(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
-        const isbn = request.params.isbn;
-        const book = yield book_service_1.default.getBookInfoFromISBN(isbn);
-        reply.send(book);
+        try {
+            const isbn = request.params.isbn;
+            const book = yield book_service_1.default.getBookInfoFromISBN(isbn);
+            reply.send(book);
+        }
+        catch (error) {
+            reply.code(404).send({ error: error.message });
+        }
     });
 }
 function searchBooks(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
-        const books = yield book_service_1.default.searchBooks(request);
-        reply.send({ books: books });
+        try {
+            const books = yield book_service_1.default.searchBooks(request);
+            reply.send({ books: books });
+        }
+        catch (error) {
+            reply.code(404).send({ error: error.message });
+        }
     });
 }
 function sendAlert(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
-        const response = yield book_service_1.default.alertUsers(request);
-        reply.send(response);
+        try {
+            const response = yield book_service_1.default.alertUsers(request);
+            reply.send(response);
+        }
+        catch (error) {
+            reply.code(400).send({ error: error.message });
+        }
     });
 }
 function getBook(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
-        const book = yield book_service_1.default.getBook(request.params.id);
-        reply.send(book);
+        try {
+            const book = yield book_service_1.default.getBook(request.params.id);
+            reply.send(book);
+        }
+        catch (error) {
+            reply.code(404).send({ error: error.message });
+        }
     });
 }
 function getBookbox(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
-        const response = yield bookbox_model_1.default.findById(request.params.bookboxId);
-        reply.send(response);
-    });
-}
-function getBookBoxBooks(request, reply) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const response = yield book_service_1.default.getBookBoxBooks(request.params.bookboxId);
-        reply.send(response);
+        try {
+            const response = yield book_service_1.default.getBookBox(request.params.bookboxId);
+            reply.send(response);
+        }
+        catch (error) {
+            reply.code(404).send({ error: error.message });
+        }
     });
 }
 function addNewBookbox(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
-        const response = yield book_service_1.default.addNewBookbox(request);
-        reply.code(201).send(response);
+        try {
+            const response = yield book_service_1.default.addNewBookbox(request);
+            reply.code(201).send(response);
+        }
+        catch (error) {
+            reply.code(400).send({ error: error.message });
+        }
     });
 }
 function clearCollection(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield book_service_1.default.clearCollection();
-        reply.send({ message: 'Books cleared' });
+        try {
+            yield book_service_1.default.clearCollection();
+            reply.send({ message: 'Books cleared' });
+        }
+        catch (error) {
+            reply.code(500).send({ error: error.message });
+        }
     });
 }
 function bookRoutes(server) {
     return __awaiter(this, void 0, void 0, function* () {
         server.get('/books/get/:id', getBook);
         server.get('/books/bookbox/:bookboxId', getBookbox);
-        server.get('/books/bookbox/books/:bookboxId', getBookBoxBooks);
         server.get('/books/:bookQRCode/:bookboxId', { preValidation: [server.optionalAuthenticate] }, getBookFromBookBox);
         server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate] }, getBookInfoFromISBN);
         server.get('/books/search', searchBooks);
