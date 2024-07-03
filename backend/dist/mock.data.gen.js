@@ -11,9 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.populateDatabase = void 0;
 const faker_1 = require("@faker-js/faker");
-const url = "http://localhost:3000";
+const url = "https://lino-1.onrender.com";
 const bookBoxIds = [];
 const bookIds = [];
+const userIdentifiers = [];
 function randomUser() {
     return {
         username: faker_1.faker.internet.userName(),
@@ -44,17 +45,34 @@ function randomBook() {
         pages: faker_1.faker.number.int({ min: 50, max: 1000 }), // Generate a random number of pages between 50 and 1000
     };
 }
+function randomThread(bookId) {
+    return {
+        bookId: bookId,
+        title: faker_1.faker.lorem.words(4),
+    };
+}
+function randomMessage(threadId, respondsTo = null) {
+    return {
+        threadId: threadId,
+        content: faker_1.faker.lorem.paragraph(),
+        respondsTo: respondsTo,
+    };
+}
 function populateUsers() {
     return __awaiter(this, void 0, void 0, function* () {
         for (let i = 0; i < 10; i++) {
-            yield fetch(url + "/users/register", {
+            const user = randomUser();
+            const response = yield fetch(url + "/users/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json; charset=UTF-8",
                 },
-                body: JSON.stringify(randomUser())
+                body: JSON.stringify(user)
             });
+            const { username, password } = user;
+            userIdentifiers.push({ identifier: username, password: password });
         }
+        console.log(userIdentifiers);
         console.log("Users created");
     });
 }
@@ -90,9 +108,10 @@ function populateBookBoxes() {
 }
 function populateBooks() {
     return __awaiter(this, void 0, void 0, function* () {
-        // add 8 books to each book box
+        // add between 3 and 5 books to each book box
         for (let bookBoxId of bookBoxIds) {
-            for (let i = 0; i < 8; i++) {
+            const nBooks = faker_1.faker.number.int({ min: 3, max: 5 });
+            for (let i = 0; i < nBooks; i++) {
                 const response = yield fetch(url + "/books/add", {
                     method: "POST",
                     headers: {
@@ -104,8 +123,65 @@ function populateBooks() {
                 bookIds.push(bookId.toString());
             }
         }
-        console.log(bookIds);
         console.log("Books created");
+    });
+}
+function populateThreads() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // add between 1 and 2 threads to each book
+        for (let bookId of bookIds) {
+            // first connect a random user
+            const { identifier, password } = userIdentifiers[faker_1.faker.number.int({ min: 0, max: 9 })];
+            const response = yield fetch(url + "/users/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json; charset=UTF-8",
+                },
+                body: JSON.stringify({ identifier, password })
+            });
+            const { token: userToken } = yield response.json();
+            const nThreads = faker_1.faker.number.int({ min: 1, max: 3 });
+            for (let i = 0; i < nThreads; i++) {
+                const response = yield fetch(url + "/threads/new", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json; charset=UTF-8",
+                        "Authorization": "Bearer " + userToken,
+                    },
+                    body: JSON.stringify(randomThread(bookId))
+                });
+                const { threadId } = yield response.json();
+                // add between 1 and 5 messages to each thread, which responds to the previous message with a probability of 0.5
+                const nMessages = faker_1.faker.number.int({ min: 3, max: 7 });
+                let respondsTo = null;
+                for (let j = 0; j < nMessages; j++) {
+                    if (faker_1.faker.number.float({ min: 0, max: 1 }) < 0.5) {
+                        respondsTo = null;
+                    }
+                    // connect a random user
+                    const { identifier, password } = userIdentifiers[faker_1.faker.number.int({ min: 0, max: 9 })];
+                    const response0 = yield fetch(url + "/users/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json; charset=UTF-8",
+                        },
+                        body: JSON.stringify({ identifier, password })
+                    });
+                    const { token: otherUserToken } = yield response0.json();
+                    const response = yield fetch(url + "/threads/messages", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json; charset=UTF-8",
+                            "Authorization": "Bearer " + otherUserToken,
+                        },
+                        body: JSON.stringify(randomMessage(threadId, respondsTo))
+                    });
+                    const { messageId } = yield response.json();
+                    respondsTo = messageId;
+                }
+            }
+        }
+        console.log("Threads created");
     });
 }
 function populateDatabase() {
@@ -113,6 +189,8 @@ function populateDatabase() {
         yield populateUsers();
         yield populateBookBoxes();
         yield populateBooks();
+        yield populateThreads();
+        console.log("Database populated!");
     });
 }
 exports.populateDatabase = populateDatabase;

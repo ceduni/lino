@@ -53,9 +53,9 @@ const ThreadService = {
         }
 
         // Get the _id of the newly created message
-        const messageId = thread.messages[thread.messages.length - 1]._id;
+        const messageId = thread.messages[thread.messages.length - 1].id;
 
-        return { ...message, _id: messageId };
+        return { ...message, id: messageId };
     },
 
     async toggleMessageReaction(threadId : string, messageId : string, username : string, reactIcon : string) {

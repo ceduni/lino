@@ -25,7 +25,7 @@ function createThread(request, reply) {
         }
         const { bookId, title } = request.body;
         const thread = yield thread_service_1.default.createThread(bookId, username, title);
-        reply.code(201).send({ threadId: thread._id });
+        reply.code(201).send({ threadId: thread.id });
     });
 }
 function addThreadMessage(request, reply) {
@@ -45,7 +45,7 @@ function addThreadMessage(request, reply) {
             const { content, respondsTo } = request.body;
             const threadId = request.body.threadId;
             const message = yield thread_service_1.default.addThreadMessage(threadId, username, content, respondsTo);
-            reply.code(201).send({ messageId: message._id });
+            reply.code(201).send({ messageId: message.id });
         }
         catch (error) {
             reply.code(500).send({ error: 'Internal server error' });

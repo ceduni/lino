@@ -62,16 +62,18 @@ function randomMessage(threadId: string, respondsTo: string | null = null) {
 
 async function populateUsers() {
     for (let i = 0; i < 10; i++) {
+        const user = randomUser();
         const response = await fetch(url + "/users/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json; charset=UTF-8",
             },
-            body: JSON.stringify(randomUser())
+            body: JSON.stringify(user)
         });
-        const { username, password } = await response.json();
+        const { username, password } = user;
         userIdentifiers.push({ identifier: username, password: password });
     }
+    console.log(userIdentifiers);
     console.log("Users created");
 }
 
@@ -140,7 +142,7 @@ async function populateThreads() {
             body: JSON.stringify({ identifier, password })
         });
         const { token : userToken } = await response.json();
-        const nThreads = faker.number.int({min: 1, max: 2});
+        const nThreads = faker.number.int({min: 1, max: 3});
         for (let i = 0; i < nThreads; i++) {
             const response = await fetch(url + "/threads/new", {
                 method: "POST",
@@ -152,33 +154,34 @@ async function populateThreads() {
             });
             const { threadId } = await response.json();
 
-            // connect a random user
-            const { identifier, password } = userIdentifiers[faker.number.int({min: 0, max: 9})];
-            const response0 = await fetch(url + "/users/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json; charset=UTF-8",
-                },
-                body: JSON.stringify({ identifier, password })
-            });
-            const { token : otherUserToken } = await response0.json();
+
             // add between 1 and 5 messages to each thread, which responds to the previous message with a probability of 0.5
-            const nMessages = faker.number.int({min: 1, max: 5});
+            const nMessages = faker.number.int({min: 3, max: 7});
             let respondsTo = null;
             for (let j = 0; j < nMessages; j++) {
                 if (faker.number.float({min: 0, max: 1}) < 0.5) {
                     respondsTo = null;
                 }
+                // connect a random user
+                const { identifier, password } = userIdentifiers[faker.number.int({min: 0, max: 9})];
+                const response0 = await fetch(url + "/users/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json; charset=UTF-8",
+                    },
+                    body: JSON.stringify({ identifier, password })
+                });
+                const { token : otherUserToken } = await response0.json();
                 const response : any = await fetch(url + "/threads/messages", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json; charset=UTF-8",
                         "Authorization": "Bearer " + otherUserToken,
                     },
-                    body: JSON.stringify(randomMessage(threadId.toString(), respondsTo))
+                    body: JSON.stringify(randomMessage(threadId, respondsTo))
                 });
                 const { messageId } = await response.json();
-                respondsTo = messageId.toString();
+                respondsTo = messageId;
             }
         }
     }
@@ -190,4 +193,5 @@ export async function populateDatabase() {
     await populateBookBoxes();
     await populateBooks();
     await populateThreads();
+    console.log("Database populated!");
 }
