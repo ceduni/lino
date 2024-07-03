@@ -6,6 +6,7 @@ const bookRoutes = require('./routes/book.route');
 const userRoutes = require('./routes/user.route');
 const threadRoutes = require('./routes/thread.route');
 const fastifyCors = require('@fastify/cors');
+const dataGenerator = require('./mock.data.gen');
 
 
 dotenv.config();
@@ -67,6 +68,7 @@ mongoose.connect(mongoURI)
         try {
             await clearCollections();
             await createAdminUser();
+            await dataGenerator.populateDatabase();
         } catch (err : any) {
             console.error('Error during initialization:', err.message);
         }

@@ -1,6 +1,27 @@
 import { faker } from '@faker-js/faker';
 
-export function randomBook() {
+
+const url = "https://lino-1.onrender.com";
+
+function randomUser() {
+    return {
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        phone: faker.phone.number(),
+        password: faker.internet.password(),
+    }
+}
+
+function randomBookBox() {
+    return {
+        name: faker.lorem.word(),
+        location: [faker.location.latitude(), faker.location.longitude()],
+        infoText: faker.lorem.sentence(),
+        books: [],
+    }
+}
+
+function randomBook() {
     return {
         isbn: faker.string.numeric(13), // Generate a random 13-digit ISBN
         qrCodeId: faker.string.uuid(), // Generate a random UUID
@@ -21,11 +42,19 @@ export function randomBook() {
     }
 }
 
-export function randomBookBox() {
-    return {
-        name: faker.lorem.word(),
-        location: [faker.location.latitude(), faker.location.longitude()],
-        infoText: faker.lorem.sentence(),
-        books: [],
+
+async function populateUsers() {
+    for (let i = 0; i < 10; i++) {
+        await fetch(url + "/users/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8",
+            },
+            body: JSON.stringify(randomUser())
+        });
     }
+}
+
+export async function populateDatabase() {
+    await populateUsers();
 }
