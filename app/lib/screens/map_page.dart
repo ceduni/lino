@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:Lino_app/widgets/search_app_bar.dart';
-import 'package:Lino_app/widgets/floating_menu.dart';
 
 class BookBoxLocationList extends StatefulWidget {
   final List<BookBox> bookBoxes;
 
-  BookBoxLocationList({required this.bookBoxes});
+  const BookBoxLocationList({required this.bookBoxes});
 
   @override
   _BookBoxLocationListState createState() => _BookBoxLocationListState();
@@ -39,7 +38,7 @@ class _BookBoxLocationListState extends State<BookBoxLocationList> {
       ),
       body: Column(
         children: [
-          Container(
+          SizedBox(
             // decoration: const BoxDecoration(
             //   color: Colors.red,
             //   borderRadius: BorderRadius.only(
@@ -75,7 +74,7 @@ class _BookBoxLocationListState extends State<BookBoxLocationList> {
 class BookBoxListItem extends StatelessWidget {
   final BookBox bookBox;
 
-  BookBoxListItem({required this.bookBox});
+  const BookBoxListItem({required this.bookBox});
 
   @override
   Widget build(BuildContext context) {

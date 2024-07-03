@@ -1,11 +1,7 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
-import 'screens/loading_page.dart';
-import 'widgets/search_app_bar.dart';
 import 'screens/map_page.dart';
 import 'models/bookbox_model.dart';
-import 'widgets/floating_menu.dart';
-import 'widgets/bottom_app_bar.dart';
 
 void main() {
   runApp(MyApp());

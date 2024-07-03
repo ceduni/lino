@@ -5,7 +5,7 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onMenuPressed;
   final ValueChanged<String> onSearchChanged;
 
-  SearchAppBar({
+  const SearchAppBar({
     required this.onUserIconPressed,
     required this.onMenuPressed,
     required this.onSearchChanged,

@@ -4,6 +4,7 @@ import { faker } from '@faker-js/faker';
 const url = "https://lino-1.onrender.com";
 const bookBoxIds: string[] = [];
 const bookIds: string[] = [];
+const userIdentifiers: any[] = [];
 
 function randomUser() {
     return {
@@ -44,16 +45,32 @@ function randomBook() {
     }
 }
 
+function randomThread(bookId: string) {
+    return {
+        bookId: bookId,
+        title: faker.lorem.words(4),
+    }
+}
+
+function randomMessage(threadId: string, respondsTo: string | null = null) {
+    return {
+        threadId: threadId,
+        content: faker.lorem.paragraph(),
+        respondsTo: respondsTo,
+    }
+}
 
 async function populateUsers() {
     for (let i = 0; i < 10; i++) {
-        await fetch(url + "/users/register", {
+        const response = await fetch(url + "/users/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json; charset=UTF-8",
             },
             body: JSON.stringify(randomUser())
         });
+        const { username, password } = await response.json();
+        userIdentifiers.push({ identifier: username, password: password });
     }
     console.log("Users created");
 }
@@ -89,9 +106,10 @@ async function populateBookBoxes() {
 }
 
 async function populateBooks() {
-    // add 8 books to each book box
+    // add between 3 and 5 books to each book box
     for (let bookBoxId of bookBoxIds) {
-        for (let i = 0; i < 8; i++) {
+        const nBooks = faker.number.int({min: 3, max: 5});
+        for (let i = 0; i < nBooks; i++) {
             const response = await fetch(url + "/books/add", {
                 method: "POST",
                 headers: {
@@ -109,8 +127,67 @@ async function populateBooks() {
     console.log("Books created");
 }
 
+async function populateThreads() {
+    // add between 1 and 2 threads to each book
+    for (let bookId of bookIds) {
+        // first connect a random user
+        const { identifier, password } = userIdentifiers[faker.number.int({min: 0, max: 9})];
+        const response = await fetch(url + "/users/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8",
+            },
+            body: JSON.stringify({ identifier, password })
+        });
+        const { token : userToken } = await response.json();
+        const nThreads = faker.number.int({min: 1, max: 2});
+        for (let i = 0; i < nThreads; i++) {
+            const response = await fetch(url + "/threads/new", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json; charset=UTF-8",
+                    "Authorization": "Bearer " + userToken,
+                },
+                body: JSON.stringify(randomThread(bookId))
+            });
+            const { threadId } = await response.json();
+
+            // connect a random user
+            const { identifier, password } = userIdentifiers[faker.number.int({min: 0, max: 9})];
+            const response0 = await fetch(url + "/users/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json; charset=UTF-8",
+                },
+                body: JSON.stringify({ identifier, password })
+            });
+            const { token : otherUserToken } = await response0.json();
+            // add between 1 and 5 messages to each thread, which responds to the previous message with a probability of 0.5
+            const nMessages = faker.number.int({min: 1, max: 5});
+            let respondsTo = null;
+            for (let j = 0; j < nMessages; j++) {
+                if (faker.number.float({min: 0, max: 1}) < 0.5) {
+                    respondsTo = null;
+                }
+                const response : any = await fetch(url + "/threads/messages", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json; charset=UTF-8",
+                        "Authorization": "Bearer " + otherUserToken,
+                    },
+                    body: JSON.stringify(randomMessage(threadId.toString(), respondsTo))
+                });
+                const { messageId } = await response.json();
+                respondsTo = messageId.toString();
+            }
+        }
+    }
+    console.log("Threads created");
+}
+
 export async function populateDatabase() {
     await populateUsers();
     await populateBookBoxes();
     await populateBooks();
+    await populateThreads();
 }
