@@ -22,7 +22,7 @@ server.register(fastifyJwt, { secret: process.env.JWT_SECRET_KEY });
 // @ts-ignore
 server.decorate('authenticate', async (request, reply) => {
     try {
-        request.jwtVerify();
+        await request.jwtVerify();
     } catch (err) {
         reply.send(err); // will send an error 401
     }
@@ -40,12 +40,41 @@ server.decorate('optionalAuthenticate', async (request) => {
     }
 });
 
+
+// Admin authentication hook, request must have an Authorization header with a valid JWT
+// and the user must have a specific username
+// @ts-ignore
+server.decorate('adminAuthenticate', async (request, reply) => {
+    try {
+        const token = request.headers.authorization.split(' ')[1];
+        const user = await server.jwt.verify(token);
+        if (user.username !== process.env.ADMIN_USERNAME) {
+            reply.status(401).send(new Error('Unauthorized'));
+        }
+    } catch (error) {
+        reply.status(401).send(error);
+    }
+});
+
+
 // Connect to MongoDB
 const mongoURI = process.env.MONGODB_URI;
 // @ts-ignore
 mongoose.connect(mongoURI)
-    .then(() => console.log('MongoDB connected...'))
-    .catch((err: any) => console.error('MongoDB connection error:', err));
+    .then(async () => {
+        console.log('MongoDB connected...');
+        // Clear collections and create the admin user after MongoDB connection
+        try {
+            await clearCollections();
+            await createAdminUser();
+        } catch (err : any) {
+            console.error('Error during initialization:', err.message);
+        }
+    })
+    .catch((err : any) => {
+        console.error('MongoDB connection error:', err);
+        process.exit(1); // Exit process if MongoDB connection fails
+    });
 
 // Register routes
 server.register(bookRoutes);
@@ -56,8 +85,8 @@ server.register(threadRoutes);
 // Start the server
 const port = process.env.PORT || 3000;
 const host = ("RENDER" in process.env) ? '0.0.0.0' : 'localhost';
-console.log(`Starting server on port ${port}`);
-server.listen({host: host, port: port}, (err: any, address: any) => {
+console.log(`Starting server on port ${port} and host ${host}...`);
+server.listen({ host: host, port: port }, (err : any, address : any) => {
     if (err) {
         console.error(err);
         process.exit(1);
@@ -65,6 +94,36 @@ server.listen({host: host, port: port}, (err: any, address: any) => {
     console.log(`Server started on port ${port}`);
 });
 
+
+// Function to create the admin user
+async function createAdminUser() {
+    try {
+        await server.inject({
+            method: 'POST',
+            url: '/users/register',
+            payload: {
+                username: process.env.ADMIN_USERNAME,
+                password: process.env.ADMIN_PASSWORD,
+                email: process.env.ADMIN_EMAIL,
+            }
+        });
+        console.log('Admin user created or already exists.');
+    } catch (err : any) {
+        if (err.message.includes('already taken')) {
+            console.log('Admin user already exists.');
+        } else {
+            throw err;
+        }
+    }
+}
+
+async function clearCollections() {
+    const collections = await mongoose.connection.db.collections();
+    for (let collection of collections) {
+        await collection.deleteMany({});
+    }
+    console.log('Collections cleared.');
+}
 
 // Export the server for testing
 module.exports = server;

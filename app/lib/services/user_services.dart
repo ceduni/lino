@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class UserService {
-  final String url = 'http://localhost:3000';
+  final String url = 'https://lino-1.onrender.com';
 
 
   Future<String> registerUser(String username, String email, String phone, String password, bool getAlerted) async {

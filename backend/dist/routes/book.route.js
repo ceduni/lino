@@ -69,6 +69,12 @@ function getBookbox(request, reply) {
         reply.send(response);
     });
 }
+function getBookBoxBooks(request, reply) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield book_service_1.default.getBookBoxBooks(request.params.bookboxId);
+        reply.send(response);
+    });
+}
 function addNewBookbox(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         const response = yield book_service_1.default.addNewBookbox(request);
@@ -83,15 +89,16 @@ function clearCollection(request, reply) {
 }
 function bookRoutes(server) {
     return __awaiter(this, void 0, void 0, function* () {
-        server.post('/books/add', { preValidation: [server.optionalAuthenticate] }, addBookToBookbox);
+        server.get('/books/get/:id', getBook);
+        server.get('/books/bookbox/:bookboxId', getBookbox);
+        server.get('/books/bookbox/books/:bookboxId', getBookBoxBooks);
         server.get('/books/:bookQRCode/:bookboxId', { preValidation: [server.optionalAuthenticate] }, getBookFromBookBox);
         server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate] }, getBookInfoFromISBN);
         server.get('/books/search', searchBooks);
+        server.post('/books/add', { preValidation: [server.optionalAuthenticate] }, addBookToBookbox);
         server.post('/books/alert', { preValidation: [server.authenticate] }, sendAlert);
-        server.get('/books/get/:id', getBook);
-        server.get('/books/bookbox/:bookboxId', getBookbox);
-        server.post('/books/bookbox/new', addNewBookbox);
-        server.delete('/books/clear', clearCollection);
+        server.post('/books/bookbox/new', { preValidation: [server.adminAuthenticate] }, addNewBookbox);
+        server.delete('/books/clear', { preValidation: [server.adminAuthenticate] }, clearCollection);
     });
 }
 exports.default = bookRoutes;

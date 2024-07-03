@@ -120,10 +120,10 @@ function userRoutes(server) {
         server.get('/users/favorites', { preValidation: [server.authenticate] }, getUserFavorites);
         server.post('/users/register', registerUser);
         server.post('/users/login', loginUser);
+        server.post('/users/update', { preValidation: [server.authenticate] }, updateUser);
         server.post('/users/favorites', { preValidation: [server.authenticate] }, addToFavorites);
         server.delete('/users/favorites/:id', { preValidation: [server.authenticate] }, removeFromFavorites);
-        server.post('/users/update', { preValidation: [server.authenticate] }, updateUser);
-        server.delete('/users/clear', clearCollection);
+        server.delete('/users/clear', { preValidation: [server.adminAuthenticate] }, clearCollection);
     });
 }
 exports.default = userRoutes;

@@ -1,18 +1,35 @@
 const server = require('../index');
 
 async function clearCollections() {
+    const token = await server.inject({
+        method: 'POST',
+        url: '/users/login',
+        payload: {
+            identifier: process.env.ADMIN_USERNAME,
+            password: process.env.ADMIN_PASSWORD
+        }
+    }).token;
     try {
         await server.inject({
             method: 'DELETE',
-            url: '/threads/clear'
+            url: '/threads/clear',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         });
         await server.inject({
             method: 'DELETE',
-            url: '/books/clear'
+            url: '/books/clear',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         });
         await server.inject({
             method: 'DELETE',
-            url: '/users/clear'
+            url: '/users/clear',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         });
         console.log('Collections cleared successfully!');
     } catch (error) {

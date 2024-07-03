@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 
 class ThreadService {
-  final String url = 'http://localhost:3000';
+  final String url = 'https://lino-1.onrender.com';
 
   Future<Map<String, dynamic>> createThread(String token, String bookid, String title) async {
       final r = await http.post(
@@ -80,7 +80,7 @@ class ThreadService {
       if (asc != null) 'asc': asc.toString(),
     };
 
-    final r = await http.get(Uri.http('localhost:3000', '/threads/search', queryParams),
+    final r = await http.get(Uri.https('lino-1.onrender.com', '/threads/search', queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

@@ -18,7 +18,9 @@ Future<void> main() async {
   var bbids = ['',''];
   var sbl = 0;
 
-  await clearCollections();
+  setUpAll(() async {
+    await clearCollections();
+  });
 
   group('User authentication', () {
     test('registerUser returns a token if the user is registered', () async {
@@ -322,11 +324,14 @@ Future<void> main() async {
     });
   });
 
+  tearDownAll(() async {
+    await clearCollections();
+  });
 }
 
 Future<void> clearCollections() async {
-  await http.delete(Uri.parse('http://localhost:3000/users/clear'));
-  await http.delete(Uri.parse('http://localhost:3000/books/clear'));
-  await http.delete(Uri.parse('http://localhost:3000/threads/clear'));
+  await http.delete(Uri.parse('https://lino-1.onrender.com/users/clear'));
+  await http.delete(Uri.parse('https://lino-1.onrender.com/books/clear'));
+  await http.delete(Uri.parse('https://lino-1.onrender.com/threads/clear'));
   print('Collections cleared');
 }

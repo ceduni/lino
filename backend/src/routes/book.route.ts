@@ -72,6 +72,11 @@ async function getBookbox(request: FastifyRequest<GetBookBoxParams>, reply: Fast
     reply.send(response);
 }
 
+async function getBookBoxBooks(request: FastifyRequest<GetBookBoxParams>, reply: FastifyReply) {
+    const response = await BookService.getBookBoxBooks(request.params.bookboxId);
+    reply.send(response);
+}
+
 async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
     const response = await BookService.addNewBookbox(request);
     reply.code(201).send(response);
@@ -85,16 +90,18 @@ async function clearCollection(request: FastifyRequest, reply: FastifyReply) {
 
 interface MyFastifyInstance extends FastifyInstance {
     optionalAuthenticate: (request: FastifyRequest) => void;
-    authenticate: (request: FastifyRequest) => void;
+    authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
+    adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
 }
 export default async function bookRoutes(server: MyFastifyInstance) {
-    server.post('/books/add', { preValidation: [server.optionalAuthenticate] }, addBookToBookbox);
+    server.get('/books/get/:id', getBook);
+    server.get('/books/bookbox/:bookboxId', getBookbox);
+    server.get('/books/bookbox/books/:bookboxId', getBookBoxBooks);
     server.get('/books/:bookQRCode/:bookboxId', { preValidation: [server.optionalAuthenticate] }, getBookFromBookBox);
     server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate] }, getBookInfoFromISBN);
     server.get('/books/search', searchBooks);
+    server.post('/books/add', { preValidation: [server.optionalAuthenticate] }, addBookToBookbox);
     server.post('/books/alert', { preValidation: [server.authenticate] }, sendAlert);
-    server.get('/books/get/:id', getBook);
-    server.get('/books/bookbox/:bookboxId', getBookbox);
-    server.post('/books/bookbox/new', addNewBookbox);
-    server.delete('/books/clear', clearCollection);
+    server.post('/books/bookbox/new', { preValidation: [server.adminAuthenticate] }, addNewBookbox);
+    server.delete('/books/clear', { preValidation: [server.adminAuthenticate] }, clearCollection);
 }

@@ -61,7 +61,7 @@ const UserService = {
             }
             // User authenticated successfully, generate tokens
             // @ts-ignore
-            const token = jsonwebtoken_1.default.sign({ id: user._id }, process.env.JWT_SECRET_KEY);
+            const token = jsonwebtoken_1.default.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY);
             return { user: user, token: token };
         });
     },

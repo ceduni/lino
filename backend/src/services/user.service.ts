@@ -49,7 +49,7 @@ const UserService = {
         }
         // User authenticated successfully, generate tokens
         // @ts-ignore
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY);
+        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY);
 
         return { user: user, token: token };
     },

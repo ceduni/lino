@@ -102,12 +102,13 @@ async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
 
 interface MyFastifyInstance extends FastifyInstance {
     authenticate: (request : FastifyRequest, reply: FastifyReply) => void;
+    adminAuthenticate: (request : FastifyRequest, reply: FastifyReply) => void;
 }
 export default async function threadRoutes(server: MyFastifyInstance) {
+    server.get('/threads/:threadId', getThread);
+    server.get('/threads/search', searchThreads);
     server.post('/threads/new', { preValidation: [server.authenticate] }, createThread);
     server.post('/threads/messages', { preValidation: [server.authenticate] }, addThreadMessage);
     server.post('/threads/messages/reactions', { preValidation: [server.authenticate] }, toggleMessageReaction);
-    server.get('/threads/search', searchThreads);
-    server.get('/threads/:threadId', getThread);
-    server.delete('/threads/clear', clearCollection);
+    server.delete('/threads/clear', { preValidation: [server.adminAuthenticate] }, clearCollection);
 }
