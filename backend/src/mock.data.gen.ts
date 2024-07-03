@@ -90,8 +90,8 @@ async function populateBookBoxes() {
     });
     const { token } = await init.json();
 
-    // then create the book boxes
-    for (let i = 0; i < 10; i++) {
+    // then create the book boxes (8)
+    for (let i = 0; i < 8; i++) {
         const response = await fetch(url + "/books/bookbox/new", {
             method: "POST",
             headers: {
@@ -129,7 +129,7 @@ async function populateBooks() {
 }
 
 async function populateThreads() {
-    // add between 1 and 2 threads to each book
+    // add between 0 and 2 threads to each book
     for (let bookId of bookIds) {
         // first connect a random user
         const { identifier, password } = userIdentifiers[faker.number.int({min: 0, max: 9})];
@@ -141,7 +141,7 @@ async function populateThreads() {
             body: JSON.stringify({ identifier, password })
         });
         const { token : userToken } = await response.json();
-        const nThreads = faker.number.int({min: 1, max: 3});
+        const nThreads = faker.number.int({min: 0, max: 2});
         for (let i = 0; i < nThreads; i++) {
             const response = await fetch(url + "/threads/new", {
                 method: "POST",
@@ -153,8 +153,8 @@ async function populateThreads() {
             });
             const { threadId } = await response.json();
 
-            // add between 1 and 5 messages to each thread, which responds to the previous message with a probability of 0.5
-            const nMessages = faker.number.int({min: 3, max: 7});
+            // add between 2 and 5 messages to each thread, which responds to the previous message with a probability of 0.5
+            const nMessages = faker.number.int({min: 2, max: 5});
             let respondsTo = null;
             for (let j = 0; j < nMessages; j++) {
                 if (faker.number.float({min: 0, max: 1}) < 0.6) {
