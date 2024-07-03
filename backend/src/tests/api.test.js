@@ -1,18 +1,35 @@
 const server = require('../index');
 
 async function clearCollections() {
+    const token = await server.inject({
+        method: 'POST',
+        url: '/users/login',
+        payload: {
+            identifier: process.env.ADMIN_USERNAME,
+            password: process.env.ADMIN_PASSWORD
+        }
+    }).token;
     try {
         await server.inject({
             method: 'DELETE',
-            url: '/threads/clear'
+            url: '/threads/clear',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         });
         await server.inject({
             method: 'DELETE',
-            url: '/books/clear'
+            url: '/books/clear',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         });
         await server.inject({
             method: 'DELETE',
-            url: '/users/clear'
+            url: '/users/clear',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         });
         console.log('Collections cleared successfully!');
     } catch (error) {
@@ -569,7 +586,7 @@ describe('Tests for thread creation and interaction', () => {
             }
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201);
         expect(payload).toHaveProperty('threadId');
         portedThreadId = payload.threadId;
     });
@@ -587,7 +604,7 @@ describe('Tests for thread creation and interaction', () => {
             }
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201);
         expect(payload).toHaveProperty('messageId');
         portedMessageId = payload.messageId;
     });
@@ -615,7 +632,7 @@ describe('Tests for thread creation and interaction', () => {
             }
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201);
         expect(payload).toHaveProperty('messageId');
     });
 
@@ -657,6 +674,28 @@ describe('Tests for thread creation and interaction', () => {
         expect(payload.reaction).toBe(null);
     });
 
+    test('Search all threads', async () => {
+        const response = await server.inject({
+            method: 'GET',
+            url: `/threads/search`
+        });
+        const payload = JSON.parse(response.payload);
+        expect(response.statusCode).toBe(200);
+        expect(payload).toHaveProperty('threads');
+        expect(payload.threads).toHaveLength(1);
+        expect(payload.threads[0].title).toBe('Discussion about the book');
+    });
+
+    test('Search a specific thread', async () => {
+        const response = await server.inject({
+            method: 'GET',
+            url: `/threads/search?q=inexistence`
+        });
+        const payload = JSON.parse(response.payload);
+        expect(response.statusCode).toBe(200);
+        expect(payload).toHaveProperty('threads');
+        expect(payload.threads).toHaveLength(0);
+    });
 });
 
 async function getUser(token) {
@@ -671,5 +710,6 @@ async function getUser(token) {
 }
 
 afterAll(async () => {
+    await clearCollections();
     await server.close();
 });

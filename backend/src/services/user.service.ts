@@ -49,7 +49,7 @@ const UserService = {
         }
         // User authenticated successfully, generate tokens
         // @ts-ignore
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY);
+        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY);
 
         return { user: user, token: token };
     },
@@ -133,12 +133,20 @@ const UserService = {
             throw new Error('User not found');
         }
         if (request.body.username) {
+            const check = await User.findOne({ username: request.body.username });
+            if (check) {
+                throw new Error('Username already taken');
+            }
             user.username = request.body.username;
         }
         if (request.body.password) {
             user.password = await argon2.hash(request.body.password);
         }
         if (request.body.email) {
+            const check = await User.findOne({ email: request.body.email });
+            if (check) {
+                throw new Error('Email already taken');
+            }
             user.email = request.body.email;
         }
         if (request.body.phone) {

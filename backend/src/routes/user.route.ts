@@ -36,7 +36,6 @@ async function addToFavorites(request : FastifyRequest, reply : FastifyReply) {
         }
         reply.code(200).send({ favorites : user.favoriteBooks });
     } catch (error) {
-        console.error('Error adding book to favorites:', error);
         reply.code(500).send({ error: 'Internal server error' });
     }
 }
@@ -52,7 +51,6 @@ async function removeFromFavorites(request : FastifyRequest, reply : FastifyRepl
         // @ts-ignore
         reply.send({ favorites : user.favoriteBooks });
     } catch (error) {
-        console.error('Error removing book from favorites:', error);
         reply.code(500).send({ error: 'Internal server error' });
     }
 }
@@ -69,29 +67,48 @@ async function getUser(request : FastifyRequest, reply : FastifyReply) {
     }
 }
 
+async function getUserFavorites(request : FastifyRequest, reply : FastifyReply) {
+    try {
+        // @ts-ignore
+        const userId = request.user.id;  // Extract user ID from JWT token
+        const favorites = await UserService.getFavorites(userId);
+        reply.send({ favorites : favorites });
+    } catch (error) {
+        reply.code(500).send({ error: 'Internal server error' });
+    }
+
+}
+
 async function updateUser(request : FastifyRequest, reply : FastifyReply) {
     try {
         const user = await UserService.updateUser(request);
         reply.send({ user: user });
-    } catch (error) {
-        reply.code(500).send({ error: 'Internal server error' });
+    } catch (error : any) {
+        reply.code(401).send({ error: error.message });
+    }
+}
+
+async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
+    try {
+        await UserService.clearCollection();
+        reply.send({message: 'Users cleared'});
+    } catch (error : any) {
+        reply.code(500).send({error: error.message});
     }
 }
 
 
 interface MyFastifyInstance extends FastifyInstance {
     authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-
+    adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
 }
 export default async function userRoutes(server: MyFastifyInstance) {
+    server.get('/users', { preValidation: [server.authenticate] }, getUser);
+    server.get('/users/favorites', { preValidation: [server.authenticate] }, getUserFavorites);
     server.post('/users/register', registerUser);
     server.post('/users/login', loginUser);
+    server.post('/users/update', { preValidation: [server.authenticate] }, updateUser);
     server.post('/users/favorites', { preValidation: [server.authenticate] }, addToFavorites);
     server.delete('/users/favorites/:id', { preValidation: [server.authenticate] }, removeFromFavorites);
-    server.get('/users', { preValidation: [server.authenticate] }, getUser);
-    server.post('/users/update', { preValidation: [server.authenticate] }, updateUser);
-    server.delete('/users/clear', async (request, reply) => {
-        await UserService.clearCollection();
-        reply.send({message: 'Users cleared'});
-    });
+    server.delete('/users/clear', { preValidation: [server.adminAuthenticate] }, clearCollection);
 }

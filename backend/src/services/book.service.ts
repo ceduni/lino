@@ -5,6 +5,27 @@ import BookBox from "../models/bookbox.model";
 import {notifyUser} from "./user.service";
 
 const bookService = {
+    async getBookBox(bookBoxId: string) {
+        const bookBox = await BookBox.findById(bookBoxId);
+        if (!bookBox) {
+            throw new Error('Bookbox not found');
+        }
+        const books = [];
+        for (const bookId of bookBox.books) {
+            const book = await Book.findById(bookId);
+            if (book) {
+                books.push(book);
+            }
+        }
+        return {
+            id: bookBox.id,
+            name: bookBox.name,
+            location: bookBox.location,
+            infoText: bookBox.infoText,
+            books: books,
+        };
+    },
+
     // Helper function to fetch or create a book
     async addBook(request: any) {
         let book = await Book.findOne({qrCodeId: request.body.qrCodeId});
@@ -287,6 +308,21 @@ const bookService = {
         return Book.findById(id);
     },
 
+    async alertUsers(request : any) {
+        const user = await User.findById(request.user.id);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const users = await User.find({getAlerted: true});
+        for (let i = 0; i < users.length; i++) {
+            if (users[i].username !== user.username) {
+                await notifyUser(users[i].id, `The user ${user.username} wants to get the book "${request.body.title}" ! If you have it, please feel free to add it to one of our book boxes !`);
+            }
+        }
+
+        return {message: 'Alert sent'};
+    },
+
     // Function that returns 1 if the book is relevant to the user by his keywords, 0 otherwise
     async getBookRelevance(book: any, user: any) {
         // @ts-ignore
@@ -304,39 +340,25 @@ const bookService = {
         return 0;
     },
 
-    async notifyAllUsers(book: any, action: string, bookBoxName: string) {
-        const users = await User.find();
-        // Notify all users who have notification keywords corresponding to the book
-        for (let i = 0; i < users.length; i++) {
-            const relevance = await this.getBookRelevance(book, users[i]);
-            if (relevance > 0) {
-                await notifyUser(users[i].id, `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
-            }
-        }
-
-        // Notify all users who have the book in their favorites
-        for (let i = 0; i < users.length; i++) {
-            if (users[i].favoriteBooks.includes(book.id)) {
-                await notifyUser(users[i].id, `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
-            }
-        }
-
+    async addNewBookbox(request: any) {
+        const bookBox = new BookBox({
+            name: request.body.name,
+            books: [],
+            location: [request.body.longitude, request.body.latitude],
+            infoText: request.body.infoText,
+        });
+        await bookBox.save();
+        return bookBox;
     },
 
-
-    async alertUsers(request : any) {
-        const users = await User.find({getAlerted: true});
-        const user = await User.findById(request.user.id);
-        if (!user) {
-            throw new Error('User not found');
-        }
+    async notifyAllUsers(book: any, action: string, bookBoxName: string) {
+        const users = await User.find();
         for (let i = 0; i < users.length; i++) {
-            if (users[i].username !== user.username) {
-                await notifyUser(users[i].id, `The user ${user.username} wants to get the book "${request.body.title}" ! If you have it, please feel free to add it to one of our book boxes !`);
+            const relevance = await this.getBookRelevance(book, users[i]);
+            if (relevance > 0 || users[i].favoriteBooks.includes(book.id)) {
+                await notifyUser(users[i].id, `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
             }
         }
-
-        return {message: 'Alert sent'};
     },
 
     async clearCollection() {
