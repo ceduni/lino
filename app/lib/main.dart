@@ -1,138 +1,202 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'navigation.dart';
+import 'Discussion.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
-  // root of the application.
   @override
   Widget build(BuildContext context) {
-
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
-      child: MaterialApp(
-        title: 'Namer App',
-
-        // app main colors
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-        ),
-
-        home: MyHomePage(),
+    return MaterialApp(
+      title: 'Lino App',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 170, 193, 251)),
       ),
-
+      home: MainScreen(),
     );
   }
 }
 
-class MyAppState extends ChangeNotifier { 
-  var current = WordPair.random();
+class MainScreen extends StatefulWidget {
+  const MainScreen({Key? key}) : super(key: key);
 
-  void getNext() {
-    current = WordPair.random();
-    notifyListeners();
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+
+  static const List<Widget> _pages = <Widget>[
+    HomePage(),
+    NavigationPage(),
+    DiscussionPage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
-  var favourites = <WordPair>[];
-
-  void toggleFavourite(){
-    if (favourites.contains(current)){
-      favourites.remove(current);
-    } else {
-      favourites.add(current);
-    }
-    notifyListeners();
-    print(favourites);
-  }
-
-  void setState(WordPair leString){
-    current = leString;
-    notifyListeners();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.business),
+            label: 'Navigation',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bubble_chart),
+            label: 'Discussion',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Color.fromRGBO(249, 143, 110, 1),
+        onTap: _onItemTapped,
+      ),
+    );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context){
-    var appState = context.watch<MyAppState>();
-    var pair = appState.current;
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
+  @override
+  State<HomePage> createState() => HomePageState();
+}
+
+class HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: BigCard(pair: pair),
-            ),
-            
-        
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton(
-                  onPressed: (){
-                    appState.toggleFavourite();
-                  }, 
-                  child: Text('like ${appState.favourites.contains(pair) == true ? "♥" : "♡"}')
+            Container(
+              width: 600, // Adjust the width as needed
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search',
+                  prefixIcon: Icon(Icons.search),
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.mic),
+                    onPressed: () {
+                      // Define the action when the microphone icon is pressed
+                    },
                   ),
-                        
-                SizedBox(width: 10,),
-
-                ElevatedButton(
-                onPressed: (){
-                  appState.getNext();
-                }, 
-                child: Text('change app state')
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
                 ),
-              ],
-            )
-          ]
+                onTap: () {
+                  showSearch(
+                    context: context,
+                    delegate: CustomSearchDelegate(),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
-
 }
 
-class BigCard extends StatelessWidget {
-  const BigCard({
-    super.key,
-    required this.pair,
-  });
+class CustomSearchDelegate extends SearchDelegate {
+  // List of search terms
+  List<String> searchTerms = [
+    "SIUUUUU",
+    "Banana",
+    "Mango",
+    "Pear",
+    "Watermelons",
+    "Blueberries",
+    "Pineapples",
+    "Strawberries"
+  ];
 
-  final WordPair pair;
-
+  // Clear the search text
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final style = theme.textTheme.displayMedium!.copyWith(
-      color: theme.colorScheme.onPrimary,
-    );
-
-    return Card(
-      color: theme.colorScheme.primary,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-
-        // 2 random word concatenated part thing
-        child: Padding(
-          padding: const EdgeInsets.only(left: 5.0, bottom: 2.0, top: 0.0, right: 5.0),
-          child: Text(
-            pair.asLowerCase, 
-            style: style,
-            semanticsLabel: "${pair.first} ${pair.second}",
-            ),
-        ),
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(
+        onPressed: () {
+          query = '';
+        },
+        icon: Icon(Icons.clear),
       ),
+    ];
+  }
+
+  // Pop out of search menu
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        close(context, null);
+      },
+      icon: Icon(Icons.arrow_back),
+    );
+  }
+
+  // Show query result
+  @override
+  Widget buildResults(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var fruit in searchTerms) {
+      if (fruit.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(fruit);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result = matchQuery[index];
+        return ListTile(
+          title: Text(result),
+        );
+      },
+    );
+  }
+
+  // Show suggestions as the user types
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var fruit in searchTerms) {
+      if (fruit.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(fruit);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result = matchQuery[index];
+        return ListTile(
+          title: Text(result),
+          onTap: () {
+            query = result;
+            showResults(context);
+          },
+        );
+      },
     );
   }
 }
