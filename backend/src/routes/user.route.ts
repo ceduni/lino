@@ -89,9 +89,12 @@ async function updateUser(request : FastifyRequest, reply : FastifyReply) {
 }
 
 async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
-    await UserService.clearCollection();
-    reply.send({message: 'Users cleared'});
-
+    try {
+        await UserService.clearCollection();
+        reply.send({message: 'Users cleared'});
+    } catch (error : any) {
+        reply.code(500).send({error: error.message});
+    }
 }
 
 

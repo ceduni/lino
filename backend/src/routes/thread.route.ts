@@ -41,10 +41,14 @@ async function addThreadMessage(request : FastifyRequest<AddThreadMessageParams>
         reply.code(401).send({ error: 'Unauthorized' });
         return;
     }
-    const { content, respondsTo } = request.body;
-    const threadId = request.body.threadId;
-    const message = await ThreadService.addThreadMessage(threadId, username, content, respondsTo);
-    reply.code(201).send({messageId: message._id});
+    try {
+        const { content, respondsTo } = request.body;
+        const threadId = request.body.threadId;
+        const message = await ThreadService.addThreadMessage(threadId, username, content, respondsTo);
+        reply.code(201).send({messageId: message._id});
+    } catch (error : any) {
+        reply.code(500).send({ error: 'Internal server error' });
+    }
 }
 
 
@@ -95,8 +99,12 @@ async function getThread(request : FastifyRequest<GetThreadParams>, reply : Fast
 }
 
 async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
-    await ThreadService.clearCollection();
-    reply.send({ message: 'Threads collection cleared' });
+    try {
+        await ThreadService.clearCollection();
+        reply.send({ message: 'Threads collection cleared' });
+    } catch (error : any) {
+        reply.code(500).send({ error: error.message });
+    }
 }
 
 

@@ -37,19 +37,31 @@ interface Params extends RouteGenericInterface {
     }
 }
 async function getBookInfoFromISBN(request: FastifyRequest<Params>, reply: FastifyReply) {
-    const isbn = request.params.isbn;
-    const book = await BookService.getBookInfoFromISBN(isbn);
-    reply.send(book);
+    try {
+        const isbn = request.params.isbn;
+        const book = await BookService.getBookInfoFromISBN(isbn);
+        reply.send(book);
+    } catch (error : any) {
+        reply.code(404).send({error: error.message});
+    }
 }
 
 async function searchBooks(request: FastifyRequest, reply: FastifyReply) {
-    const books = await BookService.searchBooks(request);
-    reply.send({books : books});
+    try {
+        const books = await BookService.searchBooks(request);
+        reply.send({books : books});
+    } catch (error : any) {
+        reply.code(404).send({error: error.message});
+    }
 }
 
 async function sendAlert(request: FastifyRequest, reply: FastifyReply) {
-    const response = await BookService.alertUsers(request);
-    reply.send(response);
+    try {
+        const response = await BookService.alertUsers(request);
+        reply.send(response);
+    } catch (error : any) {
+        reply.code(400).send({error: error.message});
+    }
 }
 
 interface GetUniqueBookParams extends RouteGenericInterface {
@@ -58,8 +70,12 @@ interface GetUniqueBookParams extends RouteGenericInterface {
     }
 }
 async function getBook(request: FastifyRequest<GetUniqueBookParams>, reply: FastifyReply) {
-    const book = await BookService.getBook(request.params.id);
-    reply.send(book);
+    try {
+        const book = await BookService.getBook(request.params.id);
+        reply.send(book);
+    } catch (error : any) {
+        reply.code(404).send({error: error.message});
+    }
 }
 
 interface GetBookBoxParams extends RouteGenericInterface {
@@ -68,24 +84,32 @@ interface GetBookBoxParams extends RouteGenericInterface {
     }
 }
 async function getBookbox(request: FastifyRequest<GetBookBoxParams>, reply: FastifyReply) {
-    const response = await BookBox.findById(request.params.bookboxId);
-    reply.send(response);
+    try {
+        const response = await BookService.getBookBox(request.params.bookboxId);
+        reply.send(response);
+    } catch (error : any) {
+        reply.code(404).send({error: error.message});
+    }
 }
 
-async function getBookBoxBooks(request: FastifyRequest<GetBookBoxParams>, reply: FastifyReply) {
-    const response = await BookService.getBookBoxBooks(request.params.bookboxId);
-    reply.send(response);
-}
 
 async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
-    const response = await BookService.addNewBookbox(request);
-    reply.code(201).send(response);
+    try {
+        const response = await BookService.addNewBookbox(request);
+        reply.code(201).send(response);
+    } catch (error : any) {
+        reply.code(400).send({error: error.message});
+    }
 }
 
-async function clearCollection(request: FastifyRequest, reply: FastifyReply) {
-    await BookService.clearCollection();
-    reply.send({message: 'Books cleared'});
 
+async function clearCollection(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        await BookService.clearCollection();
+        reply.send({message: 'Books cleared'});
+    } catch (error : any) {
+        reply.code(500).send({error: error.message});
+    }
 }
 
 interface MyFastifyInstance extends FastifyInstance {
@@ -96,7 +120,6 @@ interface MyFastifyInstance extends FastifyInstance {
 export default async function bookRoutes(server: MyFastifyInstance) {
     server.get('/books/get/:id', getBook);
     server.get('/books/bookbox/:bookboxId', getBookbox);
-    server.get('/books/bookbox/books/:bookboxId', getBookBoxBooks);
     server.get('/books/:bookQRCode/:bookboxId', { preValidation: [server.optionalAuthenticate] }, getBookFromBookBox);
     server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate] }, getBookInfoFromISBN);
     server.get('/books/search', searchBooks);
