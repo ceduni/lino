@@ -101,15 +101,15 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.search_sharp),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
+            icon: Icon(Icons.map_outlined),
             label: 'Navigation',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bubble_chart),
+            icon: Icon(Icons.chat_bubble_rounded),
             label: 'Discussion',
           ),
         ],

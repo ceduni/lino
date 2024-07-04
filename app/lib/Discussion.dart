@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class NavigationPage extends StatelessWidget {
-  const NavigationPage({Key? key}) : super(key: key);
+class DiscussionPage extends StatelessWidget {
+  const DiscussionPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Navigation Page'),
+        title: Text('Discussion Page'),
       ),
       body: Center(
         child: Text('TODO: Threads, Partage, Activites'),
