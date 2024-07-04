@@ -1,10 +1,11 @@
+import 'package:Lino_app/widgets/bottom_app_bar.dart';
+import 'package:Lino_app/widgets/floating_menu.dart';
 import 'package:flutter/material.dart';
 import 'navigation.dart';
 import 'Discussion.dart';
 
 // lib/main.dart
-import 'package:flutter/material.dart';
-import 'screens/map_page.dart';
+import 'pages/map_page.dart';
 import 'models/bookbox_model.dart';
 
 void main() {
@@ -79,44 +80,15 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
+// Changes here will apply to all pages
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
-
-  static const List<Widget> _pages = <Widget>[
-    HomePage(),
-    NavigationPage(),
-    DiscussionPage(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search_sharp),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map_outlined),
-            label: 'Navigation',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_rounded),
-            label: 'Discussion',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Color.fromRGBO(249, 143, 110, 1),
-        onTap: _onItemTapped,
-      ),
+      body: 
+      CustomNavBar(),
+
     );
   }
 }
@@ -143,7 +115,8 @@ class HomePageState extends State<HomePage> {
                   hintText: 'Search',
                   prefixIcon: Icon(Icons.search),
                   suffixIcon: IconButton(
-                    icon: Icon(Icons.mic),
+                    // TODO: Find fitting icon.  Here should be a microphone, Question mark is a placeholder, 
+                    icon: Icon(Icons.question_mark),
                     onPressed: () {
                       // Define the action when the microphone icon is pressed
                     },
@@ -162,6 +135,7 @@ class HomePageState extends State<HomePage> {
                 },
               ),
             ),
+            FloatingMenu(),
           ],
         ),
       ),
