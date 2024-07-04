@@ -19,7 +19,7 @@ async function createThread(request : FastifyRequest<CreateThreadParams>, reply 
     }
     const { bookId, title } = request.body;
     const thread = await ThreadService.createThread(bookId, username, title);
-    reply.code(201).send({threadId: thread._id});
+    reply.code(201).send({threadId: thread.id});
 }
 
 interface AddThreadMessageParams extends RouteGenericInterface {
@@ -45,7 +45,7 @@ async function addThreadMessage(request : FastifyRequest<AddThreadMessageParams>
         const { content, respondsTo } = request.body;
         const threadId = request.body.threadId;
         const message = await ThreadService.addThreadMessage(threadId, username, content, respondsTo);
-        reply.code(201).send({messageId: message._id});
+        reply.code(201).send({messageId: message.id});
     } catch (error : any) {
         reply.code(500).send({ error: 'Internal server error' });
     }
