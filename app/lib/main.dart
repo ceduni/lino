@@ -1,11 +1,9 @@
 import 'package:Lino_app/widgets/bottom_app_bar.dart';
 import 'package:Lino_app/widgets/floating_menu.dart';
+import 'package:Lino_app/widgets/search_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'navigation.dart';
-import 'Discussion.dart';
 
 // lib/main.dart
-import 'pages/map_page.dart';
 import 'models/bookbox_model.dart';
 
 void main() {
@@ -88,7 +86,7 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       body: 
       CustomNavBar(),
-
+      
     );
   }
 }
@@ -108,119 +106,19 @@ class HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 600, // Adjust the width as needed
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search',
-                  prefixIcon: Icon(Icons.search),
-                  suffixIcon: IconButton(
-                    // TODO: Find fitting icon.  Here should be a microphone, Question mark is a placeholder, 
-                    icon: Icon(Icons.question_mark),
-                    onPressed: () {
-                      // Define the action when the microphone icon is pressed
-                    },
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-                onTap: () {
-                  showSearch(
-                    context: context,
-                    delegate: CustomSearchDelegate(),
-                  );
-                },
-              ),
-            ),
-            FloatingMenu(),
+            SearchAppBar(
+            onUserIconPressed: () {
+              // Handle user icon pressed
+              print("User icon pressed");
+            },
+            onMenuPressed: () {
+              // Handle menu icon pressed
+              print("Menu icon pressed");
+            },
+            )
           ],
         ),
       ),
-    );
-  }
-}
-
-class CustomSearchDelegate extends SearchDelegate {
-  // List of search terms
-  List<String> searchTerms = [
-    "SIUUUUU",
-    "Banana",
-    "Mango",
-    "Pear",
-    "Watermelons",
-    "Blueberries",
-    "Pineapples",
-    "Strawberries"
-  ];
-
-  // Clear the search text
-  @override
-  List<Widget>? buildActions(BuildContext context) {
-    return [
-      IconButton(
-        onPressed: () {
-          query = '';
-        },
-        icon: Icon(Icons.clear),
-      ),
-    ];
-  }
-
-  // Pop out of search menu
-  @override
-  Widget? buildLeading(BuildContext context) {
-    return IconButton(
-      onPressed: () {
-        close(context, null);
-      },
-      icon: Icon(Icons.arrow_back),
-    );
-  }
-
-  // Show query result
-  @override
-  Widget buildResults(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var fruit in searchTerms) {
-      if (fruit.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(fruit);
-      }
-    }
-    return ListView.builder(
-      itemCount: matchQuery.length,
-      itemBuilder: (context, index) {
-        var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
-      },
-    );
-  }
-
-  // Show suggestions as the user types
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var fruit in searchTerms) {
-      if (fruit.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(fruit);
-      }
-    }
-    return ListView.builder(
-      itemCount: matchQuery.length,
-      itemBuilder: (context, index) {
-        var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-          onTap: () {
-            query = result;
-            showResults(context);
-          },
-        );
-      },
     );
   }
 }
