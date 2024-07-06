@@ -15,8 +15,6 @@ linter:
   rules:
     avoid_print: false  
     prefer_single_quotes: true  
-    prefer_const_constructors_in_inmutables : false
-    prefer_const_litterals_to_create_inmutables : false
     prefer_const_constructors : false 
     unnecessary_breaks : true
     use_key_in_widget_constructors : false 

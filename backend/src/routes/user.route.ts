@@ -89,23 +89,26 @@ async function updateUser(request : FastifyRequest, reply : FastifyReply) {
 }
 
 async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
-    await UserService.clearCollection();
-    reply.send({message: 'Users cleared'});
-
+    try {
+        await UserService.clearCollection();
+        reply.send({message: 'Users cleared'});
+    } catch (error : any) {
+        reply.code(500).send({error: error.message});
+    }
 }
 
 
 interface MyFastifyInstance extends FastifyInstance {
     authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-
+    adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
 }
 export default async function userRoutes(server: MyFastifyInstance) {
     server.get('/users', { preValidation: [server.authenticate] }, getUser);
     server.get('/users/favorites', { preValidation: [server.authenticate] }, getUserFavorites);
     server.post('/users/register', registerUser);
     server.post('/users/login', loginUser);
+    server.post('/users/update', { preValidation: [server.authenticate] }, updateUser);
     server.post('/users/favorites', { preValidation: [server.authenticate] }, addToFavorites);
     server.delete('/users/favorites/:id', { preValidation: [server.authenticate] }, removeFromFavorites);
-    server.post('/users/update', { preValidation: [server.authenticate] }, updateUser);
-    server.delete('/users/clear', clearCollection);
+    server.delete('/users/clear', { preValidation: [server.adminAuthenticate] }, clearCollection);
 }

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class BookService {
-  final String url = 'http://localhost:3000';
+  final String url = 'https://lino-1.onrender.com';
 
   Future<Map<String, dynamic>> addNewBB(String name, double longitude, double latitude, String infoText) async {
     // Make a POST request to the server
@@ -134,7 +134,7 @@ class BookService {
     };
 
     final r = await http.get(
-      Uri.http('localhost:3000', '/books/search', queryParams),
+      Uri.https('lino-1.onrender.com', '/books/search', queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

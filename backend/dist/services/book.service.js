@@ -18,9 +18,9 @@ const user_model_1 = __importDefault(require("../models/user.model"));
 const bookbox_model_1 = __importDefault(require("../models/bookbox.model"));
 const user_service_1 = require("./user.service");
 const bookService = {
-    getBookBoxBooks(bookboxId) {
+    getBookBox(bookBoxId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const bookBox = yield bookbox_model_1.default.findById(bookboxId);
+            const bookBox = yield bookbox_model_1.default.findById(bookBoxId);
             if (!bookBox) {
                 throw new Error('Bookbox not found');
             }
@@ -31,7 +31,13 @@ const bookService = {
                     books.push(book);
                 }
             }
-            return books;
+            return {
+                id: bookBox.id,
+                name: bookBox.name,
+                location: bookBox.location,
+                infoText: bookBox.infoText,
+                books: books,
+            };
         });
     },
     // Helper function to fetch or create a book

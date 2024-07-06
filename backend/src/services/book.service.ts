@@ -5,8 +5,8 @@ import BookBox from "../models/bookbox.model";
 import {notifyUser} from "./user.service";
 
 const bookService = {
-    async getBookBoxBooks(bookboxId: string) {
-        const bookBox = await BookBox.findById(bookboxId);
+    async getBookBox(bookBoxId: string) {
+        const bookBox = await BookBox.findById(bookBoxId);
         if (!bookBox) {
             throw new Error('Bookbox not found');
         }
@@ -17,7 +17,13 @@ const bookService = {
                 books.push(book);
             }
         }
-        return books;
+        return {
+            id: bookBox.id,
+            name: bookBox.name,
+            location: bookBox.location,
+            infoText: bookBox.infoText,
+            books: books,
+        };
     },
 
     // Helper function to fetch or create a book

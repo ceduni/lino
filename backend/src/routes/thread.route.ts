@@ -19,7 +19,7 @@ async function createThread(request : FastifyRequest<CreateThreadParams>, reply 
     }
     const { bookId, title } = request.body;
     const thread = await ThreadService.createThread(bookId, username, title);
-    reply.code(201).send({threadId: thread._id});
+    reply.code(201).send({threadId: thread.id});
 }
 
 interface AddThreadMessageParams extends RouteGenericInterface {
@@ -41,10 +41,14 @@ async function addThreadMessage(request : FastifyRequest<AddThreadMessageParams>
         reply.code(401).send({ error: 'Unauthorized' });
         return;
     }
-    const { content, respondsTo } = request.body;
-    const threadId = request.body.threadId;
-    const message = await ThreadService.addThreadMessage(threadId, username, content, respondsTo);
-    reply.code(201).send({messageId: message._id});
+    try {
+        const { content, respondsTo } = request.body;
+        const threadId = request.body.threadId;
+        const message = await ThreadService.addThreadMessage(threadId, username, content, respondsTo);
+        reply.code(201).send({messageId: message.id});
+    } catch (error : any) {
+        reply.code(500).send({ error: 'Internal server error' });
+    }
 }
 
 
@@ -95,19 +99,24 @@ async function getThread(request : FastifyRequest<GetThreadParams>, reply : Fast
 }
 
 async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
-    await ThreadService.clearCollection();
-    reply.send({ message: 'Threads collection cleared' });
+    try {
+        await ThreadService.clearCollection();
+        reply.send({ message: 'Threads collection cleared' });
+    } catch (error : any) {
+        reply.code(500).send({ error: error.message });
+    }
 }
 
 
 interface MyFastifyInstance extends FastifyInstance {
     authenticate: (request : FastifyRequest, reply: FastifyReply) => void;
+    adminAuthenticate: (request : FastifyRequest, reply: FastifyReply) => void;
 }
 export default async function threadRoutes(server: MyFastifyInstance) {
+    server.get('/threads/:threadId', getThread);
+    server.get('/threads/search', searchThreads);
     server.post('/threads/new', { preValidation: [server.authenticate] }, createThread);
     server.post('/threads/messages', { preValidation: [server.authenticate] }, addThreadMessage);
     server.post('/threads/messages/reactions', { preValidation: [server.authenticate] }, toggleMessageReaction);
-    server.get('/threads/search', searchThreads);
-    server.get('/threads/:threadId', getThread);
-    server.delete('/threads/clear', clearCollection);
+    server.delete('/threads/clear', { preValidation: [server.adminAuthenticate] }, clearCollection);
 }

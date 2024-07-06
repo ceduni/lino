@@ -110,8 +110,13 @@ function updateUser(request, reply) {
 }
 function clearCollection(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield user_service_2.default.clearCollection();
-        reply.send({ message: 'Users cleared' });
+        try {
+            yield user_service_2.default.clearCollection();
+            reply.send({ message: 'Users cleared' });
+        }
+        catch (error) {
+            reply.code(500).send({ error: error.message });
+        }
     });
 }
 function userRoutes(server) {
@@ -120,10 +125,10 @@ function userRoutes(server) {
         server.get('/users/favorites', { preValidation: [server.authenticate] }, getUserFavorites);
         server.post('/users/register', registerUser);
         server.post('/users/login', loginUser);
+        server.post('/users/update', { preValidation: [server.authenticate] }, updateUser);
         server.post('/users/favorites', { preValidation: [server.authenticate] }, addToFavorites);
         server.delete('/users/favorites/:id', { preValidation: [server.authenticate] }, removeFromFavorites);
-        server.post('/users/update', { preValidation: [server.authenticate] }, updateUser);
-        server.delete('/users/clear', clearCollection);
+        server.delete('/users/clear', { preValidation: [server.adminAuthenticate] }, clearCollection);
     });
 }
 exports.default = userRoutes;
