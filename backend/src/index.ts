@@ -67,7 +67,7 @@ server.register(fastifySwagger, {
             url: 'https://swagger.io',
             description: 'Find more info here',
         },
-        host: 'localhost', // the host of your API
+        host: 'lino-1.onrender.com', // the host of your API
         schemes: ['http', 'https'], // the protocol your API is available on
         consumes: ['application/json'], // the request content-type
         produces: ['application/json'], // the response content-type
