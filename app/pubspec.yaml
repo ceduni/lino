@@ -17,7 +17,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   shared_preferences: ^2.2.3
   http: ^1.2.1
-  google_maps_flutter: ^2.7.0
+  google_maps_flutter: ^2.6.1
   mapbox_maps_flutter: ^2.0.0
   dotenv: ^4.2.0
 

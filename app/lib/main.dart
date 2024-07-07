@@ -1,6 +1,9 @@
-// lib/main.dart
+import 'package:Lino_app/widgets/bottom_app_bar.dart';
+import 'package:Lino_app/widgets/floating_menu.dart';
+import 'package:Lino_app/widgets/search_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'screens/map_page.dart';
+
+// lib/main.dart
 import 'models/bookbox_model.dart';
 
 void main() {
@@ -53,14 +56,69 @@ var bookboxes = [
 ];
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Lino App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 170, 193, 251)),
       ),
-      home: BookBoxLocationList(bookBoxes: bookboxes),
+      home: MainScreen(),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({Key? key}) : super(key: key);
+
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
+// Changes here will apply to all pages
+class _MainScreenState extends State<MainScreen> {
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: 
+      CustomNavBar(),
+      
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => HomePageState();
+}
+
+class HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SearchAppBar(
+            onUserIconPressed: () {
+              // Handle user icon pressed
+              print("User icon pressed");
+            },
+            onMenuPressed: () {
+              // Handle menu icon pressed
+              print("Menu icon pressed");
+            },
+            )
+          ],
+        ),
+      ),
     );
   }
 }

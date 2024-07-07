@@ -1,4 +1,5 @@
 import {reinitDatabase} from "./services/utilities";
+import {populateDatabase} from "./mock.data.gen";
 
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
@@ -95,10 +96,10 @@ const start = async () => {
         console.log(`Server started on port ${port}`);
 
         await server.ready();
-        //server.swagger(); // Ensure swagger is called after server starts
+        server.swagger(); // Ensure swagger is called after server starts
 
         await reinitDatabase(server);
-
+        await populateDatabase();
 
 
     } catch (err) {

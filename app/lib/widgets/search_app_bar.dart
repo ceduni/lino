@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onUserIconPressed;
   final VoidCallback onMenuPressed;
-  final ValueChanged<String> onSearchChanged;
 
   const SearchAppBar({
     required this.onUserIconPressed,
     required this.onMenuPressed,
-    required this.onSearchChanged,
   });
 
   @override
@@ -16,46 +14,115 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.white,
-      leading: IconButton(
-        icon: Icon(Icons.account_circle,
-            color: Color.fromARGB(255, 176, 188, 234), size: 43.0),
-        onPressed: onUserIconPressed,
-      ),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.menu,
-              color: Color.fromARGB(255, 176, 188, 234), size: 43.0),
-          onPressed: onMenuPressed,
+    return Container(
+      width: 600, // Adjust the width as needed
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'Search',
+          prefixIcon: Icon(Icons.search),
+          suffixIcon: IconButton(
+            // TODO: Find fitting icon.  Here should be a microphone, Question mark is a placeholder, 
+            icon: Icon(Icons.question_mark),
+            onPressed: () {
+              // Define the action when the microphone icon is pressed
+            },
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(25.0)),
+          ),
+          filled: true,
+          fillColor: Colors.white,
         ),
-      ],
-      flexibleSpace: Padding(
-        padding: const EdgeInsets.only(top: 50.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: TextField(
-                onChanged: onSearchChanged,
-                decoration: InputDecoration(
-                    labelStyle: TextStyle(fontSize: 16.0),
-                    //TODO : Change font style, bug here for some reason
-                    hintText: 'Rechercher...',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Color.fromARGB(255, 226, 236, 240)),
-              ),
-            ),
-            SizedBox(),
-          ],
-        ),
+        onTap: () {
+          showSearch(
+            context: context,
+            delegate: CustomSearchDelegate(),
+          );
+        },
       ),
+    );
+  }
+}
+
+
+class CustomSearchDelegate extends SearchDelegate {
+  // List of search terms
+  List<String> searchTerms = [
+    "SIUUUUU",
+    "Banana",
+    "Mango",
+    "Pear",
+    "Watermelons",
+    "Blueberries",
+    "Pineapples",
+    "Strawberries"
+  ];
+
+  // Clear the search text
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(
+        onPressed: () {
+          query = '';
+        },
+        icon: Icon(Icons.clear),
+      ),
+    ];
+  }
+
+  // Pop out of search menu
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        close(context, null);
+      },
+      icon: Icon(Icons.arrow_back),
+    );
+  }
+
+  // Show query result
+  @override
+  Widget buildResults(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var fruit in searchTerms) {
+      if (fruit.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(fruit);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result = matchQuery[index];
+        return ListTile(
+          title: Text(result),
+        );
+      },
+    );
+  }
+
+  // Show suggestions as the user types
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var fruit in searchTerms) {
+      if (fruit.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(fruit);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result = matchQuery[index];
+        return ListTile(
+          title: Text(result),
+          onTap: () {
+            query = result;
+            showResults(context);
+          },
+        );
+      },
     );
   }
 }
