@@ -2,7 +2,10 @@ import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/services/thread_services.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:test/test.dart';
+import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
+
+var env = DotEnv(includePlatformEnvironment: true)..load();
 
 Future<void> main() async {
   final userService = UserService();
@@ -18,9 +21,6 @@ Future<void> main() async {
   var bbids = ['',''];
   var sbl = 0;
 
-  setUpAll(() async {
-    await clearCollections();
-  });
 
   group('User authentication', () {
     test('registerUser returns a token if the user is registered', () async {
@@ -85,14 +85,15 @@ Future<void> main() async {
 
   group('Book manipulation', () {
     test('Add some bookboxes', () async {
-      final bb1 = await bookService.addNewBB('BB1', 0.0, 0.0, 'BB1 info');
+      final token = await userService.loginUser(env['ADMIN_USERNAME']!, env['ADMIN_PASSWORD']!);
+      final bb1 = await bookService.addNewBB('BB1', 0.0, 0.0, 'BB1 info', token);
       expect(bb1, isNotNull);
       expect(bb1, isA<Map<String, dynamic>>());
       expect(bb1['name'], 'BB1');
       bb1Id = bb1['_id'].toString();
       bbids[0] = bb1Id;
 
-      final bb2 = await bookService.addNewBB('BB2', 0.1, 0.1, 'BB2 info');
+      final bb2 = await bookService.addNewBB('BB2', 0.1, 0.1, 'BB2 info', token);
       expect(bb2, isNotNull);
       expect(bb2, isA<Map<String, dynamic>>());
       expect(bb2['name'], 'BB2');
@@ -323,15 +324,4 @@ Future<void> main() async {
       expect(response['threads'].length, 0);
     });
   });
-
-  tearDownAll(() async {
-    await clearCollections();
-  });
-}
-
-Future<void> clearCollections() async {
-  await http.delete(Uri.parse('https://lino-1.onrender.com/users/clear'));
-  await http.delete(Uri.parse('https://lino-1.onrender.com/books/clear'));
-  await http.delete(Uri.parse('https://lino-1.onrender.com/threads/clear'));
-  print('Collections cleared');
 }

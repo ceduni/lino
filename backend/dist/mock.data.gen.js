@@ -62,7 +62,7 @@ function populateUsers() {
     return __awaiter(this, void 0, void 0, function* () {
         for (let i = 0; i < 10; i++) {
             const user = randomUser();
-            const response = yield fetch(url + "/users/register", {
+            yield fetch(url + "/users/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json; charset=UTF-8",
@@ -72,7 +72,6 @@ function populateUsers() {
             const { username, password } = user;
             userIdentifiers.push({ identifier: username, password: password });
         }
-        console.log(userIdentifiers);
         console.log("Users created");
     });
 }
@@ -90,8 +89,8 @@ function populateBookBoxes() {
             })
         });
         const { token } = yield init.json();
-        // then create the book boxes
-        for (let i = 0; i < 10; i++) {
+        // then create the book boxes (8)
+        for (let i = 0; i < 8; i++) {
             const response = yield fetch(url + "/books/bookbox/new", {
                 method: "POST",
                 headers: {
@@ -128,7 +127,7 @@ function populateBooks() {
 }
 function populateThreads() {
     return __awaiter(this, void 0, void 0, function* () {
-        // add between 1 and 2 threads to each book
+        // add between 0 and 2 threads to each book
         for (let bookId of bookIds) {
             // first connect a random user
             const { identifier, password } = userIdentifiers[faker_1.faker.number.int({ min: 0, max: 9 })];
@@ -140,7 +139,7 @@ function populateThreads() {
                 body: JSON.stringify({ identifier, password })
             });
             const { token: userToken } = yield response.json();
-            const nThreads = faker_1.faker.number.int({ min: 1, max: 3 });
+            const nThreads = faker_1.faker.number.int({ min: 0, max: 2 });
             for (let i = 0; i < nThreads; i++) {
                 const response = yield fetch(url + "/threads/new", {
                     method: "POST",
@@ -151,11 +150,11 @@ function populateThreads() {
                     body: JSON.stringify(randomThread(bookId))
                 });
                 const { threadId } = yield response.json();
-                // add between 1 and 5 messages to each thread, which responds to the previous message with a probability of 0.5
-                const nMessages = faker_1.faker.number.int({ min: 3, max: 7 });
+                // add between 2 and 5 messages to each thread, which responds to the previous message with a probability of 0.5
+                const nMessages = faker_1.faker.number.int({ min: 2, max: 5 });
                 let respondsTo = null;
                 for (let j = 0; j < nMessages; j++) {
-                    if (faker_1.faker.number.float({ min: 0, max: 1 }) < 0.5) {
+                    if (faker_1.faker.number.float({ min: 0, max: 1 }) < 0.6) {
                         respondsTo = null;
                     }
                     // connect a random user
@@ -178,6 +177,21 @@ function populateThreads() {
                     });
                     const { messageId } = yield response.json();
                     respondsTo = messageId;
+                    if (faker_1.faker.number.float({ min: 0, max: 1 }) < 0.5) {
+                        // add a reaction to the message
+                        yield fetch(url + "/threads/messages/reactions", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json; charset=UTF-8",
+                                "Authorization": "Bearer " + otherUserToken,
+                            },
+                            body: JSON.stringify({
+                                reactIcon: faker_1.faker.image.url(),
+                                threadId: threadId,
+                                messageId: messageId,
+                            })
+                        });
+                    }
                 }
             }
         }

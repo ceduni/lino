@@ -2,6 +2,7 @@ import User from '../models/user.model';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { newErr } from "./utilities";
 
 dotenv.config();
 
@@ -10,20 +11,30 @@ const UserService = {
     async registerUser(userData: any) {
         const { username, email, phone, password, getAlerted } = userData;
         if (username === 'guest') {
-            throw new Error('Username not allowed');
+            throw newErr(400, 'Username not allowed');
         }
 
         // Check if username already exists
+        if (!username) {
+            throw newErr(400, 'Username is required');
+        }
         const existingUser = await User.findOne({ username });
         if (existingUser) {
-            throw new Error('Username already taken');
-        }
-        // Check if email already exists
-        const existingEmail = await User.findOne({ email });
-        if (existingEmail) {
-            throw new Error('Email already taken');
+            throw newErr(400, 'Username already taken');
         }
 
+        // Check if email already exists
+        if (!email) {
+            throw newErr(400, 'Email is required');
+        }
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) {
+            throw newErr(400, 'Email already taken');
+        }
+
+        if (!password) {
+            throw newErr(400, 'Password is required');
+        }
         const hashedPassword = await argon2.hash(password);
         const user = new User(
             { username : username,
@@ -41,11 +52,11 @@ const UserService = {
         const identifier = credentials.identifier;
         const user = await User.findOne({ $or: [{ username : identifier }, { email : identifier }]});
         if (!user) {
-            throw new Error('User not found');
+            throw newErr(400, 'Invalid username or email');
         }
         const validPassword = await argon2.verify(user.password, credentials.password);
         if (!validPassword) {
-            throw new Error('Invalid password');
+            throw newErr(400, 'Invalid password');
         }
         // User authenticated successfully, generate tokens
         // @ts-ignore
@@ -56,29 +67,35 @@ const UserService = {
 
 
     // User service to add a book's ID to a user's favorites
-    async addToFavorites(userId: string, id: string) {
+    async addToFavorites(request: any) {
+        const userId = request.user.id;  // Extract user ID from JWT token
+        const bookId = request.body.bookId;
         let user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            throw newErr(404, 'User not found');
         }
-        if (user.favoriteBooks.includes(id)) {
-            return;
+        if (user.favoriteBooks.includes(bookId)) {
+            throw newErr(400, 'Book already in favorites');
         }
-        user.favoriteBooks.push(id);
+        user.favoriteBooks.push(bookId);
         await user.save();
         return user;
     },
 
 
     // User service to remove a book's ID from a user's favorites
-    async removeFromFavorites(userId: string, id: string) {
+    async removeFromFavorites(request: any) {
+        // @ts-ignore
+        const userId = request.user.id;  // Extract user ID from JWT token
+        // @ts-ignore
+        const id = request.params.id;
         let user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            throw newErr(404, 'User not found');
         }
         const index = user.favoriteBooks.indexOf(id);
-        if (index === -1) {
-            return;
+        if (index === -1) { // Book not found in favorites
+            throw newErr(404, 'Book not found in favorites');
         }
         user.favoriteBooks.splice(index, 1);
         await user.save();
@@ -90,7 +107,7 @@ const UserService = {
     async getFavorites(userId: string) {
         let user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            throw newErr(404, 'User not found');
         }
         // array to store the favorite books
         const favoriteBooks = [];
@@ -109,7 +126,7 @@ const UserService = {
     async getEcologicalImpact(userId: string) {
         const user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            throw newErr(404, 'User not found');
         }
         return user.ecologicalImpact;
     },
@@ -117,7 +134,7 @@ const UserService = {
     async getUserName(userId: string) {
         const user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            throw newErr(404, 'User not found');
         }
         return user.username;
     },
@@ -130,12 +147,12 @@ const UserService = {
     async updateUser(request: any) {
         const user = await User.findById(request.user.id);
         if (!user) {
-            throw new Error('User not found');
+            throw newErr(404, 'User not found');
         }
         if (request.body.username) {
             const check = await User.findOne({ username: request.body.username });
             if (check) {
-                throw new Error('Username already taken');
+                throw newErr(400, 'Username already taken');
             }
             user.username = request.body.username;
         }
@@ -145,7 +162,7 @@ const UserService = {
         if (request.body.email) {
             const check = await User.findOne({ email: request.body.email });
             if (check) {
-                throw new Error('Email already taken');
+                throw newErr(400, 'Email already taken');
             }
             user.email = request.body.email;
         }
@@ -163,14 +180,14 @@ const UserService = {
     },
 
     async clearCollection() {
-        await User.deleteMany({});
+        await User.deleteMany({ username: { $ne: process.env.ADMIN_USERNAME } });
     }
 };
 
 export async function notifyUser(userId: string, message: string) {
     let user = await User.findById(userId);
     if (!user) {
-        throw new Error('User not found');
+        throw newErr(404, 'User not found');
     }
     // @ts-ignore
     const notification = { content: message };

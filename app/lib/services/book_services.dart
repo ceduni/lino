@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class BookService {
   final String url = 'https://lino-1.onrender.com';
 
-  Future<Map<String, dynamic>> addNewBB(String name, double longitude, double latitude, String infoText) async {
+  Future<Map<String, dynamic>> addNewBB(String name, double longitude, double latitude, String infoText, String token) async {
     // Make a POST request to the server
     // Send the name, longitude, latitude, and infoText to the server
     // If the server returns a 201 status code, the bookbox is added
@@ -13,6 +13,7 @@ class BookService {
       Uri.parse('$url/books/bookbox/new'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode(<String, dynamic>{
         'name': name,

@@ -180,6 +180,22 @@ async function populateThreads() {
                 });
                 const { messageId } = await response.json();
                 respondsTo = messageId;
+
+                if (faker.number.float({min: 0, max: 1}) < 0.5) {
+                    // add a reaction to the message
+                    await fetch(url + "/threads/messages/reactions", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json; charset=UTF-8",
+                            "Authorization": "Bearer " + otherUserToken,
+                        },
+                        body: JSON.stringify({
+                            reactIcon: faker.image.url(),
+                            threadId: threadId,
+                            messageId: messageId,
+                        })
+                    });
+                }
             }
         }
     }

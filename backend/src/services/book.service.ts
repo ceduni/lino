@@ -3,6 +3,7 @@ import Book from "../models/book.model";
 import User from "../models/user.model";
 import BookBox from "../models/bookbox.model";
 import {notifyUser} from "./user.service";
+import {newErr} from "./utilities";
 
 const bookService = {
     async getBookBox(bookBoxId: string) {
@@ -44,20 +45,20 @@ const bookService = {
             });
         }
         if (!book.qrCodeId) {
-            throw new Error('Book\'s QR code ID is required');
+            throw newErr(400, 'Book\'s QR code ID is required');
         }
         if (!book.title) {
-            throw new Error('Book\'s title is required');
+            throw newErr(400, 'Book\'s title is required');
         }
         let bookBox = await BookBox.findById(request.body.bookboxId);
         if (!bookBox) {
-            throw new Error('Bookbox not found');
+            throw newErr(404, 'Bookbox not found');
         }
 
         // check if the book is already in a bookbox somewhere
         const bookBoxes = await BookBox.find({ books: book.id });
         if (bookBoxes.length > 0) {
-            throw new Error('Book is supposed to be in the book box ' + bookBoxes[0].name);
+            throw newErr(400, 'Book is supposed to be in the book box ' + bookBoxes[0].name);
         }
 
         bookBox.books.push(book.id);
@@ -69,22 +70,24 @@ const bookService = {
         return {bookId : book.id, books : bookBox.books};
     },
 
-    async getBookFromBookBox(qrCode: string, request: any, bookboxId: string) {
+    async getBookFromBookBox(request: any) {
+        const qrCode = request.params.bookQRCode;
+        const bookboxId = request.params.bookboxId;
         // check if the book exists
         let book = await Book.findOne({qrCodeId: qrCode});
         if (!book) {
-            throw new Error('Book not found');
+            throw newErr(404, 'Book not found');
         }
         // check if the bookbox exists
         let bookBox = await BookBox.findById(bookboxId);
         if (!bookBox) {
-            throw new Error('Bookbox not found');
+            throw newErr(404, 'Bookbox not found');
         }
         // check if the book is in the bookbox
         if (bookBox.books.includes(book.id)) {
             bookBox.books.splice(bookBox.books.indexOf(book.id), 1);
         } else {
-            throw new Error('Book not found in bookbox');
+            throw newErr(404, 'Book not found in bookbox');
         }
 
         await this.updateBooks(book, request, false);
@@ -127,7 +130,7 @@ const bookService = {
             const userId = request.user.id;
             const user = await User.findById(userId);
             if (!user) {
-                throw new Error('User not found');
+                throw newErr(404, 'User not found');
             }
             const username = user.username;
             if (given) { // if the book is given
@@ -150,10 +153,11 @@ const bookService = {
         }
     },
 
-    async getBookInfoFromISBN(isbn: string) {
+    async getBookInfoFromISBN(request: any) {
+        const isbn = request.params.isbn;
         const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
         if (response.data.totalItems === 0) {
-            throw new Error('Book not found');
+            throw newErr(404, 'Book not found');
         }
         const bookInfo = response.data.items[0].volumeInfo;
         const parutionYear = bookInfo.publishedDate ? parseInt(bookInfo.publishedDate.substring(0, 4)) : null;
@@ -166,6 +170,7 @@ const bookService = {
             publisher: bookInfo.publisher,
             parutionYear: parutionYear,
             categories: bookInfo.categories,
+            pages: bookInfo.pageCount,
         };
     },
 
@@ -185,35 +190,30 @@ const bookService = {
                 return book.title.includes(keywords) || book.authors.includes(keywords);
             });
         }
-        const pmt = request.query.pmt; // a bool to determine whether we want the books with more or less than X pages
+        const pmt = request.query.pmt === true; // a bool to determine whether we want the books with more or less than X pages
         const pg = request.query.pg; // the number of pages
-        if (pmt && pg) {
-            if (pmt === 'true') {
-                books = books.filter((book) => {
-                    // @ts-ignore
-                    return book.pages >= pg;
-                });
-            } else {
-                books = books.filter((book) => {
-                    // @ts-ignore
-                    return book.pages <= pg;
-                });
-            }
+        if (pg) {
+            books = books.filter((book) => {
+                const bookPages = book.pages;
+                if (!bookPages) return true;
+                return pmt ? bookPages >= pg : bookPages <= pg;
+            });
         }
-        const bf = request.query.bf; // a bool to determine whether we want the books before or after X year
+        const bf = request.query.bf === true; // a bool to determine whether we want the books before or after X year
         const py = request.query.py; // the year
-        if (bf && py) {
-            if (bf === 'true') {
-                books = books.filter((book) => {
-                    // @ts-ignore
-                    return book.parutionYear <= py;
-                });
-            } else {
-                books = books.filter((book) => {
-                    // @ts-ignore
-                    return book.parutionYear >= py;
-                });
-            }
+        if (py) {
+            books = books.filter((book) => {
+                // @ts-ignore
+                const bookYear = book.parutionYear;
+                if (!bookYear) return true;
+                if (bf) {
+                    // If bf is true, filter for books before the year
+                    return bookYear <= py;
+                } else {
+                    // If bf is false, filter for books after the year
+                    return bookYear >= py;
+                }
+            });
         }
         const pub = request.query.pub; // the publisher
         if (pub) {
@@ -226,7 +226,7 @@ const bookService = {
         if (bbid) {
             const bookBox = await BookBox.findById(bbid);
             if (!bookBox) {
-                throw new Error('Bookbox not found');
+                throw newErr(404, 'Bookbox not found');
             }
             books = books.filter((book) => {
                 return bookBox.books.includes(book.id);
@@ -238,7 +238,7 @@ const bookService = {
         if (!classify) {
             classify = 'by title'; // default value
         }
-        let asc = request.query.asc === 'true';
+        let asc = request.query.asc === true;
         if (classify === 'by title') {
             books.sort((a, b) => {
                 if (asc) {
@@ -311,7 +311,7 @@ const bookService = {
     async alertUsers(request : any) {
         const user = await User.findById(request.user.id);
         if (!user) {
-            throw new Error('User not found');
+            throw newErr(404, 'User not found');
         }
         const users = await User.find({getAlerted: true});
         for (let i = 0; i < users.length; i++) {
@@ -363,11 +363,7 @@ const bookService = {
 
     async clearCollection() {
         await Book.deleteMany({});
-        const bookBoxes = await BookBox.find();
-        for (let i = 0; i < bookBoxes.length; i++) {
-            bookBoxes[i].books = [];
-            await bookBoxes[i].save();
-        }
+        await BookBox.deleteMany({});
     }
 
 };

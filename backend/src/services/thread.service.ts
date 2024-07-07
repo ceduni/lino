@@ -1,13 +1,22 @@
 import Thread from "../models/thread.model";
-import {notifyUser} from "./user.service";
+import UserService, {notifyUser} from "./user.service";
 import User from "../models/user.model";
 import BookService from "./book.service";
+import {newErr} from "./utilities";
 
 const ThreadService = {
-    async createThread(bookId : string, username : string, title : string) {
+    async createThread(request: any) {
+        const username = await UserService.getUserName(request.user.id);
+        if (!username) {
+            throw newErr(401, 'Unauthorized');
+        }
+        const { bookId, title } = request.body;
         const book = await BookService.getBook(bookId);
         if (!book) {
-            throw new Error('Book not found');
+            throw newErr(404, 'Book not found');
+        }
+        if (!title) {
+            throw newErr(400, 'Title is required');
         }
         const bookTitle = book.title;
         const thread = new Thread({
@@ -20,10 +29,17 @@ const ThreadService = {
         return thread;
     },
 
-    async addThreadMessage(threadId : string, username : string, content : string, respondsTo : string) {
+    async addThreadMessage(request: any) {
+        // @ts-ignore
+        const username = await UserService.getUserName(request.user.id);
+        if (!username) {
+            throw newErr(401, 'Unauthorized');
+        }
+        const { content, respondsTo } = request.body;
+        const threadId = request.body.threadId;
         const thread = await Thread.findById(threadId);
         if (!thread) {
-            throw new Error('Thread not found');
+            throw newErr(404, 'Thread not found');
         }
         const message = {
             username: username,
@@ -40,12 +56,12 @@ const ThreadService = {
             // @ts-ignore
             const parentMessage = thread.messages.id(respondsTo);
             if (!parentMessage) {
-                throw new Error('Parent message not found');
+                throw newErr(404, 'Parent message not found');
             }
             if (parentMessage.username !== username) {
                 const userParent = await User.findOne({ username: parentMessage.username });
                 if (!userParent) {
-                    throw new Error('User not found');
+                    throw newErr(404, 'User not found');
                 }
                 // @ts-ignore
                 await notifyUser(userParent.id, `${username} responded to your message in the thread "${thread.title}"`);
@@ -55,19 +71,24 @@ const ThreadService = {
         // Get the _id of the newly created message
         const messageId = thread.messages[thread.messages.length - 1].id;
 
-        return { ...message, id: messageId };
+        return { messageId };
     },
 
-    async toggleMessageReaction(threadId : string, messageId : string, username : string, reactIcon : string) {
+    async toggleMessageReaction(request: any) {
+        const username = await UserService.getUserName(request.user.id);
+        if (!username) {
+            throw newErr(401, 'Unauthorized');
+        }
+        const { reactIcon, messageId, threadId } = request.body;
         // Find the thread that contains the message
         const thread = await Thread.findById(threadId);
         if (!thread) {
-            throw new Error('Thread not found');
+            throw newErr(404, 'Thread not found');
         }
         // Find the message
         const message = thread.messages.id(messageId);
         if (!message) {
-            throw new Error('Message not found');
+            throw newErr(404, 'Message not found');
         }
 
         // Check if the user has already reacted to this message with the same icon

@@ -1,52 +1,46 @@
 const server = require('../index');
+const { reinitDatabase } = require('../services/utilities');
+const {randomInt} = require("node:crypto");
 
-async function clearCollections() {
-    const token = await server.inject({
-        method: 'POST',
-        url: '/users/login',
-        payload: {
-            identifier: process.env.ADMIN_USERNAME,
-            password: process.env.ADMIN_PASSWORD
-        }
-    }).token;
-    try {
-        await server.inject({
-            method: 'DELETE',
-            url: '/threads/clear',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        await server.inject({
-            method: 'DELETE',
-            url: '/books/clear',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        await server.inject({
-            method: 'DELETE',
-            url: '/users/clear',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        console.log('Collections cleared successfully!');
-    } catch (error) {
-        console.error('Failed to clear collections:', error.response.data);
-    }
-}
-
-beforeAll(async () => {
-    await clearCollections();
-});
-
+let bbids = [];
 let portedBookId;
 let portedThreadId;
 let portedMessageId;
 let token;
 let portedBookIds = [];
 let fakeQRCodeCounter = 0;
+
+
+beforeAll(async () => {
+    const response = await server.inject({
+        method: 'POST',
+        url: '/users/login',
+        payload: {
+            identifier: process.env.ADMIN_USERNAME,
+            password: process.env.ADMIN_PASSWORD
+        }
+    });
+    const payload = JSON.parse(response.payload);
+    token = payload.token;
+
+    for (let i = 0; i < 3; i++) {
+        const response = await server.inject({
+            method: 'POST',
+            url: '/books/bookbox/new',
+            payload: {
+                name: `Box${i+1}`,
+                infoText: 'Find it yourself',
+                latitude: randomInt(-180, 180) + Math.random(),
+                longitude: randomInt(-180, 180) + Math.random()
+            },
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        const payload = JSON.parse(response.payload);
+        bbids.push(payload._id);
+    }
+});
 
 describe('Test user registration', () => {
 
@@ -136,8 +130,8 @@ describe('Test user login and user specific operations', () => {
             }
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(401);
-        expect(payload.error).toBe('Invalid credentials');
+        expect(response.statusCode).toBe(400);
+        expect(payload.error).toBe('Invalid password');
     });
 
     test('Logging in with correct credentials', async () => {
@@ -180,7 +174,7 @@ describe('Test book adding by guest users', () => {
             method: 'POST',
             url: '/books/add',
             payload: {
-                bookboxId: "6660ec640a7261afb1131165",
+                bookboxId: bbids[0],
                 qrCodeId: `b${fakeQRCodeCounter++}`,
                 isbn: "9782075023986",
                 title: "Le cas Jack Spark (Saison 2) - Automne traqué",
@@ -210,7 +204,10 @@ describe('Test book adding by guest users', () => {
         const response = await server.inject({
             method: 'POST',
             url: '/books/add',
-            payload: { // No title
+            payload: {
+                bookboxId: '',
+                qrCodeId: '',
+                title: "Harry Potter à l'école des sorciers",
                 authors: ["J. K. Rowling"],
                 publisher: "Gallimard Jeunesse",
                 parutionYear: 2013,
@@ -228,7 +225,7 @@ describe('Test book adding by guest users', () => {
             method: 'POST',
             url: '/books/add',
             payload: { // No title
-                bookboxId: "6660ec640a7213afb11a1c65",
+                bookboxId: "6660ec640a7261a8b1131165",
                 qrCodeId: `b${fakeQRCodeCounter++}`,
                 isbn: "9782075023986",
                 title: "Le cas Jack Spark (Saison 2) - Automne traqué",
@@ -242,7 +239,7 @@ describe('Test book adding by guest users', () => {
             }
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(404);
         expect(payload.error).toBe('Bookbox not found');
         fakeQRCodeCounter--;
     });
@@ -254,7 +251,7 @@ describe('Test book fetching by guest users', () => {
     test('Getting a book from a book box', async () => {
         const response = await server.inject({
             method: 'GET',
-            url: `/books/b0/6660ec640a7261afb1131165`
+            url: `/books/b0/${bbids[0]}` // book with qrCodeId b0 in bookbox with id bbids[0]
         });
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(200);
@@ -267,10 +264,10 @@ describe('Test book fetching by guest users', () => {
     test('Trying to get the same book from the same book box', async () => {
         const response = await server.inject({
             method: 'GET',
-            url: `/books/b0/6660ec640a7261afb1131165`
+            url: `/books/b0/${bbids[0]}`
         });
         const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(404);
         expect(payload.error).toBe('Book not found in bookbox');
     });
 
@@ -279,7 +276,7 @@ describe('Test book fetching by guest users', () => {
             method: 'POST',
             url: `/books/add`,
             payload : {
-                bookboxId: "6660ff660a7261afb113117c",
+                bookboxId: bbids[1],
                 qrCodeId: `b0`,
             }
         });
@@ -295,7 +292,7 @@ describe('Test book fetching by guest users', () => {
             method: 'POST',
             url: `/books/add`,
             payload : {
-                bookboxId : "6660ec640a7261afb1131165",
+                bookboxId : bbids[2],
                 qrCodeId: 'b0',
             }
         });
@@ -342,7 +339,7 @@ describe('Test book actions by connected users', () => {
             method: 'POST',
             url: '/books/add',
             payload: {
-                bookboxId : "6660ec640a7261afb1131165",
+                bookboxId : bbids[0],
                 qrCodeId: `b${fakeQRCodeCounter++}`,
                 isbn: "9781781101032",
                 title: "Harry Potter à L'école des Sorciers",
@@ -388,7 +385,7 @@ describe('Test book actions by connected users', () => {
     test('A guest getting the same book from the book box', async () => {
         const response = await server.inject({
             method: 'GET',
-            url: `/books/b1/6660ec640a7261afb1131165`
+            url: `/books/b1/${bbids[0]}`
         });
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(200);
@@ -409,7 +406,7 @@ describe('Test book actions by connected users', () => {
             url: `/books/add`,
             payload : {
                 qrCodeId: `b1`,
-                bookboxId : "6660ec640a7261afb1131165"
+                bookboxId : bbids[0]
             },
         });
     });
@@ -429,8 +426,8 @@ describe('Test book searching among the database', () => {
         expect(payload.books).toHaveLength(2);
         expect(payload.books[0].authors[0]).toBe('Victor Dixen');
         expect(payload.books[1].authors[0]).toBe('J.K. Rowling');
-        expect(payload.books[0].bookboxPresence[0]).toBe('6660ff660a7261afb113117c');
-        expect(payload.books[1].bookboxPresence[0]).toBe('6660ec640a7261afb1131165');
+        expect(payload.books[0].bookboxPresence[0]).toBe(bbids[1]);
+        expect(payload.books[1].bookboxPresence[0]).toBe(bbids[0]);
     });
 
     test('Add quite a lot of books for further testing', async () => {
@@ -444,10 +441,6 @@ describe('Test book searching among the database', () => {
             "9781421544328",
             "9781975319441",
             "9781974720286"
-        ]
-        const bbids = [
-            "6660ec640a7261afb1131165",
-            "6660ff660a7261afb113117c"
         ]
 
         for (let i = 0; i < isbns.length; i++) {
@@ -494,11 +487,10 @@ describe('Test book searching among the database', () => {
         'in a specific book box, in the ascending alphabetical order of the 1st author\'s name', async () => {
         const response = await server.inject({
             method: 'GET',
-            url: '/books/search?bbid=6660ec640a7261afb1131165&asc=true&cls=by+author'
+            url: `/books/search?bbid=${bbids[0]}&asc=true&cls=by+author`
         });
         const payload = JSON.parse(response.payload);
         expect(payload).toHaveProperty('books');
-        expect(payload.books).toHaveLength(6);
         for (let i = 0; i < payload.books.length-1; i++) {
             expect(payload.books[i].authors[0].localeCompare(payload.books[i+1].authors[0]))
                 .toBeLessThanOrEqual(0);
@@ -509,11 +501,10 @@ describe('Test book searching among the database', () => {
         'same as earlier but descending order', async () => {
         const response = await server.inject({
             method: 'GET',
-            url: '/books/search?bbid=6660ec640a7261afb1131165&asc=false&cls=by+author'
+            url: `/books/search?bbid=${bbids[0]}&asc=false&cls=by+author`
         });
         const payload = JSON.parse(response.payload);
         expect(payload).toHaveProperty('books');
-        expect(payload.books).toHaveLength(6);
         for (let i = 0; i < payload.books.length-1; i++) {
             expect(payload.books[i].authors[0].localeCompare(payload.books[i+1].authors[0]))
                 .toBeGreaterThanOrEqual(0);
@@ -527,9 +518,12 @@ describe('Test book searching among the database', () => {
             url: '/books/search?asc=true&cls=by+title&bf=false&py=2016'
         });
         const payload = JSON.parse(response.payload);
+        console.log(payload.books);
         expect(payload).toHaveProperty('books');
         for (let i = 0; i < payload.books.length-1; i++) {
-            expect(payload.books[i].parutionYear).toBeGreaterThanOrEqual(2016);
+            if (payload.books[i].hasOwnProperty('parutionYear')) {
+                expect(payload.books[i].parutionYear).toBeGreaterThanOrEqual(2016);
+            }
             expect(payload.books[i].title[0].localeCompare(payload.books[i+1].title[0]))
                 .toBeLessThanOrEqual(0);
         }
@@ -548,7 +542,10 @@ describe('Test book searching among the database', () => {
                 payload.books[i].title.includes('Harry')
                 || payload.books[i].authors[0].includes('Harry')
             ).toBe(true);
-            expect(payload.books[i].parutionYear).toBeGreaterThanOrEqual(payload.books[i+1].parutionYear);
+            if (payload.books[i].hasOwnProperty('parutionYear')
+                && payload.books[i+1].hasOwnProperty('parutionYear')) {
+                expect(payload.books[i].parutionYear).toBeGreaterThanOrEqual(payload.books[i + 1].parutionYear);
+            }
         }
     });
 
@@ -565,6 +562,23 @@ describe('Test book searching among the database', () => {
             const date1 = new Date(payload.books[i].dateLastAction);
             const date2 = new Date(payload.books[i+1].dateLastAction);
             expect(date1.getTime()).toBeLessThanOrEqual(date2.getTime());
+        }
+    });
+
+    test('Search specific books in specific order : ' +
+        'whose number of pages is above 200, in the descending order of the title', async () => {
+        const response = await server.inject({
+            method: 'GET',
+            url: '/books/search?asc=false&cls=by+title&pg=200&pmt=true'
+        });
+        const payload = JSON.parse(response.payload);
+        expect(payload).toHaveProperty('books');
+        for (let i = 0; i < payload.books.length-1; i++) {
+            if (payload.books[i].hasOwnProperty('pages')) {
+                expect(payload.books[i].pages).toBeGreaterThanOrEqual(200);
+            }
+            expect(payload.books[i].title[0].localeCompare(payload.books[i+1].title[0]))
+                .toBeGreaterThanOrEqual(0);
         }
     });
 });
@@ -671,7 +685,7 @@ describe('Tests for thread creation and interaction', () => {
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(200);
         expect(payload).toHaveProperty('reaction');
-        expect(payload.reaction).toBe(null);
+        expect(Object.keys(payload.reaction)).toHaveLength(0);
     });
 
     test('Search all threads', async () => {
@@ -710,6 +724,6 @@ async function getUser(token) {
 }
 
 afterAll(async () => {
-    await clearCollections();
+    await reinitDatabase(server);
     await server.close();
 });

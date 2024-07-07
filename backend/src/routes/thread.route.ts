@@ -2,54 +2,129 @@ import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} fr
 import ThreadService from '../services/thread.service';
 import UserService from "../services/user.service";
 import Thread from "../models/thread.model";
+import {clearCollectionSchema, threadSchema} from "../services/utilities";
 
 
-interface CreateThreadParams extends RouteGenericInterface {
-    Body: {
-        bookId: string,
-        title: string
-    }
-}
-async function createThread(request : FastifyRequest<CreateThreadParams>, reply : FastifyReply) {
-    // @ts-ignore
-    const username = await UserService.getUserName(request.user.id);
-    if (!username) {
-        reply.code(401).send({ error: 'Unauthorized' });
-        return;
-    }
-    const { bookId, title } = request.body;
-    const thread = await ThreadService.createThread(bookId, username, title);
-    reply.code(201).send({threadId: thread.id});
-}
-
-interface AddThreadMessageParams extends RouteGenericInterface {
-    Body: {
-        threadId: string,
-        content: string,
-        respondsTo: string
-    }
-}
-async function addThreadMessage(request : FastifyRequest<AddThreadMessageParams>, reply : FastifyReply) {
-    const thread = await Thread.findById(request.body.threadId);
-    if (!thread) {
-        reply.code(404).send({ error: 'Thread not found' });
-        return;
-    }
-    // @ts-ignore
-    const username = await UserService.getUserName(request.user.id);
-    if (!username) {
-        reply.code(401).send({ error: 'Unauthorized' });
-        return;
-    }
+async function createThread(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const { content, respondsTo } = request.body;
-        const threadId = request.body.threadId;
-        const message = await ThreadService.addThreadMessage(threadId, username, content, respondsTo);
-        reply.code(201).send({messageId: message.id});
+        const thread = await ThreadService.createThread(request);
+        reply.code(201).send({threadId: thread.id});
     } catch (error : any) {
-        reply.code(500).send({ error: 'Internal server error' });
+        reply.code(400).send({ error: error.message });
     }
 }
+
+const createThreadSchema = {
+    description: 'Create a new thread',
+    tags: ['thread', 'create'],
+    body: {
+        type: 'object',
+        required: ['bookId', 'title'],
+        properties: {
+            bookId: { type: 'string' },
+            title: { type: 'string' }
+        }
+    },
+    headers: {
+        type: 'object',
+        required: ['Authorization'],
+        properties: {
+            Authorization: {type: 'string'}
+        }
+    },
+    response: {
+        201: {
+            description: 'Thread created successfully',
+            type: 'object',
+            properties: {
+                threadId: { type: 'string' }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        400: {
+            description: 'Bad request',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
+        },
+        404: {
+            description: 'Book not found',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
+        }
+    }
+};
+
+
+async function addThreadMessage(request : FastifyRequest, reply : FastifyReply) {
+    try {
+        const messageId = await ThreadService.addThreadMessage(request);
+        reply.code(201).send(messageId);
+    } catch (error : any) {
+        reply.code(error.statusCode).send({ error: error.message });
+    }
+}
+
+const addMessageSchema = {
+    description: 'Add a new message to a thread',
+    tags: ['thread', 'message'],
+    body: {
+        type: 'object',
+        required: ['threadId', 'content'],
+        properties: {
+            threadId: { type: 'string' },
+            content: { type: 'string' },
+            respondsTo: { type: 'string' }
+        }
+    },
+    headers: {
+        type: 'object',
+        required: ['Authorization'],
+        properties: {
+            Authorization: {type: 'string'}
+        }
+    },
+    response: {
+        201: {
+            description: 'Message added successfully',
+            type: 'object',
+            properties: {
+                messageId: { type: 'string' }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        400: {
+            description: 'Bad request',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Thread, parent message or user not found',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
+        }
+    }
+};
+
 
 
 interface ToggleMessageReactionParams extends RouteGenericInterface {
@@ -60,26 +135,99 @@ interface ToggleMessageReactionParams extends RouteGenericInterface {
     }
 }
 async function toggleMessageReaction(request : FastifyRequest<ToggleMessageReactionParams>, reply : FastifyReply) {
-    // @ts-ignore
-    const username = await UserService.getUserName(request.user.id);
-    if (!username) {
-        reply.code(401).send({ error: 'Unauthorized' });
-        return;
-    }
-    const { reactIcon, messageId, threadId } = request.body;
     try {
-        const reaction = await ThreadService.toggleMessageReaction(threadId, messageId, username, reactIcon);
+        const reaction = await ThreadService.toggleMessageReaction(request);
         reply.send({reaction : reaction});
-    } catch (error) {
-        console.error('Error adding reaction:', error);
-        reply.code(500).send({ error: 'Internal server error' });
+    } catch (error : any) {
+        reply.code(400).send({ error: error.message });
     }
 }
+
+const toggleReactionSchema = {
+    description: 'Toggle a reaction to a message',
+    tags: ['thread', 'reaction'],
+    body: {
+        type: 'object',
+        required: ['reactIcon', 'threadId', 'messageId'],
+        properties: {
+            reactIcon: { type: 'string' },
+            threadId: { type: 'string' },
+            messageId: { type: 'string' }
+        }
+    },
+    headers: {
+        type: 'object',
+        required: ['Authorization'],
+        properties: {
+            Authorization: {type: 'string'}
+        }
+    },
+    response: {
+        200: {
+            description: 'Reaction added successfully',
+            type: 'object',
+            properties: {
+                reaction: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string' },
+                        username: { type: 'string' },
+                        reactIcon: { type: 'string' }
+                    }
+                }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        400: {
+            description: 'Bad request',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Thread or message not found',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
+        }
+    }
+
+};
 
 async function searchThreads(request : FastifyRequest, reply : FastifyReply) {
     const threads = await ThreadService.searchThreads(request);
     reply.send(threads);
 }
+
+const searchThreadsSchema = {
+    description: 'Search threads',
+    tags: ['thread', 'search'],
+    querystring: {
+        q: { type: 'string' },
+        cls: { type: 'string' },
+        asc: { type: 'boolean' }
+    },
+    response: {
+        200: {
+            description: 'Threads found',
+            type: 'object',
+            properties: {
+                threads: {
+                    type: 'array',
+                    items: threadSchema
+                }
+            }
+        }
+    }
+};
 
 
 interface GetThreadParams extends RouteGenericInterface {
@@ -98,6 +246,32 @@ async function getThread(request : FastifyRequest<GetThreadParams>, reply : Fast
     reply.send(thread);
 }
 
+const getThreadSchema = {
+    description: 'Get a thread by id',
+    tags: ['thread', 'get'],
+    params: {
+        type: 'object',
+        required: ['threadId'],
+        properties: {
+            threadId: { type: 'string' }
+        }
+    },
+    response: {
+        200: {
+            description: 'Thread found',
+            ...threadSchema
+        },
+        404: {
+            description: 'Thread not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+
+
 async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
     try {
         await ThreadService.clearCollection();
@@ -113,10 +287,10 @@ interface MyFastifyInstance extends FastifyInstance {
     adminAuthenticate: (request : FastifyRequest, reply: FastifyReply) => void;
 }
 export default async function threadRoutes(server: MyFastifyInstance) {
-    server.get('/threads/:threadId', getThread);
-    server.get('/threads/search', searchThreads);
-    server.post('/threads/new', { preValidation: [server.authenticate] }, createThread);
-    server.post('/threads/messages', { preValidation: [server.authenticate] }, addThreadMessage);
-    server.post('/threads/messages/reactions', { preValidation: [server.authenticate] }, toggleMessageReaction);
-    server.delete('/threads/clear', { preValidation: [server.adminAuthenticate] }, clearCollection);
+    server.get('/threads/:threadId', { schema : getThreadSchema }, getThread);
+    server.get('/threads/search', { schema : searchThreadsSchema }, searchThreads);
+    server.post('/threads/new', { preValidation: [server.authenticate], schema : createThreadSchema }, createThread);
+    server.post('/threads/messages', { preValidation: [server.authenticate], schema : addMessageSchema }, addThreadMessage);
+    server.post('/threads/messages/reactions', { preValidation: [server.authenticate], schema : toggleReactionSchema }, toggleMessageReaction);
+    server.delete('/threads/clear', { preValidation: [server.adminAuthenticate], schema : clearCollectionSchema }, clearCollection);
 }

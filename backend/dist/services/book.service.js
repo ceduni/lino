@@ -17,6 +17,7 @@ const book_model_1 = __importDefault(require("../models/book.model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const bookbox_model_1 = __importDefault(require("../models/bookbox.model"));
 const user_service_1 = require("./user.service");
+const utilities_1 = require("./utilities");
 const bookService = {
     getBookBox(bookBoxId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -59,19 +60,19 @@ const bookService = {
                 });
             }
             if (!book.qrCodeId) {
-                throw new Error('Book\'s QR code ID is required');
+                throw (0, utilities_1.newErr)(400, 'Book\'s QR code ID is required');
             }
             if (!book.title) {
-                throw new Error('Book\'s title is required');
+                throw (0, utilities_1.newErr)(400, 'Book\'s title is required');
             }
             let bookBox = yield bookbox_model_1.default.findById(request.body.bookboxId);
             if (!bookBox) {
-                throw new Error('Bookbox not found');
+                throw (0, utilities_1.newErr)(404, 'Bookbox not found');
             }
             // check if the book is already in a bookbox somewhere
             const bookBoxes = yield bookbox_model_1.default.find({ books: book.id });
             if (bookBoxes.length > 0) {
-                throw new Error('Book is supposed to be in the book box ' + bookBoxes[0].name);
+                throw (0, utilities_1.newErr)(400, 'Book is supposed to be in the book box ' + bookBoxes[0].name);
             }
             bookBox.books.push(book.id);
             yield this.updateBooks(book, request, true);
@@ -82,24 +83,26 @@ const bookService = {
             return { bookId: book.id, books: bookBox.books };
         });
     },
-    getBookFromBookBox(qrCode, request, bookboxId) {
+    getBookFromBookBox(request) {
         return __awaiter(this, void 0, void 0, function* () {
+            const qrCode = request.params.bookQRCode;
+            const bookboxId = request.params.bookboxId;
             // check if the book exists
             let book = yield book_model_1.default.findOne({ qrCodeId: qrCode });
             if (!book) {
-                throw new Error('Book not found');
+                throw (0, utilities_1.newErr)(404, 'Book not found');
             }
             // check if the bookbox exists
             let bookBox = yield bookbox_model_1.default.findById(bookboxId);
             if (!bookBox) {
-                throw new Error('Bookbox not found');
+                throw (0, utilities_1.newErr)(404, 'Bookbox not found');
             }
             // check if the book is in the bookbox
             if (bookBox.books.includes(book.id)) {
                 bookBox.books.splice(bookBox.books.indexOf(book.id), 1);
             }
             else {
-                throw new Error('Book not found in bookbox');
+                throw (0, utilities_1.newErr)(404, 'Book not found in bookbox');
             }
             yield this.updateBooks(book, request, false);
             yield this.notifyAllUsers(book, 'removed from', bookBox.name);
@@ -141,7 +144,7 @@ const bookService = {
                 const userId = request.user.id;
                 const user = yield user_model_1.default.findById(userId);
                 if (!user) {
-                    throw new Error('User not found');
+                    throw (0, utilities_1.newErr)(404, 'User not found');
                 }
                 const username = user.username;
                 if (given) { // if the book is given
@@ -167,11 +170,12 @@ const bookService = {
             }
         });
     },
-    getBookInfoFromISBN(isbn) {
+    getBookInfoFromISBN(request) {
         return __awaiter(this, void 0, void 0, function* () {
+            const isbn = request.params.isbn;
             const response = yield axios_1.default.get(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
             if (response.data.totalItems === 0) {
-                throw new Error('Book not found');
+                throw (0, utilities_1.newErr)(404, 'Book not found');
             }
             const bookInfo = response.data.items[0].volumeInfo;
             const parutionYear = bookInfo.publishedDate ? parseInt(bookInfo.publishedDate.substring(0, 4)) : null;
@@ -184,6 +188,7 @@ const bookService = {
                 publisher: bookInfo.publisher,
                 parutionYear: parutionYear,
                 categories: bookInfo.categories,
+                pages: bookInfo.pageCount,
             };
         });
     },
@@ -204,37 +209,33 @@ const bookService = {
                     return book.title.includes(keywords) || book.authors.includes(keywords);
                 });
             }
-            const pmt = request.query.pmt; // a bool to determine whether we want the books with more or less than X pages
+            const pmt = request.query.pmt === true; // a bool to determine whether we want the books with more or less than X pages
             const pg = request.query.pg; // the number of pages
-            if (pmt && pg) {
-                if (pmt === 'true') {
-                    books = books.filter((book) => {
-                        // @ts-ignore
-                        return book.pages >= pg;
-                    });
-                }
-                else {
-                    books = books.filter((book) => {
-                        // @ts-ignore
-                        return book.pages <= pg;
-                    });
-                }
+            if (pg) {
+                books = books.filter((book) => {
+                    const bookPages = book.pages;
+                    if (!bookPages)
+                        return true;
+                    return pmt ? bookPages >= pg : bookPages <= pg;
+                });
             }
-            const bf = request.query.bf; // a bool to determine whether we want the books before or after X year
+            const bf = request.query.bf === true; // a bool to determine whether we want the books before or after X year
             const py = request.query.py; // the year
-            if (bf && py) {
-                if (bf === 'true') {
-                    books = books.filter((book) => {
-                        // @ts-ignore
-                        return book.parutionYear <= py;
-                    });
-                }
-                else {
-                    books = books.filter((book) => {
-                        // @ts-ignore
-                        return book.parutionYear >= py;
-                    });
-                }
+            if (py) {
+                books = books.filter((book) => {
+                    // @ts-ignore
+                    const bookYear = book.parutionYear;
+                    if (!bookYear)
+                        return true;
+                    if (bf) {
+                        // If bf is true, filter for books before the year
+                        return bookYear <= py;
+                    }
+                    else {
+                        // If bf is false, filter for books after the year
+                        return bookYear >= py;
+                    }
+                });
             }
             const pub = request.query.pub; // the publisher
             if (pub) {
@@ -247,7 +248,7 @@ const bookService = {
             if (bbid) {
                 const bookBox = yield bookbox_model_1.default.findById(bbid);
                 if (!bookBox) {
-                    throw new Error('Bookbox not found');
+                    throw (0, utilities_1.newErr)(404, 'Bookbox not found');
                 }
                 books = books.filter((book) => {
                     return bookBox.books.includes(book.id);
@@ -258,7 +259,7 @@ const bookService = {
             if (!classify) {
                 classify = 'by title'; // default value
             }
-            let asc = request.query.asc === 'true';
+            let asc = request.query.asc === true;
             if (classify === 'by title') {
                 books.sort((a, b) => {
                     if (asc) {
@@ -341,7 +342,7 @@ const bookService = {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield user_model_1.default.findById(request.user.id);
             if (!user) {
-                throw new Error('User not found');
+                throw (0, utilities_1.newErr)(404, 'User not found');
             }
             const users = yield user_model_1.default.find({ getAlerted: true });
             for (let i = 0; i < users.length; i++) {
@@ -394,11 +395,7 @@ const bookService = {
     clearCollection() {
         return __awaiter(this, void 0, void 0, function* () {
             yield book_model_1.default.deleteMany({});
-            const bookBoxes = yield bookbox_model_1.default.find();
-            for (let i = 0; i < bookBoxes.length; i++) {
-                bookBoxes[i].books = [];
-                yield bookBoxes[i].save();
-            }
+            yield bookbox_model_1.default.deleteMany({});
         });
     }
 };
