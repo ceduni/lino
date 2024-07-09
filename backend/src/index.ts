@@ -121,6 +121,7 @@ const start = async () => {
         server.swagger(); // Ensure swagger is called after server starts
 
         await reinitDatabase(server);
+        await populateDatabase();
 
 
     } catch (err) {
