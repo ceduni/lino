@@ -353,13 +353,12 @@ const bookService = {
 
         // only return the ids of the bookboxes
         const bookBoxIds = bookBoxes.map((bookBox) => {
-            return bookBox.id;
+            return bookBox._id.toString();
         });
-
         // get the full bookbox objects
         let finalBookBoxes = [];
         for (let i = 0; i < bookBoxes.length; i++) {
-            finalBookBoxes.push(this.getBookBox(bookBoxIds[i]));
+            finalBookBoxes.push(await this.getBookBox(bookBoxIds[i]));
         }
 
         return finalBookBoxes;

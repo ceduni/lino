@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const utilities_1 = require("./services/utilities");
+const mock_data_gen_1 = require("./mock.data.gen");
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -69,12 +70,34 @@ server.register(fastifySwagger, {
         },
         externalDocs: {
             url: 'https://swagger.io',
-            description: 'Find more info here',
+            description: 'What\'s Swagger?',
         },
-        host: 'localhost', // the host of your API
-        schemes: ['http', 'https'], // the protocol your API is available on
+        host: 'lino-1.onrender.com', // the host of your API
+        schemes: ['https'], // the protocol your API is available on
         consumes: ['application/json'], // the request content-type
         produces: ['application/json'], // the response content-type
+        tags: [
+            {
+                name: 'books',
+                description: 'Operations related to books (e.g. search, add, delete)'
+            },
+            {
+                name: 'bookboxes',
+                description: 'Operations related to bookboxes (e.g. visit, add)'
+            },
+            {
+                name: 'users',
+                description: 'Operations related to users (e.g. login, register)'
+            },
+            {
+                name: 'threads',
+                description: 'Operations related to threads (e.g. create, search)'
+            },
+            {
+                name: 'messages',
+                description: 'Operations related to messages (e.g. add, react)'
+            }
+        ]
     },
 });
 server.register(fastifySwaggerUi, {
@@ -94,8 +117,9 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
         yield server.listen({ host, port });
         console.log(`Server started on port ${port}`);
         yield server.ready();
-        //server.swagger(); // Ensure swagger is called after server starts
+        server.swagger(); // Ensure swagger is called after server starts
         yield (0, utilities_1.reinitDatabase)(server);
+        yield (0, mock_data_gen_1.populateDatabase)();
     }
     catch (err) {
         console.error(err);

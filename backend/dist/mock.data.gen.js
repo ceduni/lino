@@ -41,7 +41,7 @@ function randomBook() {
         coverImage: faker_1.faker.image.url(), // Generate a random image URL
         publisher: faker_1.faker.company.name(), // Generate a random publisher name
         categories: Array.from({ length: faker_1.faker.number.int({ min: 1, max: 3 }) }, () => faker_1.faker.lorem.word()), // Generate an array of random category names with a length between 1 and 3
-        parutionYear: faker_1.faker.date.past().getFullYear(), // Generate a random past year for parutionYear
+        parutionYear: faker_1.faker.number.int({ min: 1600, max: 2022 }), // Generate a random year between 1600 and 2022
         pages: faker_1.faker.number.int({ min: 50, max: 1000 }), // Generate a random number of pages between 50 and 1000
     };
 }

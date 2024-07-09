@@ -28,7 +28,7 @@ function createThread(request, reply) {
 }
 const createThreadSchema = {
     description: 'Create a new thread',
-    tags: ['thread', 'create'],
+    tags: ['threads'],
     body: {
         type: 'object',
         required: ['bookId', 'title'],
@@ -88,7 +88,7 @@ function addThreadMessage(request, reply) {
 }
 const addMessageSchema = {
     description: 'Add a new message to a thread',
-    tags: ['thread', 'message'],
+    tags: ['threads', 'messages'],
     body: {
         type: 'object',
         required: ['threadId', 'content'],
@@ -149,7 +149,7 @@ function toggleMessageReaction(request, reply) {
 }
 const toggleReactionSchema = {
     description: 'Toggle a reaction to a message',
-    tags: ['thread', 'reaction'],
+    tags: ['threads', 'messages'],
     body: {
         type: 'object',
         required: ['reactIcon', 'threadId', 'messageId'],
@@ -212,7 +212,7 @@ function searchThreads(request, reply) {
 }
 const searchThreadsSchema = {
     description: 'Search threads',
-    tags: ['thread', 'search'],
+    tags: ['threads'],
     querystring: {
         q: { type: 'string' },
         cls: { type: 'string' },
@@ -244,7 +244,7 @@ function getThread(request, reply) {
 }
 const getThreadSchema = {
     description: 'Get a thread by id',
-    tags: ['thread', 'get'],
+    tags: ['threads'],
     params: {
         type: 'object',
         required: ['threadId'],

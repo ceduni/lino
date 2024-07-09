@@ -29,7 +29,7 @@ function registerUser(request, reply) {
 }
 const registerUserSchema = {
     description: 'Register a new user',
-    tags: ['user', 'register'],
+    tags: ['users'],
     body: {
         type: 'object',
         required: ['username', 'password', 'email'],
@@ -72,7 +72,7 @@ function loginUser(request, reply) {
 }
 const loginUserSchema = {
     description: 'Login a user',
-    tags: ['user', 'login'],
+    tags: ['users'],
     body: {
         type: 'object',
         required: ['identifier', 'password'],
@@ -112,7 +112,7 @@ function addToFavorites(request, reply) {
 }
 const addToFavoritesSchema = {
     description: 'Add a book to user favorites',
-    tags: ['user', 'favorites'],
+    tags: ['users', 'books'],
     body: {
         type: 'object',
         required: ['bookId'],
@@ -158,7 +158,7 @@ function removeFromFavorites(request, reply) {
 }
 const removeFromFavoritesSchema = {
     description: 'Remove a book from user favorites',
-    tags: ['user', 'favorites'],
+    tags: ['users', 'books'],
     params: {
         type: 'object',
         required: ['id'],
@@ -198,7 +198,7 @@ function getUser(request, reply) {
 }
 const getUserSchema = {
     description: 'Get user infos',
-    tags: ['user'],
+    tags: ['users'],
     headers: {
         type: 'object',
         required: ['authorization'],
@@ -238,7 +238,7 @@ function getUserFavorites(request, reply) {
 }
 const getUserFavoritesSchema = {
     description: 'Get user favorite books',
-    tags: ['user', 'favorites'],
+    tags: ['users', 'books'],
     headers: {
         type: 'object',
         required: ['authorization'],
@@ -276,7 +276,7 @@ function updateUser(request, reply) {
 }
 const updateUserSchema = {
     description: 'Update user infos',
-    tags: ['user'],
+    tags: ['users'],
     headers: {
         type: 'object',
         required: ['authorization'],
