@@ -22,6 +22,7 @@ beforeAll(async () => {
     });
     const payload = JSON.parse(response.payload);
     token = payload.token;
+    console.log('Admin token : ' + token);
 
     for (let i = 0; i < 3; i++) {
         const response = await server.inject({
@@ -580,6 +581,20 @@ describe('Test book searching among the database', () => {
             expect(payload.books[i].title[0].localeCompare(payload.books[i+1].title[0]))
                 .toBeGreaterThanOrEqual(0);
         }
+    });
+
+    test('Search bookboxes', async () => {
+       const response = await server.inject({
+           method: 'GET',
+           url: '/books/bookbox/search?asc=true&cls=by+name&kw=Box'
+       });
+       const payload = JSON.parse(response.payload);
+       expect(response.statusCode).toBe(200);
+       expect(payload).toHaveProperty('bookboxes');
+       expect(payload.bookboxes).toHaveLength(3);
+       for (let i = 0; i < payload.bookboxes.length-1; i++) {
+           expect(payload.bookboxes[i].name.localeCompare(payload.bookboxes[i+1].name)).toBeLessThanOrEqual(0);
+       }
     });
 });
 

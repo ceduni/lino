@@ -65,12 +65,34 @@ server.register(fastifySwagger, {
         },
         externalDocs: {
             url: 'https://swagger.io',
-            description: 'Find more info here',
+            description: 'What\'s Swagger?',
         },
         host: 'lino-1.onrender.com', // the host of your API
         schemes: ['https'], // the protocol your API is available on
         consumes: ['application/json'], // the request content-type
         produces: ['application/json'], // the response content-type
+        tags: [
+            {
+                name: 'books',
+                description: 'Operations related to books (e.g. search, add, delete)'
+            },
+            {
+                name: 'bookboxes',
+                description: 'Operations related to bookboxes (e.g. visit, add)'
+            },
+            {
+                name: 'users',
+                description: 'Operations related to users (e.g. login, register)'
+            },
+            {
+                name: 'threads',
+                description: 'Operations related to threads (e.g. create, search)'
+            },
+            {
+                name: 'messages',
+                description: 'Operations related to messages (e.g. add, react)'
+            }
+        ]
     },
 });
 
@@ -99,7 +121,6 @@ const start = async () => {
         server.swagger(); // Ensure swagger is called after server starts
 
         await reinitDatabase(server);
-        await populateDatabase();
 
 
     } catch (err) {

@@ -13,7 +13,7 @@ async function addBookToBookbox(request: FastifyRequest, reply: FastifyReply) {
 
 const addBookToBookboxSchema = {
     description: 'Add a book to a bookbox',
-    tags: ['books', 'add', 'bookbox'],
+    tags: ['books', 'bookboxes'],
     body: {
         type: 'object',
         properties: {
@@ -47,7 +47,7 @@ const addBookToBookboxSchema = {
             }
         },
         400: {
-            description: 'Error message',
+            description: 'Error in the request',
             type: 'object',
             properties: {
                 error: { type: 'string' }
@@ -74,7 +74,7 @@ async function getBookFromBookBox(request: FastifyRequest, reply: FastifyReply) 
 }
 const getBookFromBookBoxSchema = {
     description: 'Get book from bookbox',
-    tags: ['books', 'get', 'bookbox'],
+    tags: ['books', 'bookboxes'],
     params: {
         type: 'object',
         properties: {
@@ -124,7 +124,7 @@ async function getBookInfoFromISBN(request: FastifyRequest<Params>, reply: Fasti
 }
 const getBookInfoFromISBNSchema = {
     description: 'Get book info from ISBN',
-    tags: ['books', 'get', 'isbn'],
+    tags: ['books'],
     params: {
         type: 'object',
         properties: {
@@ -169,7 +169,7 @@ async function searchBooks(request: FastifyRequest, reply: FastifyReply) {
 
 const searchBooksSchema = {
     description: 'Search books',
-    tags: ['books', 'search'],
+    tags: ['books'],
     querystring: {
         type: 'object',
         properties: {
@@ -223,7 +223,7 @@ async function sendAlert(request: FastifyRequest, reply: FastifyReply) {
 
 const sendAlertSchema = {
     description: 'Send alert',
-    tags: ['books', 'alert'],
+    tags: ['books', 'users'],
     body: {
         type: 'object',
         properties: {
@@ -273,7 +273,7 @@ async function getBook(request: FastifyRequest<GetUniqueBookParams>, reply: Fast
 
 const getBookSchema = {
     description: 'Get book',
-    tags: ['books', 'get'],
+    tags: ['books'],
     params: {
         type: 'object',
         properties: {
@@ -313,7 +313,7 @@ async function getBookbox(request: FastifyRequest<GetBookBoxParams>, reply: Fast
 
 const getBookboxSchema = {
     description: 'Get bookbox',
-    tags: ['books', 'get', 'bookbox'],
+    tags: ['bookboxes'],
     params: {
         type: 'object',
         properties: {
@@ -355,7 +355,7 @@ async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
 
 const addNewBookboxSchema = {
     description: 'Add new bookbox',
-    tags: ['books', 'add', 'bookbox', 'new'],
+    tags: ['bookboxes'],
     body: {
         type: 'object',
         properties: {
@@ -395,6 +395,59 @@ const addNewBookboxSchema = {
     }
 };
 
+
+async function searchBookboxes(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const bookboxes = await BookService.searchBookboxes(request);
+        reply.send({bookboxes : bookboxes});
+    } catch (error : any) {
+        reply.code(400).send({error: error.message});
+    }
+}
+
+const searchBookboxesSchema = {
+    description: 'Search bookboxes',
+    tags: ['bookboxes'],
+    querystring: {
+        type: 'object',
+        properties: {
+            kw: { type: 'string' },
+            cls: { type: 'string' },
+            asc: { type: 'boolean' },
+            longitude: { type: 'number' },
+            latitude: { type: 'number' },
+        }
+    },
+    response: {
+        200: {
+            description: 'Bookboxes found',
+            type: 'object',
+            properties: {
+                bookboxes: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                            name: { type: 'string' },
+                            location: { type: 'array', items: { type: 'number' } },
+                            infoText: { type: 'string' },
+                            books: { type: 'array', items: bookSchema }
+                        }
+                    }
+                }
+            }
+        },
+        400: {
+            description: 'Error message',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+}
+
 async function clearCollection(request: FastifyRequest, reply: FastifyReply) {
     try {
         await BookService.clearCollection();
@@ -415,6 +468,7 @@ export default async function bookRoutes(server: MyFastifyInstance) {
     server.get('/books/:bookQRCode/:bookboxId', { preValidation: [server.optionalAuthenticate], schema: getBookFromBookBoxSchema }, getBookFromBookBox);
     server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate], schema: getBookInfoFromISBNSchema }, getBookInfoFromISBN);
     server.get('/books/search', { schema: searchBooksSchema }, searchBooks);
+    server.get('/books/bookbox/search', { schema: searchBookboxesSchema }, searchBookboxes);
     server.post('/books/add', { preValidation: [server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
     server.post('/books/alert', { preValidation: [server.authenticate], schema: sendAlertSchema }, sendAlert);
     server.post('/books/bookbox/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);

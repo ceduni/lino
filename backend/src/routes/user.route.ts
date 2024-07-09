@@ -15,7 +15,7 @@ async function registerUser(request : FastifyRequest, reply : FastifyReply) {
 
 const registerUserSchema = {
     description: 'Register a new user',
-    tags: ['user', 'register'],
+    tags: ['users'],
     body: {
         type: 'object',
         required: ['username', 'password', 'email'],
@@ -57,7 +57,7 @@ async function loginUser(request : FastifyRequest, reply : FastifyReply) {
 
 const loginUserSchema = {
     description: 'Login a user',
-    tags: ['user', 'login'],
+    tags: ['users'],
     body: {
         type: 'object',
         required: ['identifier', 'password'],
@@ -96,7 +96,7 @@ async function addToFavorites(request : FastifyRequest, reply : FastifyReply) {
 
 const addToFavoritesSchema = {
     description: 'Add a book to user favorites',
-    tags: ['user', 'favorites'],
+    tags: ['users', 'books'],
     body: {
         type: 'object',
         required: ['bookId'],
@@ -141,7 +141,7 @@ async function removeFromFavorites(request : FastifyRequest, reply : FastifyRepl
 
 const removeFromFavoritesSchema = {
     description: 'Remove a book from user favorites',
-    tags: ['user', 'favorites'],
+    tags: ['users', 'books'],
     params: {
         type: 'object',
         required: ['id'],
@@ -180,7 +180,7 @@ async function getUser(request : FastifyRequest, reply : FastifyReply) {
 
 const getUserSchema = {
     description: 'Get user infos',
-    tags: ['user'],
+    tags: ['users'],
     headers: {
         type: 'object',
         required: ['authorization'],
@@ -219,7 +219,7 @@ async function getUserFavorites(request : FastifyRequest, reply : FastifyReply) 
 
 const getUserFavoritesSchema = {
     description: 'Get user favorite books',
-    tags: ['user', 'favorites'],
+    tags: ['users', 'books'],
     headers: {
         type: 'object',
         required: ['authorization'],
@@ -256,7 +256,7 @@ async function updateUser(request : FastifyRequest, reply : FastifyReply) {
 
 const updateUserSchema = {
     description: 'Update user infos',
-    tags: ['user'],
+    tags: ['users'],
     headers: {
         type: 'object',
         required: ['authorization'],

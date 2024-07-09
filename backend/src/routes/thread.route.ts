@@ -16,7 +16,7 @@ async function createThread(request : FastifyRequest, reply : FastifyReply) {
 
 const createThreadSchema = {
     description: 'Create a new thread',
-    tags: ['thread', 'create'],
+    tags: ['threads'],
     body: {
         type: 'object',
         required: ['bookId', 'title'],
@@ -76,7 +76,7 @@ async function addThreadMessage(request : FastifyRequest, reply : FastifyReply) 
 
 const addMessageSchema = {
     description: 'Add a new message to a thread',
-    tags: ['thread', 'message'],
+    tags: ['threads', 'messages'],
     body: {
         type: 'object',
         required: ['threadId', 'content'],
@@ -145,7 +145,7 @@ async function toggleMessageReaction(request : FastifyRequest<ToggleMessageReact
 
 const toggleReactionSchema = {
     description: 'Toggle a reaction to a message',
-    tags: ['thread', 'reaction'],
+    tags: ['threads', 'messages'],
     body: {
         type: 'object',
         required: ['reactIcon', 'threadId', 'messageId'],
@@ -209,7 +209,7 @@ async function searchThreads(request : FastifyRequest, reply : FastifyReply) {
 
 const searchThreadsSchema = {
     description: 'Search threads',
-    tags: ['thread', 'search'],
+    tags: ['threads'],
     querystring: {
         q: { type: 'string' },
         cls: { type: 'string' },
@@ -248,7 +248,7 @@ async function getThread(request : FastifyRequest<GetThreadParams>, reply : Fast
 
 const getThreadSchema = {
     description: 'Get a thread by id',
-    tags: ['thread', 'get'],
+    tags: ['threads'],
     params: {
         type: 'object',
         required: ['threadId'],

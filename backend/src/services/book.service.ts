@@ -304,6 +304,67 @@ const bookService = {
         return books;
     },
 
+    async searchBookboxes(request : any) {
+        const kw = request.query.kw;
+        let bookBoxes = await BookBox.find();
+        if (kw) {
+            bookBoxes = bookBoxes.filter((bookBox) => {
+                // @ts-ignore
+                return bookBox.name.includes(kw) || bookBox.infoText.includes(kw);
+            });
+        }
+        const cls = request.query.cls;
+        let asc = request.query.asc === true;
+        if (cls === 'by name') {
+            bookBoxes.sort((a, b) => {
+                if (asc) {
+                    return a.name.localeCompare(b.name);
+                } else {
+                    return b.name.localeCompare(a.name);
+                }
+            });
+        } else if (cls === 'by location') {
+            const selfLoc = [request.query.longitude, request.query.latitude];
+            if (!selfLoc[0] || !selfLoc[1]) {
+                throw newErr(400, 'Location is required for this classification');
+            }
+            bookBoxes.sort((a, b) => {
+                const aLoc = a.location;
+                const bLoc = b.location;
+                // calculate the distance between the user's location and the bookbox's location
+                const aDist = Math.sqrt((aLoc[0] - selfLoc[0]) ** 2 + (aLoc[1] - selfLoc[1]) ** 2);
+                const bDist = Math.sqrt((bLoc[0] - selfLoc[0]) ** 2 + (bLoc[1] - selfLoc[1]) ** 2);
+                // sort in ascending or descending order of distance
+                if (asc) {
+                    return aDist - bDist;
+                } else {
+                    return bDist - aDist;
+                }
+            });
+        } else if (cls === 'by number of books') {
+            bookBoxes.sort((a, b) => {
+                if (asc) {
+                    return a.books.length - b.books.length;
+                } else {
+                    return b.books.length - a.books.length;
+                }
+            });
+        }
+
+        // only return the ids of the bookboxes
+        const bookBoxIds = bookBoxes.map((bookBox) => {
+            return bookBox.id;
+        });
+
+        // get the full bookbox objects
+        let finalBookBoxes = [];
+        for (let i = 0; i < bookBoxes.length; i++) {
+            finalBookBoxes.push(this.getBookBox(bookBoxIds[i]));
+        }
+
+        return finalBookBoxes;
+    },
+
     async getBook(id: string) {
         return Book.findById(id);
     },

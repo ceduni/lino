@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:geolocator/geolocator.dart';
 
 class BookService {
   final String url = 'https://lino-1.onrender.com';
@@ -136,6 +137,32 @@ class BookService {
 
     final r = await http.get(
       Uri.https('lino-1.onrender.com', '/books/search', queryParams),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    final response = jsonDecode(r.body);
+    if (r.statusCode != 200) {
+      throw Exception(response['error']);
+    }
+    return response;
+  }
+
+  Future<Map<String, dynamic>> searchBookboxes({String? kw, bool? asc, String? cls, num? longitude, num? latitude}) async {
+    // Make a GET request to the server
+    // Send the parameters to the server
+    // If the server returns a 200 status code, the bookboxes are found
+    // If the server returns another status code, the bookboxes are not found
+    var queryParams = {
+      if (kw != null) 'kw': kw,  // the keywords
+      if (asc != null) 'asc': asc.toString(),  // the bool to determine if we want the bookboxes in ascending or descending order of the cls
+      if (cls != null) 'cls': cls,  // the classificator : ['by name', 'by location', 'by number of books']
+      'longitude': longitude.toString(),
+      'latitude': latitude.toString(),
+    };
+
+    final r = await http.get(
+      Uri.https('lino-1.onrender.com', '/books/bookbox/search', queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
