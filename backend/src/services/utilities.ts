@@ -106,8 +106,8 @@ export const userSchema = {
 };
 
 export const clearCollectionSchema = {
-    description: 'Clear user collection',
-    tags: ['user', 'book', 'thread'],
+    description: 'Clear collection',
+    tags: ['users', 'books', 'thread'],
     headers: {
         type: 'object',
         required: ['authorization'],
@@ -117,7 +117,7 @@ export const clearCollectionSchema = {
     },
     response: {
         200: {
-            description: 'Users cleared',
+            description: 'Collection cleared',
             type: 'object',
             properties: {
                 message: {type: 'string'}
