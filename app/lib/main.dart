@@ -1,59 +1,14 @@
-import 'package:Lino_app/widgets/bottom_app_bar.dart';
-import 'package:Lino_app/widgets/floating_menu.dart';
-import 'package:Lino_app/widgets/search_app_bar.dart';
+import 'package:Lino_app/widgets/SearchBar.dart';
 import 'package:flutter/material.dart';
-
-// lib/main.dart
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'models/bookbox_model.dart';
+import 'widgets/NavBar.dart';
+import 'Discussion.dart';
+import 'navigation.dart';
 
 void main() {
   runApp(MyApp());
 }
-
-var bookboxes = [
-  BookBox(
-    name: 'BookBox 1',
-    location: [1.0, 2.0],
-    infoText: 'Info 1',
-    books: ['Book 1', 'Book 2', 'Book 3'],
-  ),
-  BookBox(
-    name: 'BookBox 2',
-    location: [3.0, 4.0],
-    infoText: 'Info 2',
-    books: ['Book 4', 'Book 5', 'Book 6'],
-  ),
-  BookBox(
-    name: 'BookBox 3',
-    location: [5.0, 6.0],
-    infoText: 'Info 3',
-    books: ['Book 7', 'Book 8', 'Book 9'],
-  ),
-  BookBox(
-    name: 'BookBox 4',
-    location: [7.0, 8.0],
-    infoText: 'Info 4',
-    books: ['Book 10', 'Book 11', 'Book 12'],
-  ),
-  BookBox(
-    name: 'BookBox 5',
-    location: [9.0, 10.0],
-    infoText: 'Info 5',
-    books: ['Book 13', 'Book 14', 'Book 15'],
-  ),
-  BookBox(
-    name: 'BookBox 6',
-    location: [11.0, 12.0],
-    infoText: 'Info 6',
-    books: ['Book 16', 'Book 17', 'Book 18'],
-  ),
-  BookBox(
-    name: 'BookBox 7',
-    location: [13.0, 14.0],
-    infoText: 'Info 7',
-    books: ['Book 19', 'Book 20', 'Book 21'],
-  ),
-];
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -64,7 +19,7 @@ class MyApp extends StatelessWidget {
       title: 'Lino App',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 170, 193, 251)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
       ),
       home: MainScreen(),
     );
@@ -78,15 +33,64 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-// Changes here will apply to all pages
 class _MainScreenState extends State<MainScreen> {
-  
+  int _selectedIndex = 0;
+
+  static const List<Widget> _pages = <Widget>[
+    HomePage(),
+    NavigationPage(),
+    DiscussionPage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: 
-      CustomNavBar(),
-      
+      body: Stack(
+        children: [
+          _pages[_selectedIndex],
+          Positioned(
+            top: 20,
+            left: 50,
+            right: 50,
+            child: SearchAppBar(
+              onUserIconPressed: () {
+                // Handle user icon press
+              },
+              onMenuPressed: () {
+                // Handle hamburger menu press
+              },
+              onSearchChanged: (String value) {
+                // Handle search input
+              },
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.business),
+            label: 'Navigation',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.school),
+            label: 'Discussion',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+      ),
     );
   }
 }
@@ -99,26 +103,122 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  late GoogleMapController mapController;
+
+  final LatLng _center = const LatLng(45.5017, -73.5673); // Coordinates for Montreal
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SearchAppBar(
-            onUserIconPressed: () {
-              // Handle user icon pressed
-              print("User icon pressed");
-            },
-            onMenuPressed: () {
-              // Handle menu icon pressed
-              print("Menu icon pressed");
-            },
-            )
-          ],
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Column(
+            children: [
+              Container(
+                height: 400, // Adjust the height as needed
+                child: GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: _center,
+                    zoom: 11.0,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: Text('Content goes here'),
+                ),
+              ),
+            ],
+          ),
         ),
+      ],
+    );
+  }
+}
+
+class CustomSearchDelegate extends SearchDelegate {
+  // List of search terms
+  List<String> searchTerms = [
+    "Apple",
+    "Banana",
+    "Mango",
+    "Pear",
+    "Watermelons",
+    "Blueberries",
+    "Pineapples",
+    "Strawberries"
+  ];
+
+  // Clear the search text
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(
+        onPressed: () {
+          query = '';
+        },
+        icon: Icon(Icons.clear),
       ),
+    ];
+  }
+
+  // Pop out of search menu
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        close(context, null);
+      },
+      icon: Icon(Icons.arrow_back),
+    );
+  }
+
+  // Show query result
+  @override
+  Widget buildResults(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var fruit in searchTerms) {
+      if (fruit.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(fruit);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result = matchQuery[index];
+        return ListTile(
+          title: Text(result),
+        );
+      },
+    );
+  }
+
+  // Show suggestions as the user types
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var fruit in searchTerms) {
+      if (fruit.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(fruit);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result = matchQuery[index];
+        return ListTile(
+          title: Text(result),
+          onTap: () {
+            query = result;
+            showResults(context);
+          },
+        );
+      },
     );
   }
 }

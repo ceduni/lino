@@ -35,19 +35,20 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
-
-  # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
-
+  
   fonts: 
   - family: SimpleRonde
     fonts: 
     - asset: fonts/SimpleRonde-Regular.ttf
+  
+  
   assets: 
   - assets/logo_with_bird.png
   - assets/logo_without_bird.png
+  - assets/croc_blanc.webp
+  - assets/croc_noir.webp
+  - assets/croc_rose.webp
+  - assets/shreque.webp
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

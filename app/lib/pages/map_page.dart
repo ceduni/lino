@@ -1,13 +1,13 @@
-import 'package:Lino_app/widgets/bottom_app_bar.dart';
+import 'package:Lino_app/widgets/SearchBar.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:Lino_app/widgets/search_app_bar.dart';
+import 'package:Lino_app/widgets/NavBar.dart';
 
 class BookBoxLocationList extends StatefulWidget {
   final List<BookBox> bookBoxes;
 
-  const BookBoxLocationList({required this.bookBoxes});
+  const BookBoxLocationList({Key? key, required this.bookBoxes}) : super(key: key);
 
   @override
   _BookBoxLocationListState createState() => _BookBoxLocationListState();
@@ -32,22 +32,14 @@ class _BookBoxLocationListState extends State<BookBoxLocationList> {
         onMenuPressed: () {
           // Handle hamburger menu press
         },
-        onSearchChanged: (value) {
-          // Handle search input change
+        onSearchChanged: (String value) {
+          // Handle search input
         },
       ),
       body: Column(
         children: [
           SizedBox(
-            // decoration: const BoxDecoration(
-            //   color: Colors.red,
-            //   borderRadius: BorderRadius.only(
-            //     bottomLeft: Radius.circular(100),
-            //     bottomRight: Radius.circular(100),
-            //   ),
-            // ),
             height: 300,
-            // width: 300,
             child: GoogleMap(
               onMapCreated: _onMapCreated,
               initialCameraPosition: CameraPosition(
@@ -74,7 +66,7 @@ class _BookBoxLocationListState extends State<BookBoxLocationList> {
 class BookBoxListItem extends StatelessWidget {
   final BookBox bookBox;
 
-  const BookBoxListItem({required this.bookBox});
+  const BookBoxListItem({Key? key, required this.bookBox}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -110,14 +102,14 @@ class BookBoxListItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                bookBox.infoText.toString(),
+                bookBox.infoText,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
               SizedBox(height: 5),
               Text(
-                bookBox.books.toString() ?? 'No books',
+                bookBox.books.isNotEmpty ? bookBox.books.toString() : 'No books',
                 style: TextStyle(fontSize: 16),
-              )
+              ),
             ],
           ),
         ),
