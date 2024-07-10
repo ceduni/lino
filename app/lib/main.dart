@@ -1,6 +1,6 @@
-import 'package:Lino_app/widgets/SearchBar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'widgets/SearchBar.dart';
 import 'models/bookbox_model.dart';
 import 'widgets/NavBar.dart';
 import 'Discussion.dart';
@@ -51,27 +51,15 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          _pages[_selectedIndex],
-          Positioned(
-            top: 20,
-            left: 50,
-            right: 50,
-            child: SearchAppBar(
-              onUserIconPressed: () {
-                // Handle user icon press
-              },
-              onMenuPressed: () {
-                // Handle hamburger menu press
-              },
-              onSearchChanged: (String value) {
-                // Handle search input
-              },
-            ),
-          ),
-        ],
+      appBar: SearchAppBar(
+        onUserIconPressed: () {
+          // Handle user icon press
+        },
+        onMenuPressed: () {
+          // Handle hamburger menu press
+        },
       ),
+      body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -113,112 +101,24 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Column(
       children: [
-        Positioned.fill(
-          child: Column(
-            children: [
-              Container(
-                height: 400, // Adjust the height as needed
-                child: GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: _center,
-                    zoom: 11.0,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Center(
-                  child: Text('Content goes here'),
-                ),
-              ),
-            ],
+        Container(
+          height: 400, // Adjust the height as needed
+          child: GoogleMap(
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: CameraPosition(
+              target: _center,
+              zoom: 11.0,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Center(
+            child: Text('Content goes here'),
           ),
         ),
       ],
-    );
-  }
-}
-
-class CustomSearchDelegate extends SearchDelegate {
-  // List of search terms
-  List<String> searchTerms = [
-    "Apple",
-    "Banana",
-    "Mango",
-    "Pear",
-    "Watermelons",
-    "Blueberries",
-    "Pineapples",
-    "Strawberries"
-  ];
-
-  // Clear the search text
-  @override
-  List<Widget>? buildActions(BuildContext context) {
-    return [
-      IconButton(
-        onPressed: () {
-          query = '';
-        },
-        icon: Icon(Icons.clear),
-      ),
-    ];
-  }
-
-  // Pop out of search menu
-  @override
-  Widget? buildLeading(BuildContext context) {
-    return IconButton(
-      onPressed: () {
-        close(context, null);
-      },
-      icon: Icon(Icons.arrow_back),
-    );
-  }
-
-  // Show query result
-  @override
-  Widget buildResults(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var fruit in searchTerms) {
-      if (fruit.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(fruit);
-      }
-    }
-    return ListView.builder(
-      itemCount: matchQuery.length,
-      itemBuilder: (context, index) {
-        var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
-      },
-    );
-  }
-
-  // Show suggestions as the user types
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var fruit in searchTerms) {
-      if (fruit.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(fruit);
-      }
-    }
-    return ListView.builder(
-      itemCount: matchQuery.length,
-      itemBuilder: (context, index) {
-        var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-          onTap: () {
-            query = result;
-            showResults(context);
-          },
-        );
-      },
     );
   }
 }

@@ -1,3 +1,5 @@
+// ARCHIVE FOR map_page.dart, RESTORE WHEN POSSIBLE
+
 import 'package:Lino_app/widgets/SearchBar.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
