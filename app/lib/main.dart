@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'widgets/SearchBar.dart';
-import 'models/bookbox_model.dart';
-import 'widgets/NavBar.dart';
 import 'Discussion.dart';
 import 'navigation.dart';
 
