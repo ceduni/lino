@@ -12,13 +12,16 @@ dependencies:
   flutter:
     sdk: flutter
 
+  get:
+
   english_words : ^4.0.0
   provider : ^6.0.0
   cupertino_icons: ^1.0.6
   shared_preferences: ^2.2.3
   http: ^1.2.1
   google_maps_flutter: ^2.7.0
-  mapbox_maps_flutter: ^2.0.0
+  flutter_native_splash: ^2.4.1
+
 
 dev_dependencies:
   test: any
@@ -44,8 +47,7 @@ flutter:
     fonts: 
     - asset: fonts/SimpleRonde-Regular.ttf
   assets: 
-  - assets/logo_with_bird.png
-  - assets/logo_without_bird.png
+  - assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
