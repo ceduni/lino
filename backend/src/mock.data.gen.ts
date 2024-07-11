@@ -5,6 +5,7 @@ const url = "https://lino-1.onrender.com";
 const bookBoxIds: string[] = [];
 const bookIds: string[] = [];
 const userIdentifiers: any[] = [];
+const reactions: string[] = ['like', 'love', 'laugh', 'sad', 'angry'];
 
 function randomUser() {
     return {
@@ -157,7 +158,7 @@ async function populateThreads() {
             const nMessages = faker.number.int({min: 2, max: 5});
             let respondsTo = null;
             for (let j = 0; j < nMessages; j++) {
-                if (faker.number.float({min: 0, max: 1}) < 0.6) {
+                if (faker.number.float({min: 0, max: 1}) < 0.2) {
                     respondsTo = null;
                 }
                 // connect a random user
@@ -190,7 +191,7 @@ async function populateThreads() {
                             "Authorization": "Bearer " + otherUserToken,
                         },
                         body: JSON.stringify({
-                            reactIcon: faker.image.url(),
+                            reactIcon: reactions[faker.number.int({min: 0, max: 4})],
                             threadId: threadId,
                             messageId: messageId,
                         })

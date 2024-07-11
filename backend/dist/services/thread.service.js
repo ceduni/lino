@@ -147,23 +147,22 @@ const ThreadService = {
     },
     searchThreads(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            let query = request.query.q;
-            if (!query) {
-                query = '';
+            const query = request.query.q;
+            let threads;
+            if (query) {
+                // Perform text search
+                threads = yield thread_model_1.default.find({ $text: { $search: query } });
+                // Further filter using regex for more flexibility
+                const regex = new RegExp(query, 'i');
+                threads = threads.filter(thread => regex.test(thread.bookTitle) || regex.test(thread.title) || regex.test(thread.username));
             }
-            let threads = yield thread_model_1.default.find({
-                $or: [
-                    { bookTitle: { $regex: query, $options: 'i' } },
-                    { title: { $regex: query, $options: 'i' } },
-                    { username: { $regex: query, $options: 'i' } }
-                ]
-            });
+            else {
+                // Return all documents if the search query is empty
+                threads = yield thread_model_1.default.find();
+            }
             // classify : ['by recent activity', 'by number of messages']
-            let classify = request.query.cls;
-            if (!classify) {
-                classify = 'by recent activity';
-            }
-            let asc = request.query.asc === 'true';
+            let classify = request.query.cls || 'by recent activity';
+            const asc = request.query.asc; // Boolean
             if (classify === 'by recent activity') {
                 threads.sort((a, b) => {
                     const aDate = a.messages.length > 0 ? a.messages[a.messages.length - 1].timestamp.getTime() : 0;

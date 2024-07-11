@@ -73,6 +73,7 @@ exports.threadSchema = {
                                 _id: { type: 'string' },
                                 username: { type: 'string' },
                                 reactIcon: { type: 'string' },
+                                timestamp: { type: 'string', format: 'date-time' }
                             }
                         }
                     }
@@ -115,8 +116,8 @@ exports.userSchema = {
     }
 };
 exports.clearCollectionSchema = {
-    description: 'Clear user collection',
-    tags: ['user', 'book', 'thread'],
+    description: 'Clear collection',
+    tags: ['users', 'books', 'thread'],
     headers: {
         type: 'object',
         required: ['authorization'],
@@ -126,7 +127,7 @@ exports.clearCollectionSchema = {
     },
     response: {
         200: {
-            description: 'Users cleared',
+            description: 'Collection cleared',
             type: 'object',
             properties: {
                 message: { type: 'string' }

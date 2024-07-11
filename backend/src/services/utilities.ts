@@ -62,6 +62,7 @@ export const threadSchema = {
                                 _id: { type: 'string' },
                                 username: { type: 'string' },
                                 reactIcon: { type: 'string' },
+                                timestamp: { type: 'string', format: 'date-time' }
                             }
                         }
                     }

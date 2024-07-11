@@ -65,6 +65,34 @@ const UserService = {
         return { user: user, token: token };
     },
 
+    async readUserNotifications(request: any) {
+        const userId = request.user.id;
+        const user = await User.findById(userId);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }
+
+        // Calculate the date 30 days ago
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        // Filter out notifications older than 30 days
+        // @ts-ignore
+        user.notifications = user.notifications.filter(notification => {
+            const notificationDate = new Date(notification.timestamp);
+            return notificationDate >= thirtyDaysAgo;
+        });
+
+        // Set all remaining notifications to read
+        user.notifications.forEach(notification => {
+            notification.read = true;
+        });
+
+        // Save the updated user document
+        await user.save();
+        return user.notifications;
+    },
+
 
     // User service to add a book's ID to a user's favorites
     async addToFavorites(request: any) {
@@ -140,7 +168,7 @@ const UserService = {
     },
 
 
-   async parseKeyWords(text: string) {
+    async parseKeyWords(text: string) {
         return text.split(',');
     },
 

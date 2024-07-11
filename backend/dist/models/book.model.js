@@ -19,5 +19,7 @@ const bookSchema = new mongoose_1.default.Schema({
     givenHistory: [{ username: String, timestamp: { type: Date, default: Date.now } }],
     dateLastAction: { type: Date, default: Date.now }
 });
-const Book = mongoose_1.default.model('Book', bookSchema, "books"); // "books" specifies the collection to use. If not provided, it will be inferred from the model name
+// Create a text index on title, authors, and description
+bookSchema.index({ title: 'text', authors: 'text' });
+const Book = mongoose_1.default.model('Book', bookSchema, "books"); // "books" specifies the collection to use
 exports.default = Book;

@@ -176,7 +176,8 @@ const toggleReactionSchema = {
                     properties: {
                         _id: { type: 'string' },
                         username: { type: 'string' },
-                        reactIcon: { type: 'string' }
+                        reactIcon: { type: 'string' },
+                        timestamp: { type: 'string' }
                     }
                 }
             }
@@ -216,7 +217,7 @@ const searchThreadsSchema = {
     querystring: {
         q: { type: 'string' },
         cls: { type: 'string' },
-        asc: { type: 'boolean' }
+        asc: { type: 'boolean' },
     },
     response: {
         200: {

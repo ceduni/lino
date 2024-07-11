@@ -9,8 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const utilities_1 = require("./services/utilities");
-const mock_data_gen_1 = require("./mock.data.gen");
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -21,7 +19,6 @@ const fastifySwaggerUi = require('@fastify/swagger-ui');
 const bookRoutes = require('./routes/book.route');
 const userRoutes = require('./routes/user.route');
 const threadRoutes = require('./routes/thread.route');
-const dataGenerator = require('./mock.data.gen');
 dotenv.config();
 const server = Fastify({ logger: { level: 'error' } });
 server.register(fastifyCors, {
@@ -118,8 +115,6 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
         console.log(`Server started on port ${port}`);
         yield server.ready();
         server.swagger(); // Ensure swagger is called after server starts
-        yield (0, utilities_1.reinitDatabase)(server);
-        yield (0, mock_data_gen_1.populateDatabase)();
     }
     catch (err) {
         console.error(err);

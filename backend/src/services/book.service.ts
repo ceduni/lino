@@ -2,8 +2,10 @@ import axios from 'axios';
 import Book from "../models/book.model";
 import User from "../models/user.model";
 import BookBox from "../models/bookbox.model";
+import Request from "../models/book.request.model";
 import {notifyUser} from "./user.service";
 import {newErr} from "./utilities";
+import Thread from "../models/thread.model";
 
 const bookService = {
     async getBookBox(bookBoxId: string) {
@@ -67,6 +69,19 @@ const bookService = {
         await book.save();
         await bookBox.save();
         await this.updateUserEcoImpact(request, book.id);
+
+        // send a notification to the user who requested the book
+        // Perform text search to get relevant requests
+        let requests = await Request.find({ $text: { $search: book.title } });
+
+        // Further filter requests using regex to match similar titles
+        const regex = new RegExp(book.title, 'i');
+        requests = requests.filter(request => regex.test(request.bookTitle));
+        for (let i = 0; i < requests.length; i++) {
+            await notifyUser(requests[i].username, `The book "${book.title}" has been added to the bookbox "${bookBox.name}" !`);
+        }
+
+
         return {bookId : book.id, books : bookBox.books};
     },
 
@@ -145,11 +160,18 @@ const bookService = {
                 book.takenHistory.push({username: "guest", timestamp: new Date()});
             }
         }
-        const books : any = await Book.find({title: book.title});
+        // Perform text search to get relevant books
+        let books = await Book.find({ $text: { $search: book.title } });
+
+        // Further filter books using regex to match similar titles
+        const regex = new RegExp(book.title, 'i');
+        books = books.filter(b => regex.test(b.title));
         for (let i = 0; i < books.length; i++) {
             // Update the dateLastAction field for all books with the same title
             // to indicate that this book has been looked at recently
+            // @ts-ignore
             books[i].dateLastAction = Date.now;
+            await books[i].save();
         }
     },
 
@@ -163,139 +185,92 @@ const bookService = {
         const parutionYear = bookInfo.publishedDate ? parseInt(bookInfo.publishedDate.substring(0, 4)) : null;
         return {
             isbn: isbn,
-            title: bookInfo.title,
-            authors: bookInfo.authors,
-            description: bookInfo.description,
-            coverImage: bookInfo.imageLinks.thumbnail,
-            publisher: bookInfo.publisher,
+            title: bookInfo.title || 'Unknown title',
+            authors: bookInfo.authors || ['Unknown author'],
+            description: bookInfo.description || 'No description available',
+            coverImage: bookInfo.imageLinks?.thumbnail || 'No thumbnail available',
+            publisher: bookInfo.publisher || 'Unknown publisher',
             parutionYear: parutionYear,
-            categories: bookInfo.categories,
-            pages: bookInfo.pageCount,
+            categories: bookInfo.categories || ['Uncategorized'],
+            pages: bookInfo.pageCount || 'Unknown number of pages',
         };
     },
 
 
-    // Helper function to get specific books from the database
-    async searchBooks(request : any) {
-        const categories = request.query.cat;
-        let books;
-        if (categories) {
-            books = await Book.find({ categories: categories });
-        } else {
-            books = await Book.find();
+    // Function that searches for books based on the query parameters
+    async searchBooks(request: any) {
+        const { cat, kw, pmt, pg, bf, py, pub, bbid, cls = 'by title', asc = true } = request.query;
+
+        let filter: any = {};
+
+        if (cat) {
+            const categories = Array.isArray(cat) ? cat : [cat];
+            const categoryArray = categories.map((c: string) => new RegExp(c.trim(), 'i'));
+            filter.categories = { $in: categoryArray };
         }
-        const keywords = request.query.kw;
-        if (keywords) {
-            books = books.filter((book) => {
-                return book.title.includes(keywords) || book.authors.includes(keywords);
-            });
+
+        if (kw) {
+            filter.$text = { $search: kw };
         }
-        const pmt = request.query.pmt === true; // a bool to determine whether we want the books with more or less than X pages
-        const pg = request.query.pg; // the number of pages
-        if (pg) {
-            books = books.filter((book) => {
-                const bookPages = book.pages;
-                if (!bookPages) return true;
-                return pmt ? bookPages >= pg : bookPages <= pg;
-            });
-        }
-        const bf = request.query.bf === true; // a bool to determine whether we want the books before or after X year
-        const py = request.query.py; // the year
+
         if (py) {
-            books = books.filter((book) => {
-                // @ts-ignore
-                const bookYear = book.parutionYear;
-                if (!bookYear) return true;
-                if (bf) {
-                    // If bf is true, filter for books before the year
-                    return bookYear <= py;
-                } else {
-                    // If bf is false, filter for books after the year
-                    return bookYear >= py;
-                }
-            });
+            filter.parutionYear = bf ? { $lte: py } : { $gte: py };
         }
-        const pub = request.query.pub; // the publisher
+
         if (pub) {
-            books = books.filter((book) => {
-                // @ts-ignore
-                return book.publisher === pub;
-            });
+            filter.publisher = new RegExp(pub, 'i');
         }
-        const bbid = request.query.bbid; // the bookbox id
+
         if (bbid) {
             const bookBox = await BookBox.findById(bbid);
             if (!bookBox) {
-                throw newErr(404, 'Bookbox not found');
+                throw new Error('Bookbox not found');
             }
+            filter._id = { $in: bookBox.books };
+        }
+
+        let books = await Book.find(filter);
+
+        if (kw) {
+            const regex = new RegExp(kw, 'i');
+            books = books.filter((book) =>
+                regex.test(book.title) || book.authors.some((author: string) => regex.test(author))
+            );
+        }
+
+        if (pg) {
+            const pageCount = parseInt(pg);
             books = books.filter((book) => {
-                return bookBox.books.includes(book.id);
+                const bookPages = book.pages || 0;
+                return pmt ? bookPages >= pageCount : bookPages <= pageCount;
             });
         }
 
-        // classify : ['by title', 'by author', 'by year', 'by most recent activity']
-        let classify = request.query.cls;
-        if (!classify) {
-            classify = 'by title'; // default value
+        // Sorting
+        const sortOptions: any = {};
+        if (cls === 'by title') {
+            sortOptions.title = asc ? 1 : -1;
+        } else if (cls === 'by author') {
+            sortOptions['authors.0'] = asc ? 1 : -1;
+        } else if (cls === 'by year') {
+            sortOptions.parutionYear = asc ? 1 : -1;
+        } else if (cls === 'by recent activity') {
+            sortOptions.dateLastAction = asc ? 1 : -1;
         }
-        let asc = request.query.asc === true;
-        if (classify === 'by title') {
-            books.sort((a, b) => {
-                if (asc) {
-                    return a.title.localeCompare(b.title); // ascending order (from a to z)
-                } else {
-                    return -a.title.localeCompare(b.title); // descending order (from z to a)
-                }
-            });
-        } else if (classify === 'by author') {
-            books.sort((a, b) => {
-                const aAuthor = a.authors[0] ?? 'anon';
-                const bAuthor = b.authors[0] ?? 'anon';
-                if (asc) {
-                    return aAuthor.localeCompare(bAuthor);
-                } else {
-                    return bAuthor.localeCompare(aAuthor);
-                }
-            });
-        } else if (classify === 'by year') {
-            books.sort((a, b) => {
-                const aYear = a.parutionYear ?? 0;
-                const bYear = b.parutionYear ?? 0;
-                if (asc) {
-                    return aYear - bYear;
-                } else {
-                    return bYear - aYear;
-                }
-            });
-        } else if (classify === 'by recent activity') {
-            books.sort((a, b) => {
-                const aDate = a.dateLastAction?.getTime() ?? 0;
-                const bDate = b.dateLastAction?.getTime() ?? 0;
-                if (asc) {
-                    return aDate - bDate;
-                } else {
-                    return bDate - aDate;
-                }
-            });
-        }
-        // Finally, only return the books that are present in bookboxes
+
+        books = await Book.find(filter).sort(sortOptions);
+
+        // Ensure only books present in bookboxes are returned
         const bookBoxes = await BookBox.find();
-
-        // Add bookbox_presence property to each book, only for this function
         for (let i = 0; i < books.length; i++) {
+            const book = books[i].toObject();
             // @ts-ignore
-            books[i] = books[i].toObject(); // Convert document to a plain JavaScript object
+            book.bookboxPresence = bookBoxes.filter((box) =>
+                box.books.includes(book._id.toString())
+            ).map(box => box._id);
+
             // @ts-ignore
-            books[i].bookboxPresence = [];
-            for (let j = 0; j < bookBoxes.length; j++) {
-                if (bookBoxes[j].books.includes(books[i]._id.toString())) {
-                    // @ts-ignore
-                    books[i].bookboxPresence.push(bookBoxes[j]._id);
-                }
-            }
-            // Remove the books that are not present in any bookbox
-            // @ts-ignore
-            if (books[i].bookboxPresence.length === 0) {
+            if (book.bookboxPresence.length === 0) {
                 books.splice(i, 1);
                 i--;
             }
@@ -304,29 +279,36 @@ const bookService = {
         return books;
     },
 
-    async searchBookboxes(request : any) {
+
+    async searchBookboxes(request: any) {
         const kw = request.query.kw;
-        let bookBoxes = await BookBox.find();
+        let bookBoxes;
+
         if (kw) {
-            bookBoxes = bookBoxes.filter((bookBox) => {
-                // @ts-ignore
-                return bookBox.name.includes(kw) || bookBox.infoText.includes(kw);
-            });
+            // Perform text search
+            bookBoxes = await BookBox.find({ $text: { $search: kw } });
+
+            // Further filter using regex for more flexibility
+            const regex = new RegExp(kw, 'i');
+            bookBoxes = bookBoxes.filter((bookBox) =>
+                regex.test(bookBox.name) || regex.test(bookBox.infoText || '')
+            );
+        } else {
+            // Return all book boxes if no keyword is provided
+            bookBoxes = await BookBox.find();
         }
+
         const cls = request.query.cls;
-        let asc = request.query.asc === true;
+        const asc = request.query.asc; // Boolean
+
         if (cls === 'by name') {
             bookBoxes.sort((a, b) => {
-                if (asc) {
-                    return a.name.localeCompare(b.name);
-                } else {
-                    return b.name.localeCompare(a.name);
-                }
+                return asc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
             });
         } else if (cls === 'by location') {
             const selfLoc = [request.query.longitude, request.query.latitude];
             if (!selfLoc[0] || !selfLoc[1]) {
-                throw newErr(400, 'Location is required for this classification');
+                throw newErr(401, 'Location is required for this classification');
             }
             bookBoxes.sort((a, b) => {
                 const aLoc = a.location;
@@ -335,29 +317,20 @@ const bookService = {
                 const aDist = Math.sqrt((aLoc[0] - selfLoc[0]) ** 2 + (aLoc[1] - selfLoc[1]) ** 2);
                 const bDist = Math.sqrt((bLoc[0] - selfLoc[0]) ** 2 + (bLoc[1] - selfLoc[1]) ** 2);
                 // sort in ascending or descending order of distance
-                if (asc) {
-                    return aDist - bDist;
-                } else {
-                    return bDist - aDist;
-                }
+                return asc ? aDist - bDist : bDist - aDist;
             });
         } else if (cls === 'by number of books') {
             bookBoxes.sort((a, b) => {
-                if (asc) {
-                    return a.books.length - b.books.length;
-                } else {
-                    return b.books.length - a.books.length;
-                }
+                return asc ? a.books.length - b.books.length : b.books.length - a.books.length;
             });
         }
 
+
         // only return the ids of the bookboxes
-        const bookBoxIds = bookBoxes.map((bookBox) => {
-            return bookBox._id.toString();
-        });
+        const bookBoxIds = bookBoxes.map((bookBox) => bookBox._id.toString());
         // get the full bookbox objects
-        let finalBookBoxes = [];
-        for (let i = 0; i < bookBoxes.length; i++) {
+        const finalBookBoxes = [];
+        for (let i = 0; i < bookBoxIds.length; i++) {
             finalBookBoxes.push(await this.getBookBox(bookBoxIds[i]));
         }
 
@@ -368,7 +341,7 @@ const bookService = {
         return Book.findById(id);
     },
 
-    async alertUsers(request : any) {
+    async requestBookToUsers(request : any) {
         const user = await User.findById(request.user.id);
         if (!user) {
             throw newErr(404, 'User not found');
@@ -380,7 +353,13 @@ const bookService = {
             }
         }
 
-        return {message: 'Alert sent'};
+        const newRequest = new Request({
+            username: user.username,
+            bookTitle: request.body.title,
+            customMessage: request.body.customMessage,
+        });
+        await newRequest.save();
+        return newRequest;
     },
 
     // Function that returns 1 if the book is relevant to the user by his keywords, 0 otherwise
@@ -415,10 +394,20 @@ const bookService = {
         const users = await User.find();
         for (let i = 0; i < users.length; i++) {
             const relevance = await this.getBookRelevance(book, users[i]);
+            // Notify the user if the book is relevant to him or if it's one of his favorite books
             if (relevance > 0 || users[i].favoriteBooks.includes(book.id)) {
                 await notifyUser(users[i].id, `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
             }
         }
+    },
+
+    async getBookThreads(request: any) {
+        let book = await Book.findById(request.params.id);
+        if (!book) {
+            throw newErr(404, 'Book not found');
+        }
+        let title = book.title;
+        return Thread.find({bookTitle: title});
     },
 
     async clearCollection() {

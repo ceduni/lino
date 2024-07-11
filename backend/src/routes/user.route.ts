@@ -206,6 +206,53 @@ const getUserSchema = {
     }
 };
 
+async function readUserNotifications(request : FastifyRequest, reply : FastifyReply) {
+    try {
+        const notifications = await UserService.readUserNotifications(request);
+        reply.send({ notifications : notifications });
+    } catch (error : any) {
+        reply.code(error.statusCode).send({ error: error.message });
+    }
+}
+
+const getUserNotificationsSchema = {
+    description: 'Get user notifications',
+    tags: ['users'],
+    headers: {
+        type: 'object',
+        required: ['authorization'],
+        properties: {
+            authorization: {type: 'string'} // JWT token
+        }
+    },
+    response: {
+        200: {
+            description: 'User notifications',
+            type: 'object',
+            properties: {
+                notifications: {
+                    type: 'array', items:
+                        {
+                            type: 'object',
+                            properties: {
+                                timestamp: { type: 'string' },
+                                content: { type: 'string' },
+                                read: { type: 'boolean' }
+                            }
+                        }
+                }
+            }
+        },
+        404: {
+            description: 'User not found',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
+        }
+    }
+}
+
 async function getUserFavorites(request : FastifyRequest, reply : FastifyReply) {
     try {
         // @ts-ignore
@@ -310,6 +357,7 @@ interface MyFastifyInstance extends FastifyInstance {
 export default async function userRoutes(server: MyFastifyInstance) {
     server.get('/users', { preValidation: [server.authenticate], schema : getUserSchema }, getUser);
     server.get('/users/favorites', { preValidation: [server.authenticate], schema : getUserFavoritesSchema }, getUserFavorites);
+    server.get('/users/notifications', { preValidation: [server.authenticate], schema : getUserNotificationsSchema }, readUserNotifications);
     server.post('/users/register', { schema : registerUserSchema }, registerUser);
     server.post('/users/login', { schema : loginUserSchema }, loginUser);
     server.post('/users/update', { preValidation: [server.authenticate], schema : updateUserSchema }, updateUser);

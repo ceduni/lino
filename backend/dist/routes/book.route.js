@@ -165,6 +165,41 @@ const getBookInfoFromISBNSchema = {
             properties: {
                 error: { type: 'string' }
             }
+        },
+    }
+};
+function getBookThreads(request, reply) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const response = yield book_service_1.default.getBookThreads(request);
+            reply.send(response);
+        }
+        catch (error) {
+            reply.code(error.statusCode).send({ error: error.message });
+        }
+    });
+}
+const getBookThreadsSchema = {
+    description: 'Get the threads created talking about a book',
+    tags: ['books', 'threads'],
+    querystring: {
+        type: 'object',
+        properties: {
+            bookId: { type: 'string' },
+        }
+    },
+    response: {
+        200: {
+            description: 'Threads found',
+            type: 'array',
+            items: utilities_1.threadSchema
+        },
+        404: {
+            description: 'Book not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
         }
     }
 };
@@ -220,10 +255,10 @@ const searchBooksSchema = {
         }
     }
 };
-function sendAlert(request, reply) {
+function sendBookRequest(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const response = yield book_service_1.default.alertUsers(request);
+            const response = yield book_service_1.default.requestBookToUsers(request);
             reply.send(response);
         }
         catch (error) {
@@ -231,13 +266,14 @@ function sendAlert(request, reply) {
         }
     });
 }
-const sendAlertSchema = {
-    description: 'Send alert',
+const sendBookRequestSchema = {
+    description: 'Send a book request to users',
     tags: ['books', 'users'],
     body: {
         type: 'object',
         properties: {
             title: { type: 'string' },
+            customMessage: { type: 'string' }
         },
         required: ['title']
     },
@@ -250,10 +286,15 @@ const sendAlertSchema = {
     },
     response: {
         200: {
-            description: 'Alert sent',
+            description: 'Book request sent',
             type: 'object',
             properties: {
-                message: { type: 'string' }
+                _id: { type: 'string' },
+                username: { type: 'string' },
+                bookTitle: { type: 'string' },
+                timestamp: { type: 'string' },
+                customMessage: { type: 'string' },
+                isFulfilled: { type: 'boolean' }
             }
         },
         400: {
@@ -463,8 +504,9 @@ function bookRoutes(server) {
         server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate], schema: getBookInfoFromISBNSchema }, getBookInfoFromISBN);
         server.get('/books/search', { schema: searchBooksSchema }, searchBooks);
         server.get('/books/bookbox/search', { schema: searchBookboxesSchema }, searchBookboxes);
+        server.get('/books/threads/:id', { schema: getBookThreadsSchema }, getBookThreads);
         server.post('/books/add', { preValidation: [server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
-        server.post('/books/alert', { preValidation: [server.authenticate], schema: sendAlertSchema }, sendAlert);
+        server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);
         server.post('/books/bookbox/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);
         server.delete('/books/clear', { preValidation: [server.adminAuthenticate], schema: utilities_1.clearCollectionSchema }, clearCollection);
     });

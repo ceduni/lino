@@ -75,6 +75,31 @@ const UserService = {
             return { user: user, token: token };
         });
     },
+    readUserNotifications(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userId = request.user.id;
+            const user = yield user_model_1.default.findById(userId);
+            if (!user) {
+                throw (0, utilities_1.newErr)(404, 'User not found');
+            }
+            // Calculate the date 30 days ago
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            // Filter out notifications older than 30 days
+            // @ts-ignore
+            user.notifications = user.notifications.filter(notification => {
+                const notificationDate = new Date(notification.timestamp);
+                return notificationDate >= thirtyDaysAgo;
+            });
+            // Set all remaining notifications to read
+            user.notifications.forEach(notification => {
+                notification.read = true;
+            });
+            // Save the updated user document
+            yield user.save();
+            return user.notifications;
+        });
+    },
     // User service to add a book's ID to a user's favorites
     addToFavorites(request) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -10,5 +10,7 @@ const bookboxSchema = new mongoose_1.default.Schema({
     infoText: String,
     books: [String], // Array of book _ids
 });
+// Create a text index on name and infoText
+bookboxSchema.index({ name: 'text', infoText: 'text' });
 const BookBox = mongoose_1.default.model('BookBox', bookboxSchema, "bookboxes");
 exports.default = BookBox;

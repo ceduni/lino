@@ -111,24 +111,27 @@ const ThreadService = {
 
 
     async searchThreads(request: any) {
-        let query = request.query.q;
-        if (!query) {
-            query = '';
+        const query = request.query.q;
+        let threads;
+
+        if (query) {
+            // Perform text search
+            threads = await Thread.find({ $text: { $search: query } });
+
+            // Further filter using regex for more flexibility
+            const regex = new RegExp(query, 'i');
+            threads = threads.filter(thread =>
+                regex.test(thread.bookTitle) || regex.test(thread.title) || regex.test(thread.username)
+            );
+        } else {
+            // Return all documents if the search query is empty
+            threads = await Thread.find();
         }
-        let threads = await Thread.find({
-            $or: [
-                {bookTitle: {$regex: query, $options: 'i'}},
-                {title: {$regex: query, $options: 'i'}},
-                {username: {$regex: query, $options: 'i'}}
-            ]
-        });
 
         // classify : ['by recent activity', 'by number of messages']
-        let classify = request.query.cls;
-        if (!classify) {
-            classify = 'by recent activity';
-        }
-        let asc = request.query.asc === 'true';
+        let classify = request.query.cls || 'by recent activity';
+        const asc = request.query.asc; // Boolean
+
         if (classify === 'by recent activity') {
             threads.sort((a, b) => {
                 const aDate = a.messages.length > 0 ? a.messages[a.messages.length - 1].timestamp.getTime() : 0;
@@ -141,7 +144,7 @@ const ThreadService = {
             });
         }
 
-        return {threads: threads};
+        return { threads: threads };
     },
 
     async clearCollection() {

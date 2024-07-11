@@ -11,7 +11,6 @@ const fastifySwaggerUi = require('@fastify/swagger-ui');
 const bookRoutes = require('./routes/book.route');
 const userRoutes = require('./routes/user.route');
 const threadRoutes = require('./routes/thread.route');
-const dataGenerator = require('./mock.data.gen');
 
 dotenv.config();
 
@@ -119,9 +118,6 @@ const start = async () => {
 
         await server.ready();
         server.swagger(); // Ensure swagger is called after server starts
-
-        await reinitDatabase(server);
-        await populateDatabase();
 
 
     } catch (err) {

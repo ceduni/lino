@@ -1,6 +1,5 @@
 import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} from 'fastify';
 import ThreadService from '../services/thread.service';
-import UserService from "../services/user.service";
 import Thread from "../models/thread.model";
 import {clearCollectionSchema, threadSchema} from "../services/utilities";
 
@@ -172,7 +171,8 @@ const toggleReactionSchema = {
                     properties: {
                         _id: { type: 'string' },
                         username: { type: 'string' },
-                        reactIcon: { type: 'string' }
+                        reactIcon: { type: 'string' },
+                        timestamp: { type: 'string' }
                     }
                 }
             }
@@ -213,7 +213,7 @@ const searchThreadsSchema = {
     querystring: {
         q: { type: 'string' },
         cls: { type: 'string' },
-        asc: { type: 'boolean' }
+        asc: { type: 'boolean' },
     },
     response: {
         200: {

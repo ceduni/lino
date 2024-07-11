@@ -1,6 +1,6 @@
 import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} from "fastify";
 import BookService from "../services/book.service";
-import {bookSchema, clearCollectionSchema} from "../services/utilities";
+import {bookSchema, clearCollectionSchema, threadSchema} from "../services/utilities";
 
 async function addBookToBookbox(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -119,7 +119,7 @@ async function getBookInfoFromISBN(request: FastifyRequest<Params>, reply: Fasti
         const book = await BookService.getBookInfoFromISBN(request);
         reply.send(book);
     } catch (error : any) {
-        reply.code(error.statusCode).send({error: error.message});
+        reply.code(error.statusCode).send({ error: error.message });
     }
 }
 const getBookInfoFromISBNSchema = {
@@ -154,9 +154,43 @@ const getBookInfoFromISBNSchema = {
             properties: {
                 error: { type: 'string' }
             }
-        }
+        },
     }
 };
+
+async function getBookThreads(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const response = await BookService.getBookThreads(request);
+        reply.send(response);
+    } catch (error : any) {
+        reply.code(error.statusCode).send({error: error.message});
+    }
+}
+
+const getBookThreadsSchema = {
+    description: 'Get the threads created talking about a book',
+    tags: ['books', 'threads'],
+    querystring: {
+        type: 'object',
+        properties: {
+            bookId: { type: 'string' },
+        }
+    },
+    response: {
+        200: {
+            description: 'Threads found',
+            type: 'array',
+            items: threadSchema
+        },
+        404: {
+            description: 'Book not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+}
 
 async function searchBooks(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -212,22 +246,23 @@ const searchBooksSchema = {
     }
 };
 
-async function sendAlert(request: FastifyRequest, reply: FastifyReply) {
+async function sendBookRequest(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const response = await BookService.alertUsers(request);
+        const response = await BookService.requestBookToUsers(request);
         reply.send(response);
     } catch (error : any) {
         reply.code(error.statusCode).send({error: error.message});
     }
 }
 
-const sendAlertSchema = {
-    description: 'Send alert',
+const sendBookRequestSchema = {
+    description: 'Send a book request to users',
     tags: ['books', 'users'],
     body: {
         type: 'object',
         properties: {
             title: { type: 'string' },
+            customMessage: { type: 'string' }
         },
         required: ['title']
     },
@@ -240,10 +275,15 @@ const sendAlertSchema = {
     },
     response: {
         200: {
-            description: 'Alert sent',
+            description: 'Book request sent',
             type: 'object',
             properties: {
-                message: { type: 'string' }
+                _id: { type: 'string' },
+                username: { type: 'string' },
+                bookTitle: { type: 'string' },
+                timestamp: { type: 'string' },
+                customMessage: { type: 'string' },
+                isFulfilled: { type: 'boolean' }
             }
         },
         400: {
@@ -469,8 +509,9 @@ export default async function bookRoutes(server: MyFastifyInstance) {
     server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate], schema: getBookInfoFromISBNSchema }, getBookInfoFromISBN);
     server.get('/books/search', { schema: searchBooksSchema }, searchBooks);
     server.get('/books/bookbox/search', { schema: searchBookboxesSchema }, searchBookboxes);
+    server.get('/books/threads/:id', { schema: getBookThreadsSchema }, getBookThreads);
     server.post('/books/add', { preValidation: [server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
-    server.post('/books/alert', { preValidation: [server.authenticate], schema: sendAlertSchema }, sendAlert);
+    server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);
     server.post('/books/bookbox/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);
     server.delete('/books/clear', { preValidation: [server.adminAuthenticate], schema: clearCollectionSchema }, clearCollection);
 }
