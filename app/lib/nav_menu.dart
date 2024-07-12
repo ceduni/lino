@@ -1,5 +1,7 @@
-import 'package:Lino_app/features/map/screens/home.dart';
+import 'package:Lino_app/screens/map_screen.dart';
+import 'package:Lino_app/screens/test_map_screen.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/utils/mock_data/mock_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -46,7 +48,7 @@ class NavigationController extends GetxController {
 
   /// TODO: change screen here
   final screens = [
-    const MapScreen(),
+    MapScreen(),
     Container(color: Colors.purple),
     Container(color: Colors.blue),
   ];

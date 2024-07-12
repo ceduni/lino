@@ -1,5 +1,5 @@
 // lib/main.dart
-import 'package:Lino_app/nav_menu.dart';
+import 'package:Lino_app/screens/map_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,6 +14,6 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: NavigationMenu());
+        home: MapScreen());
   }
 }

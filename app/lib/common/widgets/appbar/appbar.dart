@@ -1,44 +1,36 @@
-import 'package:Lino_app/utils/constants/sizes.dart';
-import 'package:Lino_app/utils/device/device_utility.dart';
+import 'package:Lino_app/common/widgets/appbar/greeting_user_bar.dart';
+import 'package:Lino_app/common/widgets/appbar/search_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
 
 class LinoAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const LinoAppBar({
-    super.key,
-    this.title,
-    this.actions,
-    this.leadingIcon,
-    this.leadingOnPressed,
-    this.showBackArrow = false,
-  });
-
-  final Widget? title;
-  final bool showBackArrow;
-  final IconData? leadingIcon;
-  final List<Widget>? actions;
-  final VoidCallback? leadingOnPressed;
+  @override
+  Size get preferredSize => Size.fromHeight(120); // Adjust the height as needed
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.zero,
-        child: AppBar(
-          automaticallyImplyLeading: false,
-          leading: showBackArrow
-              ? IconButton(
-                  onPressed: () => Get.back(),
-                  icon: const Icon(Icons.arrow_back))
-              : leadingIcon != null
-                  ? IconButton(
-                      onPressed: leadingOnPressed, icon: Icon(leadingIcon))
-                  : null,
-          title: title,
-          actions: actions,
-        ));
+    return AppBar(
+      backgroundColor: Colors.blue, // Customize the app bar color
+      flexibleSpace: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: const [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GreetingUserBar(),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: LinoSearchBar(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
-
-  @override
-  Size get preferredSize => Size.fromHeight(LinoDeviceUtils.getAppBarHeight());
 }
