@@ -158,7 +158,6 @@ const UserService = {
         }
         return user.ecologicalImpact;
     },
-
     async getUserName(userId: string) {
         const user = await User.findById(userId);
         if (!user) {
@@ -166,8 +165,6 @@ const UserService = {
         }
         return user.username;
     },
-
-
     async parseKeyWords(text: string) {
         return text.split(',');
     },

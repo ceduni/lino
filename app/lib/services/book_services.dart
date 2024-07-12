@@ -174,19 +174,34 @@ class BookService {
     return response;
   }
 
-  Future<Map<String, dynamic>> alertUsers(String token, String title) async {
+  Future<Map<String, dynamic>> requestBookToUsers(String token, String title, {String? cm}) async {
     final r = await http.post(
-      Uri.parse('$url/books/alert'),
+      Uri.parse('$url/books/request'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode(<String, dynamic>{
         'title': title,
+        'customMessage': cm,
       }),
     );
     final response = jsonDecode(r.body);
     if (r.statusCode != 201) {
+      throw Exception(response['error']);
+    }
+    return response;
+  }
+
+  Future<Map<String, dynamic>> getBookThreads(String bookId) async {
+    final r = await http.get(
+      Uri.parse('$url/books/threads/$bookId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    final response = jsonDecode(r.body);
+    if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
     return response;

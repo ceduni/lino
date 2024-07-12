@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
 const bookSchema = new mongoose.Schema({
-    isbn: { type: String}, // ISBN
-    qrCodeId: { type: String, required: true, unique: true }, // QR code ID
+    isbn: { type: String},
+    qrCodeId: { type: String, required: true, unique: true },
     title: { type: String, required: true },
     authors: [String],
     description: String,

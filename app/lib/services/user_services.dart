@@ -142,4 +142,18 @@ class UserService {
     }
     return data;
   }
+
+  Future<Map<String, dynamic>> getUserNotifications(String token) async {
+    final response = await http.get(
+      Uri.parse('$url/users/notifications'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      });
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception(data['error']);
+    }
+    return data;
+  }
 }
