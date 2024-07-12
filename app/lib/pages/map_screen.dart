@@ -1,6 +1,5 @@
 import 'package:Lino_app/common/widgets/appbar/appbar.dart';
-import 'package:Lino_app/nav_menu.dart';
-import 'package:Lino_app/screens/test_map_screen.dart';
+import 'package:Lino_app/pages/test_map_screen.dart';
 import 'package:Lino_app/utils/mock_data/mock_data.dart';
 import 'package:flutter/material.dart';
 
