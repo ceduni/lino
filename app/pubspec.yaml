@@ -47,8 +47,8 @@ flutter:
   
   
   assets: 
-  - assets/logo_with_bird.png
-  - assets/logo_without_bird.png
+  - assets/logos/logo_with_bird.png
+  - assets/logos/logo_without_bird.png
   - assets/croc_blanc.webp
   - assets/croc_noir.webp
   - assets/croc_rose.webp

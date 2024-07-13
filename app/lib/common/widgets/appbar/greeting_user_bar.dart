@@ -1,4 +1,4 @@
-import 'package:Lino_app/screens/profile_screen.dart';
+import 'package:Lino_app/pages/profile_screen.dart';
 import 'package:Lino_app/utils/constants/text_strings.dart';
 import 'package:flutter/material.dart';
 
