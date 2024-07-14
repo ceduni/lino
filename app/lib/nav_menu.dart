@@ -1,4 +1,5 @@
 import 'package:Lino_app/common/widgets/appbar/appbar.dart';
+import 'package:Lino_app/common/widgets/floating_action_button/floating_action_button.dart';
 import 'package:Lino_app/pages/map_screen.dart';
 import 'package:Lino_app/pages/test_map_screen.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
@@ -15,6 +16,7 @@ class NavigationMenu extends StatelessWidget {
 
     return Scaffold(
       appBar: LinoAppBar(),
+      floatingActionButton: LinoFloatingButton(),
       bottomNavigationBar: Obx(
         () => NavigationBar(
           height: 80,
