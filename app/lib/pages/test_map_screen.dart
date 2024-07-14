@@ -8,8 +8,21 @@ class TestMapScreen extends StatelessWidget {
   final List<BookBox> bboxes;
 
   final MapController mapController = Get.put(MapController());
+
   @override
   Widget build(BuildContext context) {
+    List<Marker> markers = bboxes
+        .map(
+          (bbox) => Marker(
+            markerId: MarkerId(bboxes.indexOf(bbox).toString()),
+            position: LatLng(bbox.location[0], bbox.location[1]),
+            infoWindow: InfoWindow(
+              title: bbox.name,
+              snippet: bbox.infoText,
+            ),
+          ),
+        )
+        .toList();
     return Column(
       children: [
         Expanded(
@@ -18,6 +31,7 @@ class TestMapScreen extends StatelessWidget {
             initialCameraPosition: mapController.cameraPosition.value,
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
+            markers: Set<Marker>.of(markers),
           ),
         ),
         Expanded(
