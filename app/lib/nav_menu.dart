@@ -1,3 +1,4 @@
+import 'package:Lino_app/common/widgets/appbar/appbar.dart';
 import 'package:Lino_app/pages/map_screen.dart';
 import 'package:Lino_app/pages/test_map_screen.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
@@ -13,6 +14,7 @@ class NavigationMenu extends StatelessWidget {
     final controller = Get.put(NavigationController());
 
     return Scaffold(
+      appBar: LinoAppBar(),
       bottomNavigationBar: Obx(
         () => NavigationBar(
           height: 80,
@@ -48,8 +50,12 @@ class NavigationController extends GetxController {
 
   /// TODO: change screen here
   final screens = [
+    Container(
+        color: Colors.white,
+        child: Center(child: Text('Placeholder for Books Screen'))),
     MapScreen(),
-    Container(color: Colors.purple),
-    Container(color: Colors.blue),
+    Container(
+        color: Colors.white,
+        child: Center(child: Text('Placeholder for Forum Screen'))),
   ];
 }

@@ -13,7 +13,6 @@ class MapScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: LinoAppBar(),
         body: TestMapScreen(bboxes: MockData.getBookBoxes()),
         // bottomNavigationBar: NavigationMenu(),
         floatingActionButton: FloatingActionButton(
