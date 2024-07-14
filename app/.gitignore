@@ -48,7 +48,7 @@ android/
 
 
 # Generate folder
-ios/
+
 linux/
 macos/
 web/

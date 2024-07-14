@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+// TODO: Rename this class
+// TODO: Add navigation button to each book box, it should open a google maps app for navigation
+
 class TestMapScreen extends StatelessWidget {
   TestMapScreen({super.key, required this.bboxes});
   final List<BookBox> bboxes;

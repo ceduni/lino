@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:geolocator/geolocator.dart';
 
 class BookService {
   final String url = 'https://lino-1.onrender.com';

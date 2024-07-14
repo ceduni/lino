@@ -23,7 +23,7 @@ class LinoFloatingButton extends StatelessWidget {
             label: 'Remove Book',
             onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => RemoveBookScreen()),
+                  MaterialPageRoute(builder: (context) => HaveNotISBNWidget()),
                 )),
       ],
     );
