@@ -23,7 +23,8 @@ dependencies:
   flutter_speed_dial: ^7.0.0
   qr_code_scanner: ^1.0.1
   mobile_scanner: ^5.1.1
-
+  timeago: ^3.0.2
+  intl: ^0.17.0
 
 
 dev_dependencies:
@@ -53,7 +54,7 @@ flutter:
   - assets/croc_noir.webp
   - assets/croc_rose.webp
   - assets/shreque.webp
-  - assets/
+  - assets/reactions/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

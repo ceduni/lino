@@ -1,8 +1,14 @@
 // lib/main.dart
 import 'package:Lino_app/nav_menu.dart';
+import 'package:Lino_app/services/user_services.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+Future<void> main() async {
+  final prefs = await SharedPreferences.getInstance();
+  var us = UserService();
+  final token = await us.loginUser('lino@fake.idc', 'J2s3jAsdjesmjOsBnmjesmbufaSdmcsT');
+  prefs.setString('token', token);
   runApp(MyApp());
 }
 

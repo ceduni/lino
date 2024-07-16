@@ -233,7 +233,7 @@ class BookService {
     return response;
   }
 
-  Future<Map<String, dynamic>> getBookThreads(String bookId) async {
+  Future<List<dynamic>> getBookThreads(String bookId) async {
     final r = await http.get(
       Uri.parse('$url/books/threads/$bookId'),
       headers: <String, String>{

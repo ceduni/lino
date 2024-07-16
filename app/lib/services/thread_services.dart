@@ -52,8 +52,8 @@ class ThreadService {
     return response;
   }
 
-  Future<Map<String, dynamic>> toggleMessageReaction(String token, String threadId, String messageId, String reactIcon) async {
-      final r = await http.post(
+  Future<Map<String, dynamic>> toggleMessageReaction(String token, String threadId, String messageId, bool isGood) async {
+    final r = await http.post(
       Uri.parse('$url/threads/messages/reactions'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -62,7 +62,7 @@ class ThreadService {
       body: jsonEncode(<String, dynamic>{
         'threadId': threadId,
         'messageId': messageId,
-        'reactIcon': reactIcon,
+        'reactIcon': isGood? 'good' : 'bad',
       }),
     );
     final response = jsonDecode(r.body);
@@ -83,8 +83,8 @@ class ThreadService {
 
   Future<Map<String, dynamic>> searchThreads({String? q, String? cls, bool? asc}) async {
     var queryParams = {
-      if (q != null) 'q': q,
-      if (cls != null) 'cls': cls,
+      if (q != null && q.isNotEmpty) 'q': q,
+      if (cls != null && cls.isNotEmpty) 'cls': cls,
       if (asc != null) 'asc': asc.toString(),
     };
 
