@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Lino_app/common/widgets/appbar/appbar.dart';
+import 'pages/navigation.dart';
 import 'package:Lino_app/common/widgets/floating_action_button/floating_action_button.dart';
 import 'package:Lino_app/pages/map_screen.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
@@ -76,7 +77,7 @@ class NavigationMenu extends StatelessWidget {
 class NavigationController extends GetxController {
   final Rx<int> selectedIndex = 0.obs;
   final screens = [
-    BooksScreen(),
+    NavigationPage(),
     MapScreen(),
     ForumScreen(),
   ];
