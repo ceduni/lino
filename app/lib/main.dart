@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   var us = UserService();
-  final token = await us.loginUser('lino@fake.idc', 'J2s3jAsdjesmjOsBnmjesmbufaSdmcsT');
+  final token = await us.loginUser('Asp3rity', 'J2s3jAsd');
   prefs.setString('token', token);
   runApp(MyApp());
 }

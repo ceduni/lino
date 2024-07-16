@@ -249,7 +249,7 @@ const searchBooksSchema = {
 async function sendBookRequest(request: FastifyRequest, reply: FastifyReply) {
     try {
         const response = await BookService.requestBookToUsers(request);
-        reply.send(response);
+        reply.code(201).send(response);
     } catch (error : any) {
         reply.code(error.statusCode).send({error: error.message});
     }
@@ -274,7 +274,7 @@ const sendBookRequestSchema = {
         required: ['authorization']
     },
     response: {
-        200: {
+        201: {
             description: 'Book request sent',
             type: 'object',
             properties: {

@@ -246,4 +246,21 @@ class BookService {
     }
     return response;
   }
+
+  Future<List<dynamic>> getBookRequests({String? username}) async {
+    var queryParams = {
+      if (username != null) 'username': username,
+    };
+    final r = await http.get(
+      Uri.https('lino-1.onrender.com', '/books/requests', queryParams),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    final response = jsonDecode(r.body);
+    if (r.statusCode != 200) {
+      throw Exception(response['error']);
+    }
+    return response;
+  }
 }
