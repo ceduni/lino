@@ -208,6 +208,7 @@ class BookService {
     );
     final response = jsonDecode(r.body);
     if (r.statusCode != 200) {
+      print("r.status != 200");
       throw Exception(response['error']);
     }
     return response;
