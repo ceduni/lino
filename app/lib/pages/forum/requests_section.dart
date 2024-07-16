@@ -2,8 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/book_services.dart';
 
-class RequestsSection extends StatelessWidget {
+class RequestsSection extends StatefulWidget {
   const RequestsSection({super.key});
+
+  @override
+  _RequestsSectionState createState() => _RequestsSectionState();
+}
+
+class _RequestsSectionState extends State<RequestsSection> {
+  List<Map<String, dynamic>> requests = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRequests();
+  }
+
+  Future<void> fetchRequests() async {
+    try {
+      var bs = BookService();
+      final List<dynamic> requestList = await bs.getBookRequests();
+      setState(() {
+        requests = requestList.cast<Map<String, dynamic>>();
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching requests: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   Future<bool> hasUserToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -34,8 +64,24 @@ class RequestsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Center(
-          child: Text('Requests Section'),
+        isLoading
+            ? Center(child: CircularProgressIndicator())
+            : ListView.builder(
+          itemCount: requests.length,
+          itemBuilder: (context, index) {
+            final request = requests[index];
+            return Card(
+              child: ListTile(
+                title: Text(request['bookTitle']),
+                subtitle: request['customMessage'] != null
+                    ? Text(request['customMessage'])
+                    : null,
+                trailing: request['isFulfilled']
+                    ? Icon(Icons.check_circle, color: Colors.green)
+                    : null,
+              ),
+            );
+          },
         ),
         FutureBuilder<bool>(
           future: hasUserToken(),
