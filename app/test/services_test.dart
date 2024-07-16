@@ -19,10 +19,8 @@ Future<void> main() async {
     print(bookId);
     final r2 = await bookService.getBookThreads(bookId);
     print(jsonEncode(r2)); // Print the result as a JSON string
-    final r3 = await userService.getUser('nah');
-    // print 'user : $username';
-    var username = r3['username'];
-    print('user : $username');
+    final r4 = await bookService.searchBookboxes();
+    print(jsonEncode(r4));
   } catch (e) {
     print('Error: $e');
   }

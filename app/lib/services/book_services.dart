@@ -196,8 +196,8 @@ class BookService {
       if (cls != null)
         'cls':
             cls, // the classificator : ['by name', 'by location', 'by number of books']
-      'longitude': longitude.toString(),
-      'latitude': latitude.toString(),
+      if (longitude != null) 'longitude': longitude.toString(),
+      if (latitude != null) 'latitude': latitude.toString(),
     };
 
     final r = await http.get(
@@ -208,7 +208,6 @@ class BookService {
     );
     final response = jsonDecode(r.body);
     if (r.statusCode != 200) {
-      print("r.status != 200");
       throw Exception(response['error']);
     }
     return response;
