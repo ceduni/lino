@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:Lino_app/common/widgets/appbar/appbar.dart';
 import 'pages/navigation.dart';
 import 'package:Lino_app/common/widgets/floating_action_button/floating_action_button.dart';
-import 'package:Lino_app/pages/forum_screen.dart';
+import 'package:Lino_app/pages/forum/forum_screen.dart';
 import 'package:Lino_app/pages/map_screen.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:Lino_app/common/widgets/appbar/search_bar.dart'
@@ -94,12 +94,4 @@ class BooksScreen extends StatelessWidget {
   }
 }
 
-class ForumScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Center(child: Text('Placeholder for Forum Screen')),
-    );
-  }
-}
+

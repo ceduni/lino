@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/thread_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../services/user_services.dart';
+import '../../services/user_services.dart';
 import 'package:intl/intl.dart'; // For formatting dates
 import 'message_tile.dart'; // Import the MessageTile
 

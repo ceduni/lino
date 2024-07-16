@@ -410,6 +410,15 @@ const bookService = {
         return Thread.find({bookTitle: title});
     },
 
+    async getBookRequests(request: any) {
+        let username = request.params.username;
+        if (!username) {
+            return Request.find();
+        } else {
+            return Request.find({username: username});
+        }
+    },
+
     async clearCollection() {
         await Book.deleteMany({});
         await BookBox.deleteMany({});

@@ -497,6 +497,50 @@ async function clearCollection(request: FastifyRequest, reply: FastifyReply) {
     }
 }
 
+async function getBookRequests(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const response = await BookService.getBookRequests(request);
+        reply.code(200).send(response);
+    } catch (error : any) {
+        reply.code(500).send({error: error.message});
+    }
+}
+
+const getBookRequestsSchema = {
+    description: 'Get book requests',
+    tags: ['books', 'users'],
+    querystring: {
+        type: 'object',
+        properties: {
+            status: {type: 'string'}
+        }
+    },
+    response: {
+        200: {
+            description: 'Book requests found',
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    _id: {type: 'string'},
+                    username: {type: 'string'},
+                    bookTitle: {type: 'string'},
+                    timestamp: {type: 'string'},
+                    customMessage: {type: 'string'},
+                    isFulfilled: {type: 'boolean'}
+                }
+            },
+            500: {
+                description: 'Error message',
+                type: 'object',
+                properties: {
+                    error: {type: 'string'}
+                }
+            }
+        }
+    }
+}
+
 interface MyFastifyInstance extends FastifyInstance {
     optionalAuthenticate: (request: FastifyRequest) => void;
     authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
@@ -512,6 +556,7 @@ export default async function bookRoutes(server: MyFastifyInstance) {
     server.get('/books/threads/:id', { schema: getBookThreadsSchema }, getBookThreads);
     server.post('/books/add', { preValidation: [server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
     server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);
+    server.get('/books/requests', { schema: getBookRequestsSchema }, getBookRequests);
     server.post('/books/bookbox/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);
     server.delete('/books/clear', { preValidation: [server.adminAuthenticate], schema: clearCollectionSchema }, clearCollection);
 }

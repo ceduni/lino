@@ -1,40 +1,9 @@
-import 'package:Lino_app/pages/thread_message_screen.dart';
-import 'package:Lino_app/services/thread_services.dart';
 import 'package:flutter/material.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
-import '../services/book_services.dart';
-
-
-class ForumScreen extends StatelessWidget {
-  const ForumScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2, // Number of tabs
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: LinoColors.primary,
-          title: const Text('Forum'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Threads'),
-              Tab(text: 'Requests'),
-            ],
-          ),
-        ),
-        body: const TabBarView(
-          children: [
-            ThreadsSection(),
-            RequestsSection(),
-          ],
-        ),
-      ),
-    );
-  }
-}
+import 'package:Lino_app/services/thread_services.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/pages/forum/thread_message_screen.dart';
+import '../../services/book_services.dart';
 
 class ThreadsSection extends StatefulWidget {
   const ThreadsSection({super.key});
@@ -77,6 +46,7 @@ class _ThreadsSectionState extends State<ThreadsSection> {
     );
   }
 }
+
 Future<List<Card>> getThreadTiles(BuildContext context, {String? q, String? cls, bool? asc, String? bookId}) async {
   if (bookId != null) {
     final bs = BookService();
@@ -141,7 +111,7 @@ Future<List<Card>> getThreadTiles(BuildContext context, {String? q, String? cls,
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ThreadMessagesScreen(threadId: thread['_id'], title: threadTitle,),
+              builder: (context) => ThreadMessagesScreen(threadId: thread['_id'], title: threadTitle),
             ),
           );
         },
@@ -149,16 +119,3 @@ Future<List<Card>> getThreadTiles(BuildContext context, {String? q, String? cls,
     );
   }).toList();
 }
-
-
-class RequestsSection extends StatelessWidget {
-  const RequestsSection({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Requests Section'),
-    );
-  }
-}
-
-
