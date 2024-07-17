@@ -102,7 +102,19 @@ export const userSchema = {
                 }
             }
         },
-        getAlerted: { type: 'boolean' }
+        getAlerted: { type: 'boolean' },
+        bookHistory: { type: 'array',
+            items:
+                {
+                    type: 'object',
+                    properties: {
+                        bookId: { type: 'string' },
+                        action: { type: 'string' },
+                        timestamp:
+                            { type: 'string', format: 'date-time' }
+                    }
+                }
+        }
     }
 };
 
