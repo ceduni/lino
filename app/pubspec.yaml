@@ -54,6 +54,7 @@ flutter:
   - assets/croc_noir.webp
   - assets/croc_rose.webp
   - assets/shreque.webp
+  - assets/reactions/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

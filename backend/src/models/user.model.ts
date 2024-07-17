@@ -21,7 +21,6 @@ const userSchema = new mongoose.Schema({
     },
     notifications: {type: [notificationSchema], default: []},
     getAlerted: { type: Boolean, default: true },
-    bookHistory: [{ bookId: String, action: String, timestamp: { type: Date, default: Date.now } }],
 });
 
 const User = mongoose.model('User', userSchema, "users");

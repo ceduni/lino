@@ -102,19 +102,7 @@ export const userSchema = {
                 }
             }
         },
-        getAlerted: { type: 'boolean' },
-        bookHistory: { type: 'array',
-            items:
-                {
-                    type: 'object',
-                    properties: {
-                        bookId: { type: 'string' },
-                        action: { type: 'string' },
-                        timestamp:
-                            { type: 'string', format: 'date-time' }
-                    }
-                }
-        }
+        getAlerted: { type: 'boolean' }
     }
 };
 
@@ -188,26 +176,6 @@ async function createAdminUser(server: any) {
     }
 }
 
-async function registerMyUser(server: any) {
-    try {
-        await server.inject({
-            method: 'POST',
-            url: '/users/register',
-            payload: {
-                username: 'Asp3rity',
-                password: 'J2s3jAsd',
-                email: 'natrazaf2022@yahoo.fr',
-            }
-        });
-    } catch (err: any) {
-        if (err.message.includes('already taken')) {
-            console.log('User already exists.');
-        } else {
-            throw err;
-        }
-    }
-}
-
 export async function reinitDatabase(server: any) {
     const token = await createAdminUser(server);
     await server.inject({
@@ -234,6 +202,5 @@ export async function reinitDatabase(server: any) {
                 Authorization: `Bearer ${token}`,
             },
     });
-    await registerMyUser(server);
     console.log('Database reinitialized.');
 }
