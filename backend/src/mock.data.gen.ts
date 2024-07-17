@@ -5,7 +5,7 @@ const url = "https://lino-1.onrender.com";
 const bookBoxIds: string[] = [];
 const bookIds: string[] = [];
 const userIdentifiers: any[] = [];
-const reactions: string[] = ['like', 'love', 'laugh', 'sad', 'angry'];
+const reactions: string[] = ['good', 'bad'];
 
 function randomUser() {
     return {
@@ -142,8 +142,8 @@ async function populateThreads() {
             body: JSON.stringify({ identifier, password })
         });
         const { token : userToken } = await response.json();
-        const nThreads = faker.number.int({min: 0, max: 2});
-        for (let i = 0; i < nThreads; i++) {
+        const doWeAddAThread = faker.number.float({min: 0, max: 1}) < 0.3;
+        if (doWeAddAThread) {
             const response = await fetch(url + "/threads/new", {
                 method: "POST",
                 headers: {
@@ -191,7 +191,7 @@ async function populateThreads() {
                             "Authorization": "Bearer " + otherUserToken,
                         },
                         body: JSON.stringify({
-                            reactIcon: reactions[faker.number.int({min: 0, max: 4})],
+                            reactIcon: reactions[faker.number.int({min: 0, max: 1})],
                             threadId: threadId,
                             messageId: messageId,
                         })
