@@ -110,6 +110,20 @@ class BookService {
     return response;
   }
 
+  Future<Map<String, dynamic>> getBookBox(String bookBoxId) async {
+    final r = await http.get(
+      Uri.parse('$url/books/bookbox/$bookBoxId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    final response = jsonDecode(r.body);
+    if (r.statusCode != 200) {
+      throw Exception(response['error']);
+    }
+    return response;
+  }
+
   Future<Map<String, dynamic>> getBook(String bookId) async {
     // Make a GET request to the server
     // Send the bookId to the server
