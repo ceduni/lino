@@ -21,28 +21,52 @@ function randomBookBox() {
         name: faker.lorem.word(),
         longitude: faker.location.longitude(),
         latitude: faker.location.latitude(),
+        image: faker.image.url(),
         infoText: faker.lorem.sentence(),
     }
 }
 
-function randomBook() {
-    return {
-        isbn: faker.string.numeric(13), // Generate a random 13-digit ISBN
-        qrCodeId: faker.string.uuid(), // Generate a random UUID
-        title: faker.lorem.words(), // Generate a random title
-        authors: Array.from(
-            { length: faker.number.int({min: 1, max: 3}) },
-            () => faker.person.fullName()
-        ), // Generate an array of random author names with a length between 1 and 3
-        description: faker.lorem.paragraph(), // Generate a random description
-        coverImage: faker.image.url(), // Generate a random image URL
-        publisher: faker.company.name(), // Generate a random publisher name
-        categories: Array.from(
-            { length: faker.number.int({min: 1, max: 3}) },
-            () => faker.lorem.word()
-        ), // Generate an array of random category names with a length between 1 and 3
-        parutionYear: faker.number.int({min: 1600, max: 2022}), // Generate a random year between 1600 and 2022
-        pages: faker.number.int({min: 50, max: 1000}), // Generate a random number of pages between 50 and 1000
+async function randomBook() {
+    const isbn = faker.string.numeric(13); // Generate a random 13-digit ISBN
+    const r = await fetch(url + `/books/${isbn}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+        },
+    });
+    if (r.status === 200) {
+        const book = await r.json();
+        return {
+            isbn: isbn,
+            qrCodeId: faker.string.uuid(), // Generate a random UUID
+            title: book.title, // Use the title from the API
+            authors: book.authors, // Use the authors from the API
+            description: book.description, // Use the description from the API
+            coverImage: book.coverImage, // Use the cover image from the API
+            publisher: book.publisher, // Use the publisher from the API
+            categories: book.categories, // Use the categories from the API
+            parutionYear: book.parutionYear, // Use the parution year from the API
+            pages: book.pages, // Use the number of pages from the API
+        }
+    } else {
+        return {
+            isbn: isbn,
+            qrCodeId: faker.string.uuid(), // Generate a random UUID
+            title: faker.lorem.words(), // Generate a random title
+            authors: Array.from(
+                { length: faker.number.int({min: 1, max: 3}) },
+                () => faker.person.fullName()
+            ), // Generate an array of random author names with a length between 1 and 3
+            description: faker.lorem.paragraph(), // Generate a random description
+            coverImage: faker.image.url(), // Generate a random image URL
+            publisher: faker.company.name(), // Generate a random publisher name
+            categories: Array.from(
+                { length: faker.number.int({min: 1, max: 3}) },
+                () => faker.lorem.word()
+            ), // Generate an array of random category names with a length between 1 and 3
+            parutionYear: faker.number.int({min: 1600, max: 2022}), // Generate a random year between 1600 and 2022
+            pages: faker.number.int({min: 50, max: 1000}), // Generate a random number of pages between 50 and 1000
+        }
     }
 }
 
@@ -119,7 +143,7 @@ async function populateBooks() {
                 },
                 body: JSON.stringify({
                     bookboxId: bookBoxId,
-                    ...randomBook(),
+                    ...await randomBook(),
                 })
             });
             const { bookId } = await response.json();

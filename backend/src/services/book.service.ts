@@ -383,6 +383,7 @@ const bookService = {
         const bookBox = new BookBox({
             name: request.body.name,
             books: [],
+            image: request.body.image,
             location: [request.body.longitude, request.body.latitude],
             infoText: request.body.infoText,
         });

@@ -370,6 +370,7 @@ const getBookboxSchema = {
                 name: { type: 'string' },
                 location: { type: 'array', items: { type: 'number' } },
                 infoText: { type: 'string' },
+                image: { type: 'string' },
                 books: { type: 'array', items: bookSchema }
             }
         },
@@ -403,8 +404,9 @@ const addNewBookboxSchema = {
             infoText: { type: 'string' },
             latitude: { type: 'number' },
             longitude: { type: 'number' },
+            image: { type: 'string' }
         },
-        required: ['name', 'infoText', 'latitude', 'longitude'],
+        required: ['name', 'infoText', 'latitude', 'longitude', 'image'],
     },
     headers: {
         type: 'object',
@@ -421,6 +423,7 @@ const addNewBookboxSchema = {
                 _id: { type: 'string' },
                 name: { type: 'string' },
                 location: { type: 'array', items: { type: 'number' } },
+                image: { type: 'string' },
                 infoText: { type: 'string' },
                 books: { type: 'array', items: { type: 'string' } }
             }
