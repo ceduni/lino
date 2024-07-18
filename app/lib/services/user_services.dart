@@ -5,7 +5,7 @@ class UserService {
   final String url = 'https://lino-1.onrender.com';
 
 
-  Future<String> registerUser(String username, String email, String phone, String password, bool getAlerted) async {
+  Future<String> registerUser(String username, String email, String password, {String phone = '', bool getAlerted = true}) async {
     // Make a POST request to the server
     // Send the username, email, phone, password, and getAlerted to the server
     // If the server returns a 201 status code, the user is registered
