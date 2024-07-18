@@ -26,8 +26,35 @@ function randomBookBox() {
     }
 }
 
+function randomISBN(): string {
+    // Helper function to generate a random integer within a given range
+    function getRandomInt(min: number, max: number): number {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Generate the first 12 digits of the ISBN
+    const prefix = getRandomInt(0, 1) === 0 ? '978' : '979';
+    const registrationGroup = getRandomInt(0, 5).toString().padStart(1, '0');
+    const registrant = getRandomInt(0, 99999).toString().padStart(5, '0');
+    const publication = getRandomInt(0, 99999).toString().padStart(5, '0');
+
+    // Combine the parts to form the first 12 digits of the ISBN
+    const isbnWithoutCheck = (prefix + registrationGroup + registrant + publication).substring(0, 12);
+
+    // Calculate the check digit
+    let total = 0;
+    for (let i = 0; i < isbnWithoutCheck.length; i++) {
+        const digit = parseInt(isbnWithoutCheck.charAt(i));
+        total += i % 2 === 0 ? digit : digit * 3;
+    }
+    const checkDigit = (10 - (total % 10)) % 10;
+
+    // Combine the first 12 digits with the check digit to form the complete ISBN
+    return isbnWithoutCheck + checkDigit.toString();
+}
+
 async function randomBook() {
-    const isbn = faker.string.numeric(13); // Generate a random 13-digit ISBN
+    const isbn = randomISBN(); // Generate a random 13-digit ISBN
     const r = await fetch(url + `/books/${isbn}`, {
         method: "GET",
         headers: {
