@@ -27,30 +27,58 @@ function randomBookBox() {
 }
 
 function randomISBN(): string {
-    // Helper function to generate a random integer within a given range
-    function getRandomInt(min: number, max: number): number {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    // Generate the first 12 digits of the ISBN
-    const prefix = getRandomInt(0, 1) === 0 ? '978' : '979';
-    const registrationGroup = getRandomInt(0, 5).toString().padStart(1, '0');
-    const registrant = getRandomInt(0, 99999).toString().padStart(5, '0');
-    const publication = getRandomInt(0, 99999).toString().padStart(5, '0');
-
-    // Combine the parts to form the first 12 digits of the ISBN
-    const isbnWithoutCheck = (prefix + registrationGroup + registrant + publication).substring(0, 12);
-
-    // Calculate the check digit
-    let total = 0;
-    for (let i = 0; i < isbnWithoutCheck.length; i++) {
-        const digit = parseInt(isbnWithoutCheck.charAt(i));
-        total += i % 2 === 0 ? digit : digit * 3;
-    }
-    const checkDigit = (10 - (total % 10)) % 10;
-
-    // Combine the first 12 digits with the check digit to form the complete ISBN
-    return isbnWithoutCheck + checkDigit.toString();
+    const realISBNs: string[] = [
+        "9780316769488",
+        "9780439139601",
+        "9780439139595",
+        "9780446310789",
+        "9780061120084",
+        "9780316015844",
+        "9781400079988",
+        "9780140283297",
+        "9780375831003",
+        "9780307474278",
+        "9780743273565",
+        "9780385490818",
+        "9780142437230",
+        "9780451524935",
+        "9780060935467",
+        "9780743234801",
+        "9780307346605",
+        "9780812981605",
+        "9780812974492",
+        "9780679785897",
+        "9780140186390",
+        "9780156012195",
+        "9780812980196",
+        "9780812982077",
+        "9780307949486",
+        "9780307277674",
+        "9780385333499",
+        "9780375725784",
+        "9780345803481",
+        "9780812995343",
+        "9780143126560",
+        "9780142437209",
+        "9780679732761",
+        "9780316769174",
+        "9780679783275",
+        "9780399501487",
+        "9780374528379",
+        "9780394716096",
+        "9780345803924",
+        "9780399590500",
+        "9780143127550",
+        "9780374533557",
+        "9780143110439",
+        "9780812988659",
+        "9780307592736",
+        "9780679760801",
+        "9780385490628",
+        "9780812979657",
+        "9780307269751"
+    ];
+    return realISBNs[faker.number.int({min: 0, max: realISBNs.length - 1})];
 }
 
 async function randomBook() {
