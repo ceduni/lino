@@ -192,7 +192,7 @@ const bookService = {
             publisher: bookInfo.publisher || 'Unknown publisher',
             parutionYear: parutionYear,
             categories: bookInfo.categories || ['Uncategorized'],
-            pages: bookInfo.pageCount || 'Unknown number of pages',
+            pages: bookInfo.pageCount || null,
         };
     },
 
