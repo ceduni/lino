@@ -1,3 +1,4 @@
+import 'package:Lino_app/pages/book_details_page.dart';
 import 'package:Lino_app/pages/test_map_screen.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/utils/constants/sizes.dart';
@@ -242,34 +243,44 @@ class BookInBookBoxRow extends StatelessWidget {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: books.map((book) => _buildBookItem(book)).toList(),
+          children: books.map((book) => _buildBookItem(context, book)).toList(),
         ),
       ),
     );
   }
 
-  Widget _buildBookItem(Map<String, dynamic> book) {
-    return Container(
-      width: 100, // Adjust the width and height as necessary
-      height: 160,
-      margin: EdgeInsets.symmetric(horizontal: 4.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        image: DecorationImage(
-          image: NetworkImage(book['coverImage']!),
-          // image: NetworkImage(
-          //     'http://books.google.com/books/content?id=O_ZvDwAAQBAJ&printsec=frontcover&img=1'),
-          // image: NetworkImage(
-          //     'https://placehold.co/100x160.png'), // Path to a placeholder image in your assets
-          fit: BoxFit.cover,
-          // Adding error handling
-          onError: (Object exception, StackTrace? stackTrace) {
-            DecorationImage(
-              image: NetworkImage(
-                  'https://placehold.co/100x160.png'), // Path to a placeholder image in your assets
-              fit: BoxFit.cover,
-            );
-          },
+  Widget _buildBookItem(BuildContext context, Map<String, dynamic> book) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BookDetailsPage(book: book),
+          ),
+        );
+      },
+      child: Container(
+        width: 100, // Adjust the width and height as necessary
+        height: 160,
+        margin: EdgeInsets.symmetric(horizontal: 4.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          image: DecorationImage(
+            image: NetworkImage(book['coverImage']!),
+            // image: NetworkImage(
+            //     'http://books.google.com/books/content?id=O_ZvDwAAQBAJ&printsec=frontcover&img=1'),
+            // image: NetworkImage(
+            //     'https://placehold.co/100x160.png'), // Path to a placeholder image in your assets
+            fit: BoxFit.cover,
+            // Adding error handling
+            onError: (Object exception, StackTrace? stackTrace) {
+              DecorationImage(
+                image: NetworkImage(
+                    'https://placehold.co/100x160.png'), // Path to a placeholder image in your assets
+                fit: BoxFit.cover,
+              );
+            },
+          ),
         ),
       ),
     );
