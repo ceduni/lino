@@ -1,64 +1,107 @@
 import 'package:Lino_app/pages/test_map_screen.dart';
+import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
-class BookBoxScreen extends StatelessWidget {
+class BookBoxScreen extends HookWidget {
   BookBoxScreen({super.key, required this.bookBoxId});
 
   final String bookBoxId;
   final MapController mapController = Get.put(MapController());
 
+  Future<Map<String, dynamic>> getBookBoxData(String bookBoxId) async {
+    var bb = await BookService().getBookBox(bookBoxId);
+    return {
+      'name': bb['name'],
+      'infoText': bb['infoText'],
+      'location': LatLng(bb['location'][0], bb['location'][1]),
+      'books': bb['books']
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bookBoxData =
+        useFuture(useMemoized(() => getBookBoxData(bookBoxId), [bookBoxId]));
+
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Book Boxes'),
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.only(top: 30, bottom: 30, left: 90),
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 232, 192, 158).withOpacity(0.5),
-                ),
-                width: double.infinity,
-                child: SingleChildScrollView(
-                    child: Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    Center(child: BookBoxTitleContainer()),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: GoogleMapsContainer(
-                        bookBoxLocation: const LatLng(45.5048, -73.5772),
-                        mapController: mapController,
-                      ),
+      appBar: AppBar(
+        title: const Text('Book Boxes'),
+      ),
+      body: bookBoxData.connectionState == ConnectionState.waiting
+          ? Center(child: CircularProgressIndicator())
+          : bookBoxData.hasError
+              ? Center(child: Text('Error loading data'))
+              : buildContent(context, bookBoxData.data!),
+    );
+  }
+
+  Widget buildContent(BuildContext context, Map<String, dynamic> data) {
+    final bbName = data['name'];
+    final bbInfoText = data['infoText'];
+    final bbLocation = data['location'];
+    final bbBooks = data['books'];
+    return Column(
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.only(top: 30, bottom: 30, left: 90),
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 232, 192, 158).withOpacity(0.5),
+            ),
+            width: double.infinity,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Center(
+                    child: BookBoxTitleContainer(
+                      name: bbName,
+                      infoText: bbInfoText,
                     ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: DirectionButton(
-                        latitude: 45.0000,
-                        longitude: -75.0000,
-                      ),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: GoogleMapsContainer(
+                      bookBoxLocation: bbLocation,
+                      mapController: mapController,
                     ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: BookInBookBoxRow(books: mockBooks),
-                    )
-                  ],
-                )),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: DirectionButton(
+                      bookBoxLocation: bbLocation,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: BookInBookBoxRow(
+                      books: (bbBooks as List<dynamic>)
+                          .map((item) => item as Map<String, dynamic>)
+                          .toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ));
+          ),
+        ),
+      ],
+    );
   }
 }
 
 class BookBoxTitleContainer extends StatelessWidget {
+  final String name;
+  final String infoText;
+
+  const BookBoxTitleContainer(
+      {super.key, required this.name, required this.infoText});
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -73,14 +116,14 @@ class BookBoxTitleContainer extends StatelessWidget {
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               SizedBox(height: 20), // Add spacing to leave space for the icon
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    'Book Box Roger Gaudry',
+                    name,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -88,9 +131,10 @@ class BookBoxTitleContainer extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
                 child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text('Bottom floor, near the cafeteria'),
-                ),
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      infoText,
+                    )),
               ),
             ],
           ),
@@ -123,6 +167,7 @@ class GoogleMapsContainer extends StatelessWidget {
       target: bookBoxLocation,
       zoom: 15,
     );
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(LinoSizes.borderRadiusLg),
       child: Container(
@@ -142,35 +187,10 @@ class GoogleMapsContainer extends StatelessWidget {
   }
 }
 
-final List<Map<String, String>> mockBooks = [
-  {
-    'coverUrl': 'https://placehold.co/50x80.png',
-    'title': 'Book 1',
-  },
-  {
-    'coverUrl': 'https://placehold.co/50x80.png',
-    'title': 'Book 2',
-  },
-  {
-    'coverUrl': 'https://placehold.co/50x80.png',
-    'title': 'Book 3',
-  },
-  {
-    'coverUrl': 'https://placehold.co/50x80.png',
-    'title': 'Book 4',
-  },
-  {
-    'coverUrl': 'https://placehold.co/50x80.png',
-    'title': 'Book 5',
-  },
-];
-
 class DirectionButton extends StatelessWidget {
-  final double latitude;
-  final double longitude;
+  final LatLng bookBoxLocation;
 
-  const DirectionButton(
-      {super.key, required this.longitude, required this.latitude});
+  const DirectionButton({super.key, required this.bookBoxLocation});
 
   Future<void> _openGoogleMapsApp(double latitude, double longitude) async {
     // TODO: Get book box latlng
@@ -193,6 +213,8 @@ class DirectionButton extends StatelessWidget {
       ),
       child: TextButton(
         onPressed: () {
+          double latitude = bookBoxLocation.latitude;
+          double longitude = bookBoxLocation.longitude;
           _openGoogleMapsApp(longitude, latitude);
         },
         child: const Text('Direction to Book Box'),
@@ -202,9 +224,9 @@ class DirectionButton extends StatelessWidget {
 }
 
 class BookInBookBoxRow extends StatelessWidget {
-  final List<Map<String, String>> books;
+  final List<Map<String, dynamic>> books;
 
-  const BookInBookBoxRow({super.key, required this.books});
+  BookInBookBoxRow({super.key, required this.books});
 
   @override
   Widget build(BuildContext context) {
@@ -226,16 +248,28 @@ class BookInBookBoxRow extends StatelessWidget {
     );
   }
 
-  Widget _buildBookItem(Map<String, String> book) {
+  Widget _buildBookItem(Map<String, dynamic> book) {
     return Container(
-      width: 50, // Adjust the width and height as necessary
-      height: 80,
+      width: 100, // Adjust the width and height as necessary
+      height: 160,
       margin: EdgeInsets.symmetric(horizontal: 4.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         image: DecorationImage(
-          image: NetworkImage(book['coverUrl']!),
+          image: NetworkImage(book['coverImage']!),
+          // image: NetworkImage(
+          //     'http://books.google.com/books/content?id=O_ZvDwAAQBAJ&printsec=frontcover&img=1'),
+          // image: NetworkImage(
+          //     'https://placehold.co/100x160.png'), // Path to a placeholder image in your assets
           fit: BoxFit.cover,
+          // Adding error handling
+          onError: (Object exception, StackTrace? stackTrace) {
+            DecorationImage(
+              image: NetworkImage(
+                  'https://placehold.co/100x160.png'), // Path to a placeholder image in your assets
+              fit: BoxFit.cover,
+            );
+          },
         ),
       ),
     );
