@@ -170,7 +170,7 @@ const bookService = {
             // Update the dateLastAction field for all books with the same title
             // to indicate that this book has been looked at recently
             // @ts-ignore
-            books[i].dateLastAction = Date.now;
+            books[i].dateLastAction = Date.now();
             await books[i].save();
         }
     },
@@ -182,7 +182,8 @@ const bookService = {
             throw newErr(404, 'Book not found');
         }
         const bookInfo = response.data.items[0].volumeInfo;
-        const parutionYear = bookInfo.publishedDate ? parseInt(bookInfo.publishedDate.substring(0, 4)) : null;
+        const parutionYear = bookInfo.publishedDate ? parseInt(bookInfo.publishedDate.substring(0, 4)) : undefined;
+        const pageCount = bookInfo.pageCount ? parseInt(bookInfo.pageCount) : undefined;
         return {
             isbn: isbn,
             title: bookInfo.title || 'Unknown title',
@@ -192,7 +193,7 @@ const bookService = {
             publisher: bookInfo.publisher || 'Unknown publisher',
             parutionYear: parutionYear,
             categories: bookInfo.categories || ['Uncategorized'],
-            pages: bookInfo.pageCount || null,
+            pages: pageCount,
         };
     },
 

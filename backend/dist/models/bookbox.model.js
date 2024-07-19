@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const bookboxSchema = new mongoose_1.default.Schema({
     name: { type: String, required: true },
+    image: String,
     location: [Number],
     infoText: String,
     books: [String], // Array of book _ids

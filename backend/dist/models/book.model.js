@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const bookSchema = new mongoose_1.default.Schema({
-    isbn: { type: String }, // ISBN
-    qrCodeId: { type: String, required: true, unique: true }, // QR code ID
+    isbn: { type: String },
+    qrCodeId: { type: String, required: true, unique: true },
     title: { type: String, required: true },
     authors: [String],
     description: String,

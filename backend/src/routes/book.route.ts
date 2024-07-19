@@ -7,6 +7,7 @@ async function addBookToBookbox(request: FastifyRequest, reply: FastifyReply) {
         const response = await BookService.addBook(request);
         reply.code(201).send(response);
     } catch (error : any) {
+        console.log(error);
         reply.code(error.statusCode).send({error: error.message});
     }
 }
@@ -26,8 +27,8 @@ const addBookToBookboxSchema = {
             coverImage: { type: 'string' },
             publisher: { type: 'string' },
             categories: { type: 'array', items: { type: 'string' } },
-            parutionYear: { type: 'number' },
-            pages: { type: 'number' }
+            parutionYear: { type: "number" },
+            pages: { type: "number" }
         },
         required: ['qrCodeId', 'bookboxId'],
     },
@@ -55,6 +56,13 @@ const addBookToBookboxSchema = {
         },
         404: {
             description: 'Error message',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
             type: 'object',
             properties: {
                 error: { type: 'string' }
@@ -104,6 +112,13 @@ const getBookFromBookBoxSchema = {
             properties: {
                 error: {type: 'string'}
             }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
         }
     }
 };
@@ -144,8 +159,8 @@ const getBookInfoFromISBNSchema = {
                 coverImage: {type: 'string'},
                 publisher: {type: 'string'},
                 categories: {type: 'array', items: {type: 'string'}},
-                parutionYear: {type: 'number'},
-                pages: {type: 'number'}
+                parutionYear: {type: ['number', 'null']},
+                pages: {type: ['number', 'null']}
             }
         },
         404: {
@@ -155,6 +170,13 @@ const getBookInfoFromISBNSchema = {
                 error: { type: 'string' }
             }
         },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
     }
 };
 
@@ -187,6 +209,13 @@ const getBookThreadsSchema = {
             type: 'object',
             properties: {
                 error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
             }
         }
     }
@@ -242,6 +271,13 @@ const searchBooksSchema = {
             properties: {
                 error: {type: 'string'}
             }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
         }
     }
 };
@@ -292,6 +328,13 @@ const sendBookRequestSchema = {
             properties: {
                 error: { type: 'string' }
             }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
         }
     }
 };
@@ -331,6 +374,13 @@ const getBookSchema = {
             type: 'object',
             properties: {
                 error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
             }
         }
     }
@@ -380,6 +430,14 @@ const getBookboxSchema = {
             properties: {
                 error: { type: 'string' }
             }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
+
         }
     }
 };
@@ -434,6 +492,13 @@ const addNewBookboxSchema = {
             properties: {
                 error: { type: 'string' }
             }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
         }
     }
 };
@@ -486,6 +551,13 @@ const searchBookboxesSchema = {
             type: 'object',
             properties: {
                 error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
             }
         }
     }

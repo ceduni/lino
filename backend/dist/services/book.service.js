@@ -182,7 +182,7 @@ const bookService = {
                 // Update the dateLastAction field for all books with the same title
                 // to indicate that this book has been looked at recently
                 // @ts-ignore
-                books[i].dateLastAction = Date.now;
+                books[i].dateLastAction = Date.now();
                 yield books[i].save();
             }
         });
@@ -196,7 +196,8 @@ const bookService = {
                 throw (0, utilities_1.newErr)(404, 'Book not found');
             }
             const bookInfo = response.data.items[0].volumeInfo;
-            const parutionYear = bookInfo.publishedDate ? parseInt(bookInfo.publishedDate.substring(0, 4)) : null;
+            const parutionYear = bookInfo.publishedDate ? parseInt(bookInfo.publishedDate.substring(0, 4)) : undefined;
+            const pageCount = bookInfo.pageCount ? parseInt(bookInfo.pageCount) : undefined;
             return {
                 isbn: isbn,
                 title: bookInfo.title || 'Unknown title',
@@ -206,7 +207,7 @@ const bookService = {
                 publisher: bookInfo.publisher || 'Unknown publisher',
                 parutionYear: parutionYear,
                 categories: bookInfo.categories || ['Uncategorized'],
-                pages: bookInfo.pageCount || 'Unknown number of pages',
+                pages: pageCount,
             };
         });
     },
@@ -377,6 +378,7 @@ const bookService = {
             const bookBox = new bookbox_model_1.default({
                 name: request.body.name,
                 books: [],
+                image: request.body.image,
                 location: [request.body.longitude, request.body.latitude],
                 infoText: request.body.infoText,
             });
@@ -404,6 +406,17 @@ const bookService = {
             }
             let title = book.title;
             return thread_model_1.default.find({ bookTitle: title });
+        });
+    },
+    getBookRequests(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let username = request.params.username;
+            if (!username) {
+                return book_request_model_1.default.find();
+            }
+            else {
+                return book_request_model_1.default.find({ username: username });
+            }
         });
     },
     clearCollection() {

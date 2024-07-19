@@ -5,7 +5,7 @@ const url = "https://lino-1.onrender.com";
 const bookBoxIds: string[] = [];
 const bookIds: string[] = [];
 const userIdentifiers: any[] = [];
-const reactions: string[] = ['like', 'love', 'laugh', 'sad', 'angry'];
+const reactions: string[] = ['good', 'bad'];
 
 function randomUser() {
     return {
@@ -153,6 +153,18 @@ async function populateUsers() {
         const { username, password } = user;
         userIdentifiers.push({ identifier: username, password: password });
     }
+    await fetch(url + "/users/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+        },
+        body: JSON.stringify({
+            username: 'Asp3rity',
+            email: faker.internet.email(),
+            phone: faker.phone.number(),
+            password: 'J2s3jAsd'
+        })
+    });
     console.log("Users created");
 }
 
@@ -270,7 +282,7 @@ async function populateThreads() {
                             "Authorization": "Bearer " + otherUserToken,
                         },
                         body: JSON.stringify({
-                            reactIcon: reactions[faker.number.int({min: 0, max: 4})],
+                            reactIcon: reactions[faker.number.int({min: 0, max: 1})],
                             threadId: threadId,
                             messageId: messageId,
                         })
