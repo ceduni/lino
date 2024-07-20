@@ -98,7 +98,7 @@ Future<List<Card>> getThreadTiles(BuildContext context, {String? q, String? cls,
     return Card(
       child: ListTile(
         leading: Icon(Icons.image, size: 50, color: LinoColors.accent),
-        title: Text('$threadTitle : $bookTitle'),
+        title: Text('$bookTitle : $threadTitle'),
         subtitle: Text('Thread created $timeAgo'),
         trailing: Column(
           children: [

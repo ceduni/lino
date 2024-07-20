@@ -122,13 +122,17 @@ class _MessageTileState extends State<MessageTile> {
             ),
             if (_isHovered)
               Positioned(
-                right: 16,
-                top: 8,
-                child: IconButton(
-                  icon: Icon(Icons.reply),
-                  onPressed: () {
-                    widget.onReply(widget.message['_id'], widget.message);
-                  },
+                right: 80, // Adjust this value to position closer to the message container
+                top: 0,
+                bottom: 0,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: IconButton(
+                    icon: Icon(Icons.reply),
+                    onPressed: () {
+                      widget.onReply(widget.message['_id'], widget.message);
+                    },
+                  ),
                 ),
               ),
           ],

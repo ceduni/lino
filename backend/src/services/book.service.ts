@@ -78,7 +78,8 @@ const bookService = {
         const regex = new RegExp(book.title, 'i');
         requests = requests.filter(request => regex.test(request.bookTitle));
         for (let i = 0; i < requests.length; i++) {
-            await notifyUser(requests[i].username, `The book "${book.title}" has been added to the bookbox "${bookBox.name}" !`);
+            await notifyUser(requests[i].username, "Book notification",
+                `The book "${book.title}" has been added to the bookbox "${bookBox.name}" !`);
         }
 
 
@@ -150,8 +151,12 @@ const bookService = {
             const username = user.username;
             if (given) { // if the book is given
                 book.givenHistory.push({username: username, timestamp: new Date()});
+                // push in the user's book history
+                user.bookHistory.push({bookId: book.id, timestamp: new Date(), given: true});
             } else { // if the book is taken
                 book.takenHistory.push({username: username, timestamp: new Date()});
+                // push in the user's book history
+                user.bookHistory.push({bookId: book.id, timestamp: new Date(), given: false});
             }
         } else { // if the user is not authenticated, username is 'guest'
             if (given) { // if the book is given
@@ -350,7 +355,9 @@ const bookService = {
         const users = await User.find({getAlerted: true});
         for (let i = 0; i < users.length; i++) {
             if (users[i].username !== user.username) {
-                await notifyUser(users[i].id, `The user ${user.username} wants to get the book "${request.body.title}" ! If you have it, please feel free to add it to one of our book boxes !`);
+                await notifyUser(users[i].id,
+                    "Book request",
+                    `The user ${user.username} wants to get the book "${request.body.title}" ! If you have it, please feel free to add it to one of our book boxes !`);
             }
         }
 
@@ -398,7 +405,9 @@ const bookService = {
             const relevance = await this.getBookRelevance(book, users[i]);
             // Notify the user if the book is relevant to him or if it's one of his favorite books
             if (relevance > 0 || users[i].favoriteBooks.includes(book.id)) {
-                await notifyUser(users[i].id, `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
+                await notifyUser(users[i].id,
+                    "Book notification",
+                    `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
             }
         }
     },

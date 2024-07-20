@@ -17,14 +17,30 @@ function randomUser() {
 }
 
 function randomBookBox() {
+    const campusBounds = {
+        north: 45.5048,
+        south: 45.4990,
+        west: -73.6195,
+        east: -73.6110
+    };
+
     return {
         name: faker.lorem.word(),
-        longitude: faker.location.longitude(),
-        latitude: faker.location.latitude(),
+        longitude: faker.number.float({
+            min: campusBounds.west,
+            max: campusBounds.east,
+            fractionDigits: 6,
+        }),
+        latitude: faker.number.float({
+            min: campusBounds.south,
+            max: campusBounds.north,
+            fractionDigits: 6,
+        }),
         image: faker.image.url(),
         infoText: faker.lorem.sentence(),
     }
 }
+
 
 function randomISBN(): string {
     const realISBNs: string[] = [

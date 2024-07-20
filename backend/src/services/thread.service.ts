@@ -64,7 +64,7 @@ const ThreadService = {
                     throw newErr(404, 'User not found');
                 }
                 // @ts-ignore
-                await notifyUser(userParent.id, `${username} responded to your message in the thread "${thread.title}"`);
+                await notifyUser(userParent.id, `${userParent.username} in ${thread.title}`, parentMessage.content);
             }
         }
 

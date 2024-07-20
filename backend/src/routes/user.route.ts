@@ -235,6 +235,7 @@ const getUserNotificationsSchema = {
                         {
                             type: 'object',
                             properties: {
+                                title: { type: 'string' },
                                 timestamp: { type: 'string' },
                                 content: { type: 'string' },
                                 read: { type: 'boolean' }

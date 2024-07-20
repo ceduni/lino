@@ -209,13 +209,13 @@ const UserService = {
     }
 };
 
-export async function notifyUser(userId: string, message: string) {
+export async function notifyUser(userId: string, title: string, message: string) {
     let user = await User.findById(userId);
     if (!user) {
         throw newErr(404, 'User not found');
     }
     // @ts-ignore
-    const notification = { content: message };
+    const notification = { title: title, content: message };
     user.notifications.push(notification);
     await user.save();
     return user;

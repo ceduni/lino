@@ -8,7 +8,7 @@ class NavigationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bookService = BookService();
-    
+
     return Scaffold(
       body: FutureBuilder<Map<String, dynamic>>(
         future: bookService.searchBookboxes(),
@@ -26,10 +26,10 @@ class NavigationPage extends StatelessWidget {
             snapshot.data!['bookboxes'].map((bookbox) => bookbox),
           );
 
-          for (var bb in bookBoxes){
+          for (var bb in bookBoxes) {
             print(bb['books'][0]['title']);
           }
-          
+
           return SingleChildScrollView(
             child: Column(
               children: [
@@ -59,13 +59,16 @@ class NavigationPage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => BookDetailsPage(book: bb['books'][index]),
+                                builder: (context) =>
+                                    BookDetailsPage(book: bb['books'][index]),
                               ),
                             );
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Image.network(bb['books'][index]['coverImage']),
+                            child: Image.network(
+                                bb['books'][index]['coverImage']
+                            ),
                           ),
                         );
                       },
@@ -79,3 +82,4 @@ class NavigationPage extends StatelessWidget {
       ),
     );
   }
+}
