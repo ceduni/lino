@@ -27,6 +27,8 @@ dependencies:
   intl: ^0.17.0
   url_launcher: ^6.0.9
   flutter_hooks: ^0.18.0
+  flutter_multi_formatter: ^2.13.0
+  intl_phone_number_input: ^0.7.0
 
 
 dev_dependencies:
