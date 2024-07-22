@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/book_services.dart';
-import 'book_details_page.dart';
+import 'book/book_details_page.dart';
 
 class NavigationPage extends StatelessWidget {
   const NavigationPage({Key? key}) : super(key: key);

@@ -1,5 +1,5 @@
-import 'package:Lino_app/pages/book_details_page.dart';
-import 'package:Lino_app/pages/test_map_screen.dart';
+import 'package:Lino_app/pages/book/book_details_page.dart';
+import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';

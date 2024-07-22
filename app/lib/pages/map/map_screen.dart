@@ -1,15 +1,13 @@
-import 'package:Lino_app/common/widgets/book_box_screen/book_box_screen.dart';
-import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/pages/bookbox/book_box_screen.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-// TODO: Rename this class
 // TODO: Add navigation button to each book box, it should open a google maps app for navigation
-class TestMapScreen extends HookWidget {
-  TestMapScreen({super.key});
+class MapScreen extends HookWidget {
+  MapScreen({super.key});
 
   final MapController mapController = Get.put(MapController());
 

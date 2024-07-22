@@ -45,11 +45,89 @@ app.*.map.json
 /android/app/release
 android/
 
+# iOS specific
+ios/.generated/
+ios/Flutter/Flutter.framework/
+ios/Flutter/App.framework/
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/GeneratedPluginRegistrant.*
+ios/Flutter/ephemeral/
+ios/ServiceDefinitions.json
+ios/Runner/GeneratedPluginRegistrant.*
 
+# CocoaPods
+ios/Pods/
+ios/Podfile.lock
+ios/Podfile
 
-# Generate folder
+# Android specific
+android/.gradle/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/*.iml
+android/.gradle/
+android/gradle/
+android/app/build/
+android/app/proguard-rules.pro
 
-linux/
-macos/
-windows/
+# Android Studio
+.idea/
+.gradle/
+build/
+local.properties
+
+# Gradle
+.gradle/
+build/
+*/build/
+!gradle/wrapper/gradle-wrapper.jar
+gradle-app.setting
+gradle.properties
+gradle-wrapper.properties
+gradle-wrapper.jar
+gradlew
+gradlew.bat
+settings.gradle
+gradle.properties
+
+# Web specific
+web/.dart_tool/
+web/.packages
+web/build/
+web/.cache/
+
+# macOS specific
+macos/Flutter/ephemeral/
+macos/.dart_tool/
+macos/.packages
+macos/Pods/
+macos/Podfile.lock
+macos/.flutter-plugins
+macos/.flutter-plugins-dependencies
+macos/.symlinks/
+macos/Flutter/GeneratedPluginRegistrant.*
+macos/Flutter/Flutter.podspec
+macos/Flutter/Generated.xcconfig
+macos/Flutter/Flutter.framework/
+macos/Runner/GeneratedPluginRegistrant.*
+
+# Xcode specific
+macos/Runner.xcworkspace/
+macos/Runner.xcodeproj/project.xcworkspace/
+macos/Runner.xcodeproj/xcuserdata/
+macos/Runner.xcodeproj/project.xcworkspace/xcuserdata/
+macos/Runner.xcodeproj/project.xcworkspace/xcshareddata/
+macos/Runner.xcodeproj/project.xcworkspace/xcshareddata/xcschemes/
+
+# Build outputs
+macos/Runner/Flutter/ephemeral/
+macos/Runner/Flutter/flutter_export_environment.sh
+macos/Runner/Flutter/Generated.xcconfig
+macos/Runner/Flutter/Flutter.podspec
+
+# Other
+macos/ServiceDefinitions.json
 

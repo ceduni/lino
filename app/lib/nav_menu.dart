@@ -1,11 +1,11 @@
-import 'package:Lino_app/pages/test_map_screen.dart';
+import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Lino_app/common/widgets/appbar/appbar.dart';
 import 'pages/navigation.dart';
 import 'package:Lino_app/common/widgets/floating_action_button/floating_action_button.dart';
 import 'package:Lino_app/pages/forum/forum_screen.dart';
-import 'package:Lino_app/pages/map_screen.dart';
+import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:Lino_app/common/widgets/appbar/search_bar.dart'
     as search_bar; // Avoid naming conflict
@@ -80,7 +80,7 @@ class NavigationController extends GetxController {
   final Rx<int> selectedIndex = 0.obs;
   final screens = [
     NavigationPage(),
-    TestMapScreen(),
+    MapScreen(),
     ForumScreen(),
   ];
 }
