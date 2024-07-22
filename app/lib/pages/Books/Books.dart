@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/book_services.dart';
-import 'book/book_details_page.dart';
+import 'book_details_page.dart';
 
 class NavigationPage extends StatelessWidget {
   const NavigationPage({Key? key}) : super(key: key);
@@ -56,18 +56,14 @@ class NavigationPage extends StatelessWidget {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    BookDetailsPage(book: bb['books'][index]),
-                              ),
+                            showDialog(
+                              context: context,
+                              builder: (context) => BookDetailsPage(book: bb['books'][index]),
                             );
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child:
-                                Image.network(bb['books'][index]['coverImage']),
+                            child: Image.network(bb['books'][index]['coverImage']),
                           ),
                         );
                       },
