@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class BookDetailsPage extends StatefulWidget {
   final Map<String, dynamic> book;
@@ -19,18 +18,6 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
     book = widget.book;
   }
 
-  Future<bool> _isValidImageUrl(String url) async {
-    if (Uri.tryParse(url)?.hasAbsolutePath != true) {
-      return false;
-    }
-    try {
-      final response = await http.head(Uri.parse(url));
-      return response.statusCode == 200;
-    } catch (e) {
-      return false;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,32 +29,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
           children: [
             Text(book['title'], style: TextStyle(fontSize: 24)),
             Text('Authors: ${book['authors'].join(', ')}'),
-            FutureBuilder<bool>(
-              future: _isValidImageUrl(book['coverImage']),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasData && snapshot.data == true) {
-                  return Image.network(book['coverImage']);
-                } else {
-                  return Container(
-                    width: 200,
-                    height: 300,
-                    color: Colors.grey,
-                    child: Center(
-                      child: Text(
-                        book['title'],
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
+            Image.network(book['coverImage']),
             Text(book['description']),
             Text('ISBN: ${book['isbn']}'),
             Text('Publisher: ${book['publisher']}'),
