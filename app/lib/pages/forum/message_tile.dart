@@ -122,7 +122,7 @@ class _MessageTileState extends State<MessageTile> {
             ),
             if (_isHovered)
               Positioned(
-                right: 80, // Adjust this value to position closer to the message container
+                right: 50, // Adjust this value to position closer to the message container
                 top: 0,
                 bottom: 0,
                 child: Align(
