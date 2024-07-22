@@ -19,6 +19,18 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
     book = widget.book;
   }
 
+  Future<bool> _isValidImageUrl(String url) async {
+    if (Uri.tryParse(url)?.hasAbsolutePath != true) {
+      return false;
+    }
+    try {
+      final response = await http.head(Uri.parse(url));
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,14 +78,5 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
         ),
       ),
     );
-  }
-
-  Future<bool> _isValidImageUrl(String url) async {
-    try {
-      final response = await http.head(Uri.parse(url));
-      return response.statusCode == 200;
-    } catch (e) {
-      return false;
-    }
   }
 }

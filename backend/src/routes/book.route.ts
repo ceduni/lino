@@ -287,6 +287,7 @@ async function sendBookRequest(request: FastifyRequest, reply: FastifyReply) {
         const response = await BookService.requestBookToUsers(request);
         reply.code(201).send(response);
     } catch (error : any) {
+        console.log(error);
         reply.code(error.statusCode).send({error: error.message});
     }
 }
