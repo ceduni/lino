@@ -48,7 +48,7 @@ class BookDetailsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Description', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Kanit')),
-                    SizedBox(height: 8),
+                    SizedBox(height: 4),
                     Container(
                       decoration: BoxDecoration(
                         color: Color.fromRGBO(250, 250, 240, 1).withOpacity(0.9), // White background with opacity
@@ -114,14 +114,15 @@ class _ExpandableTextState extends State<ExpandableText> {
       child: secondHalf.isEmpty
           ? Text(
               firstHalf,
-              textAlign: TextAlign.center, // Center-align the text
+              textAlign: TextAlign.start, // Align text to the start
               style: TextStyle(fontFamily: 'Kanit'), // Apply the font
             )
           : Column(
+              crossAxisAlignment: CrossAxisAlignment.start, // Align the column to the start
               children: <Widget>[
                 Text(
                   flag ? (firstHalf + "...") : (firstHalf + secondHalf),
-                  textAlign: TextAlign.center, // Center-align the text
+                  textAlign: TextAlign.start, // Align text to the start
                   style: TextStyle(fontFamily: 'Kanit'), // Apply the font
                 ),
                 InkWell(
@@ -145,3 +146,4 @@ class _ExpandableTextState extends State<ExpandableText> {
     );
   }
 }
+
