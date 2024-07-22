@@ -1,8 +1,8 @@
-import 'package:Lino_app/common/widgets/profile_screen/expansion_list.dart';
-import 'package:Lino_app/common/widgets/profile_screen/favorite_book_widget.dart';
-import 'package:Lino_app/common/widgets/profile_screen/history_widget.dart';
-import 'package:Lino_app/common/widgets/profile_screen/notification_widget.dart';
-import 'package:Lino_app/common/widgets/profile_screen/statistical_widget.dart';
+import 'package:Lino_app/pages/profile/expansion_list.dart';
+import 'package:Lino_app/pages/profile/favorite_book_widget.dart';
+import 'package:Lino_app/pages/profile/history_widget.dart';
+import 'package:Lino_app/pages/profile/notification_widget.dart';
+import 'package:Lino_app/pages/profile/statistical_widget.dart';
 import 'package:Lino_app/utils/constants/sizes.dart';
 import 'package:Lino_app/utils/mock_data/mock_data.dart';
 import 'package:flutter/material.dart';

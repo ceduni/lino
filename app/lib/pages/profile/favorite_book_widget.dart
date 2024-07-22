@@ -1,4 +1,4 @@
-import 'package:Lino_app/common/widgets/profile_screen/history_widget.dart';
+import 'package:Lino_app/pages/profile/history_widget.dart';
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/utils/constants/default_placeholder.dart';
 import 'package:Lino_app/utils/constants/sizes.dart';
