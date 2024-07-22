@@ -109,7 +109,7 @@ class HaveNotISBNWidget extends StatelessWidget {
               context,
               MaterialPageRoute(
                   builder: (context) => Scaffold(
-                      body: QRViewExample(),
+                      body: BarcodeScanner(),
                       appBar: AppBar(title: Text('Scan QR Code')))),
             );
           },
@@ -129,7 +129,7 @@ class RemoveBookScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Remove Book Screen'),
       ),
-      body: QRViewExample(),
+      body: BarcodeScanner(),
     );
   }
 }

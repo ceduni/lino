@@ -66,9 +66,8 @@ class NavigationPage extends StatelessWidget {
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Image.network(
-                                bb['books'][index]['coverImage']
-                            ),
+                            child:
+                                Image.network(bb['books'][index]['coverImage']),
                           ),
                         );
                       },

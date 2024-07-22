@@ -1,3 +1,4 @@
+import 'package:Lino_app/pages/test_map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Lino_app/common/widgets/appbar/appbar.dart';
@@ -79,19 +80,7 @@ class NavigationController extends GetxController {
   final Rx<int> selectedIndex = 0.obs;
   final screens = [
     NavigationPage(),
-    MapScreen(),
+    TestMapScreen(),
     ForumScreen(),
   ];
 }
-
-class BooksScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Center(child: Text('Placeholder for Books Screen')),
-    );
-  }
-}
-
-

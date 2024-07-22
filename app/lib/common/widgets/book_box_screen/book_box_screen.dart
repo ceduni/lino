@@ -50,7 +50,7 @@ class BookBoxScreen extends HookWidget {
       children: [
         Expanded(
           child: Container(
-            padding: const EdgeInsets.only(top: 30, bottom: 30, left: 90),
+            padding: const EdgeInsets.all(30),
             decoration: BoxDecoration(
               color: Color.fromARGB(255, 232, 192, 158).withOpacity(0.5),
             ),
@@ -232,13 +232,13 @@ class BookInBookBoxRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       width: double.infinity,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(
             12), // Replace with your border radius constant
-        color: Color.fromARGB(255, 242, 226, 196),
+        color: const Color.fromARGB(255, 242, 226, 196),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -250,37 +250,62 @@ class BookInBookBoxRow extends StatelessWidget {
   }
 
   Widget _buildBookItem(BuildContext context, Map<String, dynamic> book) {
+    String bookName = book['title'] + ' by ' + book['authors'].join(', ');
+
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BookDetailsPage(book: book),
-          ),
-        );
-      },
+      onTap: () => _navigateToBookDetails(context, book),
       child: Container(
-        width: 100, // Adjust the width and height as necessary
-        height: 160,
-        margin: EdgeInsets.symmetric(horizontal: 4.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          image: DecorationImage(
-            image: NetworkImage(book['coverImage']!),
-            // image: NetworkImage(
-            //     'http://books.google.com/books/content?id=O_ZvDwAAQBAJ&printsec=frontcover&img=1'),
-            // image: NetworkImage(
-            //     'https://placehold.co/100x160.png'), // Path to a placeholder image in your assets
-            fit: BoxFit.cover,
-            // Adding error handling
-            onError: (Object exception, StackTrace? stackTrace) {
-              DecorationImage(
-                image: NetworkImage(
-                    'https://placehold.co/100x160.png'), // Path to a placeholder image in your assets
-                fit: BoxFit.cover,
-              );
-            },
-          ),
+        margin: const EdgeInsets.symmetric(horizontal: 5.0),
+        width: 100,
+        child: Column(
+          children: [
+            _buildBookCover(book),
+            Text(
+              bookName,
+              style: const TextStyle(fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+            )
+            // Flexible(
+            //   child: Container(
+            //     child: Text(
+            //       book['title'],
+            //       style: const TextStyle(fontSize: 12),
+            //       overflow: TextOverflow.ellipsis,
+            //     ),
+            //   ),
+            // ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToBookDetails(BuildContext context, Map<String, dynamic> book) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BookDetailsPage(book: book),
+      ),
+    );
+  }
+
+  Widget _buildBookCover(Map<String, dynamic> book) {
+    return Container(
+      width: 100, // Adjust the width and height as necessary
+      height: 160,
+      margin: const EdgeInsets.symmetric(horizontal: 4.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        image: DecorationImage(
+          image: Image.network(book['coverImage']!).image,
+          fit: BoxFit.cover,
+          onError: (Object exception, StackTrace? stackTrace) {
+            DecorationImage(
+              image: const NetworkImage(
+                  'https://placehold.co/100x160.png'), // Path to a placeholder image in your assets
+              fit: BoxFit.cover,
+            );
+          },
         ),
       ),
     );
