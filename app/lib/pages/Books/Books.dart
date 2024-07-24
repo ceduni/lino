@@ -26,10 +26,6 @@ class NavigationPage extends StatelessWidget {
             snapshot.data!['bookboxes'].map((bookbox) => bookbox),
           );
 
-          for (var bb in bookBoxes) {
-            print(bb['books'][0]['title']);
-          }
-
           return SingleChildScrollView(
             child: Column(
               children: [
@@ -58,12 +54,14 @@ class NavigationPage extends StatelessWidget {
                           onTap: () {
                             showDialog(
                               context: context,
-                              builder: (context) => BookDetailsPage(book: bb['books'][index]),
+                              builder: (context) =>
+                                  BookDetailsPage(book: bb['books'][index]),
                             );
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Image.network(bb['books'][index]['coverImage']),
+                            child:
+                                Image.network(bb['books'][index]['coverImage']),
                           ),
                         );
                       },
