@@ -122,7 +122,7 @@ const ThreadService = {
             );
         }
 
-        // classify : ['by recent activity', 'by number of messages']
+        // classify : ['by recent activity', 'by number of messages', by creation date']
         let classify = request.query.cls || 'by recent activity';
         const asc = request.query.asc; // Boolean
 
@@ -135,6 +135,12 @@ const ThreadService = {
         } else if (classify === 'by number of messages') {
             threads.sort((a, b) => {
                 return asc ? a.messages.length - b.messages.length : b.messages.length - a.messages.length;
+            });
+        } else if (classify === 'by creation date') {
+            threads.sort((a, b) => { // if asc, most recent first
+                const aDate = a.timestamp.getTime();
+                const bDate = b.timestamp.getTime();
+                return asc ? aDate - bDate : bDate - aDate;
             });
         }
 

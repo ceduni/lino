@@ -19,7 +19,7 @@ class _ThreadsSectionState extends State<ThreadsSection> {
   @override
   void initState() {
     super.initState();
-    fetchThreadTiles();
+    fetchThreadTiles(cls: 'by creation date', asc: true);
   }
 
   Future<void> fetchThreadTiles({String? q, String? cls, bool? asc, String? bookId}) async {

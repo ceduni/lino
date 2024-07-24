@@ -155,7 +155,7 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
                         decoration: InputDecoration(
                           fillColor: Colors.grey[200],
                           filled: true,
-                          hintText: 'Type a message...',
+                          hintText: isUserAuthenticated ? 'Type a message...' : 'Login to send a message',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -164,7 +164,7 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.send, color: isUserAuthenticated ? Colors.grey.shade100 : Colors.grey.shade400),
+                      icon: Icon(Icons.send, color: isUserAuthenticated ? Colors.grey.shade100 : Colors.transparent),
                       onPressed: isUserAuthenticated ? sendMessage : null, // Disable button if not authenticated
                     ),
                   ],

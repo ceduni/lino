@@ -44,6 +44,14 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  void _openAsGuest() async {
+    await widget.prefs.remove('token');
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => NavigationMenu()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,28 +113,47 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildFooterText() {
     return Container(
       alignment: Alignment.center,
-      child: RichText(
-        text: TextSpan(
-          text: "Don't have an account? ",
-          style: TextStyle(color: Colors.white),
-          children: [
-            TextSpan(
-              text: 'Register here',
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              text: "Don't have an account? ",
+              style: TextStyle(color: Colors.white),
+              children: [
+                TextSpan(
+                  text: 'Register here',
+                  style: TextStyle(
+                    color: Color(0xFF063F6A),
+                    decoration: TextDecoration.underline,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegisterPage(prefs: widget.prefs)),
+                      );
+                    },
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10), // Add some spacing between the texts
+          GestureDetector(
+            onTap: _openAsGuest,
+            child: Text(
+              'Open as a guest',
               style: TextStyle(
-                color: Color(0xFF063F6A),
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
                 decoration: TextDecoration.underline,
               ),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RegisterPage(prefs: widget.prefs)),
-                  );
-                },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+
 }
