@@ -219,8 +219,7 @@ const bookService = {
             const regex = new RegExp(kw, 'i');
             filter.$or = [
                 { title: regex },
-                { authors: regex },
-                { description: regex }
+                { authors: regex }
             ];
         }
 
