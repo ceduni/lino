@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:Lino_app/pages/appbar/search_bar.dart' as search_bar;
+import 'package:Lino_app/pages/search_bar/search_bar.dart' as search_bar;
 
 class ResultsPage extends StatelessWidget {
   final String query;

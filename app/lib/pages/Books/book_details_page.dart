@@ -26,7 +26,19 @@ class BookDetailsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Center(
-                      child: Image.network(book['coverImage']),
+                      child: Image.network(
+                        book['coverImage'],
+                        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                          return Container(
+                            width: 150, // Set width to match your image size
+                            height: 200,
+                            color: Colors.grey,
+                            child: Center(
+                              child: Icon(Icons.broken_image, color: Colors.white),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                     SizedBox(height: 8), // Add some space between elements
                     Text(book['title'], style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Kanit')),
@@ -146,4 +158,3 @@ class _ExpandableTextState extends State<ExpandableText> {
     );
   }
 }
-

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Lino_app/pages/appbar/greeting_user_bar.dart';
-import 'package:Lino_app/pages/appbar/search_bar.dart';
+import 'package:Lino_app/pages/search_bar/search_bar.dart';
 
 class LinoAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBackButton;
