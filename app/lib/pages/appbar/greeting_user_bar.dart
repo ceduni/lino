@@ -1,4 +1,5 @@
-import 'package:Lino_app/pages/profile/profile_screen.dart';
+import 'package:Lino_app/pages/profile/profile_page.dart';
+import 'package:Lino_app/pages/profile/profile_screen_v1.dart';
 import 'package:Lino_app/utils/constants/text_strings.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ class GreetingUserBar extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ProfileScreen()),
+              MaterialPageRoute(builder: (context) => ProfilePage()),
             );
           },
           icon: const Icon(Icons.person, color: Colors.black),

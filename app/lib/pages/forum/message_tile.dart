@@ -4,10 +4,21 @@ import 'package:intl/intl.dart';
 class MessageTile extends StatefulWidget {
   final Map<String, dynamic> message;
   final List<dynamic> allMessages;
-  final void Function(String, bool) onReact; // Update the callback to include reaction handling
+  final void Function(String, bool) onReact;
   final void Function(String, Map<String, dynamic>) onReply;
+  final Color backgroundColor;
+  final bool isUserAuthenticated;
+  final String? currentUsername;
 
-  MessageTile({required this.message, required this.allMessages, required this.onReact, required this.onReply}); // Update constructor
+  MessageTile({
+    required this.message,
+    required this.allMessages,
+    required this.onReact,
+    required this.onReply,
+    required this.backgroundColor,
+    required this.isUserAuthenticated,
+    this.currentUsername,
+  });
 
   @override
   _MessageTileState createState() => _MessageTileState();
@@ -18,6 +29,11 @@ class _MessageTileState extends State<MessageTile> {
 
   int countReactions(String reactionType) {
     return widget.message['reactions'].where((reaction) => reaction['reactIcon'] == reactionType).length;
+  }
+
+  bool userHasReacted(String reactionType) {
+    if (widget.currentUsername == null) return false;
+    return widget.message['reactions'].any((reaction) => reaction['reactIcon'] == reactionType && reaction['username'] == widget.currentUsername);
   }
 
   @override
@@ -47,7 +63,7 @@ class _MessageTileState extends State<MessageTile> {
                     margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                     padding: EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: Color(0x71737373),
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(16.0),
                           topRight: Radius.circular(16.0)),
@@ -57,11 +73,11 @@ class _MessageTileState extends State<MessageTile> {
                         children: [
                           TextSpan(
                             text: '${respondingToMessage['username']}: ',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.3)),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.55)),
                           ),
                           TextSpan(
                             text: respondingToMessage['content'],
-                            style: TextStyle(fontWeight: FontWeight.normal, color: Colors.black.withOpacity(0.3)),
+                            style: TextStyle(fontWeight: FontWeight.normal, color: Colors.black.withOpacity(0.55)),
                           ),
                         ],
                       ),
@@ -75,7 +91,7 @@ class _MessageTileState extends State<MessageTile> {
                       : EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 15.0),
                   padding: EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
-                    color: Colors.amber[100], // Light beige color
+                    color: widget.backgroundColor,
                     borderRadius: respondingToMessage == null ? BorderRadius.circular(16.0)
                         : BorderRadius.only(
                         bottomLeft: Radius.circular(16.0),
@@ -90,10 +106,10 @@ class _MessageTileState extends State<MessageTile> {
                             widget.message['username'],
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(width: 8.0), // Space between username and date
+                          SizedBox(width: 8.0),
                           Text(
                             formattedDate,
-                            style: TextStyle(fontSize: 12.0, color: Colors.grey), // Smaller font size for the date
+                            style: TextStyle(fontSize: 12.0, color: Colors.black),
                           ),
                         ],
                       ),
@@ -103,14 +119,28 @@ class _MessageTileState extends State<MessageTile> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.thumb_up),
-                            onPressed: () => widget.onReact(widget.message['_id'], true),
+                            icon: Icon(
+                              Icons.thumb_up,
+                              color: !widget.isUserAuthenticated
+                                  ? Colors.grey
+                                  : userHasReacted('good')
+                                  ? Colors.cyan
+                                  : Colors.purple,
+                            ),
+                            onPressed: !widget.isUserAuthenticated ? null : () => widget.onReact(widget.message['_id'], true),
                           ),
                           Text('${countReactions('good')}'),
                           SizedBox(width: 8),
                           IconButton(
-                            icon: Icon(Icons.thumb_down),
-                            onPressed: () => widget.onReact(widget.message['_id'], false),
+                            icon: Icon(
+                              Icons.thumb_down,
+                              color: !widget.isUserAuthenticated
+                                  ? Colors.grey
+                                  : userHasReacted('bad')
+                                  ? Colors.red
+                                  : Colors.purple,
+                            ),
+                            onPressed: !widget.isUserAuthenticated ? null : () => widget.onReact(widget.message['_id'], false),
                           ),
                           Text('${countReactions('bad')}'),
                         ],
@@ -122,14 +152,14 @@ class _MessageTileState extends State<MessageTile> {
             ),
             if (_isHovered)
               Positioned(
-                right: 80, // Adjust this value to position closer to the message container
+                right: 50,
                 top: 0,
                 bottom: 0,
                 child: Align(
                   alignment: Alignment.center,
                   child: IconButton(
-                    icon: Icon(Icons.reply),
-                    onPressed: () {
+                    icon: Icon(Icons.reply, color: widget.isUserAuthenticated ? Colors.purple : Colors.grey),
+                    onPressed: !widget.isUserAuthenticated ? null : () {
                       widget.onReply(widget.message['_id'], widget.message);
                     },
                   ),

@@ -6,8 +6,7 @@ import 'pages/Books/Books.dart';
 import 'package:Lino_app/pages/floating_button/floating_action_button.dart';
 import 'package:Lino_app/pages/forum/forum_screen.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
-import 'package:Lino_app/pages/appbar/search_bar.dart'
-    as search_bar; // Avoid naming conflict
+import 'package:Lino_app/pages/appbar/search_bar.dart' as search_bar;
 
 class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});
@@ -19,7 +18,7 @@ class NavigationMenu extends StatelessWidget {
 
     return Scaffold(
       appBar: LinoAppBar(),
-      floatingActionButton: LinoFloatingButton(),
+      floatingActionButton: Obx(() => LinoFloatingButton(selectedIndex: controller.selectedIndex.value)),
       bottomNavigationBar: Obx(() => _buildNavigationBar(controller)),
       body: Stack(
         children: [
