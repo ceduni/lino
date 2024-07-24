@@ -1,4 +1,4 @@
-import 'package:Lino_app/pages/Books/book_details_page.dart';
+import 'package:Lino_app/pages/book/book_details_page.dart';
 import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/utils/constants/sizes.dart';
@@ -281,14 +281,12 @@ class BookInBookBoxRow extends StatelessWidget {
   }
 
   void _navigateToBookDetails(BuildContext context, Map<String, dynamic> book) {
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => BookDetailsPage(book: book),
-    //   ),
-    // );
-    showDialog(
-        context: context, builder: (context) => BookDetailsPage(book: book));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BookDetailsPage(book: book),
+      ),
+    );
   }
 
   Widget _buildBookCover(Map<String, dynamic> book) {

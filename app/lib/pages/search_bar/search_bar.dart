@@ -13,7 +13,9 @@ class SearchController extends GetxController {
       results.clear();
     } else {
       // Implement your search logic here
+      print('Searching for $query');
       var bookDict = await BookService().searchBooks(kw: query);
+      print(bookDict);
       var bookResults = bookDict['books'];
       bookResults.forEach((book) {
         results.add(book['title']);

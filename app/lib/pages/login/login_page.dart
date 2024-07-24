@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   final SharedPreferences prefs;
-  const LoginPage({required this.prefs, super.key});
+  const LoginPage({required this.prefs, Key? key}) : super(key: key);
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -18,13 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final UserService _userService = UserService();
 
-  bool _isLoading = false; // Add loading state
-
   void _login() async {
-    setState(() {
-      _isLoading = true; // Show loading spinner
-    });
-
     try {
       final token = await _userService.loginUser(
         _identifierController.text,
@@ -37,19 +31,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed: $e')));
-    } finally {
-      setState(() {
-        _isLoading = false; // Hide loading spinner
-      });
     }
-  }
-
-  void _openAsGuest() async {
-    await widget.prefs.remove('token');
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => NavigationMenu()),
-    );
   }
 
   @override
@@ -72,15 +54,11 @@ class _LoginPageState extends State<LoginPage> {
               _buildTextField(_passwordController, 'Password', Icons.lock, obscureText: true),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _isLoading ? null : _login, // Disable button while loading
+                onPressed: _login,
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
                 ),
-                child: _isLoading
-                    ? CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                )
-                    : Text('Login'),
+                child: Text('Login'),
               ),
               Spacer(flex: 1),
               _buildFooterText(),
@@ -113,47 +91,28 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildFooterText() {
     return Container(
       alignment: Alignment.center,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              text: "Don't have an account? ",
-              style: TextStyle(color: Colors.white),
-              children: [
-                TextSpan(
-                  text: 'Register here',
-                  style: TextStyle(
-                    color: Color(0xFF063F6A),
-                    decoration: TextDecoration.underline,
-                  ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => RegisterPage(prefs: widget.prefs)),
-                      );
-                    },
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10), // Add some spacing between the texts
-          GestureDetector(
-            onTap: _openAsGuest,
-            child: Text(
-              'Open as a guest',
+      child: RichText(
+        text: TextSpan(
+          text: "Don't have an account? ",
+          style: TextStyle(color: Colors.white),
+          children: [
+            TextSpan(
+              text: 'Register here',
               style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
+                color: Color(0xFF063F6A),
                 decoration: TextDecoration.underline,
               ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RegisterPage(prefs: widget.prefs)),
+                  );
+                },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
-
 }

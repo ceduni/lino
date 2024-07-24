@@ -605,12 +605,12 @@ const getBookRequestsSchema = {
                     isFulfilled: {type: 'boolean'}
                 }
             },
-        },
-        500: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: {type: 'string'}
+            500: {
+                description: 'Error message',
+                type: 'object',
+                properties: {
+                    error: {type: 'string'}
+                }
             }
         }
     }

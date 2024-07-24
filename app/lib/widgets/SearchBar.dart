@@ -17,7 +17,7 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
-      title: SizedBox(
+      title: Container(
         height: 40,
         child: InkWell(
           onTap: () {

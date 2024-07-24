@@ -112,17 +112,23 @@ const ThreadService = {
 
     async searchThreads(request: any) {
         const query = request.query.q;
-        let threads = await Thread.find();
+        let threads;
 
         if (query) {
-            // Filter using regex for more flexibility
+            // Perform text search
+            threads = await Thread.find({ $text: { $search: query } });
+
+            // Further filter using regex for more flexibility
             const regex = new RegExp(query, 'i');
             threads = threads.filter(thread =>
                 regex.test(thread.bookTitle) || regex.test(thread.title) || regex.test(thread.username)
             );
+        } else {
+            // Return all documents if the search query is empty
+            threads = await Thread.find();
         }
 
-        // classify : ['by recent activity', 'by number of messages', by creation date']
+        // classify : ['by recent activity', 'by number of messages']
         let classify = request.query.cls || 'by recent activity';
         const asc = request.query.asc; // Boolean
 
@@ -135,12 +141,6 @@ const ThreadService = {
         } else if (classify === 'by number of messages') {
             threads.sort((a, b) => {
                 return asc ? a.messages.length - b.messages.length : b.messages.length - a.messages.length;
-            });
-        } else if (classify === 'by creation date') {
-            threads.sort((a, b) => { // if asc, most recent first
-                const aDate = a.timestamp.getTime();
-                const bDate = b.timestamp.getTime();
-                return asc ? aDate - bDate : bDate - aDate;
             });
         }
 
