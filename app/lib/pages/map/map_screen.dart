@@ -5,7 +5,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-// TODO: Add navigation button to each book box, it should open a google maps app for navigation
 class MapScreen extends HookWidget {
   MapScreen({super.key});
 
@@ -71,24 +70,40 @@ class MapScreen extends HookWidget {
             itemBuilder: (context, index) {
               final bbox = bboxes[index];
               return GestureDetector(
-                // onDoubleTap: () {
-                //   mapController.moveToLocation(
-                //     bbox['location'].latitude,
-                //     bbox['location'].longitude,
-                //   );
-                // },
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          BookBoxScreen(bookBoxId: bbox['id']),
+                      builder: (context) => BookBoxScreen(bookBoxId: bbox['id']),
                     ),
                   );
                 },
-                child: ListTile(
-                  title: Text(bbox['name']),
-                  subtitle: Text(bbox['infoText'] ?? ''),
+                child: Container(
+                  margin: EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        offset: Offset(0, 4),
+                        blurRadius: 5.0,
+                      ),
+                    ],
+                  ),
+                  child: ListTile(
+                    title: Text(
+                      bbox['name'],
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      bbox['infoText'] ?? '',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ),
                 ),
               );
             },
