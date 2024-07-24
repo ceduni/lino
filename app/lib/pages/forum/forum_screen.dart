@@ -9,12 +9,16 @@ class ForumScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2, // Number of tabs
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: LinoColors.primary,
-          title: const Text('Forum'),
+          centerTitle: true,
+          title: const Text('Forum', style: TextStyle(fontWeight: FontWeight.bold)),
           bottom: const TabBar(
+            unselectedLabelColor: Colors.black,
+            indicatorColor: LinoColors.secondary,
+            labelColor: LinoColors.secondary,
             tabs: [
               Tab(text: 'Threads'),
               Tab(text: 'Requests'),

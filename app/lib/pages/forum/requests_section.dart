@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/book_services.dart';
+import '../../utils/constants/colors.dart';
 
 class RequestsSection extends StatefulWidget {
   const RequestsSection({super.key});
@@ -40,79 +41,41 @@ class _RequestsSectionState extends State<RequestsSection> {
     return prefs.containsKey('token');
   }
 
-  Future<void> _showRequestForm(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    if (token == null) {
-      return; // Token is missing, do nothing
-    }
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return Padding(
-          padding: MediaQuery.of(context).viewInsets,
-          child: RequestForm(token: token),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        isLoading
-            ? Center(child: CircularProgressIndicator())
-            : ListView.builder(
-          itemCount: requests.length,
-          itemBuilder: (context, index) {
-            final request = requests[index];
-            return Card(
-              child: ListTile(
-                title: Text(request['bookTitle']),
-                subtitle: request['customMessage'] != null
-                    ? Text(request['customMessage'])
-                    : null,
-                trailing: request['isFulfilled']
-                    ? Icon(Icons.check_circle, color: Colors.green)
-                    : null,
-              ),
-            );
-          },
-        ),
-        FutureBuilder<bool>(
-          future: hasUserToken(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Container(); // While loading
-            } else if (snapshot.hasData && snapshot.data == true) {
-              return Positioned(
-                bottom: 20,
-                left: 20,
-                child: FloatingActionButton(
-                  onPressed: () => _showRequestForm(context),
-                  child: Icon(Icons.add),
-                  backgroundColor: Colors.blue,
+    return Container(
+      color: LinoColors.primary,
+      child: Stack(
+        children: [
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : ListView.builder(
+            padding: const EdgeInsets.all(8.0),
+            itemCount: requests.length,
+            itemBuilder: (context, index) {
+              final request = requests[index];
+              return Card(
+                color: Color(0xFFFFC990), // Set the background color of the card
+                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Add margin between cards
+                child: ListTile(
+                  title: Text(request['bookTitle']),
+                  subtitle: request['customMessage'] != null
+                      ? Text(request['customMessage'])
+                      : null,
+                  trailing: request['isFulfilled']
+                      ? Icon(Icons.check_circle, color: Colors.green)
+                      : null,
                 ),
               );
-            } else {
-              return Container(); // No token or an error
-            }
-          },
-        ),
-      ],
+            },
+          ),
+        ],
+      ),
     );
   }
 }
 
 class RequestForm extends StatefulWidget {
-  final String token;
-
-  RequestForm({required this.token});
-
   @override
   _RequestFormState createState() => _RequestFormState();
 }
@@ -131,8 +94,10 @@ class _RequestFormState extends State<RequestForm> {
 
       try {
         var bs = BookService();
+        // Assuming you have the user token
+        final token = await SharedPreferences.getInstance().then((prefs) => prefs.getString('token'));
         await bs.requestBookToUsers(
-          widget.token,
+          token!,
           _titleController.text,
           cm: _messageController.text,
         );

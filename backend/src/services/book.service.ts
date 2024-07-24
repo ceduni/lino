@@ -204,19 +204,23 @@ const bookService = {
 
 
     // Function that searches for books based on the query parameters
-    async searchBooks(request: any) {
+    async searchBooks(request : any) {
         const { cat, kw, pmt, pg, bf, py, pub, bbid, cls = 'by title', asc = true } = request.query;
 
-        let filter: any = {};
+        let filter : any = {};
 
         if (cat) {
             const categories = Array.isArray(cat) ? cat : [cat];
-            const categoryArray = categories.map((c: string) => new RegExp(c.trim(), 'i'));
+            const categoryArray = categories.map((c) => new RegExp(c.trim(), 'i'));
             filter.categories = { $in: categoryArray };
         }
 
         if (kw) {
-            filter.$text = { $search: kw };
+            const regex = new RegExp(kw, 'i');
+            filter.$or = [
+                { title: regex },
+                { authors: regex }
+            ];
         }
 
         if (py) {
@@ -237,13 +241,6 @@ const bookService = {
 
         let books = await Book.find(filter);
 
-        if (kw) {
-            const regex = new RegExp(kw, 'i');
-            books = books.filter((book) =>
-                regex.test(book.title) || book.authors.some((author: string) => regex.test(author))
-            );
-        }
-
         if (pg) {
             const pageCount = parseInt(pg);
             books = books.filter((book) => {
@@ -253,7 +250,7 @@ const bookService = {
         }
 
         // Sorting
-        const sortOptions: any = {};
+        const sortOptions : any = {};
         if (cls === 'by title') {
             sortOptions.title = asc ? 1 : -1;
         } else if (cls === 'by author') {
@@ -288,20 +285,14 @@ const bookService = {
 
     async searchBookboxes(request: any) {
         const kw = request.query.kw;
-        let bookBoxes;
+        let bookBoxes = await BookBox.find();
 
         if (kw) {
-            // Perform text search
-            bookBoxes = await BookBox.find({ $text: { $search: kw } });
-
-            // Further filter using regex for more flexibility
+            // Filter using regex for more flexibility
             const regex = new RegExp(kw, 'i');
             bookBoxes = bookBoxes.filter((bookBox) =>
                 regex.test(bookBox.name) || regex.test(bookBox.infoText || '')
             );
-        } else {
-            // Return all book boxes if no keyword is provided
-            bookBoxes = await BookBox.find();
         }
 
         const cls = request.query.cls;

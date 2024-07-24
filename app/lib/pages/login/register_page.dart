@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:Lino_app/services/user_services.dart';
-import 'package:Lino_app/nav_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'keyword_input_page.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
   final SharedPreferences prefs;
-  const RegisterPage({required this.prefs, Key? key}) : super(key: key);
+  const RegisterPage({required this.prefs, super.key});
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -18,9 +18,10 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final UserService _userService = UserService();
+
+  bool _isLoading = false; // Add loading state
 
   void _register() async {
     final username = _usernameController.text;
@@ -37,6 +38,10 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
+    setState(() {
+      _isLoading = true; // Show loading spinner
+    });
+
     try {
       final token = await _userService.registerUser(
         username,
@@ -45,12 +50,18 @@ class _RegisterPageState extends State<RegisterPage> {
         phone: _phoneController.text,
       );
       widget.prefs.setString('token', token);
+
+      // Show welcome screen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => NavigationMenu()),
+        MaterialPageRoute(builder: (context) => WelcomeScreen(username: username, token: token, prefs: widget.prefs)),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration failed: $e')));
+    } finally {
+      setState(() {
+        _isLoading = false; // Hide loading spinner
+      });
     }
   }
 
@@ -83,17 +94,21 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(height: 20),
               _buildTextField(_passwordController, 'Password', Icons.lock, obscureText: true),
               SizedBox(height: 20),
-              _buildTextField(_phoneController, 'Phone', Icons.phone, inputType: TextInputType.phone, inputFormatters: [
+              _buildTextField(_phoneController, 'Phone (optional)', Icons.phone, inputType: TextInputType.phone, inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(15),
               ]),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _register,
+                onPressed: _isLoading ? null : _register, // Disable button while loading
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
                 ),
-                child: Text('Register'),
+                child: _isLoading
+                    ? CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                )
+                    : Text('Register'),
               ),
               Spacer(flex: 1),
               _buildFooterText(),
@@ -144,7 +159,7 @@ class _RegisterPageState extends State<RegisterPage> {
           text: TextSpan(
             text: "Already have an account? ",
             style: TextStyle(color: Colors.white),
-            children: [
+            children: const [
               TextSpan(
                 text: 'Log in',
                 style: TextStyle(
@@ -154,6 +169,43 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class WelcomeScreen extends StatefulWidget {
+  final String username;
+  final String token;
+  final SharedPreferences prefs;
+
+  const WelcomeScreen({required this.username, required this.token, required this.prefs, super.key});
+
+  @override
+  _WelcomeScreenState createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(seconds: 1), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => KeywordInputPage(username: widget.username, token: widget.token, prefs: widget.prefs)),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF4277B8), // Same blue background
+      body: Center(
+        child: Text(
+          'Welcome, ${widget.username}!',
+          style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
         ),
       ),
     );

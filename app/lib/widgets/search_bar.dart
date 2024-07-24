@@ -17,7 +17,7 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
-      title: Container(
+      title: SizedBox(
         height: 40,
         child: InkWell(
           onTap: () {
@@ -81,11 +81,11 @@ class CustomSearchDelegate extends SearchDelegate {
       children: searchSuggestions
           .where((suggestion) => suggestion.toLowerCase().contains(query.toLowerCase()))
           .map((suggestion) => ListTile(
-                title: Text(suggestion),
-                onTap: () {
-                  close(context, suggestion);
-                },
-              ))
+        title: Text(suggestion),
+        onTap: () {
+          close(context, suggestion);
+        },
+      ))
           .toList(),
     );
   }
@@ -96,12 +96,12 @@ class CustomSearchDelegate extends SearchDelegate {
       children: searchSuggestions
           .where((suggestion) => suggestion.toLowerCase().contains(query.toLowerCase()))
           .map((suggestion) => ListTile(
-                title: Text(suggestion),
-                onTap: () {
-                  query = suggestion;
-                  showResults(context);
-                },
-              ))
+        title: Text(suggestion),
+        onTap: () {
+          query = suggestion;
+          showResults(context);
+        },
+      ))
           .toList(),
     );
   }

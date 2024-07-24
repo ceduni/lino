@@ -147,12 +147,12 @@ class BarcodeScanner extends StatelessWidget {
           ),
         ),
         Obx(() => Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Barcode: ${barcodeController.barcodeObs.value}',
-                style: TextStyle(fontSize: 18),
-              ),
-            )),
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            'Barcode: ${barcodeController.barcodeObs.value}',
+            style: TextStyle(fontSize: 18),
+          ),
+        )),
       ],
     );
   }

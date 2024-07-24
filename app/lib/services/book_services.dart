@@ -32,15 +32,15 @@ class BookService {
 
   Future<Map<String, dynamic>> addBookToBB(String qrCode, String bookboxId,
       {String? token,
-      String? isbn,
-      String? title,
-      List<String>? authors,
-      String? description,
-      String? coverImage,
-      String? publisher,
-      int? parutionYear,
-      int? pages,
-      List<String>? categories}) async {
+        String? isbn,
+        String? title,
+        List<String>? authors,
+        String? description,
+        String? coverImage,
+        String? publisher,
+        int? parutionYear,
+        int? pages,
+        List<String>? categories}) async {
     // Make a POST request to the server
     // Send the qrCode, then the infos of the book if it's a new book, else just the qrCode
     // If the server returns a 201 status code, the book is added
@@ -144,15 +144,15 @@ class BookService {
 
   Future<Map<String, dynamic>> searchBooks(
       {List<String>? cat,
-      String? kw,
-      bool? pmt,
-      int? pg,
-      bool? bf,
-      int? py,
-      String? pub,
-      String? bbid,
-      String? cls,
-      bool? asc}) async {
+        String? kw,
+        bool? pmt,
+        int? pg,
+        bool? bf,
+        int? py,
+        String? pub,
+        String? bbid,
+        String? cls,
+        bool? asc}) async {
     // Make a GET request to the server
     // Send the parameters to the server
     // If the server returns a 200 status code, the books are found
@@ -173,7 +173,7 @@ class BookService {
       if (bbid != null) 'bbid': bbid, // the bookbox id
       if (cls != null)
         'cls':
-            cls, // the classificator : ['by title', 'by author', 'by year', 'by most recent activity']
+        cls, // the classificator : ['by title', 'by author', 'by year', 'by most recent activity']
       if (asc != null)
         'asc': asc
             .toString(), // the bool to determine if we want the books in ascending or descending order of the cls
@@ -194,10 +194,10 @@ class BookService {
 
   Future<Map<String, dynamic>> searchBookboxes(
       {String? kw,
-      bool? asc,
-      String? cls,
-      num? longitude,
-      num? latitude}) async {
+        bool? asc,
+        String? cls,
+        num? longitude,
+        num? latitude}) async {
     // Make a GET request to the server
     // Send the parameters to the server
     // If the server returns a 200 status code, the bookboxes are found
@@ -209,7 +209,7 @@ class BookService {
             .toString(), // the bool to determine if we want the bookboxes in ascending or descending order of the cls
       if (cls != null)
         'cls':
-            cls, // the classificator : ['by name', 'by location', 'by number of books']
+        cls, // the classificator : ['by name', 'by location', 'by number of books']
       if (longitude != null) 'longitude': longitude.toString(),
       if (latitude != null) 'latitude': latitude.toString(),
     };

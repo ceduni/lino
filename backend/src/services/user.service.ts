@@ -214,13 +214,17 @@ export async function notifyUser(userId: string, title: string, message: string)
     if (!user) {
         throw newErr(404, 'User not found');
     }
-    // @ts-ignore
-    const notification = { title: title, content: message };
-    user.notifications.push(notification);
-    await user.save();
+    const notification = { title : title, content: message, timestamp: new Date(), read: false };
+    // Validate and push the notification into the user's notifications array
+    try {
+        user.notifications.push(notification); // Type assertion to avoid TypeScript errors
+        await user.save();
+    } catch (error : any) {
+        throw new Error(`Failed to save notification: ${error.message}`);
+    }
+
     return user;
 }
-
 
 
 export default UserService;
