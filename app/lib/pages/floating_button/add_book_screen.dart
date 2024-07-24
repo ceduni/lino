@@ -1,10 +1,11 @@
 import 'dart:async';
 
+import 'package:Lino_app/nav_menu.dart';
+import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class HomeController extends GetxController {
   var selectedIndex = 0.obs;
@@ -30,29 +31,21 @@ class AddBookScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Column(
-            children: [
-              SizedBox(height: 16), // Adds spacing between AppBar and title
-              Text(
-                'Avez-vous ISBN du livre ?',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          SizedBox(height: 16),
+          Text(
+            'Avez-vous ISBN du livre ?',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          ButtonBar(
+            alignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                onPressed: () => controller.changePage(0),
+                child: Text('Oui, j\'ai ISBN'),
               ),
-              ButtonBar(
-                alignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  ElevatedButton(
-                    onPressed: () {
-                      controller.changePage(0);
-                    },
-                    child: Text('Oui, j\'ai ISBN'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      controller.changePage(1);
-                    },
-                    child: Text('Non j\'ai pas ISBN'),
-                  ),
-                ],
+              ElevatedButton(
+                onPressed: () => controller.changePage(1),
+                child: Text('Non j\'ai pas ISBN'),
               ),
             ],
           ),
@@ -68,7 +61,11 @@ class AddBookScreen extends StatelessWidget {
 class HaveISBNWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BarcodeScanner();
+    return BarcodeScanner(submitAction: (qrCode) {
+      // Add book to the database
+      final bookService = BookService();
+      bookService.addBookToBB(qrCode, '669d52d67ea5a6dc624fc4b6');
+    });
   }
 }
 
@@ -76,46 +73,41 @@ class HaveNotISBNWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(children: [
-        SizedBox(height: LinoSizes.spaceBtwSections),
-        Text('Titre du livre'),
-        TextField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'Quit yapping and enter the title',
-          ),
-        ),
-        SizedBox(height: LinoSizes.spaceBtwSections),
-        Text('Auteur du livre'),
-        TextField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'Quit yapping and enter the author',
-          ),
-        ),
-        SizedBox(height: LinoSizes.spaceBtwSections),
-        Text('Description du livre'),
-        TextField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'Quit yapping and enter the description',
-          ),
-        ),
-        SizedBox(height: LinoSizes.spaceBtwSections),
-        TextButton(
-          onPressed: () {
-            // Add book to the database
-            Navigator.push(
-              context,
-              MaterialPageRoute(
+      body: Column(
+        children: [
+          SizedBox(height: LinoSizes.spaceBtwSections),
+          buildTextField('Titre du livre'),
+          SizedBox(height: LinoSizes.spaceBtwSections),
+          buildTextField('Auteur du livre'),
+          SizedBox(height: LinoSizes.spaceBtwSections),
+          buildTextField('Description du livre'),
+          SizedBox(height: LinoSizes.spaceBtwSections),
+          TextButton(
+            onPressed: () {
+              // Add book to the database
+              Navigator.push(
+                context,
+                MaterialPageRoute(
                   builder: (context) => Scaffold(
-                      body: BarcodeScanner(),
-                      appBar: AppBar(title: Text('Scan QR Code')))),
-            );
-          },
-          child: Text('Ajouter le livre'),
-        )
-      ]),
+                    body: BarcodeScanner(),
+                    appBar: AppBar(title: Text('Scan QR Code')),
+                  ),
+                ),
+              );
+            },
+            child: Text('Ajouter le livre'),
+          )
+        ],
+      ),
+    );
+  }
+
+  TextField buildTextField(String label) {
+    return TextField(
+      decoration: InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: label,
+      ),
     );
   }
 }
@@ -134,34 +126,11 @@ class RemoveBookScreen extends StatelessWidget {
   }
 }
 
-class BarcodeScanner extends StatelessWidget {
-  final BarcodeController barcodeController = Get.put(BarcodeController());
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: MobileScanner(
-            controller: barcodeController.scannerController,
-            fit: BoxFit.contain,
-          ),
-        ),
-        Obx(() => Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Barcode: ${barcodeController.barcodeObs.value}',
-                style: TextStyle(fontSize: 18),
-              ),
-            )),
-      ],
-    );
-  }
-}
-
 class BarcodeController extends GetxController with WidgetsBindingObserver {
   final MobileScannerController scannerController = MobileScannerController();
   StreamSubscription<Object?>? _subscription;
   var barcodeObs = ''.obs;
+  var isScanned = false.obs;
 
   @override
   void onInit() {
@@ -190,7 +159,8 @@ class BarcodeController extends GetxController with WidgetsBindingObserver {
         unawaited(scannerController.stop());
         break;
       case AppLifecycleState.hidden:
-      // TODO: Handle this case.
+        // TODO: Handle this case.
+        break;
     }
   }
 
@@ -208,6 +178,8 @@ class BarcodeController extends GetxController with WidgetsBindingObserver {
       final barcode = capture.barcodes.first;
       if (barcode.rawValue != null) {
         barcodeObs.value = barcode.rawValue!;
+        isScanned.value = true;
+        stopScanner();
       } else {
         barcodeObs.value = 'Unknown Barcode';
       }
@@ -215,58 +187,104 @@ class BarcodeController extends GetxController with WidgetsBindingObserver {
       barcodeObs.value = 'No Barcode Detected';
     }
   }
-}
 
-class QRController extends GetxController {
-  var qrText = ''.obs;
-  QRViewController? qrViewController;
-
-  void setQrText(String text) {
-    qrText.value = text;
+  void stopScanner() {
+    unawaited(scannerController.stop());
+    _subscription?.cancel();
   }
 
-  void onQRViewCreated(QRViewController controller) {
-    qrViewController = controller;
-    controller.scannedDataStream.listen((scanData) {
-      setQrText(scanData.code!);
-    });
-  }
-
-  @override
-  void onClose() {
-    qrViewController?.dispose();
-    super.onClose();
+  void resetScanState() {
+    barcodeObs.value = '';
+    isScanned.value = false;
+    unawaited(scannerController.start());
+    _subscription = scannerController.barcodes.listen(_handleBarcode);
   }
 }
 
-class QRViewExample extends StatelessWidget {
-  final QRController qrController = Get.put(QRController());
+typedef BarcodeSubmitCallback = void Function(String qrCode);
+
+class BarcodeScanner extends StatelessWidget {
+  final BarcodeController barcodeController = Get.put(BarcodeController());
+  final BarcodeSubmitCallback? submitAction;
+
+  BarcodeScanner({super.key, this.submitAction});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Expanded(
-          flex: 5,
-          child: QRView(
-            key: GlobalKey(debugLabel: 'QR'),
-            onQRViewCreated: qrController.onQRViewCreated,
-            overlay: QrScannerOverlayShape(
-              borderColor: Colors.red,
-              borderRadius: 10,
-              borderLength: 30,
-              borderWidth: 10,
-              cutOutSize: 300,
+    return Scaffold(
+      appBar: AppBar(title: Text('Barcode Scanner')),
+      body: Column(
+        children: [
+          Expanded(
+            child: MobileScanner(
+              controller: barcodeController.scannerController,
+              fit: BoxFit.contain,
             ),
           ),
-        ),
-        Expanded(
-          flex: 1,
-          child: Center(
-            child: Obx(() => Text('Scan result: ${qrController.qrText}')),
+          Obx(() {
+            if (barcodeController.isScanned.value) {
+              return _buildConfirmation(context);
+            } else {
+              return Container();
+            }
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConfirmation(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          Text(
+            'Barcode: ${barcodeController.barcodeObs.value}',
+            style: TextStyle(fontSize: 18),
           ),
-        ),
-      ],
+          SizedBox(height: 16),
+          Text('Is this scan correct?'),
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  // Submit the scanned barcode
+                  _submitBarcode(context);
+                },
+                child: Text('Yes'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Reset the scan state to scan again
+                  barcodeController.resetScanState();
+                },
+                child: Text('No'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _submitBarcode(BuildContext context) {
+    if (submitAction != null) {
+      submitAction!(
+          barcodeController.barcodeObs.value); // Temp hard coded bbox id valu);
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content:
+            Text('Barcode submitted: ${barcodeController.barcodeObs.value}'),
+      ),
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => NavigationMenu()),
     );
   }
 }
