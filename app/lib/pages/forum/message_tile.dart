@@ -6,8 +6,9 @@ class MessageTile extends StatefulWidget {
   final List<dynamic> allMessages;
   final void Function(String, bool) onReact; // Update the callback to include reaction handling
   final void Function(String, Map<String, dynamic>) onReply;
+  final Color backgroundColor;
 
-  MessageTile({required this.message, required this.allMessages, required this.onReact, required this.onReply}); // Update constructor
+  MessageTile({required this.message, required this.allMessages, required this.onReact, required this.onReply, required this.backgroundColor}); // Update constructor
 
   @override
   _MessageTileState createState() => _MessageTileState();
@@ -47,7 +48,7 @@ class _MessageTileState extends State<MessageTile> {
                     margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                     padding: EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: Color(0x71737373),
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(16.0),
                           topRight: Radius.circular(16.0)),
@@ -57,11 +58,11 @@ class _MessageTileState extends State<MessageTile> {
                         children: [
                           TextSpan(
                             text: '${respondingToMessage['username']}: ',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.3)),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.55)),
                           ),
                           TextSpan(
                             text: respondingToMessage['content'],
-                            style: TextStyle(fontWeight: FontWeight.normal, color: Colors.black.withOpacity(0.3)),
+                            style: TextStyle(fontWeight: FontWeight.normal, color: Colors.black.withOpacity(0.55)),
                           ),
                         ],
                       ),
@@ -75,7 +76,7 @@ class _MessageTileState extends State<MessageTile> {
                       : EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 15.0),
                   padding: EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
-                    color: Colors.amber[100], // Light beige color
+                    color: widget.backgroundColor,
                     borderRadius: respondingToMessage == null ? BorderRadius.circular(16.0)
                         : BorderRadius.only(
                         bottomLeft: Radius.circular(16.0),
@@ -90,10 +91,10 @@ class _MessageTileState extends State<MessageTile> {
                             widget.message['username'],
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(width: 8.0), // Space between username and date
+                          SizedBox(width: 8.0),
                           Text(
                             formattedDate,
-                            style: TextStyle(fontSize: 12.0, color: Colors.grey), // Smaller font size for the date
+                            style: TextStyle(fontSize: 12.0, color: Colors.black),
                           ),
                         ],
                       ),
@@ -122,7 +123,7 @@ class _MessageTileState extends State<MessageTile> {
             ),
             if (_isHovered)
               Positioned(
-                right: 50, // Adjust this value to position closer to the message container
+                right: 50,
                 top: 0,
                 bottom: 0,
                 child: Align(

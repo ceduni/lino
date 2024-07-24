@@ -39,10 +39,14 @@ class _ThreadsSectionState extends State<ThreadsSection> {
 
   @override
   Widget build(BuildContext context) {
-    return isLoading
-        ? Center(child: CircularProgressIndicator())
-        : ListView(
-      children: threadCards,
+    return Container(
+      color: LinoColors.primary, // Set the background color of the entire section
+      child: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : ListView(
+        padding: EdgeInsets.all(10), // Add padding around the list
+        children: threadCards,
+      ),
     );
   }
 }
@@ -60,6 +64,8 @@ Future<List<Card>> getThreadTiles(BuildContext context, {String? q, String? cls,
       final bookTitle = thread['bookTitle'];
 
       return Card(
+        margin: EdgeInsets.symmetric(vertical: 10), // Add vertical margin between cards
+        color: LinoColors.accent, // Set the background color of the card
         child: ListTile(
           leading: Icon(Icons.image, size: 50, color: LinoColors.accent),
           title: Text('$threadTitle : $bookTitle'),
@@ -96,8 +102,10 @@ Future<List<Card>> getThreadTiles(BuildContext context, {String? q, String? cls,
     final bookTitle = thread['bookTitle'];
 
     return Card(
+      margin: EdgeInsets.symmetric(vertical: 10), // Add vertical margin between cards
+      color: LinoColors.secondary, // Set the background color of the card
       child: ListTile(
-        leading: Icon(Icons.image, size: 50, color: LinoColors.accent),
+        leading: Icon(Icons.image, size: 50, color: LinoColors.primary),
         title: Text('$bookTitle : $threadTitle'),
         subtitle: Text('Thread created $timeAgo'),
         trailing: Column(

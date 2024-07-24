@@ -112,20 +112,14 @@ const ThreadService = {
 
     async searchThreads(request: any) {
         const query = request.query.q;
-        let threads;
+        let threads = await Thread.find();
 
         if (query) {
-            // Perform text search
-            threads = await Thread.find({ $text: { $search: query } });
-
-            // Further filter using regex for more flexibility
+            // Filter using regex for more flexibility
             const regex = new RegExp(query, 'i');
             threads = threads.filter(thread =>
                 regex.test(thread.bookTitle) || regex.test(thread.title) || regex.test(thread.username)
             );
-        } else {
-            // Return all documents if the search query is empty
-            threads = await Thread.find();
         }
 
         // classify : ['by recent activity', 'by number of messages']
