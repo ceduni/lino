@@ -3,7 +3,9 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/services/thread_services.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:Lino_app/pages/forum/thread_message_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/book_services.dart';
+import '../../services/user_services.dart';
 
 class ThreadsSection extends StatefulWidget {
   const ThreadsSection({super.key});
@@ -15,11 +17,14 @@ class ThreadsSection extends StatefulWidget {
 class _ThreadsSectionState extends State<ThreadsSection> {
   List<Card> threadCards = [];
   bool isLoading = true;
+  bool isUserAuthenticated = false;
+  String? currentUsername;
 
   @override
   void initState() {
     super.initState();
-    fetchThreadTiles(cls: 'by creation date', asc: true);
+    fetchThreadTiles(cls: 'by creation date', asc: false);
+    checkUser();
   }
 
   Future<void> fetchThreadTiles({String? q, String? cls, bool? asc, String? bookId}) async {
@@ -34,6 +39,23 @@ class _ThreadsSectionState extends State<ThreadsSection> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> checkUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? storedToken = prefs.getString('token');
+    if (storedToken != null) {
+      try {
+        var us = UserService();
+        final response = await us.getUser(storedToken);
+        setState(() {
+          isUserAuthenticated = true;
+          currentUsername = response['user']['username'];
+        });
+      } catch (e) {
+        print('Error: $e');
+      }
     }
   }
 

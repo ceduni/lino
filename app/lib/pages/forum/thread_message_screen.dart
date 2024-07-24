@@ -128,6 +128,8 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
                           backgroundColor: isCurrentUser
                               ? LinoColors.secondary
                               : LinoColors.primaryBackground,
+                          isUserAuthenticated: isUserAuthenticated,
+                          currentUsername: currentUsername,
                         );
                       },
                     ),

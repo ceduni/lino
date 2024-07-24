@@ -4,11 +4,21 @@ import 'package:intl/intl.dart';
 class MessageTile extends StatefulWidget {
   final Map<String, dynamic> message;
   final List<dynamic> allMessages;
-  final void Function(String, bool) onReact; // Update the callback to include reaction handling
+  final void Function(String, bool) onReact;
   final void Function(String, Map<String, dynamic>) onReply;
   final Color backgroundColor;
+  final bool isUserAuthenticated;
+  final String? currentUsername;
 
-  MessageTile({required this.message, required this.allMessages, required this.onReact, required this.onReply, required this.backgroundColor}); // Update constructor
+  MessageTile({
+    required this.message,
+    required this.allMessages,
+    required this.onReact,
+    required this.onReply,
+    required this.backgroundColor,
+    required this.isUserAuthenticated,
+    this.currentUsername,
+  });
 
   @override
   _MessageTileState createState() => _MessageTileState();
@@ -19,6 +29,11 @@ class _MessageTileState extends State<MessageTile> {
 
   int countReactions(String reactionType) {
     return widget.message['reactions'].where((reaction) => reaction['reactIcon'] == reactionType).length;
+  }
+
+  bool userHasReacted(String reactionType) {
+    if (widget.currentUsername == null) return false;
+    return widget.message['reactions'].any((reaction) => reaction['reactIcon'] == reactionType && reaction['username'] == widget.currentUsername);
   }
 
   @override
@@ -104,14 +119,28 @@ class _MessageTileState extends State<MessageTile> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.thumb_up),
-                            onPressed: () => widget.onReact(widget.message['_id'], true),
+                            icon: Icon(
+                              Icons.thumb_up,
+                              color: !widget.isUserAuthenticated
+                                  ? Colors.grey
+                                  : userHasReacted('good')
+                                  ? Colors.cyan
+                                  : Colors.purple,
+                            ),
+                            onPressed: !widget.isUserAuthenticated ? null : () => widget.onReact(widget.message['_id'], true),
                           ),
                           Text('${countReactions('good')}'),
                           SizedBox(width: 8),
                           IconButton(
-                            icon: Icon(Icons.thumb_down),
-                            onPressed: () => widget.onReact(widget.message['_id'], false),
+                            icon: Icon(
+                              Icons.thumb_down,
+                              color: !widget.isUserAuthenticated
+                                  ? Colors.grey
+                                  : userHasReacted('bad')
+                                  ? Colors.red
+                                  : Colors.purple,
+                            ),
+                            onPressed: !widget.isUserAuthenticated ? null : () => widget.onReact(widget.message['_id'], false),
                           ),
                           Text('${countReactions('bad')}'),
                         ],
@@ -129,8 +158,8 @@ class _MessageTileState extends State<MessageTile> {
                 child: Align(
                   alignment: Alignment.center,
                   child: IconButton(
-                    icon: Icon(Icons.reply),
-                    onPressed: () {
+                    icon: Icon(Icons.reply, color: widget.isUserAuthenticated ? Colors.purple : Colors.grey),
+                    onPressed: !widget.isUserAuthenticated ? null : () {
                       widget.onReply(widget.message['_id'], widget.message);
                     },
                   ),
