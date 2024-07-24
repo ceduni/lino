@@ -339,6 +339,63 @@ const sendBookRequestSchema = {
     }
 };
 
+async function deleteBookRequest(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        await BookService.deleteBookRequest(request);
+        reply.code(204).send({message: 'Book request deleted'});
+    } catch (error : any) {
+        reply.code(error.statusCode).send({error: error.message});
+    }
+}
+
+const deleteBookRequestSchema = {
+    description: 'Delete a book request',
+    tags: ['books', 'users'],
+    params: {
+        type: 'object',
+        properties: {
+            id: { type: 'string' }
+        },
+        required: ['id']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' }
+        },
+        required: ['authorization']
+    },
+    response: {
+        204: {
+            description: 'Book request deleted',
+            type: 'object',
+            properties: {
+                message: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Error message',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
 
 interface GetUniqueBookParams extends RouteGenericInterface {
     Params: {
@@ -563,15 +620,6 @@ const searchBookboxesSchema = {
     }
 }
 
-async function clearCollection(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        await BookService.clearCollection();
-        reply.send({message: 'Books cleared'});
-    } catch (error : any) {
-        reply.code(500).send({error: error.message});
-    }
-}
-
 async function getBookRequests(request: FastifyRequest, reply: FastifyReply) {
     try {
         const response = await BookService.getBookRequests(request);
@@ -616,6 +664,15 @@ const getBookRequestsSchema = {
     }
 }
 
+async function clearCollection(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        await BookService.clearCollection();
+        reply.send({message: 'Books cleared'});
+    } catch (error : any) {
+        reply.code(500).send({error: error.message});
+    }
+}
+
 interface MyFastifyInstance extends FastifyInstance {
     optionalAuthenticate: (request: FastifyRequest) => void;
     authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
@@ -631,6 +688,7 @@ export default async function bookRoutes(server: MyFastifyInstance) {
     server.get('/books/threads/:id', { schema: getBookThreadsSchema }, getBookThreads);
     server.post('/books/add', { preValidation: [server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
     server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);
+    server.delete('/books/request/:id', { preValidation: [server.authenticate], schema: deleteBookRequestSchema }, deleteBookRequest);
     server.get('/books/requests', { schema: getBookRequestsSchema }, getBookRequests);
     server.post('/books/bookbox/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);
     server.delete('/books/clear', { preValidation: [server.adminAuthenticate], schema: clearCollectionSchema }, clearCollection);

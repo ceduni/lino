@@ -247,6 +247,20 @@ class BookService {
     return response;
   }
 
+  Future<Map<String, dynamic>> deleteBookRequest(String token, String requestId) async {
+    final r = await http.delete(
+      Uri.parse('$url/books/request/$requestId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      });
+    final response = jsonDecode(r.body);
+    if (r.statusCode != 204) {
+      throw Exception(response['error']);
+    }
+    return response;
+  }
+
   Future<List<dynamic>> getBookThreads(String bookId) async {
     final r = await http.get(
       Uri.parse('$url/books/threads/$bookId'),
@@ -277,4 +291,5 @@ class BookService {
     }
     return response;
   }
+
 }

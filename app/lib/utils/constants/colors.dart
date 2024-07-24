@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class LinoColors {
   // App theme colors
-  static const Color primary = Color(0xFF3870AE);
+  static const Color primary = Color(0xFFDEE9ED);
   static const Color secondary = Color(0xFF78B6FB);
   static const Color accent = Color(0xFF558ED5);
 

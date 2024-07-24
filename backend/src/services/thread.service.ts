@@ -29,6 +29,15 @@ const ThreadService = {
         return thread;
     },
 
+    async deleteThread(request: any) {
+        const threadId = request.params.threadId;
+        const thread = await Thread.findById(threadId);
+        if (!thread) {
+            throw newErr(404, 'Thread not found');
+        }
+        await thread.deleteOne();
+    },
+
     async addThreadMessage(request: any) {
         // @ts-ignore
         const username = await UserService.getUserName(request.user.id);

@@ -1,15 +1,24 @@
-import 'package:Lino_app/pages/floating_button/add_book_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../forum/add_thread_form.dart';
+import '../forum/request_form.dart';
 import '../forum/requests_section.dart';
+import 'add_book_screen.dart';
 
 class LinoFloatingButton extends StatefulWidget {
   final int selectedIndex;
+  final VoidCallback? onThreadCreated;
+  final VoidCallback? onRequestCreated;
 
-  const LinoFloatingButton({required this.selectedIndex, Key? key}) : super(key: key);
+  const LinoFloatingButton({
+    required this.selectedIndex,
+    this.onThreadCreated,
+    this.onRequestCreated,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _LinoFloatingButtonState createState() => _LinoFloatingButtonState();
@@ -46,14 +55,14 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
             labelBackgroundColor: Colors.blue.shade300,
             child: Icon(Icons.add),
             label: 'Add Thread',
-            onTap: () => _addThread(context),
+            onTap: () => _addThread(context, widget.onThreadCreated),
           ),
           SpeedDialChild(
             backgroundColor: Colors.blue.shade300,
             labelBackgroundColor: Colors.blue.shade300,
             child: Icon(Icons.add),
             label: 'Add Request',
-            onTap: () => _showRequestForm(context),
+            onTap: () => _showRequestForm(context, widget.onRequestCreated),
           ),
         ]
             : [],
@@ -84,27 +93,27 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
     );
   }
 
-  void _addThread(BuildContext context) {
+  void _addThread(BuildContext context, VoidCallback? onThreadCreated) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) {
         return Padding(
           padding: MediaQuery.of(context).viewInsets,
-          child: AddThreadForm(),
+          child: AddThreadForm(onThreadCreated: onThreadCreated!),
         );
       },
     );
   }
 
-  void _showRequestForm(BuildContext context) {
+  void _showRequestForm(BuildContext context, VoidCallback? onRequestCreated) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) {
         return Padding(
           padding: MediaQuery.of(context).viewInsets,
-          child: RequestForm(),
+          child: RequestForm(onRequestCreated: onRequestCreated!),
         );
       },
     );

@@ -1,4 +1,6 @@
 import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,6 +8,10 @@ import '../../services/book_services.dart';
 import '../../services/thread_services.dart';
 
 class AddThreadForm extends StatefulWidget {
+  final VoidCallback onThreadCreated;
+
+  const AddThreadForm({required this.onThreadCreated, Key? key}) : super(key: key);
+
   @override
   _AddThreadFormState createState() => _AddThreadFormState();
 }
@@ -46,7 +52,6 @@ class _AddThreadFormState extends State<AddThreadForm> {
     try {
       var bs = BookService();
       var response = await bs.searchBooks(kw: query);
-      print('Search response: $response'); // Debug print
       setState(() {
         books = response['books'];
       });
@@ -64,7 +69,9 @@ class _AddThreadFormState extends State<AddThreadForm> {
       try {
         var token = await SharedPreferences.getInstance().then((prefs) => prefs.getString('token'));
         var ts = ThreadService();
-        await ts.createThread(token!, selectedBookId!, _titleController.text);
+        final newThread = await ts.createThread(token!, selectedBookId!, _titleController.text);
+
+        widget.onThreadCreated();  // Call the callback to re-fetch threads
 
         Navigator.of(context).pop(); // Close the modal
 
@@ -101,7 +108,7 @@ class _AddThreadFormState extends State<AddThreadForm> {
             ),
             if (books.isNotEmpty)
               Container(
-                height: 120, // Increase the container height
+                height: 120,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: books.length,
@@ -126,9 +133,9 @@ class _AddThreadFormState extends State<AddThreadForm> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(isSelected ? 12.0 : 8.0),
                           child: Container(
-                            width: isSelected ? 120 : 100, // Increase width for selected book
-                            height: isSelected ? 120 : 100, // Increase height for selected book
-                            color: Colors.grey.shade200, // Placeholder color
+                            width: isSelected ? 120 : 100,
+                            height: isSelected ? 120 : 100,
+                            color: Colors.grey.shade200,
                             child: book['coverImage'] != null
                                 ? Image.network(
                               book['coverImage'],
@@ -192,4 +199,3 @@ class _AddThreadFormState extends State<AddThreadForm> {
     );
   }
 }
-

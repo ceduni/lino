@@ -3,28 +3,23 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/services/thread_services.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:Lino_app/pages/forum/thread_message_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/book_services.dart';
-import '../../services/user_services.dart';
 
 class ThreadsSection extends StatefulWidget {
   const ThreadsSection({super.key});
 
   @override
-  _ThreadsSectionState createState() => _ThreadsSectionState();
+  ThreadsSectionState createState() => ThreadsSectionState();
 }
 
-class _ThreadsSectionState extends State<ThreadsSection> {
+class ThreadsSectionState extends State<ThreadsSection> {
   List<Card> threadCards = [];
   bool isLoading = true;
-  bool isUserAuthenticated = false;
-  String? currentUsername;
 
   @override
   void initState() {
     super.initState();
     fetchThreadTiles(cls: 'by creation date', asc: false);
-    checkUser();
   }
 
   Future<void> fetchThreadTiles({String? q, String? cls, bool? asc, String? bookId}) async {
@@ -42,31 +37,14 @@ class _ThreadsSectionState extends State<ThreadsSection> {
     }
   }
 
-  Future<void> checkUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    String? storedToken = prefs.getString('token');
-    if (storedToken != null) {
-      try {
-        var us = UserService();
-        final response = await us.getUser(storedToken);
-        setState(() {
-          isUserAuthenticated = true;
-          currentUsername = response['user']['username'];
-        });
-      } catch (e) {
-        print('Error: $e');
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: LinoColors.primary, // Set the background color of the entire section
+      color: LinoColors.primary,
       child: isLoading
           ? Center(child: CircularProgressIndicator())
           : ListView(
-        padding: EdgeInsets.all(10), // Add padding around the list
+        padding: EdgeInsets.all(10),
         children: threadCards,
       ),
     );
@@ -86,8 +64,8 @@ Future<List<Card>> getThreadTiles(BuildContext context, {String? q, String? cls,
       final bookTitle = thread['bookTitle'];
 
       return Card(
-        margin: EdgeInsets.symmetric(vertical: 10), // Add vertical margin between cards
-        color: LinoColors.accent, // Set the background color of the card
+        margin: EdgeInsets.symmetric(vertical: 10),
+        color: LinoColors.accent,
         child: ListTile(
           leading: Icon(Icons.image, size: 50, color: LinoColors.accent),
           title: Text('$threadTitle : $bookTitle'),
@@ -99,7 +77,6 @@ Future<List<Card>> getThreadTiles(BuildContext context, {String? q, String? cls,
             ],
           ),
           onTap: () {
-            // Navigate to the thread messages screen with the thread ID
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -124,8 +101,8 @@ Future<List<Card>> getThreadTiles(BuildContext context, {String? q, String? cls,
     final bookTitle = thread['bookTitle'];
 
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 10), // Add vertical margin between cards
-      color: LinoColors.secondary, // Set the background color of the card
+      margin: EdgeInsets.symmetric(vertical: 10),
+      color: LinoColors.secondary,
       child: ListTile(
         leading: Icon(Icons.image, size: 50, color: LinoColors.primary),
         title: Text('$bookTitle : $threadTitle'),
@@ -137,7 +114,6 @@ Future<List<Card>> getThreadTiles(BuildContext context, {String? q, String? cls,
           ],
         ),
         onTap: () {
-          // Navigate to the thread messages screen with the thread ID
           Navigator.push(
             context,
             MaterialPageRoute(

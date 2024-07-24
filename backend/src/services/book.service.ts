@@ -361,6 +361,15 @@ const bookService = {
         return newRequest;
     },
 
+    async deleteBookRequest(request : any) {
+        const requestId = request.params.id;
+        const requestToDelete = await Request.findById(requestId);
+        if (!requestToDelete) {
+            throw newErr(404, 'Request not found');
+        }
+        await requestToDelete.deleteOne();
+    },
+
     // Function that returns 1 if the book is relevant to the user by his keywords, 0 otherwise
     async getBookRelevance(book: any, user: any) {
         // @ts-ignore

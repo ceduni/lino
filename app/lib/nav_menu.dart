@@ -1,9 +1,9 @@
-import 'package:Lino_app/pages/map/map_screen.dart';
-import 'package:Lino_app/pages/search_bar/search_bar.dart' as search_bar;
+import 'package:Lino_app/pages/Books/Books.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Lino_app/pages/appbar/appbar.dart';
-import 'pages/Books/Books.dart';
+import 'package:Lino_app/pages/map/map_screen.dart';
+import 'package:Lino_app/pages/search_bar/search_bar.dart' as search_bar;
 import 'package:Lino_app/pages/floating_button/floating_action_button.dart';
 import 'package:Lino_app/pages/forum/forum_screen.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
@@ -18,7 +18,19 @@ class NavigationMenu extends StatelessWidget {
 
     return Scaffold(
       appBar: LinoAppBar(),
-      floatingActionButton: Obx(() => LinoFloatingButton(selectedIndex: controller.selectedIndex.value)),
+      floatingActionButton: Obx(() {
+        if (controller.selectedIndex.value == 2) {
+          // Forum page is active
+          return LinoFloatingButton(
+            selectedIndex: controller.selectedIndex.value,
+            onThreadCreated: () => controller.forumScreenKey.currentState?.refreshThreads(),
+            onRequestCreated: () => controller.forumScreenKey.currentState?.refreshRequests(),
+          );
+        } else {
+          // Default Floating Button
+          return LinoFloatingButton(selectedIndex: controller.selectedIndex.value);
+        }
+      }),
       bottomNavigationBar: Obx(() => _buildNavigationBar(controller)),
       body: Stack(
         children: [
@@ -74,11 +86,19 @@ class NavigationMenu extends StatelessWidget {
   }
 }
 
+
 class NavigationController extends GetxController {
   final Rx<int> selectedIndex = 0.obs;
-  final screens = [
-    NavigationPage(),
-    MapScreen(),
-    ForumScreen(),
-  ];
+  final GlobalKey<ForumScreenState> forumScreenKey = GlobalKey<ForumScreenState>();
+
+  late final List<Widget> screens;
+
+  NavigationController() {
+    screens = [
+      NavigationPage(),
+      MapScreen(),
+      ForumScreen(key: forumScreenKey),
+    ];
+  }
 }
+

@@ -7,7 +7,6 @@ class MessageTile extends StatefulWidget {
   final void Function(String, bool) onReact;
   final void Function(String, Map<String, dynamic>) onReply;
   final Color backgroundColor;
-  final bool isUserAuthenticated;
   final String? currentUsername;
 
   MessageTile({
@@ -16,7 +15,6 @@ class MessageTile extends StatefulWidget {
     required this.onReact,
     required this.onReply,
     required this.backgroundColor,
-    required this.isUserAuthenticated,
     this.currentUsername,
   });
 
@@ -121,26 +119,22 @@ class _MessageTileState extends State<MessageTile> {
                           IconButton(
                             icon: Icon(
                               Icons.thumb_up,
-                              color: !widget.isUserAuthenticated
-                                  ? Colors.grey
-                                  : userHasReacted('good')
+                              color: userHasReacted('good')
                                   ? Colors.cyan
                                   : Colors.purple,
                             ),
-                            onPressed: !widget.isUserAuthenticated ? null : () => widget.onReact(widget.message['_id'], true),
+                            onPressed: () => widget.onReact(widget.message['_id'], true),
                           ),
                           Text('${countReactions('good')}'),
                           SizedBox(width: 8),
                           IconButton(
                             icon: Icon(
                               Icons.thumb_down,
-                              color: !widget.isUserAuthenticated
-                                  ? Colors.grey
-                                  : userHasReacted('bad')
+                              color:  userHasReacted('bad')
                                   ? Colors.red
                                   : Colors.purple,
                             ),
-                            onPressed: !widget.isUserAuthenticated ? null : () => widget.onReact(widget.message['_id'], false),
+                            onPressed: () => widget.onReact(widget.message['_id'], false),
                           ),
                           Text('${countReactions('bad')}'),
                         ],
@@ -158,8 +152,8 @@ class _MessageTileState extends State<MessageTile> {
                 child: Align(
                   alignment: Alignment.center,
                   child: IconButton(
-                    icon: Icon(Icons.reply, color: widget.isUserAuthenticated ? Colors.purple : Colors.grey),
-                    onPressed: !widget.isUserAuthenticated ? null : () {
+                    icon: Icon(Icons.reply, color: Colors.grey),
+                    onPressed: () {
                       widget.onReply(widget.message['_id'], widget.message);
                     },
                   ),

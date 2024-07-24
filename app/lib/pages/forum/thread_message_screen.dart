@@ -67,16 +67,14 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
     if (_controller.text.isNotEmpty) {
       try {
         final ts = ThreadService();
-        await ts.addMessage(token, widget.threadId, _controller.text,
-            respondsTo: respondsTo);
+        await ts.addMessage(token, widget.threadId, _controller.text, respondsTo: respondsTo);
         _controller.clear();
         setState(() {
           respondsTo = null;
           respondingToMessage = null;
         });
         fetchThreadMessages(); // Refresh messages after sending
-        _scrollController.jumpTo(_scrollController
-            .position.maxScrollExtent); // Scroll to bottom after sending
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent); // Scroll to bottom after sending
       } catch (e) {
         print('Error sending message: $e');
       }
@@ -112,23 +110,18 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
                 itemBuilder: (context, index) {
                   final message = messages[index];
                   final messageUsername = message['username'];
-                  final isCurrentUser =
-                      messageUsername == currentUsername;
+                  final isCurrentUser = messageUsername == currentUsername;
                   return MessageTile(
                     message: message,
                     allMessages: messages,
                     onReact: handleReaction,
-                    onReply:
-                        (String messageId, Map<String, dynamic> message) {
+                    onReply: (String messageId, Map<String, dynamic> message) {
                       setState(() {
                         respondsTo = messageId;
                         respondingToMessage = message;
                       });
                     },
-                    backgroundColor: isCurrentUser
-                        ? LinoColors.secondary
-                        : LinoColors.primaryBackground,
-                    isUserAuthenticated: isUserAuthenticated,
+                    backgroundColor: isCurrentUser ? LinoColors.secondary : Color(0xFFFFD6AB),
                     currentUsername: currentUsername,
                   );
                 },
@@ -173,7 +166,6 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
                 ),
               ),
             ),
-
           ],
         ),
       ),
@@ -185,8 +177,7 @@ class RespondingToMessagePreview extends StatelessWidget {
   final Map<String, dynamic> respondingToMessage;
   final VoidCallback onClose;
 
-  const RespondingToMessagePreview(
-      {required this.respondingToMessage, required this.onClose});
+  const RespondingToMessagePreview({required this.respondingToMessage, required this.onClose});
 
   @override
   Widget build(BuildContext context) {
