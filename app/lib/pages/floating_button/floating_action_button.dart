@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../forum/add_thread_form.dart';
 import '../forum/request_form.dart';
 import 'add_book_screen.dart';
-import 'add_book_dialog.dart';
+import 'dialog_options/scan_qr_code.dart';
 
 class LinoFloatingButton extends StatefulWidget {
   final int selectedIndex;
@@ -69,7 +69,7 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
     }
 
     // Default Floating Button
-return Container(
+    return Container(
       margin: EdgeInsets.all(16.0), // Adjust margin as needed
       decoration: BoxDecoration(
         shape: BoxShape.circle,
@@ -87,10 +87,16 @@ return Container(
             labelBackgroundColor: Colors.white,
             child: Icon(Icons.add),
             label: 'Add Book',
-            onTap: () => showDialog(
-              context: context,
-              builder: (context) => AddBookDialog(),
-            ),
+            onTap: () async {
+              String? scannedCode = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ScanQRCode()),
+              );
+              if (scannedCode != null) {
+                // Handle the scanned code, for example, navigate to another page
+                // with the scanned UUID
+              }
+            },
           ),
           SpeedDialChild(
             child: Icon(Icons.remove),

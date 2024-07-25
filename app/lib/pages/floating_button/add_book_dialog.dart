@@ -4,6 +4,10 @@ import 'dialog_options/QRCode.dart';
 import 'dialog_options/no_ISBN.dart';
 
 class AddBookDialog extends StatelessWidget {
+  final String qrCode;
+
+  AddBookDialog({required this.qrCode});
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -26,18 +30,7 @@ class AddBookDialog extends StatelessWidget {
                 builder: (context) => ISBNCodeDialog(),
               );
             },
-            child: Text('ISBN Code'),
-          ),
-          SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ISBNQRCodeDialog()),
-              );
-            },
-            child: Text('ISBN via QR Code'),
+            child: Text('I have the book ISBN'),
           ),
           SizedBox(height: 8),
           ElevatedButton(
