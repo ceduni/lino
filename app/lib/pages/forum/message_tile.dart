@@ -61,6 +61,14 @@ class _MessageTileState extends State<MessageTile> {
                     margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                     padding: EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          spreadRadius: 1,
+                          blurRadius: 1,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
                       color: Color(0x71737373),
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(16.0),
@@ -89,6 +97,14 @@ class _MessageTileState extends State<MessageTile> {
                       : EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 15.0),
                   padding: EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 1,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
                     color: widget.backgroundColor,
                     borderRadius: respondingToMessage == null ? BorderRadius.circular(16.0)
                         : BorderRadius.only(
@@ -120,8 +136,11 @@ class _MessageTileState extends State<MessageTile> {
                             icon: Icon(
                               Icons.thumb_up,
                               color: userHasReacted('good')
-                                  ? Colors.cyan
-                                  : Colors.purple,
+                                  ? Color(0xFF4CAF50)
+                                  : Color(0xFFD3D3D3),
+                                shadows: const [
+                                  BoxShadow(color: Colors.black, blurRadius: 1),
+                                ]
                             ),
                             onPressed: () => widget.onReact(widget.message['_id'], true),
                           ),
@@ -132,7 +151,10 @@ class _MessageTileState extends State<MessageTile> {
                               Icons.thumb_down,
                               color:  userHasReacted('bad')
                                   ? Colors.red
-                                  : Colors.purple,
+                                  : Color(0xFFD3D3D3),
+                                shadows: const [
+                                  BoxShadow(color: Colors.black, blurRadius: 1),
+                                ]
                             ),
                             onPressed: () => widget.onReact(widget.message['_id'], false),
                           ),
@@ -152,7 +174,9 @@ class _MessageTileState extends State<MessageTile> {
                 child: Align(
                   alignment: Alignment.center,
                   child: IconButton(
-                    icon: Icon(Icons.reply, color: Colors.grey),
+                    icon: Icon(Icons.reply, color: Color(0xFFD3D3D3), shadows: const [
+                          BoxShadow(color: Colors.black, blurRadius: 1),
+                        ]),
                     onPressed: () {
                       widget.onReply(widget.message['_id'], widget.message);
                     },

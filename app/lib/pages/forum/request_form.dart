@@ -25,7 +25,7 @@ class _RequestFormState extends State<RequestForm> {
       });
 
       try {
-        var bs = BookService();
+        var bs =  BookService();
         final token = await SharedPreferences.getInstance().then((prefs) => prefs.getString('token'));
         await bs.requestBookToUsers(
           token!,

@@ -67,11 +67,9 @@ class NavigationPage extends StatelessWidget {
                               bb['books'][index]['coverImage'],
                               errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
                                 return Container(
-                                  width: 100, // Set width and height to match your image size
-                                  height: 150,
                                   color: Colors.grey,
                                   child: Center(
-                                    child: Icon(Icons.broken_image, color: Colors.white),
+                                    child: Text(bb['books'][index]['title'], style: TextStyle(color: Colors.white)),
                                   ),
                                 );
                               },

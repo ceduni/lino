@@ -29,8 +29,7 @@ class RequestsSectionState extends State<RequestsSection> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     if (token != null) {
-      var us = UserService();
-      final user = await us.getUser(token);
+      final user = await UserService().getUser(token);
       setState(() {
         currentUsername = user['user']['username'];
       });
@@ -46,12 +45,12 @@ class RequestsSectionState extends State<RequestsSection> {
         isLoading = false;
       });
     } catch (e) {
-      print('Error fetching requests: $e');
       setState(() {
         isLoading = false;
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -66,10 +65,9 @@ class RequestsSectionState extends State<RequestsSection> {
             itemCount: requests.length,
             itemBuilder: (context, index) {
               final request = requests[index];
-              final requestUsername = request['username'];
-              final isOwner = requestUsername == currentUsername;
+              final isOwner = request['username'] == currentUsername;
               return Card(
-                color: Color(0xFFFFD6AB), // Set the background color of the card
+                color: isOwner? LinoColors.accent : LinoColors.secondary,
                 margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Add margin between cards
                 child: ListTile(
                   title: Text(request['bookTitle'], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -80,14 +78,15 @@ class RequestsSectionState extends State<RequestsSection> {
                       if (request['isFulfilled']) Icon(Icons.check_circle, color: Colors.green),
                       if (isOwner)
                         IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
+                          icon: Icon(Icons.delete, color: Colors.red, shadows: const [
+                            BoxShadow(color: Colors.black, blurRadius: 1),
+                          ]),
                           onPressed: () async {
                             final prefs = await SharedPreferences.getInstance();
                             final token = prefs.getString('token');
                             if (token != null) {
                               try {
-                                var bs = BookService();
-                                await bs.deleteBookRequest(token, request['_id']);
+                                await BookService().deleteBookRequest(token, request['_id']);
                                 setState(() {
                                   requests.removeAt(index);
                                 });
@@ -95,6 +94,7 @@ class RequestsSectionState extends State<RequestsSection> {
                                   SnackBar(content: Text('Request deleted successfully!')),
                                 );
                               } catch (e) {
+                                print(e);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text('Error: ${e.toString()}')),
                                 );

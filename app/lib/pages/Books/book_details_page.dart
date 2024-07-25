@@ -1,25 +1,96 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
+import '../../services/thread_services.dart'; // Assuming you have this file
+import '../../services/user_services.dart';
 
-class BookDetailsPage extends StatelessWidget {
+class BookDetailsPage extends StatefulWidget {
   final Map<String, dynamic> book;
 
   BookDetailsPage({required this.book});
 
   @override
+  _BookDetailsPageState createState() => _BookDetailsPageState();
+}
+
+class _BookDetailsPageState extends State<BookDetailsPage> {
+  bool _isFavorite = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfFavorite();
+  }
+
+  Future<void> _checkIfFavorite() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token != null) {
+      final user = await UserService().getUser(token);
+      final favs = user['user']['favoriteBooks'];
+      setState(() {
+        _isFavorite = favs.contains(widget.book['_id']);
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _toggleFavorite() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token != null) {
+      try {
+        if (_isFavorite) {
+          await UserService().removeFromFavorites(token, widget.book['_id']);
+          setState(() {
+            _isFavorite = false;
+          });
+        } else {
+          await UserService().addToFavorites(token, widget.book['_id']);
+          setState(() {
+            _isFavorite = true;
+          });
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_isFavorite ? 'Added to favorites' : 'Removed from favorites')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
+    }
+  }
+
+  Future<bool> _isUserLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token') != null;
+  }
+
+  void _showAddThreadForm(BuildContext context, String bookId) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => AddThreadForm(bookId: bookId),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.transparent, // Set the dialog background to transparent
+      backgroundColor: Colors.transparent,
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0), // Add some padding for better layout
+          padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, // Align text to the start
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Container for the book cover, title, and author
               Container(
                 decoration: BoxDecoration(
-                  color: const Color.fromRGBO(250, 250, 240, 1).withOpacity(0.9), // White background with opacity
-                  borderRadius: BorderRadius.circular(10), // Rounded corners
+                  color: const Color.fromRGBO(250, 250, 240, 1).withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -27,33 +98,70 @@ class BookDetailsPage extends StatelessWidget {
                   children: [
                     Center(
                       child: Image.network(
-                        book['coverImage'],
+                        widget.book['coverImage'],
                         errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
                           return Container(
-                            width: 150, // Set width to match your image size
+                            width: 150,
                             height: 200,
                             color: Colors.grey,
                             child: Center(
-                              child: Icon(Icons.broken_image, color: Colors.white),
+                              child: Text(widget.book['title'], style: TextStyle(color: Colors.white)),
                             ),
                           );
                         },
                       ),
                     ),
-                    SizedBox(height: 8), // Add some space between elements
-                    Text(book['title'], style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Kanit')),
                     SizedBox(height: 8),
-                    Text('Authors: ${book['authors'].join(', ')}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
+                    Text(widget.book['title'], style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Kanit')),
+                    SizedBox(height: 8),
+                    Text('Authors: ${widget.book['authors'].join(', ')}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
+                    SizedBox(height: 8),
+                    FutureBuilder<bool>(
+                      future: _isUserLoggedIn(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return SizedBox.shrink(); // Show nothing while waiting
+                        } else if (snapshot.hasData && snapshot.data == true) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green.shade700, // Semi-dark green background
+                                ),
+                                onPressed: () {
+                                  _showAddThreadForm(context, widget.book['_id']);
+                                },
+                                child: Text('+ Add Thread', style: TextStyle(color: Colors.white)),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: LinoColors.secondary, // LinoColors.primary background
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)), // Rectangular shape with rounded corners
+                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Increase horizontal padding
+                                ),
+                                onPressed: _isLoading ? null : _toggleFavorite,
+                                child: Icon(
+                                  _isFavorite ? Icons.favorite : Icons.favorite_border,
+                                  color: Colors.redAccent,
+                                ),
+                              ),
+                            ],
+                          );
+                        } else {
+                          return SizedBox.shrink(); // Show nothing if no token
+                        }
+                      },
+                    ),
                   ],
                 ),
               ),
-              SizedBox(height: 16), // Add some space between the two containers
-
+              SizedBox(height: 16),
               // Container for the book description and other details
               Container(
                 decoration: BoxDecoration(
-                  color: const Color.fromRGBO(244, 226, 193, 1).withOpacity(0.9), // White background with opacity
-                  borderRadius: BorderRadius.circular(10), // Rounded corners
+                  color: const Color.fromRGBO(244, 226, 193, 1).withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -63,22 +171,22 @@ class BookDetailsPage extends StatelessWidget {
                     SizedBox(height: 4),
                     Container(
                       decoration: BoxDecoration(
-                        color: Color.fromRGBO(250, 250, 240, 1).withOpacity(0.9), // White background with opacity
-                        borderRadius: BorderRadius.circular(5), // Rounded corners
+                        color: Color.fromRGBO(250, 250, 240, 1).withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       padding: const EdgeInsets.all(16.0),
-                      child: ExpandableText(book['description']),
+                      child: ExpandableText(widget.book['description']),
                     ),
                     SizedBox(height: 16),
-                    Text('ISBN: ${book['isbn']}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
+                    Text('ISBN: ${widget.book['isbn']}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
                     SizedBox(height: 8),
-                    Text('Publisher: ${book['publisher']}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
+                    Text('Publisher: ${widget.book['publisher']}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
                     SizedBox(height: 8),
-                    Text('Categories: ${book['categories'].join(', ')}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
+                    Text('Categories: ${widget.book['categories'].join(', ')}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
                     SizedBox(height: 8),
-                    Text('Year: ${book['parutionYear']}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
+                    Text('Year: ${widget.book['parutionYear']}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
                     SizedBox(height: 8),
-                    Text('Pages: ${book['pages']}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
+                    Text('Pages: ${widget.book['pages']}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
                   ],
                 ),
               ),
@@ -122,39 +230,122 @@ class _ExpandableTextState extends State<ExpandableText> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8.0), // Add padding for the text
+      padding: const EdgeInsets.all(8.0),
       child: secondHalf.isEmpty
           ? Text(
-              firstHalf,
-              textAlign: TextAlign.start, // Align text to the start
-              style: TextStyle(fontFamily: 'Kanit'), // Apply the font
-            )
+        firstHalf,
+        textAlign: TextAlign.start,
+        style: TextStyle(fontFamily: 'Kanit'),
+      )
           : Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // Align the column to the start
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            flag ? (firstHalf + "...") : (firstHalf + secondHalf),
+            textAlign: TextAlign.start,
+            style: TextStyle(fontFamily: 'Kanit'),
+          ),
+          InkWell(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                Text(
-                  flag ? (firstHalf + "...") : (firstHalf + secondHalf),
-                  textAlign: TextAlign.start, // Align text to the start
-                  style: TextStyle(fontFamily: 'Kanit'), // Apply the font
-                ),
-                InkWell(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Icon(
-                        flag ? Icons.arrow_drop_down : Icons.arrow_drop_up,
-                        color: Colors.blue,
-                      ),
-                    ],
-                  ),
-                  onTap: () {
-                    setState(() {
-                      flag = !flag;
-                    });
-                  },
+                Icon(
+                  flag ? Icons.arrow_drop_down : Icons.arrow_drop_up,
+                  color: Colors.blue,
                 ),
               ],
             ),
+            onTap: () {
+              setState(() {
+                flag = !flag;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AddThreadForm extends StatefulWidget {
+  final String bookId;
+
+  const AddThreadForm({required this.bookId, Key? key}) : super(key: key);
+
+  @override
+  _AddThreadFormState createState() => _AddThreadFormState();
+}
+
+class _AddThreadFormState extends State<AddThreadForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('token');
+        if (token != null) {
+          await ThreadService().createThread(token, widget.bookId, _titleController.text);
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Thread created successfully!')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Create New Thread', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                  hintText: 'The title of your new thread',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a title';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16),
+              _isLoading
+                  ? CircularProgressIndicator()
+                  : ElevatedButton(
+                onPressed: _submitForm,
+                child: Text('Submit'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

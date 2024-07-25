@@ -24,18 +24,16 @@ class ThreadService {
     return response;
   }
 
-  Future<Map<String, dynamic>> deleteThread(String token, String threadId) async {
+  Future<void> deleteThread(String token, String threadId) async {
     final r = await http.delete(
       Uri.parse('$url/threads/$threadId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       });
-    final response = jsonDecode(r.body);
     if (r.statusCode != 204) {
-      throw Exception(response['error']);
+      throw Exception(jsonDecode(r.body)['error']);
     }
-    return response;
   }
 
   Future<Map<String, dynamic>> addMessage(String token, String threadId, String content, {String? respondsTo}) async {
