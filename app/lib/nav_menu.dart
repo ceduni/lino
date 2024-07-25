@@ -6,7 +6,6 @@ import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:Lino_app/pages/search_bar/search_bar.dart' as search_bar;
 import 'package:Lino_app/pages/floating_button/floating_action_button.dart';
 import 'package:Lino_app/pages/forum/forum_screen.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
 
 class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});

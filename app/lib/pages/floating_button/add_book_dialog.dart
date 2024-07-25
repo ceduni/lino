@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dialog_options/with_ISBN.dart';
-import 'dialog_options/QRCode.dart';
 import 'dialog_options/no_ISBN.dart';
 
 class AddBookDialog extends StatelessWidget {

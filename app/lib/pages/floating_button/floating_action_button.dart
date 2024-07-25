@@ -88,9 +88,9 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
             child: Icon(Icons.add),
             label: 'Add Book',
             onTap: () async {
-              String? scannedCode = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ScanQRCode()),
+              String? scannedCode = await showDialog(
+                context: context,
+                builder: (context) => ScanQRCode(),
               );
               if (scannedCode != null) {
                 // Handle the scanned code, for example, navigate to another page
