@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:Lino_app/services/book_services.dart';
+import 'confirmBook.dart';
 
 class ISBNCodeDialog extends StatefulWidget {
   @override
@@ -61,23 +62,41 @@ class _ISBNCodeDialogState extends State<ISBNCodeDialog> {
                   ],
                 ),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     final isbn = isbnController.text;
-                    if (RegExp(r'^\d{13}$').hasMatch(isbn)) {
-                      // Handle valid ISBN input and selected name
-                      late Future<Map<String, dynamic>> bookInfo = bookService.getBookInfo(isbn);
+                    try {
+                      // Await the result of the asynchronous operation
+                      final bookInfo = await bookService.getBookInfo(isbn);
 
-                      // Close the dialog
-                      Navigator.of(context).pop();
-                    } else {
-                      // Show error if ISBN is not valid or name is not selected
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Invalid ISBN or no name selected.')),
+                      // Show the dialog with the book information
+                      showDialog(
+                        context: context,
+                        builder: (context) => BookConfirmDialog(bookInfoFuture: Future.value(bookInfo)),
+                      );
+                    } catch (error) {
+                      // Show the error dialog if an exception occurs
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Error'),
+                            content: Text("An error occurred: $error"), // Display the actual error message
+                            actions: <Widget>[
+                              TextButton(
+                                child: Text('OK'),
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Close the dialog
+                                },
+                              ),
+                            ],
+                          );
+                        },
                       );
                     }
                   },
                   child: Text('Submit'),
                 ),
+
               ],
             ),
           ),
