@@ -26,10 +26,6 @@ class NavigationPage extends StatelessWidget {
             snapshot.data!['bookboxes'].map((bookbox) => bookbox),
           );
 
-          for (var bb in bookBoxes) {
-            print(bb['books'][0]['title']);
-          }
-
           return SingleChildScrollView(
             child: Column(
               children: [

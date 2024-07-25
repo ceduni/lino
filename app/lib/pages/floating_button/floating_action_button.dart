@@ -2,11 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../forum/add_thread_form.dart';
 import '../forum/request_form.dart';
-import '../forum/requests_section.dart';
 import 'add_book_screen.dart';
+import 'add_book_dialog.dart';
 
 class LinoFloatingButton extends StatefulWidget {
   final int selectedIndex;
@@ -76,9 +75,9 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
         SpeedDialChild(
           child: Icon(Icons.add),
           label: 'Add Book',
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddBookScreen()),
+          onTap: () => showDialog(
+            context: context,
+            builder: (context) => AddBookDialog(),
           ),
         ),
         SpeedDialChild(
