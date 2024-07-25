@@ -13,7 +13,7 @@ class LinoAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.blue, // Customize the app bar color
+      backgroundColor: Color.fromRGBO(125, 200, 237, 1), // Customize the app bar color
       leading: showBackButton
           ? IconButton(
               icon: Icon(Icons.arrow_back),

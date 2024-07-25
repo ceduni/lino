@@ -32,7 +32,7 @@ class NavigationPage extends StatelessWidget {
                 for (var bb in bookBoxes) ...[
                   Container(
                     width: double.infinity,
-                    color: Colors.blue,
+                    color: Color.fromRGBO(125, 200, 237, 1),
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Text(
                       bb['name'],
@@ -45,34 +45,37 @@ class NavigationPage extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    height: 150,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: bb['books'].length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => BookDetailsPage(book: bb['books'][index]),
-                            );
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Image.network(
-                              bb['books'][index]['coverImage'],
-                              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                                return Container(
-                                  color: Colors.grey,
-                                  child: Center(
-                                    child: Text(bb['books'][index]['title'], style: TextStyle(color: Colors.white)),
-                                  ),
-                                );
-                              },
+                    color: Color.fromRGBO(250, 250, 240, 1),
+                    child: Container(
+                      height: 150,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: bb['books'].length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => BookDetailsPage(book: bb['books'][index]),
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.network(
+                                bb['books'][index]['coverImage'],
+                                errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                  return Container(
+                                    color: Colors.grey,
+                                    child: Center(
+                                      child: Text(bb['books'][index]['title'], style: TextStyle(color: Colors.white)),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ],

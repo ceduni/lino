@@ -69,26 +69,39 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
     }
 
     // Default Floating Button
-    return SpeedDial(
-      icon: Icons.add,
-      children: [
-        SpeedDialChild(
-          child: Icon(Icons.add),
-          label: 'Add Book',
-          onTap: () => showDialog(
-            context: context,
-            builder: (context) => AddBookDialog(),
-          ),
+return Container(
+      margin: EdgeInsets.all(16.0), // Adjust margin as needed
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Color.fromRGBO(214, 142, 97, 1), // Border color
+          width: 3.0, // Border width
         ),
-        SpeedDialChild(
-          child: Icon(Icons.remove),
-          label: 'Remove Book',
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => RemoveBookScreen()),
+      ),
+      child: SpeedDial(
+        icon: Icons.add,
+        backgroundColor: Colors.blue.shade800,
+        children: [
+          SpeedDialChild(
+            backgroundColor: Colors.white,
+            labelBackgroundColor: Colors.white,
+            child: Icon(Icons.add),
+            label: 'Add Book',
+            onTap: () => showDialog(
+              context: context,
+              builder: (context) => AddBookDialog(),
+            ),
           ),
-        ),
-      ],
+          SpeedDialChild(
+            child: Icon(Icons.remove),
+            label: 'Remove Book',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RemoveBookScreen()),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

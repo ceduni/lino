@@ -46,7 +46,7 @@ class NavigationMenu extends StatelessWidget {
       height: 80,
       elevation: 10,
       selectedIndex: controller.selectedIndex.value,
-      indicatorColor: LinoColors.accent,
+      indicatorColor: Color.fromRGBO(239, 174, 133, 1),
       onDestinationSelected: (index) => controller.selectedIndex.value = index,
       labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       destinations: const [
@@ -72,7 +72,7 @@ class NavigationMenu extends StatelessWidget {
     }
 
     return Container(
-      color: Colors.grey.withOpacity(0.5),
+      color: Color.fromRGBO(211, 242, 255, 1),
       child: ListView.builder(
         shrinkWrap: true,
         itemCount: searchController.results.length,
