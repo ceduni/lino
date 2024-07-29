@@ -23,6 +23,7 @@ const bookService = {
         return {
             id: bookBox.id,
             name: bookBox.name,
+            image: bookBox.image,
             location: bookBox.location,
             infoText: bookBox.infoText,
             books: books,

@@ -1,4 +1,4 @@
-import 'package:Lino_app/pages/Books/Books.dart';
+import 'package:Lino_app/pages/Books/book_nav_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Lino_app/pages/appbar/appbar.dart';
@@ -7,8 +7,8 @@ import 'package:Lino_app/pages/search_bar/search_bar.dart' as search_bar;
 import 'package:Lino_app/pages/floating_button/floating_action_button.dart';
 import 'package:Lino_app/pages/forum/forum_screen.dart';
 
-class NavigationMenu extends StatelessWidget {
-  const NavigationMenu({super.key});
+class BookNavPage extends StatelessWidget {
+  const BookNavPage({super.key});
 
   @override
   Widget build(BuildContext context) {

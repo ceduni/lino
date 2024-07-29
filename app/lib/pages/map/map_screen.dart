@@ -1,137 +1,178 @@
-import 'package:Lino_app/pages/bookbox/book_box_screen.dart';
-import 'package:Lino_app/services/book_services.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
+
+import '../bookbox/book_box_screen.dart';
+import 'book_box_controller.dart';
 
 class MapScreen extends HookWidget {
   MapScreen({super.key});
 
-  final MapController mapController = Get.put(MapController());
+  final BookBoxController bookBoxController = Get.put(BookBoxController());
 
-  Future<List<Map<String, dynamic>>> getBookBoxList() async {
-    var bbs = await BookService().searchBookboxes();
-
-    var returnBBs = bbs['bookboxes'].map<Map<String, dynamic>>((bb) {
-      return {
-        'id': bb['id'],
-        'name': bb['name'],
-        'infoText': bb['infoText'],
-        'location': LatLng(bb['location'][0], bb['location'][1]),
-        'books': bb['books']
-      };
-    }).toList();
-    return returnBBs;
+  Future<void> _checkLocationPermission(BuildContext context) async {
+    PermissionStatus status = await Permission.locationWhenInUse.status;
+    if (status.isDenied) {
+      status = await Permission.locationWhenInUse.request();
+    }
+    if (status.isGranted) {
+      bookBoxController.getUserLocation();
+    } else if (status.isPermanentlyDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Location permissions are permanently denied, please enable them in settings.'),
+      ));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final futureBboxes = useMemoized(() => getBookBoxList(), []);
-    final bboxesSnapshot = useFuture(futureBboxes);
+    useEffect(() {
+      _checkLocationPermission(context);
+      return null;
+    }, []);
 
-    if (bboxesSnapshot.connectionState == ConnectionState.waiting) {
-      return Center(child: CircularProgressIndicator());
-    } else if (bboxesSnapshot.hasError) {
-      return Center(child: Text('Error: ${bboxesSnapshot.error}'));
-    } else if (!bboxesSnapshot.hasData) {
-      return Center(child: Text('No data available'));
-    }
-
-    final bboxes = bboxesSnapshot.data!;
-
-    List<Marker> markers = bboxes
-        .map(
-          (bbox) => Marker(
-            markerId: MarkerId(bboxes.indexOf(bbox).toString()),
-            position: bbox['location'],
-            infoWindow: InfoWindow(
-              title: bbox['name'],
-              snippet: bbox['infoText'],
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Book Boxes'),
+        actions: [
+          Row(
+            children: [
+              Text('Order: '),
+              PopupMenuButton<String>(
+                onSelected: (String value) {
+                  bookBoxController.sortBy.value = value;
+                  bookBoxController.getBookBoxes();
+                },
+                itemBuilder: (BuildContext context) {
+                  return {'by location', 'by number of books', 'by name'}
+                      .map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: choice,
+                      child: Text(choice),
+                    );
+                  }).toList();
+                },
+                icon: Icon(Icons.filter_list),
+              ),
+              Text('Sort: '),
+              PopupMenuButton<bool>(
+                onSelected: (bool value) {
+                  bookBoxController.isAscending.value = value;
+                  bookBoxController.getBookBoxes();
+                },
+                itemBuilder: (BuildContext context) {
+                  return {
+                    true: 'Ascending',
+                    false: 'Descending',
+                  }.entries.map((entry) {
+                    return PopupMenuItem<bool>(
+                      value: entry.key,
+                      child: Text(entry.value),
+                    );
+                  }).toList();
+                },
+                icon: Icon(Icons.sort),
+              ),
+            ],
           ),
-        )
-        .toList();
-
-    return Column(
-      children: [
-        Expanded(
-          child: GoogleMap(
-            onMapCreated: mapController.onMapCreated,
-            initialCameraPosition: mapController.cameraPosition.value,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-            markers: Set<Marker>.of(markers),
-          ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: bboxes.length,
-            itemBuilder: (context, index) {
-              final bbox = bboxes[index];
-              return GestureDetector(
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            flex: 1,
+            child: Obx(() {
+              final bboxes = bookBoxController.bookBoxes;
+              List<Marker> markers = bboxes.map((bbox) => Marker(
+                markerId: MarkerId(bbox['id']),
+                position: bbox['location'],
+                infoWindow: InfoWindow(
+                  title: bbox['name'],
+                  snippet: bbox['infoText'],
+                ),
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BookBoxScreen(bookBoxId: bbox['id']),
+                  bookBoxController.highlightBookBox(bbox['id']);
+                },
+              )).toList();
+
+              return GoogleMap(
+                onMapCreated: bookBoxController.mapController.onMapCreated,
+                initialCameraPosition: bookBoxController.mapController.cameraPosition.value,
+                myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                markers: Set<Marker>.of(markers),
+              );
+            }),
+          ),
+          Expanded(
+            flex: 1,
+            child: Obx(() {
+              final bboxes = bookBoxController.bookBoxes;
+              final highlightedBookBoxId = bookBoxController.highlightedBookBoxId.value;
+              final userLocation = bookBoxController.userLocation.value;
+
+              return ListView.builder(
+                itemCount: bboxes.length,
+                itemBuilder: (context, index) {
+                  final bbox = bboxes[index];
+                  double? distance;
+                  if (userLocation != null) {
+                    distance = Geolocator.distanceBetween(
+                      userLocation.latitude,
+                      userLocation.longitude,
+                      bbox['location'].latitude,
+                      bbox['location'].longitude,
+                    );
+                  }
+
+                  return Opacity(
+                    opacity: highlightedBookBoxId == bbox['id'] || highlightedBookBoxId == null ? 1.0 : 0.5,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                      decoration: BoxDecoration(
+                        color: LinoColors.secondary,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: ListTile(
+                        title: Text(
+                          bbox['name'],
+                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (distance != null)
+                              Text(
+                                '${(distance / 1000).toStringAsFixed(2)} km away',
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                            Text(
+                              'Books: ${bbox['books'].length}',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BookBoxScreen(bookBoxId: bbox['id']),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   );
                 },
-                child: Container(
-                  margin: EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: Colors.orange,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        offset: Offset(0, 4),
-                        blurRadius: 5.0,
-                      ),
-                    ],
-                  ),
-                  child: ListTile(
-                    title: Text(
-                      bbox['name'],
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Text(
-                      bbox['infoText'] ?? '',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                  ),
-                ),
               );
-            },
+            }),
           ),
-        ),
-      ],
+        ],
+      ),
     );
-  }
-}
-
-class MapController extends GetxController {
-  final Rx<CameraPosition> cameraPosition = CameraPosition(
-    target: LatLng(45.500880, -73.615563),
-    zoom: 14.0,
-  ).obs;
-
-  late GoogleMapController mapController;
-
-  void onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
-  void moveToLocation(double latitude, double longitude) {
-    final newPosition = CameraPosition(
-      target: LatLng(latitude, longitude),
-      zoom: 14.0,
-    );
-    mapController.animateCamera(CameraUpdate.newCameraPosition(newPosition));
-    cameraPosition.value = newPosition;
   }
 }

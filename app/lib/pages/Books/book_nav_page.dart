@@ -3,7 +3,7 @@ import 'package:Lino_app/services/book_services.dart';
 import 'book_details_page.dart';
 
 class NavigationPage extends StatelessWidget {
-  const NavigationPage({Key? key}) : super(key: key);
+  const NavigationPage({super.key});
 
   @override
   Widget build(BuildContext context) {

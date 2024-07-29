@@ -49,7 +49,7 @@ class _KeywordInputPageState extends State<KeywordInputPage> {
       Future.delayed(Duration(seconds: 1), () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => NavigationMenu()),
+          MaterialPageRoute(builder: (context) => BookNavPage()),
         );
       });
     } catch (e) {
@@ -63,7 +63,7 @@ class _KeywordInputPageState extends State<KeywordInputPage> {
   void _pass() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => NavigationMenu()),
+      MaterialPageRoute(builder: (context) => BookNavPage()),
     );
   }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
-import '../../services/thread_services.dart'; // Assuming you have this file
+import '../../services/thread_services.dart';
 import '../../services/user_services.dart';
 
 class BookDetailsPage extends StatefulWidget {

@@ -7,7 +7,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token');
-
   runApp(MyApp(initialToken: token, prefs: prefs));
 }
 
@@ -24,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: NavigationMenu(),
+      home: BookNavPage(),
     );
   }
 }

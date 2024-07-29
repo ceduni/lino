@@ -41,11 +41,11 @@ class AddBookScreen extends StatelessWidget {
             children: <Widget>[
               ElevatedButton(
                 onPressed: () => controller.changePage(0),
-                child: Text('Oui, j\'ai ISBN'),
+                child: Text('Oui, j\'ai l\'ISBN'),
               ),
               ElevatedButton(
                 onPressed: () => controller.changePage(1),
-                child: Text('Non j\'ai pas ISBN'),
+                child: Text('Non je n\'ai pas l\'ISBN'),
               ),
             ],
           ),
@@ -284,7 +284,7 @@ class BarcodeScanner extends StatelessWidget {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => NavigationMenu()),
+      MaterialPageRoute(builder: (context) => BookNavPage()),
     );
   }
 }

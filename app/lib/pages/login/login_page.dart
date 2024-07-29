@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
       widget.prefs.setString('token', token);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => NavigationMenu()),
+        MaterialPageRoute(builder: (context) => BookNavPage()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed: $e')));
@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
     await widget.prefs.remove('token');
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => NavigationMenu()),
+      MaterialPageRoute(builder: (context) => BookNavPage()),
     );
   }
 
