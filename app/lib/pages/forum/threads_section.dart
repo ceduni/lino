@@ -6,6 +6,7 @@ import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:Lino_app/pages/forum/thread_message_screen.dart';
 import '../../services/book_services.dart';
 import '../../services/user_services.dart';
+
 class ThreadsSection extends StatefulWidget {
   const ThreadsSection({super.key});
 
@@ -51,7 +52,6 @@ class ThreadsSectionState extends State<ThreadsSection> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -80,7 +80,7 @@ class ThreadsSectionState extends State<ThreadsSection> {
 
         return Card(
           margin: EdgeInsets.symmetric(vertical: 10),
-          color: isOwner? LinoColors.accent : LinoColors.secondary,
+          color: isOwner ? LinoColors.accent : LinoColors.secondary,
           child: ListTile(
             leading: Icon(Icons.image, size: 50, color: LinoColors.accent),
             title: Text('$threadTitle : $bookTitle'),
@@ -96,19 +96,39 @@ class ThreadsSectionState extends State<ThreadsSection> {
                       BoxShadow(color: Colors.black, blurRadius: 1),
                     ]),
                     onPressed: () async {
-                      final prefs = await SharedPreferences.getInstance();
-                      final token = prefs.getString('token');
-                      if (token != null) {
-                        try {
-                          await ThreadService().deleteThread(token, thread['_id']);
-                          fetchThreadTiles(cls: 'by creation date', asc: false); // Re-fetch threads
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Thread deleted successfully!')),
-                          );
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error: ${e.toString()}')),
-                          );
+                      final deleteConfirmed = await showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text('Delete thread "$threadTitle"?'),
+                          content: Text('All the messages written in it will be deleted.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (deleteConfirmed == true) {
+                        final prefs = await SharedPreferences.getInstance();
+                        final token = prefs.getString('token');
+                        if (token != null) {
+                          try {
+                            await ThreadService().deleteThread(token, thread['_id']);
+                            fetchThreadTiles(cls: 'by creation date', asc: false); // Re-fetch threads
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Thread deleted successfully!')),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error: ${e.toString()}')),
+                            );
+                          }
                         }
                       }
                     },
@@ -142,7 +162,7 @@ class ThreadsSectionState extends State<ThreadsSection> {
 
       return Card(
         margin: EdgeInsets.symmetric(vertical: 10),
-        color: isOwner? LinoColors.accent : LinoColors.secondary,
+        color: isOwner ? LinoColors.accent : LinoColors.secondary,
         child: ListTile(
           leading: Icon(Icons.image, size: 50, color: LinoColors.primary),
           title: Text('$bookTitle : $threadTitle'),
@@ -158,19 +178,39 @@ class ThreadsSectionState extends State<ThreadsSection> {
                     BoxShadow(color: Colors.black, blurRadius: 1),
                   ]),
                   onPressed: () async {
-                    final prefs = await SharedPreferences.getInstance();
-                    final token = prefs.getString('token');
-                    if (token != null) {
-                      try {
-                        await ThreadService().deleteThread(token, thread['_id']);
-                        fetchThreadTiles(cls: 'by creation date', asc: false); // Re-fetch threads
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Thread deleted successfully!')),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error: ${e.toString()}')),
-                        );
+                    final deleteConfirmed = await showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('Delete thread $threadTitle?'),
+                        content: Text('All the messages written in it will be deleted.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: Text('Delete'),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (deleteConfirmed == true) {
+                      final prefs = await SharedPreferences.getInstance();
+                      final token = prefs.getString('token');
+                      if (token != null) {
+                        try {
+                          await ThreadService().deleteThread(token, thread['_id']);
+                          fetchThreadTiles(cls: 'by creation date', asc: false); // Re-fetch threads
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Thread deleted successfully!')),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error: ${e.toString()}')),
+                          );
+                        }
                       }
                     }
                   },

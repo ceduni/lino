@@ -1,22 +1,29 @@
-import 'package:Lino_app/pages/search_bar/results_screen.dart';
-import 'package:Lino_app/services/book_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:Lino_app/services/book_services.dart';
 
 class SearchController extends GetxController {
   var query = ''.obs;
   var results = <String>[].obs;
+
+  void showSearchResults(String query) {
+    this.query.value = query;
+  }
+
+  void hideSearchResults() {
+    this.query.value = '';
+    results.clear();
+  }
 
   Future<void> search(String query) async {
     this.query.value = query;
     if (query.isEmpty) {
       results.clear();
     } else {
-      // Implement your search logic here
       print('Searching for $query');
       var bookDict = await BookService().searchBooks(kw: query);
-      print(bookDict);
       var bookResults = bookDict['books'];
+      results.clear();
       bookResults.forEach((book) {
         results.add(book['title']);
       });
@@ -24,24 +31,21 @@ class SearchController extends GetxController {
   }
 }
 
+
 class LinoSearchBar extends StatelessWidget {
-  LinoSearchBar({super.key});
+  final int sourcePage;
+  LinoSearchBar({super.key, required this.sourcePage});
 
   final SearchController searchController = Get.put(SearchController());
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 40.0, // Adjust the height of the search bar here
+    return SizedBox(
+      height: 40.0,
       child: TextField(
         onSubmitted: (value) {
           if (value.isNotEmpty) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ResultsPage(query: value),
-              ),
-            );
+            searchController.showSearchResults(value);
           }
         },
         onChanged: (value) {
@@ -55,7 +59,7 @@ class LinoSearchBar extends StatelessWidget {
           ),
           filled: true,
           fillColor: Colors.white,
-          contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0), // Adjust vertical padding to match new height
+          contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
         ),
       ),
     );

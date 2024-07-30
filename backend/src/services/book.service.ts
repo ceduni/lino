@@ -72,15 +72,13 @@ const bookService = {
         await this.updateUserEcoImpact(request, book.id);
 
         // send a notification to the user who requested the book
-        // Perform text search to get relevant requests
-        let requests = await Request.find({ $text: { $search: book.title } });
-
-        // Further filter requests using regex to match similar titles
+        let requests = await Request.find();
+        // Filter requests using regex to match similar titles
         const regex = new RegExp(book.title, 'i');
         requests = requests.filter(request => regex.test(request.bookTitle));
         for (let i = 0; i < requests.length; i++) {
             await notifyUser(requests[i].username, "Book notification",
-                `The book "${book.title}" has been added to the bookbox "${bookBox.name}" !`);
+                `The book "${book.title}" has been added to the bookbox "${bookBox.name}" to fulfill your request !`);
         }
 
 
@@ -166,10 +164,9 @@ const bookService = {
                 book.takenHistory.push({username: "guest", timestamp: new Date()});
             }
         }
-        // Perform text search to get relevant books
-        let books = await Book.find({ $text: { $search: book.title } });
 
-        // Further filter books using regex to match similar titles
+        let books = await Book.find();
+        // Filter books using regex to match similar titles
         const regex = new RegExp(book.title, 'i');
         books = books.filter(b => regex.test(b.title));
         for (let i = 0; i < books.length; i++) {
@@ -272,12 +269,6 @@ const bookService = {
             book.bookboxPresence = bookBoxes.filter((box) =>
                 box.books.includes(book._id.toString())
             ).map(box => box._id);
-
-            // @ts-ignore
-            if (book.bookboxPresence.length === 0) {
-                books.splice(i, 1);
-                i--;
-            }
         }
 
         return books;

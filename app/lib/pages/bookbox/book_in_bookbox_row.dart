@@ -5,8 +5,9 @@ import '../Books/book_details_page.dart';
 
 class BookInBookBoxRow extends StatelessWidget {
   final List<Map<String, dynamic>> books;
+  final String bbid;
 
-  const BookInBookBoxRow({super.key, required this.books});
+  const BookInBookBoxRow({super.key, required this.books, required this.bbid});
 
   @override
   Widget build(BuildContext context) {
@@ -50,11 +51,9 @@ class BookInBookBoxRow extends StatelessWidget {
   }
 
   void _navigateToBookDetails(BuildContext context, Map<String, dynamic> book) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BookDetailsPage(book: book),
-      ),
+    showDialog(
+      context: context,
+      builder: (context) => BookDetailsPage(book: book, bbid: bbid),
     );
   }
 

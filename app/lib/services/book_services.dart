@@ -74,23 +74,25 @@ class BookService {
 
   Future<Map<String, dynamic>> getBookFromBB(String qrCode, String bookboxId,
       {String? token}) async {
+    final headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+
     // Make a GET request to the server
-    // Send the qrCode and bookboxId to the server
-    // If the server returns a 200 status code, the book is taken
-    // If the server returns another status code, the book is not taken
     final r = await http.get(
       Uri.parse('$url/books/$qrCode/$bookboxId'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
-      },
+      headers: headers,
     );
+
+    // Parse the response
     final response = jsonDecode(r.body);
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
     return response;
   }
+
 
   Future<Map<String, dynamic>> getBookInfo(String isbn) async {
     // Make a GET request to the server

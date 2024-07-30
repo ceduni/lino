@@ -32,19 +32,19 @@ class GreetingUserBar extends StatelessWidget {
               );
               },
           icon: const Icon(Icons.remove, color: Colors.red)),
-        const SizedBox(width: 8.0), // Add space between icon and text
+        const SizedBox(width: 8.0),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               LinoTexts.homeAppbarTitle,
               style: Theme.of(context).textTheme.labelSmall!.apply(
-                  color: Colors.black), // Replace with LinoColors.textPrimary
+                  color: Colors.black),
             ),
             Text(
               LinoTexts.homeAppbarSubTitle,
               style: Theme.of(context).textTheme.labelLarge!.apply(
-                  color: Colors.black), // Replace with LinoColors.textPrimary
+                  color: Colors.black),
             ),
           ],
         ),

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import '../../services/book_services.dart';
 import '../../services/thread_services.dart';
 import '../../services/user_services.dart';
 
 class BookDetailsPage extends StatefulWidget {
   final Map<String, dynamic> book;
+  final String bbid;
 
-  BookDetailsPage({required this.book});
+  BookDetailsPage({required this.book, required this.bbid});
 
   @override
   _BookDetailsPageState createState() => _BookDetailsPageState();
@@ -29,6 +31,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
     if (token != null) {
       final user = await UserService().getUser(token);
       final favs = user['user']['favoriteBooks'];
+      if (user['user'] != null && user['user'].isEmpty) {
+        return;
+      }
       setState(() {
         _isFavorite = favs.contains(widget.book['_id']);
         _isLoading = false;
@@ -65,7 +70,19 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
 
   Future<bool> _isUserLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token') != null;
+    var token = prefs.getString('token');
+    if (token == null) {
+      return false;
+    }
+
+    var user = await UserService().getUser(token);
+
+    // Check if the 'user' key is an empty object
+    if (user['user'] != null && user['user'].isEmpty) {
+      return false;
+    }
+
+    return true;
   }
 
   void _showAddThreadForm(BuildContext context, String bookId) {
@@ -75,6 +92,49 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       builder: (context) => AddThreadForm(bookId: bookId),
     );
   }
+
+  void _showGetBookConfirmation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Get book "${widget.book['title']}" from this bookbox?'),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Confirm'),
+              onPressed: () {
+                _getBookFromBookBox();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _getBookFromBookBox() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      await BookService().getBookFromBB(widget.book['qrCodeId'], widget.bbid, token: token);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Book retrieved successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -187,9 +247,20 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                     Text('Year: ${widget.book['parutionYear']}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
                     SizedBox(height: 8),
                     Text('Pages: ${widget.book['pages']}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
+                    SizedBox(height: 10),
+                    Center(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white, backgroundColor: Colors.blue, // Text color
+                        ),
+                        onPressed: _showGetBookConfirmation,
+                        child: Text('Get book from bookbox'),
+                      ),
+                    ),
                   ],
                 ),
               ),
+
             ],
           ),
         ),

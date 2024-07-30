@@ -20,11 +20,11 @@ class ForumScreenState extends State<ForumScreen> {
     return prefs.containsKey('token');
   }
 
-  void refreshThreads() {
+  Future<void> refreshThreads() async {
     threadsSectionKey.currentState?.fetchThreadTiles(cls: 'by creation date', asc: false);
   }
 
-  void refreshRequests() {
+  Future<void> refreshRequests() async {
     requestsSectionKey.currentState?.fetchRequests();
   }
 
@@ -80,8 +80,14 @@ class ForumScreenState extends State<ForumScreen> {
             ),
             body: TabBarView(
               children: [
-                ThreadsSection(key: threadsSectionKey),
-                RequestsSection(key: requestsSectionKey),
+                RefreshIndicator(
+                  onRefresh: refreshThreads,
+                  child: ThreadsSection(key: threadsSectionKey),
+                ),
+                RefreshIndicator(
+                  onRefresh: refreshRequests,
+                  child: RequestsSection(key: requestsSectionKey),
+                ),
               ],
             ),
           ),

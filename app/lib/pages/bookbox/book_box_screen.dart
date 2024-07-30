@@ -1,12 +1,9 @@
-import 'package:Lino_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../../services/book_services.dart';
+import '../../utils/constants/sizes.dart';
 import 'book_in_bookbox_row.dart';
 
 class BookBoxScreen extends HookWidget {
@@ -16,7 +13,6 @@ class BookBoxScreen extends HookWidget {
 
   Future<Map<String, dynamic>> getBookBoxData(String bookBoxId) async {
     var bb = await BookService().getBookBox(bookBoxId);
-    print(bb);
     return {
       'name': bb['name'],
       'image': bb['image'],
@@ -26,11 +22,9 @@ class BookBoxScreen extends HookWidget {
     };
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final bookBoxData =
-    useFuture(useMemoized(() => getBookBoxData(bookBoxId), [bookBoxId]));
+    final bookBoxData = useFuture(useMemoized(() => getBookBoxData(bookBoxId), [bookBoxId]));
 
     return Scaffold(
       appBar: AppBar(
@@ -40,7 +34,10 @@ class BookBoxScreen extends HookWidget {
           ? Center(child: CircularProgressIndicator())
           : bookBoxData.hasError
           ? Center(child: Text('Error loading data'))
-          : buildContent(context, bookBoxData.data!),
+          : RefreshIndicator(
+        onRefresh: () => getBookBoxData(bookBoxId),
+        child: buildContent(context, bookBoxData.data!),
+      ),
     );
   }
 
@@ -62,14 +59,13 @@ class BookBoxScreen extends HookWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   Center(
                     child: BookBoxTitleContainer(
                       name: bbName,
                       infoText: bbInfoText,
                     ),
                   ),
-                  const SizedBox(height: 20),
                   Center(
                     child: Image.network(
                       bbImage,
@@ -77,7 +73,6 @@ class BookBoxScreen extends HookWidget {
                       height: 300,
                     ),
                   ),
-                  const SizedBox(height: 20),
                   Center(
                     child: DirectionButton(
                       bookBoxLocation: bbLocation,
@@ -89,6 +84,7 @@ class BookBoxScreen extends HookWidget {
                       books: (bbBooks as List<dynamic>)
                           .map((item) => item as Map<String, dynamic>)
                           .toList(),
+                      bbid: bookBoxId,
                     ),
                   ),
                 ],
@@ -105,8 +101,7 @@ class BookBoxTitleContainer extends StatelessWidget {
   final String name;
   final String infoText;
 
-  const BookBoxTitleContainer(
-      {super.key, required this.name, required this.infoText});
+  const BookBoxTitleContainer({super.key, required this.name, required this.infoText});
 
   @override
   Widget build(BuildContext context) {
@@ -137,10 +132,11 @@ class BookBoxTitleContainer extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
                 child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      infoText,
-                    )),
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    infoText,
+                  ),
+                ),
               ),
             ],
           ),
@@ -149,7 +145,6 @@ class BookBoxTitleContainer extends StatelessWidget {
           // Adjust this value to control the amount of overflow
           // Get container width and divide by 2 to center the icon
           rect: const RelativeRect.fromLTRB(0, -70, 0, 0),
-
           child: Icon(
             Icons.home,
             size: 60,
@@ -160,8 +155,6 @@ class BookBoxTitleContainer extends StatelessWidget {
     );
   }
 }
-
-
 
 class DirectionButton extends StatelessWidget {
   final LatLng bookBoxLocation;
@@ -185,6 +178,14 @@ class DirectionButton extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(LinoSizes.borderRadiusLg),
         color: Color.fromARGB(255, 142, 199, 233),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 0.5,
+            blurRadius: 3,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: TextButton(
         onPressed: () {
@@ -192,10 +193,8 @@ class DirectionButton extends StatelessWidget {
           double longitude = bookBoxLocation.longitude;
           _openGoogleMapsApp(longitude, latitude);
         },
-        child: const Text('Direction to Book Box'),
+        child: const Text('Itinerary to Book Box (Google Maps)'),
       ),
     );
   }
 }
-
-

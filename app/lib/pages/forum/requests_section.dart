@@ -49,7 +49,6 @@ class RequestsSectionState extends State<RequestsSection> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -65,7 +64,7 @@ class RequestsSectionState extends State<RequestsSection> {
               final request = requests[index];
               final isOwner = request['username'] == currentUsername;
               return Card(
-                color: isOwner? LinoColors.accent : LinoColors.secondary,
+                color: isOwner ? LinoColors.accent : LinoColors.secondary,
                 margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Add margin between cards
                 child: ListTile(
                   title: Text(request['bookTitle'], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -80,22 +79,42 @@ class RequestsSectionState extends State<RequestsSection> {
                             BoxShadow(color: Colors.black, blurRadius: 1),
                           ]),
                           onPressed: () async {
-                            final prefs = await SharedPreferences.getInstance();
-                            final token = prefs.getString('token');
-                            if (token != null) {
-                              try {
-                                await BookService().deleteBookRequest(token, request['_id']);
-                                setState(() {
-                                  requests.removeAt(index);
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Request deleted successfully!')),
-                                );
-                              } catch (e) {
-                                print(e);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Error: ${e.toString()}')),
-                                );
+                            final deleteConfirmed = await showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Delete your request for "${request['bookTitle']}"?'),
+                                content: Text('You won\'t be notified when the book you want will be added to a bookbox.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(false),
+                                    child: Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(true),
+                                    child: Text('Delete'),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (deleteConfirmed == true) {
+                              final prefs = await SharedPreferences.getInstance();
+                              final token = prefs.getString('token');
+                              if (token != null) {
+                                try {
+                                  await BookService().deleteBookRequest(token, request['_id']);
+                                  setState(() {
+                                    requests.removeAt(index);
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Request deleted successfully!')),
+                                  );
+                                } catch (e) {
+                                  print(e);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Error: ${e.toString()}')),
+                                  );
+                                }
                               }
                             }
                           },

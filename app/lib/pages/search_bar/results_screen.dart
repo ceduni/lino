@@ -1,35 +1,96 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:Lino_app/pages/search_bar/search_bar.dart' as search_bar;
+import 'package:Lino_app/pages/search_bar/books_list.dart';
+import 'package:Lino_app/pages/search_bar/bookboxes_list.dart';
+import 'package:Lino_app/pages/search_bar/threads_list.dart';
 
 class ResultsPage extends StatelessWidget {
   final String query;
+  final int sourcePage;
+  final VoidCallback onBack;
 
-  const ResultsPage({required this.query, super.key});
+  const ResultsPage({required this.query, required this.sourcePage, required this.onBack});
 
   @override
   Widget build(BuildContext context) {
-    // Use a post-frame callback to ensure the search is performed after the build
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final search_bar.SearchController searchController = Get.find();
-      searchController.search(query);
-    });
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Results for "$query"'),
+        title: Text('Search Results'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: onBack,
+        ),
       ),
-      body: Obx(() {
-        final search_bar.SearchController searchController = Get.find();
-        return ListView.builder(
-          itemCount: searchController.results.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(searchController.results[index]),
-            );
-          },
-        );
-      }),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: _buildSections(),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildSections() {
+    List<Widget> sections = [];
+    switch (sourcePage) {
+      case 0:
+        sections.addAll([
+          SectionTitle(title: 'Books'),
+          BooksList(query: query),
+          SectionTitle(title: 'Book Boxes'),
+          BookBoxesList(query: query),
+          SectionTitle(title: 'Threads'),
+          ThreadsList(query: query),
+        ]);
+        break;
+      case 1:
+        sections.addAll([
+          SectionTitle(title: 'Book Boxes'),
+          BookBoxesList(query: query),
+          SectionTitle(title: 'Books'),
+          BooksList(query: query),
+          SectionTitle(title: 'Threads'),
+          ThreadsList(query: query),
+        ]);
+        break;
+      case 2:
+        sections.addAll([
+          SectionTitle(title: 'Threads'),
+          ThreadsList(query: query),
+          SectionTitle(title: 'Books'),
+          BooksList(query: query),
+          SectionTitle(title: 'Book Boxes'),
+          BookBoxesList(query: query),
+        ]);
+        break;
+      default:
+        sections.addAll([
+          SectionTitle(title: 'Books'),
+          BooksList(query: query),
+          SectionTitle(title: 'Book Boxes'),
+          BookBoxesList(query: query),
+          SectionTitle(title: 'Threads'),
+          ThreadsList(query: query),
+        ]);
+        break;
+    }
+
+    return sections;
+  }
+}
+
+class SectionTitle extends StatelessWidget {
+  final String title;
+
+  const SectionTitle({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        title,
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
     );
   }
 }

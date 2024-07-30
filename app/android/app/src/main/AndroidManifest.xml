@@ -2,7 +2,7 @@
     <application
         android:label="Lino"
         android:name="${applicationName}"
-        android:icon="@mipmap/logo1"
+        android:icon="@mipmap/ic_launcher"
         android:theme="@style/LaunchTheme"
         android:enableOnBackInvokedCallback="true"
     >
@@ -28,7 +28,7 @@
         />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyD2S0FbkhCA-w5ACASmelGH1jCoi7UcoYE"
+            android:value="@string/google_maps_api_key"
         />
     </application>
     <queries>
