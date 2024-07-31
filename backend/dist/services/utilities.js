@@ -53,6 +53,7 @@ exports.threadSchema = {
         _id: { type: 'string' },
         username: { type: 'string' },
         title: { type: 'string' },
+        image: { type: 'string' },
         bookTitle: { type: 'string' },
         timestamp: { type: 'string', format: 'date-time' },
         messages: {
@@ -107,12 +108,24 @@ exports.userSchema = {
                 type: 'object',
                 properties: {
                     timestamp: { type: 'string', format: 'date-time' },
+                    title: { type: 'string' },
                     content: { type: 'string' },
                     read: { type: 'boolean' }
                 }
             }
         },
-        getAlerted: { type: 'boolean' }
+        getAlerted: { type: 'boolean' },
+        bookHistory: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    bookId: { type: 'string' },
+                    timestamp: { type: 'string', format: 'date-time' },
+                    given: { type: 'boolean' }
+                }
+            }
+        }
     }
 };
 exports.clearCollectionSchema = {

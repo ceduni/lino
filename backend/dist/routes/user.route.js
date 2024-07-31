@@ -253,6 +253,7 @@ const getUserNotificationsSchema = {
                     type: 'array', items: {
                         type: 'object',
                         properties: {
+                            title: { type: 'string' },
                             timestamp: { type: 'string' },
                             content: { type: 'string' },
                             read: { type: 'boolean' }

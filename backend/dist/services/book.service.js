@@ -19,7 +19,6 @@ const bookbox_model_1 = __importDefault(require("../models/bookbox.model"));
 const book_request_model_1 = __importDefault(require("../models/book.request.model"));
 const user_service_1 = require("./user.service");
 const utilities_1 = require("./utilities");
-const thread_model_1 = __importDefault(require("../models/thread.model"));
 const bookService = {
     getBookBox(bookBoxId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -37,6 +36,7 @@ const bookService = {
             return {
                 id: bookBox.id,
                 name: bookBox.name,
+                image: bookBox.image,
                 location: bookBox.location,
                 infoText: bookBox.infoText,
                 books: books,
@@ -83,13 +83,12 @@ const bookService = {
             yield bookBox.save();
             yield this.updateUserEcoImpact(request, book.id);
             // send a notification to the user who requested the book
-            // Perform text search to get relevant requests
-            let requests = yield book_request_model_1.default.find({ $text: { $search: book.title } });
-            // Further filter requests using regex to match similar titles
+            let requests = yield book_request_model_1.default.find();
+            // Filter requests using regex to match similar titles
             const regex = new RegExp(book.title, 'i');
             requests = requests.filter(request => regex.test(request.bookTitle));
             for (let i = 0; i < requests.length; i++) {
-                yield (0, user_service_1.notifyUser)(requests[i].username, `The book "${book.title}" has been added to the bookbox "${bookBox.name}" !`);
+                yield (0, user_service_1.notifyUser)(requests[i].username, "Book notification", `The book "${book.title}" has been added to the bookbox "${bookBox.name}" to fulfill your request !`);
             }
             return { bookId: book.id, books: bookBox.books };
         });
@@ -160,9 +159,13 @@ const bookService = {
                 const username = user.username;
                 if (given) { // if the book is given
                     book.givenHistory.push({ username: username, timestamp: new Date() });
+                    // push in the user's book history
+                    user.bookHistory.push({ bookId: book.id, timestamp: new Date(), given: true });
                 }
                 else { // if the book is taken
                     book.takenHistory.push({ username: username, timestamp: new Date() });
+                    // push in the user's book history
+                    user.bookHistory.push({ bookId: book.id, timestamp: new Date(), given: false });
                 }
             }
             else { // if the user is not authenticated, username is 'guest'
@@ -173,9 +176,8 @@ const bookService = {
                     book.takenHistory.push({ username: "guest", timestamp: new Date() });
                 }
             }
-            // Perform text search to get relevant books
-            let books = yield book_model_1.default.find({ $text: { $search: book.title } });
-            // Further filter books using regex to match similar titles
+            let books = yield book_model_1.default.find();
+            // Filter books using regex to match similar titles
             const regex = new RegExp(book.title, 'i');
             books = books.filter(b => regex.test(b.title));
             for (let i = 0; i < books.length; i++) {
@@ -222,7 +224,11 @@ const bookService = {
                 filter.categories = { $in: categoryArray };
             }
             if (kw) {
-                filter.$text = { $search: kw };
+                const regex = new RegExp(kw, 'i');
+                filter.$or = [
+                    { title: regex },
+                    { authors: regex }
+                ];
             }
             if (py) {
                 filter.parutionYear = bf ? { $lte: py } : { $gte: py };
@@ -238,10 +244,6 @@ const bookService = {
                 filter._id = { $in: bookBox.books };
             }
             let books = yield book_model_1.default.find(filter);
-            if (kw) {
-                const regex = new RegExp(kw, 'i');
-                books = books.filter((book) => regex.test(book.title) || book.authors.some((author) => regex.test(author)));
-            }
             if (pg) {
                 const pageCount = parseInt(pg);
                 books = books.filter((book) => {
@@ -264,35 +266,25 @@ const bookService = {
                 sortOptions.dateLastAction = asc ? 1 : -1;
             }
             books = yield book_model_1.default.find(filter).sort(sortOptions);
-            // Ensure only books present in bookboxes are returned
             const bookBoxes = yield bookbox_model_1.default.find();
+            const finalBooks = [];
             for (let i = 0; i < books.length; i++) {
                 const book = books[i].toObject();
                 // @ts-ignore
                 book.bookboxPresence = bookBoxes.filter((box) => box.books.includes(book._id.toString())).map(box => box._id);
-                // @ts-ignore
-                if (book.bookboxPresence.length === 0) {
-                    books.splice(i, 1);
-                    i--;
-                }
+                finalBooks.push(book);
             }
-            return books;
+            return finalBooks;
         });
     },
     searchBookboxes(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const kw = request.query.kw;
-            let bookBoxes;
+            let bookBoxes = yield bookbox_model_1.default.find();
             if (kw) {
-                // Perform text search
-                bookBoxes = yield bookbox_model_1.default.find({ $text: { $search: kw } });
-                // Further filter using regex for more flexibility
+                // Filter using regex for more flexibility
                 const regex = new RegExp(kw, 'i');
                 bookBoxes = bookBoxes.filter((bookBox) => regex.test(bookBox.name) || regex.test(bookBox.infoText || ''));
-            }
-            else {
-                // Return all book boxes if no keyword is provided
-                bookBoxes = yield bookbox_model_1.default.find();
             }
             const cls = request.query.cls;
             const asc = request.query.asc; // Boolean
@@ -345,7 +337,7 @@ const bookService = {
             const users = yield user_model_1.default.find({ getAlerted: true });
             for (let i = 0; i < users.length; i++) {
                 if (users[i].username !== user.username) {
-                    yield (0, user_service_1.notifyUser)(users[i].id, `The user ${user.username} wants to get the book "${request.body.title}" ! If you have it, please feel free to add it to one of our book boxes !`);
+                    yield (0, user_service_1.notifyUser)(users[i].id, "Book request", `The user ${user.username} wants to get the book "${request.body.title}" ! If you have it, please feel free to add it to one of our book boxes !`);
                 }
             }
             const newRequest = new book_request_model_1.default({
@@ -355,6 +347,16 @@ const bookService = {
             });
             yield newRequest.save();
             return newRequest;
+        });
+    },
+    deleteBookRequest(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const requestId = request.params.id;
+            const requestToDelete = yield book_request_model_1.default.findById(requestId);
+            if (!requestToDelete) {
+                throw (0, utilities_1.newErr)(404, 'Request not found');
+            }
+            yield requestToDelete.deleteOne();
         });
     },
     // Function that returns 1 if the book is relevant to the user by his keywords, 0 otherwise
@@ -393,19 +395,9 @@ const bookService = {
                 const relevance = yield this.getBookRelevance(book, users[i]);
                 // Notify the user if the book is relevant to him or if it's one of his favorite books
                 if (relevance > 0 || users[i].favoriteBooks.includes(book.id)) {
-                    yield (0, user_service_1.notifyUser)(users[i].id, `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
+                    yield (0, user_service_1.notifyUser)(users[i].id, "Book notification", `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
                 }
             }
-        });
-    },
-    getBookThreads(request) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let book = yield book_model_1.default.findById(request.params.id);
-            if (!book) {
-                throw (0, utilities_1.newErr)(404, 'Book not found');
-            }
-            let title = book.title;
-            return thread_model_1.default.find({ bookTitle: title });
         });
     },
     getBookRequests(request) {

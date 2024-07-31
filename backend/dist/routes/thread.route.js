@@ -75,6 +75,58 @@ const createThreadSchema = {
         }
     }
 };
+function deleteThread(request, reply) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield thread_service_1.default.deleteThread(request);
+            reply.code(204).send({ message: 'Thread deleted' });
+        }
+        catch (error) {
+            reply.code(error.statusCode).send({ error: error.message });
+        }
+    });
+}
+const deleteThreadSchema = {
+    description: 'Delete a thread',
+    tags: ['threads'],
+    params: {
+        type: 'object',
+        required: ['threadId'],
+        properties: {
+            threadId: { type: 'string' }
+        }
+    },
+    headers: {
+        type: 'object',
+        required: ['Authorization'],
+        properties: {
+            Authorization: { type: 'string' }
+        }
+    },
+    response: {
+        204: {
+            description: 'Thread deleted',
+            type: 'object',
+            properties: {
+                message: { type: 'string' }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Thread not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
 function addThreadMessage(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -280,6 +332,7 @@ function threadRoutes(server) {
         server.get('/threads/:threadId', { schema: getThreadSchema }, getThread);
         server.get('/threads/search', { schema: searchThreadsSchema }, searchThreads);
         server.post('/threads/new', { preValidation: [server.authenticate], schema: createThreadSchema }, createThread);
+        server.delete('/threads/:threadId', { preValidation: [server.authenticate], schema: deleteThreadSchema }, deleteThread);
         server.post('/threads/messages', { preValidation: [server.authenticate], schema: addMessageSchema }, addThreadMessage);
         server.post('/threads/messages/reactions', { preValidation: [server.authenticate], schema: toggleReactionSchema }, toggleMessageReaction);
         server.delete('/threads/clear', { preValidation: [server.adminAuthenticate], schema: utilities_1.clearCollectionSchema }, clearCollection);

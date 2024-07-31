@@ -204,7 +204,7 @@ async function populateBookBoxes() {
 async function populateBooks() {
     // add between 3 and 5 books to each book box
     for (let i = 0; i < bookBoxIds.length; i++) {
-        const nBooks = i == bookBoxIds.length - 1 ? 40 - bookIndex : faker.number.int({min: 3, max: 5});
+        const nBooks = i === (bookBoxIds.length - 1) ? 40 - bookIndex : faker.number.int({min: 3, max: 5});
         for (let i = 0; i < nBooks; i++) {
             const response = await fetch(url + "/books/add", {
                 method: "POST",

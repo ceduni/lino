@@ -190,48 +190,6 @@ const getBookInfoFromISBNSchema = {
         }
     }
 };
-function getBookThreads(request, reply) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield book_service_1.default.getBookThreads(request);
-            reply.send(response);
-        }
-        catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
-        }
-    });
-}
-const getBookThreadsSchema = {
-    description: 'Get the threads created talking about a book',
-    tags: ['books', 'threads'],
-    querystring: {
-        type: 'object',
-        properties: {
-            bookId: { type: 'string' },
-        }
-    },
-    response: {
-        200: {
-            description: 'Threads found',
-            type: 'array',
-            items: utilities_1.threadSchema
-        },
-        404: {
-            description: 'Book not found',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function searchBooks(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -335,6 +293,65 @@ const sendBookRequestSchema = {
         },
         400: {
             description: 'Error message',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+function deleteBookRequest(request, reply) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield book_service_1.default.deleteBookRequest(request);
+            reply.code(204).send({ message: 'Book request deleted' });
+        }
+        catch (error) {
+            reply.code(error.statusCode).send({ error: error.message });
+        }
+    });
+}
+const deleteBookRequestSchema = {
+    description: 'Delete a book request',
+    tags: ['books', 'users'],
+    params: {
+        type: 'object',
+        properties: {
+            id: { type: 'string' }
+        },
+        required: ['id']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' }
+        },
+        required: ['authorization']
+    },
+    response: {
+        204: {
+            description: 'Book request deleted',
+            type: 'object',
+            properties: {
+                message: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Error message',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
             type: 'object',
             properties: {
                 error: { type: 'string' }
@@ -537,6 +554,7 @@ const searchBookboxesSchema = {
                             name: { type: 'string' },
                             location: { type: 'array', items: { type: 'number' } },
                             infoText: { type: 'string' },
+                            image: { type: 'string' },
                             books: { type: 'array', items: utilities_1.bookSchema }
                         }
                     }
@@ -559,17 +577,6 @@ const searchBookboxesSchema = {
         }
     }
 };
-function clearCollection(request, reply) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield book_service_1.default.clearCollection();
-            reply.send({ message: 'Books cleared' });
-        }
-        catch (error) {
-            reply.code(500).send({ error: error.message });
-        }
-    });
-}
 function getBookRequests(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -605,16 +612,27 @@ const getBookRequestsSchema = {
                     isFulfilled: { type: 'boolean' }
                 }
             },
-            500: {
-                description: 'Error message',
-                type: 'object',
-                properties: {
-                    error: { type: 'string' }
-                }
+        },
+        500: {
+            description: 'Error message',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
             }
         }
     }
 };
+function clearCollection(request, reply) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield book_service_1.default.clearCollection();
+            reply.send({ message: 'Books cleared' });
+        }
+        catch (error) {
+            reply.code(500).send({ error: error.message });
+        }
+    });
+}
 function bookRoutes(server) {
     return __awaiter(this, void 0, void 0, function* () {
         server.get('/books/get/:id', { schema: getBookSchema }, getBook);
@@ -623,9 +641,9 @@ function bookRoutes(server) {
         server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate], schema: getBookInfoFromISBNSchema }, getBookInfoFromISBN);
         server.get('/books/search', { schema: searchBooksSchema }, searchBooks);
         server.get('/books/bookbox/search', { schema: searchBookboxesSchema }, searchBookboxes);
-        server.get('/books/threads/:id', { schema: getBookThreadsSchema }, getBookThreads);
         server.post('/books/add', { preValidation: [server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
         server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);
+        server.delete('/books/request/:id', { preValidation: [server.authenticate], schema: deleteBookRequestSchema }, deleteBookRequest);
         server.get('/books/requests', { schema: getBookRequestsSchema }, getBookRequests);
         server.post('/books/bookbox/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);
         server.delete('/books/clear', { preValidation: [server.adminAuthenticate], schema: utilities_1.clearCollectionSchema }, clearCollection);

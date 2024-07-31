@@ -117,6 +117,7 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
         console.log(`Server started on port ${port}`);
         yield server.ready();
         server.swagger(); // Ensure swagger is called after server starts
+        // Reinitialize the database
         yield (0, utilities_1.reinitDatabase)(server);
         yield (0, mock_data_gen_1.populateDatabase)();
     }

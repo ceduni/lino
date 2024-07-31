@@ -11,11 +11,53 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.populateDatabase = void 0;
 const faker_1 = require("@faker-js/faker");
-const url = "http://localhost:3000";
+const url = "https://lino-1.onrender.com";
 const bookBoxIds = [];
 const bookIds = [];
 const userIdentifiers = [];
-const reactions = ['like', 'love', 'laugh', 'sad', 'angry'];
+var bookIndex = 0;
+const bookISBNs = [
+    "9780061120084", // To Kill a Mockingbird
+    "9780451524935", // 1984
+    "9781503290563", // Pride and Prejudice
+    "9780743273565", // The Great Gatsby
+    "9781503280786", // Moby-Dick
+    "9781853260629", // War and Peace
+    "9780316769488", // The Catcher in the Rye
+    "9780547928227", // The Hobbit
+    "9781451673319", // Fahrenheit 451
+    "9780141441146", // Jane Eyre
+    "9780060850524", // Brave New World
+    "9780141439556", // Wuthering Heights
+    "9780451526342", // Animal Farm
+    "9780374528379", // The Brothers Karamazov
+    "9780486415871", // Crime and Punishment
+    "9780143128564", // The Grapes of Wrath
+    "9780142437230", // Great Expectations
+    "9780486280615", // The Adventures of Huckleberry Finn
+    "9780140283334", // The Odyssey
+    "9780143039433", // The Iliad
+    "9780140449112", // The Aeneid
+    "9780140449242", // The Divine Comedy
+    "9780375758997", // The Old Man and the Sea
+    "9780553213119", // Dracula
+    "9780141439600", // Frankenstein
+    "9780142424179", // The Fault in Our Stars
+    "9780307269751", // The Road
+    "9780143128571", // East of Eden
+    "9780345803481", // Fifty Shades of Grey
+    "9780679783268", // The Picture of Dorian Gray
+    "9780307474278", // Life of Pi
+    "9780143035008", // A Tale of Two Cities
+    "9780143111580", // On the Road
+    "9780743297332", // The Da Vinci Code
+    "9780062024039", // Divergent
+    "9780307588371", // The Girl with the Dragon Tattoo
+    "9781594489501", // The Kite Runner
+    "9780451526922", // The Scarlet Letter
+    "9780141442433", // Tess of the d'Urbervilles
+    "9780062316097" // The Alchemist
+];
 function randomUser() {
     return {
         username: faker_1.faker.internet.userName(),
@@ -25,71 +67,30 @@ function randomUser() {
     };
 }
 function randomBookBox() {
+    const campusBounds = {
+        north: 45.5048,
+        south: 45.4990,
+        west: -73.6195,
+        east: -73.6110
+    };
     return {
         name: faker_1.faker.lorem.word(),
-        longitude: faker_1.faker.location.longitude(),
-        latitude: faker_1.faker.location.latitude(),
+        longitude: faker_1.faker.number.float({
+            min: campusBounds.west,
+            max: campusBounds.east,
+            fractionDigits: 6,
+        }),
+        latitude: faker_1.faker.number.float({
+            min: campusBounds.south,
+            max: campusBounds.north,
+            fractionDigits: 6,
+        }),
         image: faker_1.faker.image.url(),
         infoText: faker_1.faker.lorem.sentence(),
     };
 }
-function randomISBN() {
-    const realISBNs = [
-        "9780316769488",
-        "9780439139601",
-        "9780439139595",
-        "9780446310789",
-        "9780061120084",
-        "9780316015844",
-        "9781400079988",
-        "9780140283297",
-        "9780375831003",
-        "9780307474278",
-        "9780743273565",
-        "9780385490818",
-        "9780142437230",
-        "9780451524935",
-        "9780060935467",
-        "9780743234801",
-        "9780307346605",
-        "9780812981605",
-        "9780812974492",
-        "9780679785897",
-        "9780140186390",
-        "9780156012195",
-        "9780812980196",
-        "9780812982077",
-        "9780307949486",
-        "9780307277674",
-        "9780385333499",
-        "9780375725784",
-        "9780345803481",
-        "9780812995343",
-        "9780143126560",
-        "9780142437209",
-        "9780679732761",
-        "9780316769174",
-        "9780679783275",
-        "9780399501487",
-        "9780374528379",
-        "9780394716096",
-        "9780345803924",
-        "9780399590500",
-        "9780143127550",
-        "9780374533557",
-        "9780143110439",
-        "9780812988659",
-        "9780307592736",
-        "9780679760801",
-        "9780385490628",
-        "9780812979657",
-        "9780307269751"
-    ];
-    return realISBNs[faker_1.faker.number.int({ min: 0, max: realISBNs.length - 1 })];
-}
-function randomBook() {
+function randomBook(isbn) {
     return __awaiter(this, void 0, void 0, function* () {
-        const isbn = randomISBN(); // Generate a random 13-digit ISBN
         const r = yield fetch(url + `/books/${isbn}`, {
             method: "GET",
             headers: {
@@ -154,6 +155,18 @@ function populateUsers() {
             const { username, password } = user;
             userIdentifiers.push({ identifier: username, password: password });
         }
+        yield fetch(url + "/users/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8",
+            },
+            body: JSON.stringify({
+                username: 'Asp3rity',
+                email: faker_1.faker.internet.email(),
+                phone: faker_1.faker.phone.number(),
+                password: 'J2s3jAsd'
+            })
+        });
         console.log("Users created");
     });
 }
@@ -190,15 +203,15 @@ function populateBookBoxes() {
 function populateBooks() {
     return __awaiter(this, void 0, void 0, function* () {
         // add between 3 and 5 books to each book box
-        for (let bookBoxId of bookBoxIds) {
-            const nBooks = faker_1.faker.number.int({ min: 3, max: 5 });
+        for (let i = 0; i < bookBoxIds.length; i++) {
+            const nBooks = i == bookBoxIds.length - 1 ? 40 - bookIndex : faker_1.faker.number.int({ min: 3, max: 5 });
             for (let i = 0; i < nBooks; i++) {
                 const response = yield fetch(url + "/books/add", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json; charset=UTF-8",
                     },
-                    body: JSON.stringify(Object.assign({ bookboxId: bookBoxId }, yield randomBook()))
+                    body: JSON.stringify(Object.assign({ bookboxId: bookBoxIds[i] }, yield randomBook(bookISBNs[bookIndex++])))
                 });
                 const { bookId } = yield response.json();
                 bookIds.push(bookId.toString());
@@ -233,7 +246,7 @@ function populateThreads() {
                 });
                 const { threadId } = yield response.json();
                 // add between 2 and 5 messages to each thread, which responds to the previous message with a probability of 0.5
-                const nMessages = faker_1.faker.number.int({ min: 2, max: 5 });
+                const nMessages = faker_1.faker.number.int({ min: 2, max: 3 });
                 let respondsTo = null;
                 for (let j = 0; j < nMessages; j++) {
                     if (faker_1.faker.number.float({ min: 0, max: 1 }) < 0.2) {
@@ -259,21 +272,6 @@ function populateThreads() {
                     });
                     const { messageId } = yield response.json();
                     respondsTo = messageId;
-                    if (faker_1.faker.number.float({ min: 0, max: 1 }) < 0.5) {
-                        // add a reaction to the message
-                        yield fetch(url + "/threads/messages/reactions", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json; charset=UTF-8",
-                                "Authorization": "Bearer " + otherUserToken,
-                            },
-                            body: JSON.stringify({
-                                reactIcon: reactions[faker_1.faker.number.int({ min: 0, max: 4 })],
-                                threadId: threadId,
-                                messageId: messageId,
-                            })
-                        });
-                    }
                 }
             }
         }

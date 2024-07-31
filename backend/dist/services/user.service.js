@@ -222,16 +222,21 @@ const UserService = {
         });
     }
 };
-function notifyUser(userId, message) {
+function notifyUser(userId, title, message) {
     return __awaiter(this, void 0, void 0, function* () {
         let user = yield user_model_1.default.findById(userId);
         if (!user) {
             throw (0, utilities_1.newErr)(404, 'User not found');
         }
-        // @ts-ignore
-        const notification = { content: message };
-        user.notifications.push(notification);
-        yield user.save();
+        const notification = { title: title, content: message, timestamp: new Date(), read: false };
+        // Validate and push the notification into the user's notifications array
+        try {
+            user.notifications.push(notification); // Type assertion to avoid TypeScript errors
+            yield user.save();
+        }
+        catch (error) {
+            throw new Error(`Failed to save notification: ${error.message}`);
+        }
         return user;
     });
 }

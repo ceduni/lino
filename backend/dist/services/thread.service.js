@@ -60,10 +60,21 @@ const ThreadService = {
                 bookTitle: bookTitle,
                 username: username,
                 title: title,
+                image: book.coverImage,
                 messages: []
             });
             yield thread.save();
             return thread;
+        });
+    },
+    deleteThread(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const threadId = request.params.threadId;
+            const thread = yield thread_model_1.default.findById(threadId);
+            if (!thread) {
+                throw (0, utilities_1.newErr)(404, 'Thread not found');
+            }
+            yield thread.deleteOne();
         });
     },
     addThreadMessage(request) {
@@ -101,7 +112,7 @@ const ThreadService = {
                         throw (0, utilities_1.newErr)(404, 'User not found');
                     }
                     // @ts-ignore
-                    yield (0, user_service_1.notifyUser)(userParent.id, `${username} responded to your message in the thread "${thread.title}"`);
+                    yield (0, user_service_1.notifyUser)(userParent.id, `${userParent.username} in ${thread.title}`, parentMessage.content);
                 }
             }
             // Get the _id of the newly created message
@@ -148,19 +159,13 @@ const ThreadService = {
     searchThreads(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const query = request.query.q;
-            let threads;
+            let threads = yield thread_model_1.default.find();
             if (query) {
-                // Perform text search
-                threads = yield thread_model_1.default.find({ $text: { $search: query } });
-                // Further filter using regex for more flexibility
+                // Filter using regex for more flexibility
                 const regex = new RegExp(query, 'i');
                 threads = threads.filter(thread => regex.test(thread.bookTitle) || regex.test(thread.title) || regex.test(thread.username));
             }
-            else {
-                // Return all documents if the search query is empty
-                threads = yield thread_model_1.default.find();
-            }
-            // classify : ['by recent activity', 'by number of messages']
+            // classify : ['by recent activity', 'by number of messages', by creation date']
             let classify = request.query.cls || 'by recent activity';
             const asc = request.query.asc; // Boolean
             if (classify === 'by recent activity') {
@@ -173,6 +178,13 @@ const ThreadService = {
             else if (classify === 'by number of messages') {
                 threads.sort((a, b) => {
                     return asc ? a.messages.length - b.messages.length : b.messages.length - a.messages.length;
+                });
+            }
+            else if (classify === 'by creation date') {
+                threads.sort((a, b) => {
+                    const aDate = a.timestamp.getTime();
+                    const bDate = b.timestamp.getTime();
+                    return asc ? aDate - bDate : bDate - aDate;
                 });
             }
             return { threads: threads };

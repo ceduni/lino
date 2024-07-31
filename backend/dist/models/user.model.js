@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const notificationSchema = new mongoose_1.default.Schema({
     timestamp: { type: Date, default: Date.now },
+    title: { type: String, required: true },
     content: { type: String, required: true },
     read: { type: Boolean, default: false }
 });
@@ -24,6 +25,7 @@ const userSchema = new mongoose_1.default.Schema({
     },
     notifications: { type: [notificationSchema], default: [] },
     getAlerted: { type: Boolean, default: true },
+    bookHistory: { type: [{ bookId: String, timestamp: { type: Date, default: Date.now }, given: Boolean }], default: [] },
 });
 const User = mongoose_1.default.model('User', userSchema, "users");
 exports.default = User;
