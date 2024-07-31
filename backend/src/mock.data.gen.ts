@@ -85,7 +85,9 @@ function randomBookBox() {
 }
 
 
-async function randomBook(isbn: string) {
+async function randomBook() {
+    const isbn = bookISBNs[bookIndex];
+    bookIndex++;
     const r = await fetch(url + `/books/${isbn}`, {
         method: "GET",
         headers: {
@@ -213,9 +215,10 @@ async function populateBooks() {
                 },
                 body: JSON.stringify({
                     bookboxId: bookBoxIds[i],
-                    ...await randomBook(bookISBNs[bookIndex++]),
+                    ...await randomBook(),
                 })
             });
+            console.log(response);
             const { bookId } = await response.json();
             bookIds.push(bookId.toString());
         }
