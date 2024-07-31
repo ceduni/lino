@@ -30,11 +30,9 @@ class ProfilePage extends HookWidget {
     List<Map<String, dynamic>> booksHistory = userData['user']['bookHistory'];
     List<Map<String, dynamic>> favoriteBooks =
         userData['user']['favoriteBooks'];
-    List<Map<String, dynamic>> trackedBooks = userData['user']['trackedBooks'];
 
     return UserDashboard(
       favoriteBooks: favoriteBooks,
-      trackedBooks: trackedBooks,
       booksHistory: booksHistory,
       username: userData['user']['username'],
       savedTrees: savedTrees,
@@ -86,10 +84,6 @@ class ProfilePage extends HookWidget {
               getBooksListFromUserData(userData.data!['user']['favoriteBooks']),
           [userData.data])),
       useFuture(useMemoized(
-          () =>
-              getBooksListFromUserData(userData.data!['user']['trackedBooks']),
-          [userData.data])),
-      useFuture(useMemoized(
           () => getBooksListFromUserData(userData.data!['user']['bookHistory']),
           [userData.data])),
     ];
@@ -109,14 +103,16 @@ class ProfilePage extends HookWidget {
       'user': {
         ...userData.data!['user'],
         'favoriteBooks': bookDataFutures[0].data!['books'],
-        'trackedBooks': bookDataFutures[1].data!['books'],
-        'bookHistory': bookDataFutures[2].data!['books'],
+        'bookHistory': bookDataFutures[1].data!['books'],
       }
     };
 
+    final username = modifiedUserData['user']!['username'];
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User Profile Test'),
+        backgroundColor: Color.fromRGBO(125, 200, 237, 1),
+        title: Text(username),
         actions: [
           IconButton(
             icon: Icon(Icons.settings),

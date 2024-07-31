@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 class UserDashboard extends StatefulWidget {
   final List<Map<String, dynamic>> favoriteBooks;
-  final List<Map<String, dynamic>> trackedBooks;
   final List<Map<String, dynamic>> booksHistory;
 
   final String username;
@@ -14,7 +13,6 @@ class UserDashboard extends StatefulWidget {
   const UserDashboard(
       {super.key,
       required this.favoriteBooks,
-      required this.trackedBooks,
       required this.booksHistory,
       required this.username,
       required this.savedTrees,
@@ -29,7 +27,7 @@ class _UserDashboardState extends State<UserDashboard> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: NestedScrollView(
         // allows you to build a list of elements that would be scrolled away till the body reached the top
         headerSliverBuilder: (context, _) {
@@ -54,7 +52,6 @@ class _UserDashboardState extends State<UserDashboard> {
             TabBar(
               tabs: const [
                 Tab(icon: Icon(Icons.favorite)),
-                Tab(icon: Icon(Icons.change_circle)),
                 Tab(icon: Icon(Icons.history))
               ],
             ),
@@ -62,7 +59,6 @@ class _UserDashboardState extends State<UserDashboard> {
               child: TabBarView(
                 children: [
                   TabView(books: widget.favoriteBooks),
-                  TabView(books: widget.trackedBooks),
                   TabView(books: widget.booksHistory),
                 ],
               ),
@@ -106,18 +102,20 @@ class ProfileCard extends StatelessWidget {
                   // TODO: Add avatar
                   // backgroundImage: NetworkImage(avatar),
                 ),
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        _buildStatColumn('$booksBorrowed', 'Books Borrowed'),
-                        SizedBox(width: 8),
-                        _buildStatColumn('$booksGiven', 'Books Given'),
-                        SizedBox(width: 8),
-                        _buildStatColumn('$savedTrees', 'Saved Trees'),
-                      ],
-                    ),
-                  ],
+                SizedBox(width: 16), // Add space between avatar and stats
+                Expanded(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildStatColumn('$booksBorrowed', 'Books Borrowed'),
+                          _buildStatColumn('$booksGiven', 'Books Given'),
+                          _buildStatColumn('$savedTrees', 'Saved Trees'),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
