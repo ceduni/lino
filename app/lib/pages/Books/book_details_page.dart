@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import '../../nav_menu.dart';
 import '../../services/book_services.dart';
-import '../../services/thread_services.dart';
+import './add_thread_form.dart';
 import '../../services/user_services.dart';
+import 'expandable_text.dart';
 
 class BookDetailsPage extends StatefulWidget {
   final Map<String, dynamic> book;
@@ -18,11 +21,14 @@ class BookDetailsPage extends StatefulWidget {
 class _BookDetailsPageState extends State<BookDetailsPage> {
   bool _isFavorite = false;
   bool _isLoading = true;
+  bool _isUserLoggedIn = false;
+  bool _isCheckingUser = true;  // New flag to check if user status is being checked
 
   @override
   void initState() {
     super.initState();
     _checkIfFavorite();
+    _checkUserLoggedIn();
   }
 
   Future<void> _checkIfFavorite() async {
@@ -36,9 +42,25 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       }
       setState(() {
         _isFavorite = favs.contains(widget.book['_id']);
-        _isLoading = false;
       });
     }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _checkUserLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token != null) {
+      final user = await UserService().getUser(token);
+      setState(() {
+        _isUserLoggedIn = user['user'] != null && user['user'].isNotEmpty;
+      });
+    }
+    setState(() {
+      _isCheckingUser = false;
+    });
   }
 
   Future<void> _toggleFavorite() async {
@@ -66,23 +88,6 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
         );
       }
     }
-  }
-
-  Future<bool> _isUserLoggedIn() async {
-    final prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString('token');
-    if (token == null) {
-      return false;
-    }
-
-    var user = await UserService().getUser(token);
-
-    // Check if the 'user' key is an empty object
-    if (user['user'] != null && user['user'].isEmpty) {
-      return false;
-    }
-
-    return true;
   }
 
   void _showAddThreadForm(BuildContext context, String bookId) {
@@ -135,18 +140,24 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
     }
   }
 
+  void _navigateToForumPage() {
+    final controller = Get.find<NavigationController>();
+    controller.navigateToForumWithQuery(widget.book['title']);
+    Navigator.of(context).pop(); // Close the dialog
+  }
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: SingleChildScrollView(
+      child: _isLoading || _isCheckingUser
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Container for the book cover, title, and author
               Container(
                 decoration: BoxDecoration(
                   color: const Color.fromRGBO(250, 250, 240, 1).withOpacity(0.9),
@@ -176,48 +187,37 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                     SizedBox(height: 8),
                     Text('Authors: ${widget.book['authors'].join(', ')}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
                     SizedBox(height: 8),
-                    FutureBuilder<bool>(
-                      future: _isUserLoggedIn(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return SizedBox.shrink(); // Show nothing while waiting
-                        } else if (snapshot.hasData && snapshot.data == true) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green.shade700, // Semi-dark green background
-                                ),
-                                onPressed: () {
-                                  _showAddThreadForm(context, widget.book['_id']);
-                                },
-                                child: Text('+ Add Thread', style: TextStyle(color: Colors.white)),
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: LinoColors.secondary, // LinoColors.primary background
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)), // Rectangular shape with rounded corners
-                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Increase horizontal padding
-                                ),
-                                onPressed: _isLoading ? null : _toggleFavorite,
-                                child: Icon(
-                                  _isFavorite ? Icons.favorite : Icons.favorite_border,
-                                  color: Colors.redAccent,
-                                ),
-                              ),
-                            ],
-                          );
-                        } else {
-                          return SizedBox.shrink(); // Show nothing if no token
-                        }
-                      },
-                    ),
+                    if (_isUserLoggedIn)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green.shade700,
+                            ),
+                            onPressed: () {
+                              _showAddThreadForm(context, widget.book['_id']);
+                            },
+                            child: Text('+ Add Thread', style: TextStyle(color: Colors.white)),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: LinoColors.secondary,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            ),
+                            onPressed: _isLoading ? null : _toggleFavorite,
+                            child: Icon(
+                              _isFavorite ? Icons.favorite : Icons.favorite_border,
+                              color: Colors.redAccent,
+                            ),
+                          ),
+                        ],
+                      ),
                   ],
                 ),
               ),
               SizedBox(height: 16),
-              // Container for the book description and other details
               Container(
                 decoration: BoxDecoration(
                   color: const Color.fromRGBO(244, 226, 193, 1).withOpacity(0.9),
@@ -251,167 +251,24 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                     Center(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white, backgroundColor: Colors.blue, // Text color
+                          foregroundColor: Colors.white, backgroundColor: Colors.blue,
                         ),
                         onPressed: _showGetBookConfirmation,
                         child: Text('Get book from bookbox'),
                       ),
                     ),
+                    if (_isUserLoggedIn)
+                      Center(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white, backgroundColor: Colors.blue,
+                          ),
+                          onPressed: _navigateToForumPage,
+                          child: Text('View Threads in Forum'),
+                        ),
+                      ),
                   ],
                 ),
-              ),
-
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ExpandableText extends StatefulWidget {
-  final String text;
-
-  ExpandableText(this.text);
-
-  @override
-  _ExpandableTextState createState() => _ExpandableTextState();
-}
-
-class _ExpandableTextState extends State<ExpandableText> {
-  late String firstHalf;
-  late String secondHalf;
-
-  bool flag = true;
-  int FIRST_HALF_CHARACTERS = 200;
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (widget.text.length > FIRST_HALF_CHARACTERS) {
-      firstHalf = widget.text.substring(0, FIRST_HALF_CHARACTERS);
-      secondHalf = widget.text.substring(FIRST_HALF_CHARACTERS, widget.text.length);
-    } else {
-      firstHalf = widget.text;
-      secondHalf = "";
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      child: secondHalf.isEmpty
-          ? Text(
-        firstHalf,
-        textAlign: TextAlign.start,
-        style: TextStyle(fontFamily: 'Kanit'),
-      )
-          : Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            flag ? (firstHalf + "...") : (firstHalf + secondHalf),
-            textAlign: TextAlign.start,
-            style: TextStyle(fontFamily: 'Kanit'),
-          ),
-          InkWell(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Icon(
-                  flag ? Icons.arrow_drop_down : Icons.arrow_drop_up,
-                  color: Colors.blue,
-                ),
-              ],
-            ),
-            onTap: () {
-              setState(() {
-                flag = !flag;
-              });
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class AddThreadForm extends StatefulWidget {
-  final String bookId;
-
-  const AddThreadForm({required this.bookId, Key? key}) : super(key: key);
-
-  @override
-  _AddThreadFormState createState() => _AddThreadFormState();
-}
-
-class _AddThreadFormState extends State<AddThreadForm> {
-  final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  bool _isLoading = false;
-
-  Future<void> _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('token');
-        if (token != null) {
-          await ThreadService().createThread(token, widget.bookId, _titleController.text);
-          Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Thread created successfully!')),
-          );
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Create New Thread', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _titleController,
-                decoration: InputDecoration(
-                  labelText: 'Title',
-                  hintText: 'The title of your new thread',
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              _isLoading
-                  ? CircularProgressIndicator()
-                  : ElevatedButton(
-                onPressed: _submitForm,
-                child: Text('Submit'),
               ),
             ],
           ),

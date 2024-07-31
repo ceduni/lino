@@ -55,7 +55,7 @@ class NavigationPage extends StatelessWidget {
                             showDialog(
                               context: context,
                               builder: (context) =>
-                                  BookDetailsPage(book: bb['books'][index]),
+                                  BookDetailsPage(book: bb['books'][index], bbid: bb['_id'],),
                             );
                           },
                           child: Padding(

@@ -180,46 +180,6 @@ const getBookInfoFromISBNSchema = {
     }
 };
 
-async function getBookThreads(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const response = await BookService.getBookThreads(request);
-        reply.send(response);
-    } catch (error : any) {
-        reply.code(error.statusCode).send({error: error.message});
-    }
-}
-
-const getBookThreadsSchema = {
-    description: 'Get the threads created talking about a book',
-    tags: ['books', 'threads'],
-    querystring: {
-        type: 'object',
-        properties: {
-            bookId: { type: 'string' },
-        }
-    },
-    response: {
-        200: {
-            description: 'Threads found',
-            type: 'array',
-            items: threadSchema
-        },
-        404: {
-            description: 'Book not found',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: {type: 'string'}
-            }
-        }
-    }
-}
 
 async function searchBooks(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -685,7 +645,6 @@ export default async function bookRoutes(server: MyFastifyInstance) {
     server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate], schema: getBookInfoFromISBNSchema }, getBookInfoFromISBN);
     server.get('/books/search', { schema: searchBooksSchema }, searchBooks);
     server.get('/books/bookbox/search', { schema: searchBookboxesSchema }, searchBookboxes);
-    server.get('/books/threads/:id', { schema: getBookThreadsSchema }, getBookThreads);
     server.post('/books/add', { preValidation: [server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
     server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);
     server.delete('/books/request/:id', { preValidation: [server.authenticate], schema: deleteBookRequestSchema }, deleteBookRequest);

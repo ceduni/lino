@@ -83,14 +83,23 @@ class NavigationController extends GetxController {
   late Rx<int> selectedIndex = 0.obs;
   final GlobalKey<ForumScreenState> forumScreenKey = GlobalKey<ForumScreenState>();
   final RxString sourcePage = ''.obs;
+  late String forumQuery;
 
   late final List<Widget> screens;
 
   NavigationController() {
+    forumQuery = '';
     screens = [
       NavigationPage(),
       MapScreen(),
-      ForumScreen(key: forumScreenKey),
+      ForumScreen(key: forumScreenKey, query: forumQuery),
     ];
   }
+
+  void navigateToForumWithQuery(String query) {
+    forumQuery = query;
+    selectedIndex.value = 2; // Set to Forum tab
+    screens[2] = ForumScreen(key: forumScreenKey, query: forumQuery); // Update ForumScreen with new query
+  }
 }
+

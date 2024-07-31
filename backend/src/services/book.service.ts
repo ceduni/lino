@@ -261,17 +261,18 @@ const bookService = {
 
         books = await Book.find(filter).sort(sortOptions);
 
-        // Ensure only books present in bookboxes are returned
         const bookBoxes = await BookBox.find();
+        const finalBooks = [];
         for (let i = 0; i < books.length; i++) {
             const book = books[i].toObject();
             // @ts-ignore
             book.bookboxPresence = bookBoxes.filter((box) =>
                 box.books.includes(book._id.toString())
             ).map(box => box._id);
+            finalBooks.push(book);
         }
 
-        return books;
+        return finalBooks;
     },
 
 
@@ -404,14 +405,6 @@ const bookService = {
         }
     },
 
-    async getBookThreads(request: any) {
-        let book = await Book.findById(request.params.id);
-        if (!book) {
-            throw newErr(404, 'Book not found');
-        }
-        let title = book.title;
-        return Thread.find({bookTitle: title});
-    },
 
     async getBookRequests(request: any) {
         let username = request.params.username;

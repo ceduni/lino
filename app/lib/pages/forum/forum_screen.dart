@@ -5,7 +5,9 @@ import 'requests_section.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 
 class ForumScreen extends StatefulWidget {
-  const ForumScreen({super.key});
+  String? query;
+
+  ForumScreen({super.key, this.query});
 
   @override
   ForumScreenState createState() => ForumScreenState();
@@ -20,12 +22,17 @@ class ForumScreenState extends State<ForumScreen> {
     return prefs.containsKey('token');
   }
 
-  Future<void> refreshThreads() async {
-    threadsSectionKey.currentState?.fetchThreadTiles(cls: 'by creation date', asc: false);
+  void refreshThreads() {
+    threadsSectionKey.currentState?.fetchThreadTiles(cls: 'by creation date', asc: false, q: '');
   }
 
-  Future<void> refreshRequests() async {
+  void refreshRequests() {
     requestsSectionKey.currentState?.fetchRequests();
+  }
+
+  Future<void> _refresh() async {
+    refreshThreads();
+    refreshRequests();
   }
 
   @override
@@ -81,11 +88,11 @@ class ForumScreenState extends State<ForumScreen> {
             body: TabBarView(
               children: [
                 RefreshIndicator(
-                  onRefresh: refreshThreads,
-                  child: ThreadsSection(key: threadsSectionKey),
+                  onRefresh: _refresh,
+                  child: ThreadsSection(key: threadsSectionKey, query: widget.query),
                 ),
                 RefreshIndicator(
-                  onRefresh: refreshRequests,
+                  onRefresh: _refresh,
                   child: RequestsSection(key: requestsSectionKey),
                 ),
               ],

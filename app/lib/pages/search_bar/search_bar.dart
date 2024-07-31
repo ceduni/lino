@@ -20,7 +20,6 @@ class SearchController extends GetxController {
     if (query.isEmpty) {
       results.clear();
     } else {
-      // Implement your search logic here
       print('Searching for $query');
       var bookDict = await BookService().searchBooks(kw: query);
       var bookResults = bookDict['books'];
@@ -31,6 +30,7 @@ class SearchController extends GetxController {
     }
   }
 }
+
 
 class LinoSearchBar extends StatelessWidget {
   final int sourcePage;

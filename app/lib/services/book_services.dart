@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:Lino_app/services/thread_services.dart';
 import 'package:http/http.dart' as http;
 
 class BookService {
@@ -259,19 +260,7 @@ class BookService {
     }
   }
 
-  Future<List<dynamic>> getBookThreads(String bookId) async {
-    final r = await http.get(
-      Uri.parse('$url/books/threads/$bookId'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-    final response = jsonDecode(r.body);
-    if (r.statusCode != 200) {
-      throw Exception(response['error']);
-    }
-    return response;
-  }
+
 
   Future<List<dynamic>> getBookRequests({String? username}) async {
     var queryParams = {
