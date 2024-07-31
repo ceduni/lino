@@ -75,13 +75,19 @@ class BookBoxesList extends StatelessWidget {
                 final bookbox = bookboxes[index];
                 final distance = _calculateDistance(userLocation, bookbox['location']);
                 final distanceStr = '${distance.toStringAsFixed(2)} km';
-                final bbimage = bookbox['image'];
-                print('Bookbox: ${bookbox['name']} - Distance: $distanceStr, Image: $bbimage');
-
                 return Card(
                     color: Colors.blueGrey[50],
                     margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                     child: ListTile(
+                      leading: Image.network(
+                        bookbox['image'],
+                        fit: BoxFit.cover,
+                        width: 50,
+                        height: 75,
+                        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                          return Icon(Icons.book);
+                        },
+                      ),
                       title: Text(
                         bookbox['name'],
                         style: TextStyle(fontWeight: FontWeight.bold),

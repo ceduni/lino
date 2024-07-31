@@ -16,6 +16,7 @@ const messageSchema = new mongoose.Schema({
 
 const threadSchema = new mongoose.Schema({
     bookTitle: { type: String, required: true },
+    image: { type: String },
     username: { type: String, required: true },
     title: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },

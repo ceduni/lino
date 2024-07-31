@@ -42,6 +42,7 @@ export const threadSchema = {
         _id: { type: 'string' },
         username: { type: 'string' },
         title: { type: 'string' },
+        image: { type: 'string' },
         bookTitle: { type: 'string' },
         timestamp: { type: 'string', format: 'date-time' },
         messages: {

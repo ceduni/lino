@@ -23,6 +23,7 @@ const ThreadService = {
             bookTitle: bookTitle,
             username: username,
             title: title,
+            image: book.coverImage,
             messages: []
         });
         await thread.save();
