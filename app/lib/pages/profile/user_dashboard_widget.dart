@@ -1,3 +1,4 @@
+import 'package:Lino_app/pages/Books/book_details_page.dart';
 import 'package:flutter/material.dart';
 
 class UserDashboard extends StatefulWidget {
@@ -180,42 +181,52 @@ class TabView extends StatelessWidget {
       padding: EdgeInsets.zero,
       crossAxisCount: 3,
       children: books.map((book) {
-        return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            margin: EdgeInsets.only(bottom: 8.0, top: 8.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        book['coverImage'],
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                        errorBuilder: (BuildContext context, Object exception,
-                            StackTrace? stackTrace) {
-                          return Image.network(
-                            // TODO: replace the placeholder with a real fall back image
-
-                            'https://placehold.co/600x400',
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                          );
-                        },
+        return GestureDetector(
+          onTap: () {
+            // TODO: Will cause error here because bbid is not passed, maybe drop the bbid as requirement?
+            showDialog(
+                context: context,
+                builder: (context) => BookDetailsPage(
+                      book: book,
+                      bbid: '',
+                    ));
+          },
+          child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              margin: EdgeInsets.only(bottom: 8.0, top: 8.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: Image.network(
+                          book['coverImage'],
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          errorBuilder: (BuildContext context, Object exception,
+                              StackTrace? stackTrace) {
+                            return Image.network(
+                              // TODO: replace the placeholder with a real fall back image
+                              'https://placehold.co/600x400',
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 8.0),
-                Text(book['title']),
-              ],
-            ));
+                  SizedBox(height: 8.0),
+                  Text(book['title']),
+                ],
+              )),
+        );
       }).toList(),
     );
   }
