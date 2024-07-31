@@ -557,6 +557,7 @@ const searchBookboxesSchema = {
                             name: { type: 'string' },
                             location: { type: 'array', items: { type: 'number' } },
                             infoText: { type: 'string' },
+                            image: { type: 'string' },
                             books: { type: 'array', items: bookSchema }
                         }
                     }

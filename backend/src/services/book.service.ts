@@ -5,7 +5,6 @@ import BookBox from "../models/bookbox.model";
 import Request from "../models/book.request.model";
 import {notifyUser} from "./user.service";
 import {newErr} from "./utilities";
-import Thread from "../models/thread.model";
 
 const bookService = {
     async getBookBox(bookBoxId: string) {

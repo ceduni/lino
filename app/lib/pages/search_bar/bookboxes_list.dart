@@ -1,11 +1,45 @@
-// bookboxes_list.dart
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:Lino_app/services/book_services.dart';
+import '../BookBox/book_box_screen.dart'; // Update this import based on your project structure
 
 class BookBoxesList extends StatelessWidget {
   final String query;
 
-  BookBoxesList({required this.query});
+  const BookBoxesList({required this.query});
+
+  Future<Position> _getUserLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied.');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    return await Geolocator.getCurrentPosition();
+  }
+
+  double _calculateDistance(Position userLocation, List<dynamic> bookboxLocation) {
+    return Geolocator.distanceBetween(
+      userLocation.latitude,
+      userLocation.longitude,
+      bookboxLocation[1],
+      bookboxLocation[0],
+    ) / 1000; // Convert to kilometers
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,18 +55,53 @@ class BookBoxesList extends StatelessWidget {
         }
 
         final bookboxes = snapshot.data!['bookboxes'];
-        return ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: bookboxes.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(bookboxes[index]['name']),
-              subtitle: Text(
-                bookboxes[index]['infoText'],
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+        return FutureBuilder<Position>(
+          future: _getUserLocation(),
+          builder: (context, locationSnapshot) {
+            if (locationSnapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (locationSnapshot.hasError) {
+              return Center(child: Text('Error: ${locationSnapshot.error}'));
+            } else if (!locationSnapshot.hasData) {
+              return Center(child: Text('Unable to get location.'));
+            }
+
+            final userLocation = locationSnapshot.data!;
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: bookboxes.length,
+              itemBuilder: (context, index) {
+                final bookbox = bookboxes[index];
+                final distance = _calculateDistance(userLocation, bookbox['location']);
+                final distanceStr = '${distance.toStringAsFixed(2)} km';
+                final bbimage = bookbox['image'];
+                print('Bookbox: ${bookbox['name']} - Distance: $distanceStr, Image: $bbimage');
+
+                return Card(
+                    color: Colors.blueGrey[50],
+                    margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    child: ListTile(
+                      title: Text(
+                        bookbox['name'],
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        '${bookbox['books'].length} books',
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                      trailing: Text(distanceStr),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BookBoxScreen(bookBoxId: bookbox['id']),
+                          ),
+                        );
+                      },
+                    )
+                );
+              },
             );
           },
         );
