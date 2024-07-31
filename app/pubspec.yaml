@@ -30,6 +30,7 @@ dependencies:
   flutter_hooks: ^0.20.5
   flutter_multi_formatter: ^2.13.0
   intl_phone_number_input: ^0.7.0
+  nfc_manager: ^3.5.0
 
 
 dev_dependencies:

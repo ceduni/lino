@@ -26,6 +26,12 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NFCReaderUsageDescription</key>
+	<string>We need to use NFC to read bookbox tags.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires camera access to scan barcodes.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app requires location access to show your current location on the map.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -45,9 +51,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSCameraUsageDescription</key>
-	<string>This app requires camera access to scan barcodes.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app requires location access to show your current location on the map.</string>
+	<key>com.apple.developer.nfc.readersession.formats</key>
+	<array>
+		<string>NDEF</string>
+		<string>TAG</string>
+	</array>
 </dict>
 </plist>
