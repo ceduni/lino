@@ -1,108 +1,56 @@
 import 'package:Lino_app/pages/profile/user_dashboard_widget.dart';
+import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends HookWidget {
-  SharedPreferences? prefs;
-  String? token;
+  ProfilePage({Key? key}) : super(key: key);
 
-  ProfilePage({Key? key}) {
-    initializePrefs();
-  }
-
-  Future<void> initializePrefs() async {
-    prefs = await SharedPreferences.getInstance();
-    token = prefs!.getString('token');
-    print('token: $token');
+  Future<String?> initializePrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
   }
 
   Future<Map<String, dynamic>> getUserData(String token) async {
-    var user = await UserService().getUser(token);
-    print('User data: $user');
-    return user;
+    return await UserService().getUser(token);
+  }
+
+  Future<Map<String, dynamic>> getBooksListFromUserData(
+      List<dynamic> bookIds) async {
+    List<Map<String, dynamic>> books = await Future.wait(
+      bookIds.map((id) => BookService().getBook(id)).toList(),
+    );
+    return {'books': books};
   }
 
   Widget buildContent(BuildContext context, Map<String, dynamic> userData) {
-    userData = userData['user'];
-
-    double carbonSavings = userData['ecologicalImpact']['carbonSavings'];
-    double savedWater = userData['ecologicalImpact']['savedWater'];
-    double savedTrees = userData['ecologicalImpact']['savedTrees'];
-    // int booksBorrowed = userData['bookHistory']['booksBorrowed'];
-    // int booksGiven = userData['bookHistory']['booksGiven'];
-
-    int booksBorrowed = 0;
-    int booksGiven = 0;
-
-    // print(userData['bookHistory'].runtimeType);
-    // print(userData['favoriteBooks'].runtimeType);
-    // print(userData['trackedBooks'].runtimeType);
-
-    List<dynamic> dynamicBooksHistory = userData['bookHistory'];
-    List<dynamic> dynamicFavoriteBooks = userData['favoriteBooks'];
-    List<dynamic> dynamicTrackedBooks = userData['trackedBooks'];
-
-    // Function to transform List<dynamic> to List<Map<String, dynamic>>
-    List<Map<String, dynamic>> transformToMapList(List<dynamic> dynamicList) {
-      return dynamicList.map((item) {
-        if (item is Map<String, dynamic>) {
-          return item;
-        } else {
-          throw TypeError(); // Handle unexpected item type appropriately
-        }
-      }).toList();
-    }
-
-    // Transform the dynamic lists to List<Map<String, dynamic>>
-    List<Map<String, dynamic>> booksHistory =
-        transformToMapList(dynamicBooksHistory);
+    double savedTrees = userData['user']['ecologicalImpact']['savedTrees'];
+    List<Map<String, dynamic>> booksHistory = userData['user']['bookHistory'];
     List<Map<String, dynamic>> favoriteBooks =
-        transformToMapList(dynamicFavoriteBooks);
-    List<Map<String, dynamic>> trackedBooks =
-        transformToMapList(dynamicTrackedBooks);
-
-    // List<Map<String, dynamic>> booksHistory = userData['bookHistory'];
-    // List<Map<String, dynamic>> favoriteBooks = userData['favoriteBooks'];
-    // List<Map<String, dynamic>> trackedBooks = userData['trackedBooks'];
+        userData['user']['favoriteBooks'];
+    List<Map<String, dynamic>> trackedBooks = userData['user']['trackedBooks'];
 
     return UserDashboard(
       favoriteBooks: favoriteBooks,
       trackedBooks: trackedBooks,
       booksHistory: booksHistory,
-      username: userData['username'],
-      carbonSavings: carbonSavings,
-      savedWater: savedWater,
+      username: userData['user']['username'],
       savedTrees: savedTrees,
-      booksBorrowed: booksBorrowed,
-      booksGiven: booksGiven,
+      booksBorrowed: 0,
+      booksGiven: 0,
     );
-    // // return Column(
-    // //   children: [
-    // //     Center(
-    // //       child: Text(userData.toString()),
-    // //     ),
-    // //     Center(child: Text(userData['username'].toString())),
-    // //     Center(child: Text(userData['email'].toString())),
-    // //     Center(child: Text(userData['phone'].toString())),
-    // //     Center(child: Text(userData['getAlerted'].toString())),
-    // //     Center(child: Text(userData['ecologicalImapct'].toString())),
-    // //     Center(child: Text(userData['favoriteBooks'].toString())),
-    // //     Center(child: Text(userData['trackedBooks'].toString())),
-    // //     Center(child: Text(userData['notificationKeyWords'].toString())),
-    // //     Center(child: Text(userData['notifications'].toString())),
-    // //     Center(child: Text(userData['bookHistory'].toString())),
-    // //   ],
-    // // );
   }
 
   @override
   Widget build(BuildContext context) {
     final initialized = useState(false);
+    final token = useState<String?>(null);
 
     useEffect(() {
-      initializePrefs().then((_) {
+      initializePrefs().then((value) {
+        token.value = value;
         initialized.value = true;
       });
       return null;
@@ -112,7 +60,59 @@ class ProfilePage extends HookWidget {
       return Center(child: CircularProgressIndicator());
     }
 
-    final userData = useFuture(useMemoized(() => getUserData(token!), [token]));
+    if (token.value == null || token.value!.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('User Profile Test'),
+        ),
+        body: Center(child: Text('No token found. Please log in.')),
+      );
+    }
+
+    final userData =
+        useFuture(useMemoized(() => getUserData(token.value!), [token.value]));
+
+    if (userData.connectionState != ConnectionState.done) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (userData.hasError || userData.data == null) {
+      return Center(child: Text('Error loading data or user data is null'));
+    }
+
+    final bookDataFutures = [
+      useFuture(useMemoized(
+          () =>
+              getBooksListFromUserData(userData.data!['user']['favoriteBooks']),
+          [userData.data])),
+      useFuture(useMemoized(
+          () =>
+              getBooksListFromUserData(userData.data!['user']['trackedBooks']),
+          [userData.data])),
+      useFuture(useMemoized(
+          () => getBooksListFromUserData(userData.data!['user']['bookHistory']),
+          [userData.data])),
+    ];
+
+    if (bookDataFutures
+        .any((future) => future.connectionState != ConnectionState.done)) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (bookDataFutures
+        .any((future) => future.hasError || future.data == null)) {
+      return Center(
+          child: Text('Error loading book data or book data is null'));
+    }
+
+    final modifiedUserData = {
+      'user': {
+        ...userData.data!['user'],
+        'favoriteBooks': bookDataFutures[0].data!['books'],
+        'trackedBooks': bookDataFutures[1].data!['books'],
+        'bookHistory': bookDataFutures[2].data!['books'],
+      }
+    };
 
     return Scaffold(
       appBar: AppBar(
@@ -132,11 +132,7 @@ class ProfilePage extends HookWidget {
           ),
         ],
       ),
-      body: userData.connectionState == ConnectionState.waiting
-          ? Center(child: CircularProgressIndicator())
-          : userData.hasError
-              ? Center(child: Text('Error loading data'))
-              : buildContent(context, userData.data!),
+      body: buildContent(context, modifiedUserData),
     );
   }
 }

@@ -6,8 +6,6 @@ class UserDashboard extends StatefulWidget {
   final List<Map<String, dynamic>> booksHistory;
 
   final String username;
-  final double carbonSavings;
-  final double savedWater;
   final double savedTrees;
   final int booksBorrowed;
   final int booksGiven;
@@ -18,8 +16,6 @@ class UserDashboard extends StatefulWidget {
       required this.trackedBooks,
       required this.booksHistory,
       required this.username,
-      required this.carbonSavings,
-      required this.savedWater,
       required this.savedTrees,
       this.booksBorrowed = 0,
       this.booksGiven = 0});
@@ -42,8 +38,6 @@ class _UserDashboardState extends State<UserDashboard> {
                 [
                   ProfileCard(
                     username: widget.username,
-                    carbonSavings: widget.carbonSavings,
-                    savedWater: widget.savedWater,
                     savedTrees: widget.savedTrees,
                     booksBorrowed: widget.booksBorrowed,
                     booksGiven: widget.booksGiven,
@@ -81,8 +75,6 @@ class _UserDashboardState extends State<UserDashboard> {
 
 class ProfileCard extends StatelessWidget {
   final String username;
-  final double carbonSavings;
-  final double savedWater;
   final double savedTrees;
   final int booksBorrowed;
   final int booksGiven;
@@ -90,8 +82,6 @@ class ProfileCard extends StatelessWidget {
   const ProfileCard(
       {super.key,
       required this.username,
-      required this.carbonSavings,
-      required this.savedWater,
       required this.savedTrees,
       required this.booksBorrowed,
       required this.booksGiven});
@@ -119,21 +109,13 @@ class ProfileCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        _buildStatColumn('${carbonSavings}kg', 'Carbon Saving'),
+                        _buildStatColumn('$booksBorrowed', 'Books Borrowed'),
                         SizedBox(width: 8),
-                        _buildStatColumn('${savedWater}L', 'Saved Water'),
+                        _buildStatColumn('$booksGiven', 'Books Given'),
                         SizedBox(width: 8),
                         _buildStatColumn('$savedTrees', 'Saved Trees'),
                       ],
                     ),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        _buildStatColumn('$booksBorrowed', 'Books Borrowed'),
-                        SizedBox(width: 8),
-                        _buildStatColumn('$booksGiven', 'Books Given'),
-                      ],
-                    )
                   ],
                 ),
               ],
@@ -211,10 +193,21 @@ class TabView extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
                       child: Image.network(
-                        book['cover'],
+                        book['coverImage'],
                         fit: BoxFit.cover,
                         width: double.infinity,
                         height: double.infinity,
+                        errorBuilder: (BuildContext context, Object exception,
+                            StackTrace? stackTrace) {
+                          return Image.network(
+                            // TODO: replace the placeholder with a real fall back image
+
+                            'https://placehold.co/600x400',
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          );
+                        },
                       ),
                     ),
                   ),
