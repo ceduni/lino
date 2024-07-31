@@ -1,4 +1,3 @@
-import 'package:Lino_app/pages/Books/book_details_page.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
@@ -77,17 +76,17 @@ class BookBoxScreen extends HookWidget {
                     ),
                   ),
                   Center(
-                    child: DirectionButton(
-                      bookBoxLocation: bbLocation,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
                     child: BookInBookBoxRow(
                       books: (bbBooks as List<dynamic>)
                           .map((item) => item as Map<String, dynamic>)
                           .toList(),
                       bbid: bookBoxId,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: DirectionButton(
+                      bookBoxLocation: bbLocation,
                     ),
                   ),
                 ],
@@ -130,15 +129,6 @@ class BookBoxTitleContainer extends StatelessWidget {
                   child: Text(
                     name,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    infoText,
                   ),
                 ),
               ),

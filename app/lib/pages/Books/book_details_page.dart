@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 import '../../nav_menu.dart';
-import '../../services/book_services.dart';
 import './add_thread_form.dart';
 import '../../services/user_services.dart';
 import 'expandable_text.dart';
@@ -98,47 +97,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
     );
   }
 
-  void _showGetBookConfirmation() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Get book "${widget.book['title']}" from this bookbox?'),
-          actions: [
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Confirm'),
-              onPressed: () {
-                _getBookFromBookBox();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
-  Future<void> _getBookFromBookBox() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    try {
-      await BookService().getBookFromBB(widget.book['qrCodeId'], widget.bbid, token: token);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Book retrieved successfully!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
-    }
-  }
 
   void _navigateToForumPage() {
     final controller = Get.find<NavigationController>();
@@ -202,7 +161,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                           ),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: LinoColors.secondary,
+                              backgroundColor: LinoColors.primary,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                             ),
@@ -248,20 +207,11 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                     SizedBox(height: 8),
                     Text('Pages: ${widget.book['pages']}', style: TextStyle(fontSize: 16, fontFamily: 'Kanit')),
                     SizedBox(height: 10),
-                    Center(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white, backgroundColor: Colors.blue,
-                        ),
-                        onPressed: _showGetBookConfirmation,
-                        child: Text('Get book from bookbox'),
-                      ),
-                    ),
                     if (_isUserLoggedIn)
                       Center(
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white, backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white, backgroundColor: Colors.green.shade700,
                           ),
                           onPressed: _navigateToForumPage,
                           child: Text('View Threads in Forum'),

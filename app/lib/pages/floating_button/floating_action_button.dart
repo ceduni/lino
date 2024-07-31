@@ -73,14 +73,10 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
       margin: EdgeInsets.all(16.0), // Adjust margin as needed
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(
-          color: Color.fromRGBO(214, 142, 97, 1), // Border color
-          width: 3.0, // Border width
-        ),
       ),
       child: SpeedDial(
         icon: Icons.add,
-        backgroundColor: Colors.blue.shade800,
+        backgroundColor: Color(0xFF4AC3FF),
         children: [
           SpeedDialChild(
             backgroundColor: Colors.white,

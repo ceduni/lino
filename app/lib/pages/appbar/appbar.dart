@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:Lino_app/pages/appbar/greeting_user_bar.dart';
 import 'package:Lino_app/pages/search_bar/search_bar.dart';
 
 class LinoAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -9,7 +8,7 @@ class LinoAppBar extends StatelessWidget implements PreferredSizeWidget {
   const LinoAppBar({this.showBackButton = false, required this.sourcePage}); // Make sourcePage required
 
   @override
-  Size get preferredSize => Size.fromHeight(120); // Adjust the height as needed
+  Size get preferredSize => Size.fromHeight(0); // Adjust the height as needed
 
   @override
   Widget build(BuildContext context) {
@@ -26,16 +25,6 @@ class LinoAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  GreetingUserBar(),
-                  // Maybe a hamburger menu or notification icon?
-                ],
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: LinoSearchBar(sourcePage: sourcePage), // Pass sourcePage to LinoSearchBar

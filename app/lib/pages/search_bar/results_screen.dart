@@ -3,12 +3,25 @@ import 'package:Lino_app/pages/search_bar/books_list.dart';
 import 'package:Lino_app/pages/search_bar/bookboxes_list.dart';
 import 'package:Lino_app/pages/search_bar/threads_list.dart';
 
-class ResultsPage extends StatelessWidget {
+class ResultsPage extends StatefulWidget {
   final String query;
   final int sourcePage;
   final VoidCallback onBack;
 
   const ResultsPage({required this.query, required this.sourcePage, required this.onBack});
+
+  @override
+  _ResultsPageState createState() => _ResultsPageState();
+}
+
+class _ResultsPageState extends State<ResultsPage> {
+  late int sourcePage;
+
+  @override
+  void initState() {
+    super.initState();
+    sourcePage = widget.sourcePage;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +30,7 @@ class ResultsPage extends StatelessWidget {
         title: Text('Search Results'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: onBack,
+          onPressed: widget.onBack,
         ),
       ),
       body: SingleChildScrollView(
@@ -34,42 +47,134 @@ class ResultsPage extends StatelessWidget {
     switch (sourcePage) {
       case 0:
         sections.addAll([
-          SectionTitle(title: 'Books'),
-          BooksList(query: query),
-          SectionTitle(title: 'Book Boxes'),
-          BookBoxesList(query: query),
-          SectionTitle(title: 'Threads'),
-          ThreadsList(query: query),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  sourcePage = 1; // Switch to BookBoxesList
+                });
+              },
+              child: Text(
+                'Find results for bookboxes',
+                style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  sourcePage = 2; // Switch to ThreadsList
+                });
+              },
+              child: Text(
+                'Find results for threads',
+                style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+              ),
+            ),
+          ),
+          BooksList(query: widget.query),
         ]);
         break;
       case 1:
         sections.addAll([
-          SectionTitle(title: 'Book Boxes'),
-          BookBoxesList(query: query),
-          SectionTitle(title: 'Books'),
-          BooksList(query: query),
-          SectionTitle(title: 'Threads'),
-          ThreadsList(query: query),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  sourcePage = 0; // Switch to BooksList
+                });
+              },
+              child: Text(
+                'Find results for books',
+                style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  sourcePage = 2; // Switch to ThreadsList
+                });
+              },
+              child: Text(
+                'Find results for threads',
+                style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+              ),
+            ),
+          ),
+          BookBoxesList(query: widget.query),
         ]);
         break;
       case 2:
         sections.addAll([
-          SectionTitle(title: 'Threads'),
-          ThreadsList(query: query),
-          SectionTitle(title: 'Books'),
-          BooksList(query: query),
-          SectionTitle(title: 'Book Boxes'),
-          BookBoxesList(query: query),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  sourcePage = 0; // Switch to BooksList
+                });
+              },
+              child: Text(
+                'Find results for books',
+                style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  sourcePage = 1; // Switch to BookBoxesList
+                });
+              },
+              child: Text(
+                'Find results for bookboxes',
+                style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+              ),
+            ),
+          ),
+          ThreadsList(query: widget.query),
         ]);
         break;
       default:
         sections.addAll([
-          SectionTitle(title: 'Books'),
-          BooksList(query: query),
-          SectionTitle(title: 'Book Boxes'),
-          BookBoxesList(query: query),
-          SectionTitle(title: 'Threads'),
-          ThreadsList(query: query),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  sourcePage = 1; // Switch to BookBoxesList
+                });
+              },
+              child: Text(
+                'Find results for bookboxes',
+                style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  sourcePage = 2; // Switch to ThreadsList
+                });
+              },
+              child: Text(
+                'Find results for threads',
+                style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+              ),
+            ),
+          ),
+          BooksList(query: widget.query),
         ]);
         break;
     }
@@ -86,7 +191,7 @@ class SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(12.0),
       child: Text(
         title,
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

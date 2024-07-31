@@ -69,7 +69,7 @@ class _AddThreadFormState extends State<AddThreadForm> {
       try {
         var token = await SharedPreferences.getInstance().then((prefs) => prefs.getString('token'));
         var ts = ThreadService();
-        final newThread = await ts.createThread(token!, selectedBookId!, _titleController.text);
+        await ts.createThread(token!, selectedBookId!, _titleController.text);
 
         widget.onThreadCreated();  // Call the callback to re-fetch threads
 

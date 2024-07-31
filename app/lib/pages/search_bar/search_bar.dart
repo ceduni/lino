@@ -20,7 +20,6 @@ class SearchController extends GetxController {
     if (query.isEmpty) {
       results.clear();
     } else {
-      print('Searching for $query');
       var bookDict = await BookService().searchBooks(kw: query);
       var bookResults = bookDict['books'];
       results.clear();

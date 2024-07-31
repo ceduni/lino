@@ -39,7 +39,6 @@ class _ScanQRCodeState extends State<ScanQRCode> {
       setState(() {
         qrText = scanData.code; // This contains the raw text from the QR code
       });
-      print(qrText);
       Navigator.of(context).pop(qrText); // Pass the scanned data back
     });
   }
