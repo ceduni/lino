@@ -5,6 +5,7 @@ import 'package:Lino_app/services/book_services.dart';
 class SearchController extends GetxController {
   var query = ''.obs;
   var results = <String>[].obs;
+  final FocusNode focusNode = FocusNode();
 
   void showSearchResults(String query) {
     this.query.value = query;
@@ -13,6 +14,7 @@ class SearchController extends GetxController {
   void hideSearchResults() {
     this.query.value = '';
     results.clear();
+    focusNode.unfocus();
   }
 
   Future<void> search(String query) async {
@@ -28,8 +30,13 @@ class SearchController extends GetxController {
       });
     }
   }
-}
 
+  @override
+  void onClose() {
+    focusNode.dispose();
+    super.onClose();
+  }
+}
 
 class LinoSearchBar extends StatelessWidget {
   final int sourcePage;
@@ -39,26 +46,55 @@ class LinoSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 40.0,
-      child: TextField(
-        onSubmitted: (value) {
-          if (value.isNotEmpty) {
-            searchController.showSearchResults(value);
-          }
-        },
-        onChanged: (value) {
-          searchController.search(value);
-        },
-        decoration: InputDecoration(
-          hintText: 'Search...',
-          prefixIcon: Icon(Icons.search),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25.0),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus(); // Unfocus when tapping outside
+      },
+      child: SizedBox(
+        height: 40.0,
+        child: TextField(
+          focusNode: searchController.focusNode,
+          onSubmitted: (value) {
+            if (value.isNotEmpty) {
+              searchController.showSearchResults(value);
+            }
+          },
+          onChanged: (value) {
+            searchController.search(value);
+          },
+          decoration: InputDecoration(
+            hintText: 'Search...',
+            prefixIcon: Icon(Icons.search),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25.0),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
           ),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
+        ),
+      ),
+    );
+  }
+}
+
+class SearchPage extends StatelessWidget {
+  final int sourcePage;
+
+  SearchPage({required this.sourcePage});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus(); // Unfocus when tapping outside
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Search Page'),
+        ),
+        body: Center(
+          child: LinoSearchBar(sourcePage: sourcePage),
         ),
       ),
     );

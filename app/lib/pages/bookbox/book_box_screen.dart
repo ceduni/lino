@@ -25,19 +25,15 @@ class BookBoxScreen extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bookBoxData =
-        useFuture(useMemoized(() => getBookBoxData(bookBoxId), [bookBoxId]));
+    final bookBoxData = useFuture(useMemoized(() => getBookBoxData(bookBoxId), [bookBoxId]));
 
-    return Scaffold(
+    return Dialog(
       backgroundColor: Colors.transparent,
-      body: bookBoxData.connectionState == ConnectionState.waiting
+      child: bookBoxData.connectionState == ConnectionState.waiting
           ? Center(child: CircularProgressIndicator())
           : bookBoxData.hasError
-              ? Center(child: Text('Error loading data'))
-              : RefreshIndicator(
-                  onRefresh: () => getBookBoxData(bookBoxId),
-                  child: buildContent(context, bookBoxData.data!),
-                ),
+          ? Center(child: Text('Error loading data'))
+          : buildContent(context, bookBoxData.data!),
     );
   }
 
@@ -47,17 +43,16 @@ class BookBoxScreen extends HookWidget {
     final bbInfoText = data['infoText'];
     final bbLocation = data['location'];
     final bbBooks = data['books'];
-    return Column(
-      children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(30),
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 232, 192, 158).withOpacity(0.5),
-            ),
-            width: double.infinity,
-            child: SingleChildScrollView(
+    return SingleChildScrollView(
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 15),
                   Center(
@@ -68,22 +63,19 @@ class BookBoxScreen extends HookWidget {
                       bbLocation: bbLocation,
                     ),
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 30),
                   Center(
                     child: BookInBookBoxRow(
-                      books: (bbBooks as List<dynamic>)
-                          .map((item) => item as Map<String, dynamic>)
-                          .toList(),
+                      books: (bbBooks as List<dynamic>).map((item) => item as Map<String, dynamic>).toList(),
                       bbid: bookBoxId,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
-      ],
-    );
+      );
   }
 }
 
@@ -93,12 +85,7 @@ class BookBoxTitleContainer extends StatelessWidget {
   final String bbImageLink;
   final LatLng bbLocation;
 
-  const BookBoxTitleContainer(
-      {super.key,
-      required this.bbName,
-      required this.bbInfoText,
-      required this.bbImageLink,
-      required this.bbLocation});
+  const BookBoxTitleContainer({super.key, required this.bbName, required this.bbInfoText, required this.bbImageLink, required this.bbLocation});
 
   @override
   Widget build(BuildContext context) {
@@ -110,15 +97,16 @@ class BookBoxTitleContainer extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
-          width: 400,
+          width: double.infinity,
           height: 300,
           margin: const EdgeInsets.symmetric(horizontal: 1.0),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              image: DecorationImage(
-                image: Image.network(bbImageLink).image,
-                fit: BoxFit.cover,
-              )),
+            borderRadius: BorderRadius.circular(10),
+            image: DecorationImage(
+              image: Image.network(bbImageLink).image,
+              fit: BoxFit.cover,
+            ),
+          ),
         ),
         SizedBox(height: 8),
         Text(
@@ -148,8 +136,7 @@ class DirectionButton extends StatelessWidget {
   const DirectionButton({super.key, required this.bookBoxLocation});
 
   Future<void> _openGoogleMapsApp(double latitude, double longitude) async {
-    final String googleMapsUrl =
-        'https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude&travelmode=driving';
+    final String googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude&travelmode=driving';
 
     if (await canLaunchUrlString(googleMapsUrl)) {
       await launchUrlString(googleMapsUrl);

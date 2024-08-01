@@ -26,10 +26,15 @@ class ProfilePage extends HookWidget {
   }
 
   Widget buildContent(BuildContext context, Map<String, dynamic> userData) {
-    double savedTrees = userData['user']['ecologicalImpact']['savedTrees'];
+    double savedTrees;
+    if (userData['user']['ecologicalImpact']['savedTrees'] is int) {
+      savedTrees = (userData['user']['ecologicalImpact']['savedTrees'] as int).toDouble();
+    } else {
+      savedTrees = userData['user']['ecologicalImpact']['savedTrees'];
+    }
+
     List<Map<String, dynamic>> booksHistory = userData['user']['bookHistory'];
-    List<Map<String, dynamic>> favoriteBooks =
-        userData['user']['favoriteBooks'];
+    List<Map<String, dynamic>> favoriteBooks = userData['user']['favoriteBooks'];
 
     return UserDashboard(
       favoriteBooks: favoriteBooks,
@@ -40,6 +45,7 @@ class ProfilePage extends HookWidget {
       booksGiven: 0,
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

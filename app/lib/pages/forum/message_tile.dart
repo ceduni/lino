@@ -116,9 +116,13 @@ class _MessageTileState extends State<MessageTile> {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            widget.message['username'],
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          Expanded(
+                            child: Text(
+                              widget.message['username'],
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
                           SizedBox(width: 8.0),
                           Text(
@@ -138,9 +142,9 @@ class _MessageTileState extends State<MessageTile> {
                               color: userHasReacted('good')
                                   ? Color(0xFF4CAF50)
                                   : Color(0xFFD3D3D3),
-                                shadows: const [
-                                  BoxShadow(color: Colors.black, blurRadius: 1),
-                                ]
+                              shadows: const [
+                                BoxShadow(color: Colors.black, blurRadius: 1),
+                              ],
                             ),
                             onPressed: () => widget.onReact(widget.message['_id'], true),
                           ),
@@ -149,12 +153,12 @@ class _MessageTileState extends State<MessageTile> {
                           IconButton(
                             icon: Icon(
                               Icons.thumb_down,
-                              color:  userHasReacted('bad')
+                              color: userHasReacted('bad')
                                   ? Colors.red
                                   : Color(0xFFD3D3D3),
-                                shadows: const [
-                                  BoxShadow(color: Colors.black, blurRadius: 1),
-                                ]
+                              shadows: const [
+                                BoxShadow(color: Colors.black, blurRadius: 1),
+                              ],
                             ),
                             onPressed: () => widget.onReact(widget.message['_id'], false),
                           ),
@@ -175,8 +179,8 @@ class _MessageTileState extends State<MessageTile> {
                   alignment: Alignment.center,
                   child: IconButton(
                     icon: Icon(Icons.reply, color: Color(0xFFD3D3D3), shadows: const [
-                          BoxShadow(color: Colors.black, blurRadius: 1),
-                        ]),
+                      BoxShadow(color: Colors.black, blurRadius: 1),
+                    ]),
                     onPressed: () {
                       widget.onReply(widget.message['_id'], widget.message);
                     },

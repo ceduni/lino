@@ -63,63 +63,48 @@ class RequestsSectionState extends State<RequestsSection> {
             itemBuilder: (context, index) {
               final request = requests[index];
               final isOwner = request['username'] == currentUsername;
-              return Card(
-                color: isOwner ? LinoColors.accent : LinoColors.secondary,
-                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Add margin between cards
-                child: ListTile(
-                  title: Text(request['bookTitle'], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  subtitle: request['customMessage'] != null ? Text(request['customMessage']) : null,
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (request['isFulfilled']) Icon(Icons.check_circle, color: Colors.green),
-                      if (isOwner)
-                        IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red, shadows: const [
-                            BoxShadow(color: Colors.black, blurRadius: 1),
-                          ]),
-                          onPressed: () async {
-                            final deleteConfirmed = await showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text('Delete your request for "${request['bookTitle']}"?'),
-                                content: Text('You won\'t be notified when the book you want will be added to a bookbox.'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.of(context).pop(false),
-                                    child: Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.of(context).pop(true),
-                                    child: Text('Delete'),
-                                  ),
-                                ],
-                              ),
-                            );
 
-                            if (deleteConfirmed == true) {
-                              final prefs = await SharedPreferences.getInstance();
-                              final token = prefs.getString('token');
-                              if (token != null) {
-                                try {
-                                  await BookService().deleteBookRequest(token, request['_id']);
-                                  setState(() {
-                                    requests.removeAt(index);
-                                  });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Request deleted successfully!')),
-                                  );
-                                } catch (e) {
-                                  print(e);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Error: ${e.toString()}')),
-                                  );
-                                }
-                              }
-                            }
-                          },
-                        ),
-                    ],
+              return GestureDetector(
+                onLongPress: isOwner
+                    ? () {
+                  _showDeleteDialog(context, request['_id'], request['bookTitle']);
+                }
+                    : null,
+                child: Dismissible(
+                  key: Key(request['_id']),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Match the margin of the card
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(8.0), // Match the border radius of the card
+                    ),
+                    alignment: Alignment.centerRight,
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Icon(Icons.delete, color: Colors.white),
+                  ),
+                  confirmDismiss: (direction) async {
+                    if (isOwner) {
+                      return await _showDeleteDialog(context, request['_id'], request['bookTitle']);
+                    }
+                    return false;
+                  },
+                  child: Card(
+                    color: isOwner ? LinoColors.accent : LinoColors.secondary,
+                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Add margin between cards
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0), // Match the border radius
+                    ),
+                    child: ListTile(
+                      title: Text(request['bookTitle'], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      subtitle: request['customMessage'] != null ? Text(request['customMessage']) : null,
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (request['isFulfilled']) Icon(Icons.check_circle, color: Colors.green),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               );
@@ -128,5 +113,44 @@ class RequestsSectionState extends State<RequestsSection> {
         ],
       ),
     );
+  }
+
+  Future<bool> _showDeleteDialog(BuildContext context, String requestId, String bookTitle) async {
+    final deleteConfirmed = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete your request for "$bookTitle"?'),
+        content: Text('You won\'t be notified when the book you want will be added to a bookbox.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (deleteConfirmed == true) {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token != null) {
+        try {
+          await BookService().deleteBookRequest(token, requestId);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Request deleted successfully!')),
+          );
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${e.toString()}')),
+          );
+        }
+      }
+    }
+
+    return deleteConfirmed;
   }
 }

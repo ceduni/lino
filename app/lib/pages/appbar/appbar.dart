@@ -36,7 +36,7 @@ class LinoAppBar extends StatelessWidget implements PreferredSizeWidget {
         return AppBar(
           backgroundColor: LinoColors.accent,
           flexibleSpace: Padding(
-            padding: EdgeInsets.only(top: 20),
+            padding: EdgeInsets.only(top: 50),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [

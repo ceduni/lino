@@ -12,12 +12,12 @@ class UserDashboard extends StatefulWidget {
 
   const UserDashboard(
       {super.key,
-      required this.favoriteBooks,
-      required this.booksHistory,
-      required this.username,
-      required this.savedTrees,
-      this.booksBorrowed = 0,
-      this.booksGiven = 0});
+        required this.favoriteBooks,
+        required this.booksHistory,
+        required this.username,
+        required this.savedTrees,
+        this.booksBorrowed = 0,
+        this.booksGiven = 0});
 
   @override
   _UserDashboardState createState() => _UserDashboardState();
@@ -29,7 +29,6 @@ class _UserDashboardState extends State<UserDashboard> {
     return DefaultTabController(
       length: 2,
       child: NestedScrollView(
-        // allows you to build a list of elements that would be scrolled away till the body reached the top
         headerSliverBuilder: (context, _) {
           return [
             SliverList(
@@ -46,7 +45,6 @@ class _UserDashboardState extends State<UserDashboard> {
             ),
           ];
         },
-        // You tab view goes here
         body: Column(
           children: <Widget>[
             TabBar(
@@ -78,10 +76,10 @@ class ProfileCard extends StatelessWidget {
 
   const ProfileCard(
       {super.key,
-      required this.username,
-      required this.savedTrees,
-      required this.booksBorrowed,
-      required this.booksGiven});
+        required this.username,
+        required this.savedTrees,
+        required this.booksBorrowed,
+        required this.booksGiven});
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +96,7 @@ class ProfileCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CircleAvatar(
-                  radius: 50,
+                  radius: 40, // Reduced size
                   // TODO: Add avatar
                   // backgroundImage: NetworkImage(avatar),
                 ),
@@ -109,9 +107,9 @@ class ProfileCard extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildStatColumn('$booksBorrowed', 'Books Borrowed'),
-                          _buildStatColumn('$booksGiven', 'Books Given'),
-                          _buildStatColumn('$savedTrees', 'Saved Trees'),
+                          Expanded(child: _buildStatColumn('$booksBorrowed', 'Books Borrowed')),
+                          Expanded(child: _buildStatColumn('$booksGiven', 'Books Given')),
+                          Expanded(child: _buildStatColumn('$savedTrees', 'Saved Trees')),
                         ],
                       ),
                     ],
@@ -154,6 +152,7 @@ class ProfileCard extends StatelessWidget {
         SizedBox(height: 4),
         Text(
           label,
+          textAlign: TextAlign.center, // Center text alignment
           overflow: TextOverflow.clip,
           style: TextStyle(
             fontSize: 16,
@@ -181,13 +180,12 @@ class TabView extends StatelessWidget {
       children: books.map((book) {
         return GestureDetector(
           onTap: () {
-            // TODO: Will cause error here because bbid is not passed, maybe drop the bbid as requirement?
             showDialog(
                 context: context,
                 builder: (context) => BookDetailsPage(
-                      book: book,
-                      bbid: '',
-                    ));
+                  book: book,
+                  bbid: '',
+                ));
           },
           child: Container(
               decoration: BoxDecoration(
@@ -209,7 +207,6 @@ class TabView extends StatelessWidget {
                           errorBuilder: (BuildContext context, Object exception,
                               StackTrace? stackTrace) {
                             return Image.network(
-                              // TODO: replace the placeholder with a real fall back image
                               'https://placehold.co/600x400',
                               fit: BoxFit.cover,
                               width: double.infinity,
