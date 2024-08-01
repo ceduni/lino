@@ -2,7 +2,6 @@ import 'package:Lino_app/pages/login/register_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/user_services.dart';
-import 'package:Lino_app/nav_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -18,11 +17,12 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final UserService _userService = UserService();
 
-  bool _isLoading = false; // Add loading state
+  bool _isLoading = false;
+  bool _obscureText = true;
 
   void _login() async {
     setState(() {
-      _isLoading = true; // Show loading spinner
+      _isLoading = true;
     });
 
     try {
@@ -31,25 +31,25 @@ class _LoginPageState extends State<LoginPage> {
         _passwordController.text,
       );
       widget.prefs.setString('token', token);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => BookNavPage()),
-      );
+      Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed: $e')));
     } finally {
       setState(() {
-        _isLoading = false; // Hide loading spinner
+        _isLoading = false;
       });
     }
   }
 
   void _openAsGuest() async {
     await widget.prefs.remove('token');
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => BookNavPage()),
-    );
+    Navigator.pushReplacementNamed(context, '/home');
+  }
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
   }
 
   @override
@@ -58,21 +58,21 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: Color(0xFF4277B8), // Darker blue background
+        color: Color(0xFF4277B8),
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Spacer(flex: 2),
-              Image.asset('assets/logos/logo_with_bird.png', height: 150), // Logo near the top
+              Image.asset('assets/logos/logo_with_bird.png', height: 150),
               Spacer(flex: 1),
               _buildTextField(_identifierController, 'Username or Email', Icons.person),
               SizedBox(height: 20),
-              _buildTextField(_passwordController, 'Password', Icons.lock, obscureText: true),
+              _buildTextField(_passwordController, 'Password', Icons.lock, obscureText: _obscureText),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _isLoading ? null : _login, // Disable button while loading
+                onPressed: _isLoading ? null : _login,
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
                 ),
@@ -97,14 +97,23 @@ class _LoginPageState extends State<LoginPage> {
       controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)), // Less opaque placeholder text
+        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
         filled: true,
-        fillColor: Color(0xFFE0F7FA), // Clearer blue background
+        fillColor: Color(0xFFE0F7FA),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30.0), // Rounded borders
+          borderRadius: BorderRadius.circular(30.0),
           borderSide: BorderSide.none,
         ),
         prefixIcon: Icon(icon, color: Colors.black.withOpacity(0.5)),
+        suffixIcon: hintText == 'Password'
+            ? IconButton(
+          icon: Icon(
+            _obscureText ? Icons.visibility_off : Icons.visibility,
+            color: Colors.black.withOpacity(0.5),
+          ),
+          onPressed: _togglePasswordVisibility,
+        )
+            : null,
       ),
       obscureText: obscureText,
     );
@@ -139,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
           ),
-          SizedBox(height: 10), // Add some spacing between the texts
+          SizedBox(height: 10),
           GestureDetector(
             onTap: _openAsGuest,
             child: Text(
@@ -155,5 +164,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
 }

@@ -1,37 +1,84 @@
+import 'package:Lino_app/pages/profile/profile_page.dart';
 import 'package:flutter/material.dart';
-import 'package:Lino_app/pages/search_bar/search_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../services/user_services.dart';
+import '../../utils/constants/colors.dart';
+import '../search_bar/search_bar.dart';
 
 class LinoAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final bool showBackButton;
-  final int sourcePage; // Add sourcePage parameter
+  final int sourcePage;
 
-  const LinoAppBar({this.showBackButton = false, required this.sourcePage}); // Make sourcePage required
+  const LinoAppBar({required this.sourcePage});
+
+  Future<bool> _isUserLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null) return false;
+    try {
+      final userService = UserService();
+      final user = await userService.getUser(token);
+      return user['user'] != null;
+    } catch (e) {
+      return false;
+    }
+  }
 
   @override
-  Size get preferredSize => Size.fromHeight(0); // Adjust the height as needed
+  Size get preferredSize => Size.fromHeight(60);
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: Color.fromRGBO(125, 200, 237, 1), // Customize the app bar color
-      leading: showBackButton
-          ? IconButton(
-        icon: Icon(Icons.arrow_back),
-        onPressed: () => Navigator.of(context).pop(),
-      )
-          : null,
-      flexibleSpace: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: LinoSearchBar(sourcePage: sourcePage), // Pass sourcePage to LinoSearchBar
+    return FutureBuilder<bool>(
+      future: _isUserLoggedIn(),
+      builder: (context, snapshot) {
+        bool isLoggedIn = snapshot.data ?? false;
+
+        return AppBar(
+          backgroundColor: LinoColors.accent,
+          flexibleSpace: Padding(
+            padding: EdgeInsets.only(top: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: IconButton(
+                    icon: Icon(isLoggedIn ? Icons.person : Icons.login),
+                    color: isLoggedIn ? LinoColors.primary : null,
+                    onPressed: () {
+                      if (!isLoggedIn) {
+                        Navigator.of(context).pushReplacementNamed('/login');
+                      } else {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ProfilePage(),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                    child: LinoSearchBar(sourcePage: sourcePage),
+                  ),
+                ),
+                if (isLoggedIn)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: IconButton(
+                      icon: Icon(Icons.notifications),
+                      onPressed: () {
+                        // Add your notification handler here
+                      },
+                    ),
+                  ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

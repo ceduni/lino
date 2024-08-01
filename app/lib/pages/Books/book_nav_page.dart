@@ -96,13 +96,25 @@ class _NavigationPageState extends State<NavigationPage> {
                               errorBuilder: (BuildContext context,
                                   Object exception,
                                   StackTrace? stackTrace) {
-                                return Container(
-                                  color: Colors.grey,
-                                  child: Center(
-                                    child: Text(
-                                      bb['books'][index]['title'],
-                                      style: TextStyle(
-                                          color: Colors.white),
+                                return ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: 100, // Set a maximum width
+                                  ),
+                                  child: Container(
+                                    color: Colors.grey,
+                                    child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          bb['books'][index]['title'],
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          maxLines: null, // Allow multiple lines
+                                          overflow: TextOverflow.visible,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 );

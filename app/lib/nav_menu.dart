@@ -20,8 +20,11 @@ class BookNavPage extends StatelessWidget {
     final searchController = Get.put(sb.SearchController());
 
     return Scaffold(
-      appBar: ObservableAppBar(
-          sourcePage: controller.selectedIndex), // Use ObservableAppBar
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80.0),
+        child: ObservableAppBar(
+            sourcePage: controller.selectedIndex),
+      ),
       floatingActionButton: Obx(() {
         if (controller.selectedIndex.value == 2) {
           // Forum page is active
@@ -89,7 +92,7 @@ class BookNavPage extends StatelessWidget {
 class NavigationController extends GetxController {
   late Rx<int> selectedIndex = 0.obs;
   final GlobalKey<ForumScreenState> forumScreenKey =
-      GlobalKey<ForumScreenState>();
+  GlobalKey<ForumScreenState>();
   final RxString sourcePage = ''.obs;
   late String forumQuery;
 

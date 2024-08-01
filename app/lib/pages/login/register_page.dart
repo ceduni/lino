@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'keyword_input_page.dart';
 import 'login_page.dart';
 
@@ -21,7 +20,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _phoneController = TextEditingController();
   final UserService _userService = UserService();
 
-  bool _isLoading = false; // Add loading state
+  bool _isLoading = false;
+  bool _obscureText = true;
 
   void _register() async {
     final username = _usernameController.text;
@@ -39,7 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     setState(() {
-      _isLoading = true; // Show loading spinner
+      _isLoading = true;
     });
 
     try {
@@ -51,16 +51,18 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       widget.prefs.setString('token', token);
 
-      // Show welcome screen
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => WelcomeScreen(username: username, token: token, prefs: widget.prefs)),
+        MaterialPageRoute(
+          builder: (context) => WelcomeScreen(username: username, token: token, prefs: widget.prefs),
+        ),
+            (route) => false, // Remove all previous routes
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration failed: $e')));
     } finally {
       setState(() {
-        _isLoading = false; // Hide loading spinner
+        _isLoading = false;
       });
     }
   }
@@ -73,26 +75,32 @@ class _RegisterPageState extends State<RegisterPage> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: Color(0xFF4277B8), // Darker blue background
+        color: Color(0xFF4277B8),
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Spacer(flex: 2),
-              Image.asset('assets/logos/logo_with_bird.png', height: 150), // Logo near the top
+              Image.asset('assets/logos/logo_with_bird.png', height: 150),
               Spacer(flex: 1),
               _buildTextField(_usernameController, 'Username', Icons.person),
               SizedBox(height: 20),
               _buildTextField(_emailController, 'Email', Icons.email),
               SizedBox(height: 20),
-              _buildTextField(_passwordController, 'Password', Icons.lock, obscureText: true),
+              _buildTextField(_passwordController, 'Password', Icons.lock, obscureText: _obscureText),
               SizedBox(height: 20),
               _buildTextField(_phoneController, 'Phone (optional)', Icons.phone, inputType: TextInputType.phone, inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
@@ -100,7 +108,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ]),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _isLoading ? null : _register, // Disable button while loading
+                onPressed: _isLoading ? null : _register,
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
                 ),
@@ -123,21 +131,32 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildTextField(
       TextEditingController controller,
       String hintText,
-      IconData icon,
-      {bool obscureText = false, TextInputType inputType = TextInputType.text, List<TextInputFormatter>? inputFormatters}
-      ) {
+      IconData icon, {
+        bool obscureText = false,
+        TextInputType inputType = TextInputType.text,
+        List<TextInputFormatter>? inputFormatters,
+      }) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)), // Less opaque placeholder text
+        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
         filled: true,
-        fillColor: Color(0xFFE0F7FA), // Clearer blue background
+        fillColor: Color(0xFFE0F7FA),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30.0), // Rounded borders
+          borderRadius: BorderRadius.circular(30.0),
           borderSide: BorderSide.none,
         ),
         prefixIcon: Icon(icon, color: Colors.black.withOpacity(0.5)),
+        suffixIcon: hintText == 'Password'
+            ? IconButton(
+          icon: Icon(
+            _obscureText ? Icons.visibility_off : Icons.visibility,
+            color: Colors.black.withOpacity(0.5),
+          ),
+          onPressed: _togglePasswordVisibility,
+        )
+            : null,
       ),
       obscureText: obscureText,
       keyboardType: inputType,
@@ -150,14 +169,14 @@ class _RegisterPageState extends State<RegisterPage> {
       alignment: Alignment.center,
       child: GestureDetector(
         onTap: () {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => LoginPage(prefs: widget.prefs)),
           );
         },
         child: RichText(
           text: TextSpan(
-            text: "Already have an account? ",
+            text: 'Already have an account? ',
             style: TextStyle(color: Colors.white),
             children: const [
               TextSpan(
@@ -191,9 +210,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   void initState() {
     super.initState();
     Future.delayed(Duration(seconds: 1), () {
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => KeywordInputPage(username: widget.username, token: widget.token, prefs: widget.prefs)),
+            (route) => false, // Remove all previous routes
       );
     });
   }
@@ -201,7 +221,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF4277B8), // Same blue background
+      backgroundColor: Color(0xFF4277B8),
       body: Center(
         child: Text(
           'Welcome, ${widget.username}!',

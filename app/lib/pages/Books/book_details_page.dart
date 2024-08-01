@@ -135,11 +135,18 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                             height: 200,
                             color: Colors.grey,
                             child: Center(
-                              child: Text(widget.book['title'], style: TextStyle(color: Colors.white)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  widget.book['title'],
+                                  style: TextStyle(color: Colors.white),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
                             ),
                           );
                         },
-                      ),
+                      )
                     ),
                     SizedBox(height: 8),
                     Text(widget.book['title'], style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Kanit')),

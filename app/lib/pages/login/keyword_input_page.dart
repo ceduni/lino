@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/user_services.dart';
-import 'package:Lino_app/nav_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class KeywordInputPage extends StatefulWidget {
@@ -47,10 +46,7 @@ class _KeywordInputPageState extends State<KeywordInputPage> {
 
       // Navigate after a short delay to show the Snackbar
       Future.delayed(Duration(seconds: 1), () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => BookNavPage()),
-        );
+        Navigator.pushReplacementNamed(context, '/home');
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -59,12 +55,8 @@ class _KeywordInputPageState extends State<KeywordInputPage> {
     }
   }
 
-
   void _pass() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => BookNavPage()),
-    );
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   @override
