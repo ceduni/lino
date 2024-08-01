@@ -16,14 +16,26 @@ class BookInBookBoxRow extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(12), // Replace with your border radius constant
+        borderRadius: BorderRadius.circular(
+            12), // Replace with your border radius constant
         color: const Color.fromARGB(255, 242, 226, 196),
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: books.map((book) => _buildBookItem(context, book)).toList(),
-        ),
+      child: Column(
+        children: [
+          const Text(
+            'Books in this Book Box',
+            style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Kanit'),
+          ),
+          const SizedBox(height: 15),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: books.map((book) {
+              return _buildBookItem(context, book);
+            }).toList(),
+          ),
+        ],
       ),
     );
   }

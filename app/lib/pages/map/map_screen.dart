@@ -23,7 +23,8 @@ class MapScreen extends HookWidget {
       bookBoxController.getUserLocation();
     } else if (status.isPermanentlyDenied) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Location permissions are permanently denied, please enable them in settings.'),
+        content: Text(
+            'Location permissions are permanently denied, please enable them in settings.'),
       ));
     }
   }
@@ -87,21 +88,24 @@ class MapScreen extends HookWidget {
             flex: 1,
             child: Obx(() {
               final bboxes = bookBoxController.bookBoxes;
-              List<Marker> markers = bboxes.map((bbox) => Marker(
-                markerId: MarkerId(bbox['id']),
-                position: bbox['location'],
-                infoWindow: InfoWindow(
-                  title: bbox['name'],
-                  snippet: bbox['infoText'],
-                ),
-                onTap: () {
-                  bookBoxController.highlightBookBox(bbox['id']);
-                },
-              )).toList();
+              List<Marker> markers = bboxes
+                  .map((bbox) => Marker(
+                        markerId: MarkerId(bbox['id']),
+                        position: bbox['location'],
+                        infoWindow: InfoWindow(
+                          title: bbox['name'],
+                          snippet: bbox['infoText'],
+                        ),
+                        onTap: () {
+                          bookBoxController.highlightBookBox(bbox['id']);
+                        },
+                      ))
+                  .toList();
 
               return GoogleMap(
                 onMapCreated: bookBoxController.mapController.onMapCreated,
-                initialCameraPosition: bookBoxController.mapController.cameraPosition.value,
+                initialCameraPosition:
+                    bookBoxController.mapController.cameraPosition.value,
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,
                 markers: Set<Marker>.of(markers),
@@ -112,7 +116,8 @@ class MapScreen extends HookWidget {
             flex: 1,
             child: Obx(() {
               final bboxes = bookBoxController.bookBoxes;
-              final highlightedBookBoxId = bookBoxController.highlightedBookBoxId.value;
+              final highlightedBookBoxId =
+                  bookBoxController.highlightedBookBoxId.value;
               final userLocation = bookBoxController.userLocation.value;
 
               return ListView.builder(
@@ -130,9 +135,13 @@ class MapScreen extends HookWidget {
                   }
 
                   return Opacity(
-                    opacity: highlightedBookBoxId == bbox['id'] || highlightedBookBoxId == null ? 1.0 : 0.5,
+                    opacity: highlightedBookBoxId == bbox['id'] ||
+                            highlightedBookBoxId == null
+                        ? 1.0
+                        : 0.5,
                     child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                      margin:
+                          EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                       decoration: BoxDecoration(
                         color: LinoColors.secondary,
                         borderRadius: BorderRadius.circular(15),
@@ -140,7 +149,8 @@ class MapScreen extends HookWidget {
                       child: ListTile(
                         title: Text(
                           bbox['name'],
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,12 +167,10 @@ class MapScreen extends HookWidget {
                           ],
                         ),
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BookBoxScreen(bookBoxId: bbox['id']),
-                            ),
-                          );
+                          showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  BookBoxScreen(bookBoxId: bbox['id']));
                         },
                       ),
                     ),

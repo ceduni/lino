@@ -29,9 +29,7 @@ class BookBoxScreen extends HookWidget {
         useFuture(useMemoized(() => getBookBoxData(bookBoxId), [bookBoxId]));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Book Boxes'),
-      ),
+      backgroundColor: Colors.transparent,
       body: bookBoxData.connectionState == ConnectionState.waiting
           ? Center(child: CircularProgressIndicator())
           : bookBoxData.hasError
@@ -64,29 +62,19 @@ class BookBoxScreen extends HookWidget {
                   const SizedBox(height: 15),
                   Center(
                     child: BookBoxTitleContainer(
-                      name: bbName,
-                      infoText: bbInfoText,
+                      bbName: bbName,
+                      bbInfoText: bbInfoText,
+                      bbImageLink: bbImage,
+                      bbLocation: bbLocation,
                     ),
                   ),
-                  Center(
-                    child: Image.network(
-                      bbImage,
-                      width: 300,
-                      height: 300,
-                    ),
-                  ),
+                  const SizedBox(height: 15),
                   Center(
                     child: BookInBookBoxRow(
                       books: (bbBooks as List<dynamic>)
                           .map((item) => item as Map<String, dynamic>)
                           .toList(),
                       bbid: bookBoxId,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: DirectionButton(
-                      bookBoxLocation: bbLocation,
                     ),
                   ),
                 ],
@@ -100,52 +88,56 @@ class BookBoxScreen extends HookWidget {
 }
 
 class BookBoxTitleContainer extends StatelessWidget {
-  final String name;
-  final String infoText;
+  final String bbName;
+  final String bbInfoText;
+  final String bbImageLink;
+  final LatLng bbLocation;
 
   const BookBoxTitleContainer(
-      {super.key, required this.name, required this.infoText});
+      {super.key,
+      required this.bbName,
+      required this.bbInfoText,
+      required this.bbImageLink,
+      required this.bbLocation});
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(250, 250, 240, 1).withOpacity(0.9),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
-          width: 150,
-          height: 100,
+          width: 400,
+          height: 300,
+          margin: const EdgeInsets.symmetric(horizontal: 1.0),
           decoration: BoxDecoration(
-            color: Color.fromARGB(255, 251, 251, 240),
-            borderRadius: BorderRadius.circular(LinoSizes.borderRadiusLg),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: 20), // Add spacing to leave space for the icon
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    name,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ],
+              borderRadius: BorderRadius.circular(10),
+              image: DecorationImage(
+                image: Image.network(bbImageLink).image,
+                fit: BoxFit.cover,
+              )),
+        ),
+        SizedBox(height: 8),
+        Text(
+          bbName,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Kanit',
           ),
         ),
-        Positioned.fromRelativeRect(
-          // Adjust this value to control the amount of overflow
-          // Get container width and divide by 2 to center the icon
-          rect: const RelativeRect.fromLTRB(0, -70, 0, 0),
-          child: Icon(
-            Icons.home,
-            size: 60,
-            color: Color.fromARGB(255, 142, 199, 233),
+        SizedBox(height: 8),
+        Text(
+          'Where can you find the bookbox: $bbInfoText',
+          style: const TextStyle(
+            fontSize: 16,
+            fontFamily: 'Kanit',
           ),
         ),
-      ],
+      ]),
     );
   }
 }
@@ -187,9 +179,18 @@ class DirectionButton extends StatelessWidget {
           double longitude = bookBoxLocation.longitude;
           _openGoogleMapsApp(longitude, latitude);
         },
-        child: const Text('Direction to Book Box'),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(Icons.directions, color: Colors.white),
+            SizedBox(width: 4),
+            Text(
+              'Get Directions',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
