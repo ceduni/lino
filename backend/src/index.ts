@@ -30,9 +30,12 @@ const clients = new Set();
 // Function to broadcast a message to a specific user
 export function broadcastToUser(userId : string, message: any) {
     try {
+        console.log('Broadcasting message to user:', userId, message);
         clients.forEach((client) => {
+            console.log('Check readyState and userId of client:', client);
             // @ts-ignore
             if (client.userId === userId && client.socket.readyState === 1) {
+                console.log('Broadcasting message to user:', userId, message);
                 // @ts-ignore
                 client.socket.send(JSON.stringify(message));
             }
@@ -45,12 +48,15 @@ export function broadcastToUser(userId : string, message: any) {
 
 export function broadcastMessage(event: string, data: any) {
     try {
-        console.log('Broadcasting message:', event, data);
         clients.forEach((client) => {
+            console.log('Check readyState of client:', client);
             // @ts-ignore
             if (client.socket.readyState === 1) { // 1 means OPEN
+                console.log('Broadcasting message:', event, data);
                 // @ts-ignore
                 client.socket.send(JSON.stringify({ event, data }));
+            } else {
+                console.log('Client not ready:', client);
             }
         });
     } catch (error : any) {
