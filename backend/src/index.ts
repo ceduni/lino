@@ -27,30 +27,36 @@ const clients = new Set();
 // WebSocket route
 // @ts-ignore
 server.get('/ws', { websocket: true }, (connection, req) => {
-    console.log('Received request:', req);
-    console.log('Received url:', req.url);
-    console.log('Received userId:', req.url.toString().split('=')[1]);
-    console.log('Received WebSocket connection with query:', req.query);
+    try {
+        const userId = req.query.userId;
+        console.log('Watching url:',new URLSearchParams(req.raw.url.split('?')[1]));
 
-    const userId = req.query.userId;
+        console.log('Received WebSocket connection with userId:', userId);
 
-    if (!userId) {
-        console.log('No userId found, closing connection');
+        if (!userId) {
+            console.log('No userId found, closing connection');
+            connection.socket.close();
+            return;
+        }
+
+        connection.socket.userId = userId; // Attach userId to WebSocket connection
+
+        clients.add(connection);
+
+        connection.socket.on('message', (message: any) => {
+            // Handle incoming messages
+            console.log('Received message:', message);
+        });
+
+        connection.socket.on('close', () => {
+            // Handle WebSocket closure
+            console.log('WebSocket connection closed');
+            clients.delete(connection);
+        });
+    } catch (error) {
+        console.error('Error processing WebSocket connection:', error);
         connection.socket.close();
-        return;
     }
-
-    connection.socket.userId = userId; // Attach userId to WebSocket connection
-
-    connection.socket.on('message', (message: any) => {
-        // Handle incoming messages
-        console.log('Received message:', message);
-    });
-
-    connection.socket.on('close', () => {
-        // Handle WebSocket closure
-        console.log('WebSocket connection closed');
-    });
 });
 
 
