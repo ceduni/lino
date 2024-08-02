@@ -3,7 +3,7 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { newErr } from "./utilities";
-const {broadcastToUser} = require('../index');
+const server = require('../index');
 
 dotenv.config();
 
@@ -226,7 +226,7 @@ export async function notifyUser(userId: string, title: string, message: string)
     }
 
     // Broadcast the notification to the user if they are connected via WebSocket
-    broadcastToUser(userId, { event: 'newNotification', data: notification });
+    server.broadcastToUser(userId, { event: 'newNotification', data: notification });
 
     return user;
 }

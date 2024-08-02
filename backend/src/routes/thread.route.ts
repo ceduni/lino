@@ -2,7 +2,7 @@ import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} fr
 import ThreadService from '../services/thread.service';
 import Thread from "../models/thread.model";
 import {clearCollectionSchema, threadSchema} from "../services/utilities";
-const {broadcastMessage} = require('../index');
+const server = require('../index');
 
 
 async function createThread(request : FastifyRequest, reply : FastifyReply) {
@@ -70,7 +70,7 @@ async function deleteThread(request : FastifyRequest, reply : FastifyReply) {
         reply.code(204).send({ message: 'Thread deleted' });
         // Broadcast thread deletion
         // @ts-ignore
-        broadcastMessage('threadDeleted', { threadId: request.params.threadId });
+        server.broadcastMessage('threadDeleted', { threadId: request.params.threadId });
     } catch (error : any) {
         reply.code(error.statusCode).send({ error: error.message });
     }
@@ -196,7 +196,7 @@ async function toggleMessageReaction(request : FastifyRequest<ToggleMessageReact
         const reaction = await ThreadService.toggleMessageReaction(request);
         reply.send({reaction : reaction});
         // Broadcast reaction
-        broadcastMessage('messageReaction', { reaction, threadId: request.body.threadId });
+        server.broadcastMessage('messageReaction', { reaction, threadId: request.body.threadId });
     } catch (error : any) {
         console.log(error);
         reply.code(400).send({ error: error.message });
