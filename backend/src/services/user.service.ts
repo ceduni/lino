@@ -214,16 +214,28 @@ export async function notifyUser(userId: string, title: string, message: string)
     if (!user) {
         throw newErr(404, 'User not found');
     }
-    const notification = { title : title, content: message, timestamp: new Date(), read: false };
+    const notification = { title: title, content: message, timestamp: new Date(), read: false };
+
     // Validate and push the notification into the user's notifications array
     try {
         user.notifications.push(notification); // Type assertion to avoid TypeScript errors
         await user.save();
-    } catch (error : any) {
+    } catch (error: any) {
         throw new Error(`Failed to save notification: ${error.message}`);
     }
 
+    // Broadcast the notification to the user if they are connected via WebSocket
+    broadcastToUser(userId, { event: 'newNotification', data: notification });
+
     return user;
+}
+
+function broadcastToUser(userId: string, message: any) {
+    server.websocketServer.clients.forEach((client: { readyState: number; userId: string; send: (arg0: string) => void; }) => {
+        if (client.readyState === 1 && client.userId === userId) { // Check if client is connected and is the correct user
+            client.send(JSON.stringify(message));
+        }
+    });
 }
 
 

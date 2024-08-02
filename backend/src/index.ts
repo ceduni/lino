@@ -1,6 +1,3 @@
-import {reinitDatabase} from "./services/utilities";
-import {populateDatabase} from "./mock.data.gen";
-
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -11,6 +8,7 @@ const fastifySwaggerUi = require('@fastify/swagger-ui');
 const bookRoutes = require('./routes/book.route');
 const userRoutes = require('./routes/user.route');
 const threadRoutes = require('./routes/thread.route');
+const fastifyWebSocket = require('@fastify/websocket');
 
 dotenv.config();
 
@@ -19,6 +17,35 @@ const server = Fastify({ logger: { level: 'error' } });
 server.register(fastifyCors, {
     origin: true,
 });
+
+// Register WebSocket plugin
+server.register(fastifyWebSocket);
+
+// Store connected WebSocket clients
+const clients = new Set();
+
+// WebSocket route
+server.get('/ws', { websocket: true }, (connection: any, req: any) => {
+    // Assuming userId is passed as a query parameter, or handle authentication as necessary
+    connection.socket.userId = req.query.userId; // Attach userId to WebSocket connection
+
+    clients.add(connection);
+
+    connection.socket.on('close', () => {
+        clients.delete(connection);
+    });
+
+    connection.socket.on('message', (message: any) => {
+        // Broadcast message to all connected clients
+        clients.forEach(client => {
+            if (client !== connection) {
+                // @ts-ignore
+                client.socket.send(message);
+            }
+        });
+    });
+});
+
 
 // Register JWT plugin
 server.register(fastifyJwt, { secret: process.env.JWT_SECRET_KEY });
@@ -105,6 +132,8 @@ server.register(bookRoutes);
 server.register(userRoutes);
 server.register(threadRoutes);
 
+
+
 const start = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_URI);
@@ -118,11 +147,6 @@ const start = async () => {
 
         await server.ready();
         server.swagger(); // Ensure swagger is called after server starts
-
-        // Reinitialize the database
-        await reinitDatabase(server);
-        await populateDatabase();
-
 
 
     } catch (err) {

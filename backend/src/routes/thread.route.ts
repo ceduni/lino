@@ -67,6 +67,9 @@ async function deleteThread(request : FastifyRequest, reply : FastifyReply) {
     try {
         await ThreadService.deleteThread(request);
         reply.code(204).send({ message: 'Thread deleted' });
+        // Broadcast thread deletion
+        // @ts-ignore
+        broadcastMessage('threadDeleted', { threadId: request.params.threadId });
     } catch (error : any) {
         reply.code(error.statusCode).send({ error: error.message });
     }
@@ -118,6 +121,9 @@ async function addThreadMessage(request : FastifyRequest, reply : FastifyReply) 
     try {
         const messageId = await ThreadService.addThreadMessage(request);
         reply.code(201).send(messageId);
+        // Broadcast new message
+        // @ts-ignore
+        broadcastMessage('newMessage', { messageId, threadId: request.body.threadId });
     } catch (error : any) {
         reply.code(error.statusCode).send({ error: error.message });
     }
@@ -187,6 +193,8 @@ async function toggleMessageReaction(request : FastifyRequest<ToggleMessageReact
     try {
         const reaction = await ThreadService.toggleMessageReaction(request);
         reply.send({reaction : reaction});
+        // Broadcast reaction
+        broadcastMessage('messageReaction', { reaction, threadId: request.body.threadId });
     } catch (error : any) {
         reply.code(400).send({ error: error.message });
     }
@@ -344,4 +352,12 @@ export default async function threadRoutes(server: MyFastifyInstance) {
     server.post('/threads/messages', { preValidation: [server.authenticate], schema : addMessageSchema }, addThreadMessage);
     server.post('/threads/messages/reactions', { preValidation: [server.authenticate], schema : toggleReactionSchema }, toggleMessageReaction);
     server.delete('/threads/clear', { preValidation: [server.adminAuthenticate], schema : clearCollectionSchema }, clearCollection);
+}
+
+function broadcastMessage(event: string, data: any) {
+    server.websocketServer.clients.forEach((client: { readyState: number; send: (arg0: string) => void; }) => {
+        if (client.readyState === 1) { // 1 means OPEN
+            client.send(JSON.stringify({ event, data }));
+        }
+    });
 }
