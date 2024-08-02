@@ -3,7 +3,7 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { newErr } from "./utilities";
-const server = require('../index');
+const {broadcastToUser} = require('../index');
 
 dotenv.config();
 
@@ -229,14 +229,6 @@ export async function notifyUser(userId: string, title: string, message: string)
     broadcastToUser(userId, { event: 'newNotification', data: notification });
 
     return user;
-}
-
-function broadcastToUser(userId: string, message: any) {
-    server.websocketServer.clients.forEach((client: { readyState: number; userId: string; send: (arg0: string) => void; }) => {
-        if (client.readyState === 1 && client.userId === userId) { // Check if client is connected and is the correct user
-            client.send(JSON.stringify(message));
-        }
-    });
 }
 
 

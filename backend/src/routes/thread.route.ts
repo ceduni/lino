@@ -2,7 +2,7 @@ import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} fr
 import ThreadService from '../services/thread.service';
 import Thread from "../models/thread.model";
 import {clearCollectionSchema, threadSchema} from "../services/utilities";
-const server = require('../index');
+const {broadcastMessage} = require('../index');
 
 
 async function createThread(request : FastifyRequest, reply : FastifyReply) {
@@ -360,16 +360,4 @@ export default async function threadRoutes(server: MyFastifyInstance) {
     server.post('/threads/messages', { preValidation: [server.authenticate], schema : addMessageSchema }, addThreadMessage);
     server.post('/threads/messages/reactions', { preValidation: [server.authenticate], schema : toggleReactionSchema }, toggleMessageReaction);
     server.delete('/threads/clear', { preValidation: [server.adminAuthenticate], schema : clearCollectionSchema }, clearCollection);
-}
-
-function broadcastMessage(event: string, data: any) {
-    try {
-        server.websocketServer.clients.forEach((client: { readyState: number; send: (arg0: string) => void; }) => {
-            if (client.readyState === 1) { // 1 means OPEN
-                client.send(JSON.stringify({ event, data }));
-            }
-        });
-    } catch (error : any) {
-        console.error('Failed to broadcast message:', error.message);
-    }
 }
