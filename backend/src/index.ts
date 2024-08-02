@@ -27,32 +27,29 @@ const clients = new Set();
 // WebSocket route
 // @ts-ignore
 server.get('/ws', { websocket: true }, (connection, req) => {
-    console.log('Received WebSocket connection with URL:', req.url);
+    console.log('Received WebSocket connection with query:', req.query);
 
-    try {
-        const urlParams = new URLSearchParams(req.url.split('?')[1]);
-        const userId = urlParams.get('userId');
+    const userId = req.query.userId;
 
-        if (!userId) {
-            console.log('No userId found, closing connection');
-            connection.socket.close();
-            return;
-        }
-
-        connection.socket.userId = userId; // Attach userId to WebSocket connection
-
-        connection.socket.on('message', () => {
-            // Handle incoming messages
-        });
-
-        connection.socket.on('close', () => {
-            // Handle WebSocket closure
-        });
-    } catch (error) {
-        console.error('Error processing WebSocket connection:', error);
+    if (!userId) {
+        console.log('No userId found, closing connection');
         connection.socket.close();
+        return;
     }
+
+    connection.socket.userId = userId; // Attach userId to WebSocket connection
+
+    connection.socket.on('message', (message: any) => {
+        // Handle incoming messages
+        console.log('Received message:', message);
+    });
+
+    connection.socket.on('close', () => {
+        // Handle WebSocket closure
+        console.log('WebSocket connection closed');
+    });
 });
+
 
 
 
