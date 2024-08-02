@@ -69,7 +69,11 @@ server.get('/ws', { websocket: true }, (connection : WebSocket, req : FastifyReq
         connection.userId = 'anonymous'; // Set a default user ID
     }
 
+
     clients.add(connection); // Add the connected client to the set
+    console.log('Client connected:', connection);
+    console.log('Clients:', clients);
+    console.log('Client count:', clients.size);
 
     connection.socket.on('message', (msg: any) => {
         console.log('Received message:', msg);

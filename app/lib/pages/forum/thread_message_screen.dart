@@ -66,9 +66,11 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
           currentUsername = response['user']['username'];
         });
         webSocketService.connect(
-          'ws://localhost:3000/ws',
+          'wss://lino-1.onrender.com/ws',
           userId: response['user']['_id'],
           onEvent: (event, data) {
+            print('Received event: $event');
+            print('Data: $data');
             if (event == 'newMessage' || event == 'messageReaction') {
               fetchThreadMessages();
             }
