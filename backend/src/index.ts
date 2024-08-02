@@ -28,6 +28,8 @@ const clients = new Set();
 // @ts-ignore
 server.get('/ws', { websocket: true }, (connection, req) => {
     console.log('Received request:', req);
+    console.log('Received url:', req.url);
+    console.log('Received userId:', req.url.toString().split('=')[1]);
     console.log('Received WebSocket connection with query:', req.query);
 
     const userId = req.query.userId;
