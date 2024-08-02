@@ -177,7 +177,7 @@ const addMessageSchema = {
             properties: {
                 error: {type: 'string'}
             }
-        }
+        },
     }
 };
 
@@ -252,6 +252,13 @@ const toggleReactionSchema = {
         },
         404: {
             description: 'Thread or message not found',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
+        },
+        500: {
+            description: 'Internal server error',
             type: 'object',
             properties: {
                 error: {type: 'string'}
@@ -356,9 +363,13 @@ export default async function threadRoutes(server: MyFastifyInstance) {
 }
 
 function broadcastMessage(event: string, data: any) {
-    server.websocketServer.clients.forEach((client: { readyState: number; send: (arg0: string) => void; }) => {
-        if (client.readyState === 1) { // 1 means OPEN
-            client.send(JSON.stringify({ event, data }));
-        }
-    });
+    try {
+        server.websocketServer.clients.forEach((client: { readyState: number; send: (arg0: string) => void; }) => {
+            if (client.readyState === 1) { // 1 means OPEN
+                client.send(JSON.stringify({ event, data }));
+            }
+        });
+    } catch (error : any) {
+        console.error('Failed to broadcast message:', error.message);
+    }
 }

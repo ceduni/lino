@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const thread_service_1 = __importDefault(require("../services/thread.service"));
 const thread_model_1 = __importDefault(require("../models/thread.model"));
 const utilities_1 = require("../services/utilities");
+const server = require('../index');
 function createThread(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -80,6 +81,9 @@ function deleteThread(request, reply) {
         try {
             yield thread_service_1.default.deleteThread(request);
             reply.code(204).send({ message: 'Thread deleted' });
+            // Broadcast thread deletion
+            // @ts-ignore
+            broadcastMessage('threadDeleted', { threadId: request.params.threadId });
         }
         catch (error) {
             reply.code(error.statusCode).send({ error: error.message });
@@ -132,6 +136,9 @@ function addThreadMessage(request, reply) {
         try {
             const messageId = yield thread_service_1.default.addThreadMessage(request);
             reply.code(201).send(messageId);
+            // Broadcast new message
+            // @ts-ignore
+            broadcastMessage('newMessage', { messageId, threadId: request.body.threadId });
         }
         catch (error) {
             reply.code(error.statusCode).send({ error: error.message });
@@ -193,6 +200,8 @@ function toggleMessageReaction(request, reply) {
         try {
             const reaction = yield thread_service_1.default.toggleMessageReaction(request);
             reply.send({ reaction: reaction });
+            // Broadcast reaction
+            broadcastMessage('messageReaction', { reaction, threadId: request.body.threadId });
         }
         catch (error) {
             reply.code(400).send({ error: error.message });
@@ -339,3 +348,10 @@ function threadRoutes(server) {
     });
 }
 exports.default = threadRoutes;
+function broadcastMessage(event, data) {
+    server.websocketServer.clients.forEach((client) => {
+        if (client.readyState === 1) { // 1 means OPEN
+            client.send(JSON.stringify({ event, data }));
+        }
+    });
+}

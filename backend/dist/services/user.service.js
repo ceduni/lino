@@ -18,6 +18,7 @@ const argon2_1 = __importDefault(require("argon2"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const utilities_1 = require("./utilities");
+const server = require('../index');
 dotenv_1.default.config();
 const UserService = {
     // User service to register a new user's account
@@ -237,8 +238,17 @@ function notifyUser(userId, title, message) {
         catch (error) {
             throw new Error(`Failed to save notification: ${error.message}`);
         }
+        // Broadcast the notification to the user if they are connected via WebSocket
+        broadcastToUser(userId, { event: 'newNotification', data: notification });
         return user;
     });
 }
 exports.notifyUser = notifyUser;
+function broadcastToUser(userId, message) {
+    server.websocketServer.clients.forEach((client) => {
+        if (client.readyState === 1 && client.userId === userId) { // Check if client is connected and is the correct user
+            client.send(JSON.stringify(message));
+        }
+    });
+}
 exports.default = UserService;

@@ -9,8 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const utilities_1 = require("./services/utilities");
-const mock_data_gen_1 = require("./mock.data.gen");
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -21,10 +19,33 @@ const fastifySwaggerUi = require('@fastify/swagger-ui');
 const bookRoutes = require('./routes/book.route');
 const userRoutes = require('./routes/user.route');
 const threadRoutes = require('./routes/thread.route');
+const fastifyWebSocket = require('@fastify/websocket');
 dotenv.config();
 const server = Fastify({ logger: { level: 'error' } });
 server.register(fastifyCors, {
     origin: true,
+});
+// Register WebSocket plugin
+server.register(fastifyWebSocket);
+// Store connected WebSocket clients
+const clients = new Set();
+// WebSocket route
+// @ts-ignore
+server.get('/ws', { websocket: true }, (connection, req) => {
+    console.log('Request query userId:', req.request.query.userId);
+    try {
+        connection.userId = req.query.userId; // Store the user ID in the socket to identify the user
+    }
+    catch (error) {
+        connection.userId = 'anonymous'; // Set a default user ID
+    }
+    clients.add(connection); // Add the connected client to the set
+    connection.socket.on('message', (msg) => {
+        console.log('Received message:', msg);
+    });
+    connection.socket.on('close', () => {
+        clients.delete(connection);
+    });
 });
 // Register JWT plugin
 server.register(fastifyJwt, { secret: process.env.JWT_SECRET_KEY });
@@ -117,9 +138,6 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
         console.log(`Server started on port ${port}`);
         yield server.ready();
         server.swagger(); // Ensure swagger is called after server starts
-        // Reinitialize the database
-        yield (0, utilities_1.reinitDatabase)(server);
-        yield (0, mock_data_gen_1.populateDatabase)();
     }
     catch (err) {
         console.error(err);

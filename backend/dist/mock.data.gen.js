@@ -89,8 +89,10 @@ function randomBookBox() {
         infoText: faker_1.faker.lorem.sentence(),
     };
 }
-function randomBook(isbn) {
+function randomBook() {
     return __awaiter(this, void 0, void 0, function* () {
+        const isbn = bookISBNs[bookIndex];
+        bookIndex++;
         const r = yield fetch(url + `/books/${isbn}`, {
             method: "GET",
             headers: {
@@ -203,16 +205,17 @@ function populateBookBoxes() {
 function populateBooks() {
     return __awaiter(this, void 0, void 0, function* () {
         // add between 3 and 5 books to each book box
-        for (let i = 0; i < bookBoxIds.length; i++) {
-            const nBooks = i == bookBoxIds.length - 1 ? 40 - bookIndex : faker_1.faker.number.int({ min: 3, max: 5 });
+        for (let j = 0; j < bookBoxIds.length; j++) {
+            const nBooks = j === (bookBoxIds.length - 1) ? 40 - bookIndex : faker_1.faker.number.int({ min: 3, max: 5 });
             for (let i = 0; i < nBooks; i++) {
                 const response = yield fetch(url + "/books/add", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json; charset=UTF-8",
                     },
-                    body: JSON.stringify(Object.assign({ bookboxId: bookBoxIds[i] }, yield randomBook(bookISBNs[bookIndex++])))
+                    body: JSON.stringify(Object.assign({ bookboxId: bookBoxIds[j] }, yield randomBook()))
                 });
+                console.log(response);
                 const { bookId } = yield response.json();
                 bookIds.push(bookId.toString());
             }
