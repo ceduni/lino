@@ -2,6 +2,7 @@ import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} fr
 import ThreadService from '../services/thread.service';
 import Thread from "../models/thread.model";
 import {clearCollectionSchema, threadSchema} from "../services/utilities";
+const server = require('../index');
 
 
 async function createThread(request : FastifyRequest, reply : FastifyReply) {

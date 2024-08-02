@@ -1,6 +1,6 @@
 import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} from "fastify";
 import BookService from "../services/book.service";
-import {bookSchema, clearCollectionSchema, threadSchema} from "../services/utilities";
+import {bookSchema, clearCollectionSchema} from "../services/utilities";
 
 async function addBookToBookbox(request: FastifyRequest, reply: FastifyReply) {
     try {

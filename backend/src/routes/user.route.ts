@@ -1,4 +1,4 @@
-import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} from 'fastify';
+import {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify';
 import userService from '../services/user.service';
 import UserService from "../services/user.service";
 import User from "../models/user.model";

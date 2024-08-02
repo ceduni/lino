@@ -1,3 +1,5 @@
+import {WebSocket} from "@fastify/websocket";
+
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -26,37 +28,17 @@ const clients = new Set();
 
 // WebSocket route
 // @ts-ignore
-server.get('/ws', { websocket: true }, (connection, req) => {
-    try {
-        const userId = req.query.userId;
-        console.log('Watching url:',new URLSearchParams(req.raw.url.split('?')[1]));
+server.get('/ws', { websocket: true }, (socket : WebSocket, req : FastifyRequest) => {
+    socket.userId = req.query.userId; // Store the user ID in the socket to identify the user
 
-        console.log('Received WebSocket connection with userId:', userId);
+    clients.add(socket); // Add the connected client to the set
 
-        if (!userId) {
-            console.log('No userId found, closing connection');
-            connection.socket.close();
-            return;
-        }
-
-        connection.socket.userId = userId; // Attach userId to WebSocket connection
-
-        clients.add(connection);
-
-        connection.socket.on('message', (message: any) => {
-            // Handle incoming messages
-            console.log('Received message:', message);
-        });
-
-        connection.socket.on('close', () => {
-            // Handle WebSocket closure
-            console.log('WebSocket connection closed');
-            clients.delete(connection);
-        });
-    } catch (error) {
-        console.error('Error processing WebSocket connection:', error);
-        connection.socket.close();
-    }
+    socket.on('message', (msg: any) => {
+        console.log('Received message:', msg);
+    });
+    socket.on('close', () => {
+        clients.delete(socket);
+    });
 });
 
 
