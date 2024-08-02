@@ -126,6 +126,7 @@ async function addThreadMessage(request : FastifyRequest, reply : FastifyReply) 
         // @ts-ignore
         broadcastMessage('newMessage', { messageId, threadId: request.body.threadId });
     } catch (error : any) {
+        console.log(error);
         reply.code(error.statusCode).send({ error: error.message });
     }
 }
@@ -197,6 +198,7 @@ async function toggleMessageReaction(request : FastifyRequest<ToggleMessageReact
         // Broadcast reaction
         broadcastMessage('messageReaction', { reaction, threadId: request.body.threadId });
     } catch (error : any) {
+        console.log(error);
         reply.code(400).send({ error: error.message });
     }
 }
