@@ -39,9 +39,11 @@ function broadcastToUser(userId : string, message: any) {
 
 function broadcastMessage(event: string, data: any) {
     try {
-        server.websocketServer.clients.forEach((client: { readyState: number; send: (arg0: string) => void; }) => {
-            if (client.readyState === 1) { // 1 means OPEN
-                client.send(JSON.stringify({ event, data }));
+        clients.forEach((client) => {
+            // @ts-ignore
+            if (client.socket.readyState === 1) { // 1 means OPEN
+                // @ts-ignore
+                client.socket.send(JSON.stringify({ event, data }));
             }
         });
     } catch (error : any) {
