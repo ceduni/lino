@@ -38,7 +38,7 @@ export function broadcastToUser(userId : string, message: any) {
             if (client.userId === userId && client.socket.readyState === 'open') {
                 console.log('Broadcasting message to user:', userId, message);
                 // @ts-ignore
-                client.socket.send(JSON.stringify(message));
+                client.send(JSON.stringify(message));
             }
         });
     } catch (error : any) {
@@ -56,7 +56,7 @@ export function broadcastMessage(event: string, data: any) {
             if (client.socket.readyState === 'open') {
                 console.log('Broadcasting message:', event, data);
                 // @ts-ignore
-                client.socket.send(JSON.stringify({ event, data }));
+                client.send(JSON.stringify({ event, data }));
             } else {
                 console.log('Client not ready');
             }
@@ -69,15 +69,15 @@ export function broadcastMessage(event: string, data: any) {
 
 // WebSocket route
 // @ts-ignore
-server.get('/ws', { websocket: true }, (connection : WebSocket, req : FastifyRequest) => {
+server.get('/ws', { websocket: true }, (socket : WebSocket, req : FastifyRequest) => {
     try {
-        connection.userId = req.request.query.userId; // Store the user ID in the socket to identify the user
+        socket.userId = req.request.query.userId; // Store the user ID in the socket to identify the user
     } catch (error) {
-        connection.userId = 'anonymous'; // Set a default user ID
+        socket.userId = 'anonymous'; // Set a default user ID
     }
 
-    clients.add(connection); // Add the connected client to the set
-    console.log('Client connected:', connection.userId);
+    clients.add(socket); // Add the connected client to the set
+    console.log('Client connected:', socket.userId);
     console.log('Clients:');
     for (const client of clients) {
         // @ts-ignore
@@ -85,12 +85,12 @@ server.get('/ws', { websocket: true }, (connection : WebSocket, req : FastifyReq
     }
     console.log('Client count:', clients.size);
 
-    connection.socket.on('message', (msg: any) => {
+    socket.on('message', (msg: any) => {
         console.log('Received message:', msg);
     });
-    connection.socket.on('close', () => {
-        clients.delete(connection);
-        console.log('Client disconnected:', connection.userId);
+    socket.on('close', () => {
+        clients.delete(socket);
+        console.log('Client disconnected:', socket.userId);
         console.log('Remaining clients:');
         // @ts-ignore
         clients.forEach((client) => console.log(client.userId));
