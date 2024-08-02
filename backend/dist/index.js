@@ -9,6 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.clients = exports.server = exports.broadcastMessage = exports.broadcastToUser = void 0;
+const utilities_1 = require("./services/utilities");
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -22,6 +24,7 @@ const threadRoutes = require('./routes/thread.route');
 const fastifyWebSocket = require('@fastify/websocket');
 dotenv.config();
 const server = Fastify({ logger: { level: 'error' } });
+exports.server = server;
 server.register(fastifyCors, {
     origin: true,
 });
@@ -29,6 +32,7 @@ server.register(fastifyCors, {
 server.register(fastifyWebSocket);
 // Store connected WebSocket clients
 const clients = new Set();
+exports.clients = clients;
 // Function to broadcast a message to a specific user
 function broadcastToUser(userId, message) {
     try {
@@ -41,9 +45,11 @@ function broadcastToUser(userId, message) {
         });
     }
     catch (error) {
-        console.error('Failed to broadcast message to user:', error.message);
+        console.log('Failed to broadcast message to user:', error.message);
+        throw (0, utilities_1.newErr)(500, error.message);
     }
 }
+exports.broadcastToUser = broadcastToUser;
 function broadcastMessage(event, data) {
     try {
         clients.forEach((client) => {
@@ -55,9 +61,11 @@ function broadcastMessage(event, data) {
         });
     }
     catch (error) {
-        console.error('Failed to broadcast message:', error.message);
+        console.log('Failed to broadcast message:', error.message);
+        throw (0, utilities_1.newErr)(500, error.message);
     }
 }
+exports.broadcastMessage = broadcastMessage;
 // WebSocket route
 // @ts-ignore
 server.get('/ws', { websocket: true }, (connection, req) => {
@@ -174,10 +182,3 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 start();
-// Export the server and utility functions for use in other modules
-module.exports = {
-    server,
-    clients,
-    broadcastMessage,
-    broadcastToUser
-};

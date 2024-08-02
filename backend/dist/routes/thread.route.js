@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const thread_service_1 = __importDefault(require("../services/thread.service"));
 const thread_model_1 = __importDefault(require("../models/thread.model"));
 const utilities_1 = require("../services/utilities");
-const { broadcastMessage } = require('../index');
+const index_1 = require("../index");
 function createThread(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -83,7 +83,7 @@ function deleteThread(request, reply) {
             reply.code(204).send({ message: 'Thread deleted' });
             // Broadcast thread deletion
             // @ts-ignore
-            broadcastMessage('threadDeleted', { threadId: request.params.threadId });
+            server.broadcastMessage('threadDeleted', { threadId: request.params.threadId });
         }
         catch (error) {
             reply.code(error.statusCode).send({ error: error.message });
@@ -138,9 +138,10 @@ function addThreadMessage(request, reply) {
             reply.code(201).send(messageId);
             // Broadcast new message
             // @ts-ignore
-            broadcastMessage('newMessage', { messageId, threadId: request.body.threadId });
+            (0, index_1.broadcastMessage)('newMessage', { messageId, threadId: request.body.threadId });
         }
         catch (error) {
+            console.log(error);
             reply.code(error.statusCode).send({ error: error.message });
         }
     });
@@ -201,9 +202,10 @@ function toggleMessageReaction(request, reply) {
             const reaction = yield thread_service_1.default.toggleMessageReaction(request);
             reply.send({ reaction: reaction });
             // Broadcast reaction
-            broadcastMessage('messageReaction', { reaction, threadId: request.body.threadId });
+            (0, index_1.broadcastMessage)('messageReaction', { reaction, threadId: request.body.threadId });
         }
         catch (error) {
+            console.log(error);
             reply.code(400).send({ error: error.message });
         }
     });

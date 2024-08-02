@@ -2,7 +2,7 @@ import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} fr
 import ThreadService from '../services/thread.service';
 import Thread from "../models/thread.model";
 import {clearCollectionSchema, threadSchema} from "../services/utilities";
-const server = require('../index');
+import {broadcastMessage} from "../index";
 
 
 async function createThread(request : FastifyRequest, reply : FastifyReply) {
@@ -196,7 +196,7 @@ async function toggleMessageReaction(request : FastifyRequest<ToggleMessageReact
         const reaction = await ThreadService.toggleMessageReaction(request);
         reply.send({reaction : reaction});
         // Broadcast reaction
-        server.broadcastMessage('messageReaction', { reaction, threadId: request.body.threadId });
+        broadcastMessage('messageReaction', { reaction, threadId: request.body.threadId });
     } catch (error : any) {
         console.log(error);
         reply.code(400).send({ error: error.message });

@@ -28,7 +28,7 @@ server.register(fastifyWebSocket);
 const clients = new Set();
 
 // Function to broadcast a message to a specific user
-function broadcastToUser(userId : string, message: any) {
+export function broadcastToUser(userId : string, message: any) {
     try {
         clients.forEach((client) => {
             // @ts-ignore
@@ -43,8 +43,9 @@ function broadcastToUser(userId : string, message: any) {
     }
 }
 
-function broadcastMessage(event: string, data: any) {
+export function broadcastMessage(event: string, data: any) {
     try {
+        console.log('Broadcasting message:', event, data);
         clients.forEach((client) => {
             // @ts-ignore
             if (client.socket.readyState === 1) { // 1 means OPEN
@@ -192,9 +193,4 @@ const start = async () => {
 start();
 
 // Export the server and utility functions for use in other modules
-module.exports = {
-    server,
-    clients,
-    broadcastMessage,
-    broadcastToUser
-};
+export { server, clients };

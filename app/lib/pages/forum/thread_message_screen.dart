@@ -66,7 +66,7 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
           currentUsername = response['user']['username'];
         });
         webSocketService.connect(
-          'wss://lino-1.onrender.com/ws',
+          'ws://localhost:3000/ws',
           userId: response['user']['_id'],
           onEvent: (event, data) {
             if (event == 'newMessage' || event == 'messageReaction') {
