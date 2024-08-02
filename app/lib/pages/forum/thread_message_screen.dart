@@ -4,6 +4,7 @@ import 'package:Lino_app/services/user_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 import 'message_tile.dart';
+import 'package:Lino_app/services/websocket_service.dart';
 
 class ThreadMessagesScreen extends StatefulWidget {
   final String threadId;
@@ -25,12 +26,19 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
   TextEditingController _controller = TextEditingController();
   ScrollController _scrollController = ScrollController();
   String? currentUsername;
+  WebSocketService webSocketService = WebSocketService();
 
   @override
   void initState() {
     super.initState();
     fetchThreadMessages();
     checkUser();
+  }
+
+  @override
+  void dispose() {
+    webSocketService.disconnect();
+    super.dispose();
   }
 
   Future<void> fetchThreadMessages() async {
@@ -57,6 +65,15 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
           token = storedToken;
           currentUsername = response['user']['username'];
         });
+        webSocketService.connect(
+          'wss://lino-1.onrender.com/ws',
+          userId: response['user']['_id'],
+          onEvent: (event, data) {
+            if (event == 'newMessage' || event == 'messageReaction') {
+              fetchThreadMessages();
+            }
+          },
+        );
       } catch (e) {
         print('Error: $e');
       }
@@ -74,6 +91,7 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
           respondingToMessage = null;
         });
         fetchThreadMessages(); // Refresh messages after sending
+        webSocketService.sendMessage('newMessage'); // Notify other users
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent); // Scroll to bottom after sending
       } catch (e) {
         print('Error sending message: $e');
@@ -86,6 +104,7 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
       final ts = ThreadService();
       await ts.toggleMessageReaction(token, widget.threadId, messageId, isGood);
       fetchThreadMessages(); // Refresh messages after reaction
+      webSocketService.sendMessage('messageReaction'); // Notify other users
     } catch (e) {
       print('Error reacting to message: $e');
     }

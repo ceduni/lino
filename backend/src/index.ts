@@ -24,25 +24,23 @@ server.register(fastifyWebSocket);
 // Store connected WebSocket clients
 const clients = new Set();
 
-// WebSocket route
-server.get('/ws', { websocket: true }, (connection: any, req: any) => {
-    // Assuming userId is passed as a query parameter, or handle authentication as necessary
-    connection.socket.userId = req.query.userId; // Attach userId to WebSocket connection
+server.get('/ws', { websocket: true }, (connection: { socket: { close: () => void; userId: string; on: (arg0: string, arg1: { (message: any): void; (): void; }) => void; }; }, req: { url: string; }) => {
+    const urlParams = new URLSearchParams(req.url.split('?')[1]);
+    const userId = urlParams.get('userId');
 
-    clients.add(connection);
+    if (!userId) {
+        connection.socket.close();
+        return;
+    }
 
-    connection.socket.on('close', () => {
-        clients.delete(connection);
+    connection.socket.userId = userId; // Attach userId to WebSocket connection
+
+    connection.socket.on('message', () => {
+        // Handle incoming messages
     });
 
-    connection.socket.on('message', (message: any) => {
-        // Broadcast message to all connected clients
-        clients.forEach(client => {
-            if (client !== connection) {
-                // @ts-ignore
-                client.socket.send(message);
-            }
-        });
+    connection.socket.on('close', () => {
+        // Handle WebSocket closure
     });
 });
 
