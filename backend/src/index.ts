@@ -90,6 +90,11 @@ server.get('/ws', { websocket: true }, (connection : WebSocket, req : FastifyReq
     });
     connection.socket.on('close', () => {
         clients.delete(connection);
+        console.log('Client disconnected:', connection.userId);
+        console.log('Remaining clients:');
+        // @ts-ignore
+        clients.forEach((client) => console.log(client.userId));
+        console.log('Client count:', clients.size);
     });
 });
 
