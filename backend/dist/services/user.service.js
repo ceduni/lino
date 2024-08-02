@@ -18,7 +18,7 @@ const argon2_1 = __importDefault(require("argon2"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const utilities_1 = require("./utilities");
-const server = require('../index');
+const { broadcastToUser } = require('../index');
 dotenv_1.default.config();
 const UserService = {
     // User service to register a new user's account
@@ -244,11 +244,4 @@ function notifyUser(userId, title, message) {
     });
 }
 exports.notifyUser = notifyUser;
-function broadcastToUser(userId, message) {
-    server.websocketServer.clients.forEach((client) => {
-        if (client.readyState === 1 && client.userId === userId) { // Check if client is connected and is the correct user
-            client.send(JSON.stringify(message));
-        }
-    });
-}
 exports.default = UserService;

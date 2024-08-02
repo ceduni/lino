@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const thread_service_1 = __importDefault(require("../services/thread.service"));
 const thread_model_1 = __importDefault(require("../models/thread.model"));
 const utilities_1 = require("../services/utilities");
-const server = require('../index');
+const { broadcastMessage } = require('../index');
 function createThread(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -192,7 +192,7 @@ const addMessageSchema = {
             properties: {
                 error: { type: 'string' }
             }
-        }
+        },
     }
 };
 function toggleMessageReaction(request, reply) {
@@ -259,6 +259,13 @@ const toggleReactionSchema = {
         },
         404: {
             description: 'Thread or message not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
             type: 'object',
             properties: {
                 error: { type: 'string' }
@@ -348,10 +355,3 @@ function threadRoutes(server) {
     });
 }
 exports.default = threadRoutes;
-function broadcastMessage(event, data) {
-    server.websocketServer.clients.forEach((client) => {
-        if (client.readyState === 1) { // 1 means OPEN
-            client.send(JSON.stringify({ event, data }));
-        }
-    });
-}

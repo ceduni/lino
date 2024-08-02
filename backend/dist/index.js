@@ -29,6 +29,35 @@ server.register(fastifyCors, {
 server.register(fastifyWebSocket);
 // Store connected WebSocket clients
 const clients = new Set();
+// Function to broadcast a message to a specific user
+function broadcastToUser(userId, message) {
+    try {
+        clients.forEach((client) => {
+            // @ts-ignore
+            if (client.userId === userId && client.socket.readyState === 1) {
+                // @ts-ignore
+                client.socket.send(JSON.stringify(message));
+            }
+        });
+    }
+    catch (error) {
+        console.error('Failed to broadcast message to user:', error.message);
+    }
+}
+function broadcastMessage(event, data) {
+    try {
+        clients.forEach((client) => {
+            // @ts-ignore
+            if (client.socket.readyState === 1) { // 1 means OPEN
+                // @ts-ignore
+                client.socket.send(JSON.stringify({ event, data }));
+            }
+        });
+    }
+    catch (error) {
+        console.error('Failed to broadcast message:', error.message);
+    }
+}
 // WebSocket route
 // @ts-ignore
 server.get('/ws', { websocket: true }, (connection, req) => {
@@ -145,5 +174,10 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 start();
-// Export the server for testing
-module.exports = server;
+// Export the server and utility functions for use in other modules
+module.exports = {
+    server,
+    clients,
+    broadcastMessage,
+    broadcastToUser
+};

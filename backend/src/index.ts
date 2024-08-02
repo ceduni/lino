@@ -1,4 +1,5 @@
 import {WebSocket} from "@fastify/websocket";
+import {newErr} from "./services/utilities";
 
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
@@ -37,7 +38,8 @@ function broadcastToUser(userId : string, message: any) {
             }
         });
     } catch (error : any) {
-        console.error('Failed to broadcast message to user:', error.message);
+        console.log('Failed to broadcast message to user:', error.message);
+        throw newErr(500, error.message);
     }
 }
 
@@ -51,7 +53,8 @@ function broadcastMessage(event: string, data: any) {
             }
         });
     } catch (error : any) {
-        console.error('Failed to broadcast message:', error.message);
+        console.log('Failed to broadcast message:', error.message);
+        throw newErr(500, error.message);
     }
 }
 
