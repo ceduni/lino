@@ -28,13 +28,17 @@ const clients = new Set();
 
 // Function to broadcast a message to a specific user
 function broadcastToUser(userId : string, message: any) {
-    clients.forEach((client) => {
-        // @ts-ignore
-        if (client.socket.readyState === 1 && client.userId === userId) { // Check if client is connected and is the correct user
+    try {
+        clients.forEach((client) => {
             // @ts-ignore
-            client.socket.send(JSON.stringify(message));
-        }
-    });
+            if (client.userId === userId && client.socket.readyState === 1) {
+                // @ts-ignore
+                client.socket.send(JSON.stringify(message));
+            }
+        });
+    } catch (error : any) {
+        console.error('Failed to broadcast message to user:', error.message);
+    }
 }
 
 function broadcastMessage(event: string, data: any) {
