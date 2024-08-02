@@ -30,7 +30,13 @@ const clients = new Set();
 // @ts-ignore
 server.get('/ws', { websocket: true }, (socket : WebSocket, req : FastifyRequest) => {
     console.log('Request:', req);
-    socket.userId = req.query.userId || 'null'; // Store the user ID in the socket to identify the user
+    console.log('Request query:', req.request.query);
+    try {
+        socket.userId = req.query.userId; // Store the user ID in the socket to identify the user
+    } catch (error) {
+        console.error('Error setting user ID:', error);
+        socket.userId = 'anonymous'; // Set a default user ID
+    }
 
     clients.add(socket); // Add the connected client to the set
 
