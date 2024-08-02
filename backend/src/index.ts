@@ -28,23 +28,21 @@ const clients = new Set();
 
 // WebSocket route
 // @ts-ignore
-server.get('/ws', { websocket: true }, (socket : WebSocket, req : FastifyRequest) => {
-    console.log('Request:', req);
-    console.log('Request query:', req.request.query);
+server.get('/ws', { websocket: true }, (connection : WebSocket, req : FastifyRequest) => {
+    console.log('Request query userId:', req.request.query.userId);
     try {
-        socket.userId = req.query.userId; // Store the user ID in the socket to identify the user
+        connection.userId = req.query.userId; // Store the user ID in the socket to identify the user
     } catch (error) {
-        console.error('Error setting user ID:', error);
-        socket.userId = 'anonymous'; // Set a default user ID
+        connection.userId = 'anonymous'; // Set a default user ID
     }
 
-    clients.add(socket); // Add the connected client to the set
+    clients.add(connection); // Add the connected client to the set
 
-    socket.on('message', (msg: any) => {
+    connection.socket.on('message', (msg: any) => {
         console.log('Received message:', msg);
     });
-    socket.on('close', () => {
-        clients.delete(socket);
+    connection.socket.on('close', () => {
+        clients.delete(connection);
     });
 });
 
