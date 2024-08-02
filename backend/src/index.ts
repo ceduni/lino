@@ -24,25 +24,36 @@ server.register(fastifyWebSocket);
 // Store connected WebSocket clients
 const clients = new Set();
 
-server.get('/ws', { websocket: true }, (connection: { socket: { close: () => void; userId: string; on: (arg0: string, arg1: { (message: any): void; (): void; }) => void; }; }, req: { url: string; }) => {
-    const urlParams = new URLSearchParams(req.url.split('?')[1]);
-    const userId = urlParams.get('userId');
+// WebSocket route
+// @ts-ignore
+server.get('/ws', { websocket: true }, (connection, req) => {
+    console.log('Received WebSocket connection with URL:', req.url);
 
-    if (!userId) {
+    try {
+        const urlParams = new URLSearchParams(req.url.split('?')[1]);
+        const userId = urlParams.get('userId');
+
+        if (!userId) {
+            console.log('No userId found, closing connection');
+            connection.socket.close();
+            return;
+        }
+
+        connection.socket.userId = userId; // Attach userId to WebSocket connection
+
+        connection.socket.on('message', () => {
+            // Handle incoming messages
+        });
+
+        connection.socket.on('close', () => {
+            // Handle WebSocket closure
+        });
+    } catch (error) {
+        console.error('Error processing WebSocket connection:', error);
         connection.socket.close();
-        return;
     }
-
-    connection.socket.userId = userId; // Attach userId to WebSocket connection
-
-    connection.socket.on('message', () => {
-        // Handle incoming messages
-    });
-
-    connection.socket.on('close', () => {
-        // Handle WebSocket closure
-    });
 });
+
 
 
 // Register JWT plugin

@@ -1,28 +1,16 @@
 import 'package:Lino_app/pages/login/login_page.dart';
 import 'package:Lino_app/services/user_services.dart';
-import 'package:Lino_app/services/websocket_service.dart'; // Add this import
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'nav_menu.dart';
-import 'splash_screen.dart'; // Add this import
+import 'splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   prefs.remove('token');
   String? userId = await fetchUserId(prefs);
-
-  WebSocketService().connect(
-    'wss://lino-1.onrender.com/ws',
-    userId: userId,
-    onEvent: (event, data) {
-      // Handle incoming WebSocket events
-      print('Event: $event, Data: $data');
-      // Add your custom event handling logic here
-    },
-  ); // Initialize WebSocket connection with userId
-
   runApp(MyApp(prefs: prefs, userId: userId));
 }
 

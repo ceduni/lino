@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WebSocketService {
   static final WebSocketService _singleton = WebSocketService._internal();
-  late IOWebSocketChannel channel;
+  late WebSocketChannel channel;
+  Function(String event, dynamic data)? onEvent;
 
   factory WebSocketService() {
     return _singleton;
@@ -12,17 +14,16 @@ class WebSocketService {
 
   WebSocketService._internal();
 
-  void connect(String url, {String? userId, required Function(String, dynamic) onEvent}) {
+  void connect(String url, {String? userId, required Function(String event, dynamic data) onEvent}) {
+    this.onEvent = onEvent;
     final uri = Uri.parse(url);
-    final queryParameters = userId != null ? {'userId': userId} : {'userId': ''};
+    final queryParameters = userId != null ? {'userId': userId} : {'userId': 'anon'};
     final wsUri = uri.replace(queryParameters: queryParameters);
-    try {
-      channel = IOWebSocketChannel.connect(wsUri.toString());
-    } catch (e) {
-      print(e);
-    }
+
+    channel = IOWebSocketChannel.connect(wsUri.toString());
+
     channel.stream.listen((message) {
-      final decodedMessage = _decodeMessage(message);
+      final decodedMessage = jsonDecode(message);
       onEvent(decodedMessage['event'], decodedMessage['data']);
     }, onError: (error) {
       print('WebSocket error: $error');
@@ -31,20 +32,15 @@ class WebSocketService {
     });
   }
 
-  Map<String, dynamic> _decodeMessage(String message) {
-    try {
-      return Map<String, dynamic>.from(jsonDecode(message));
-    } catch (e) {
-      print('Error decoding message: $e');
-      return {'event': 'error', 'data': message};
+  void sendMessage(String message) {
+    if (channel != null) {
+      channel.sink.add(message);
     }
   }
 
-  void sendMessage(String message) {
-    channel.sink.add(message);
-    }
-
   void disconnect() {
-    channel.sink.close();
+    if (channel != null) {
+      channel.sink.close();
     }
+  }
 }
