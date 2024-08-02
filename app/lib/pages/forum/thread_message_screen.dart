@@ -37,6 +37,7 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
 
   @override
   void dispose() {
+    print('Disconnecting websocket');
     webSocketService.disconnect();
     super.dispose();
   }

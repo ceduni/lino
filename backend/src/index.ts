@@ -32,7 +32,8 @@ export function broadcastToUser(userId : string, message: any) {
     try {
         console.log('Broadcasting message to user:', userId, message);
         clients.forEach((client) => {
-            console.log('Check readyState and userId of client:', client);
+            // @ts-ignore
+            console.log('Check readyState and userId of client:', client.socket.readyState);
             // @ts-ignore
             if (client.userId === userId && client.socket.readyState === 1) {
                 console.log('Broadcasting message to user:', userId, message);
@@ -49,14 +50,15 @@ export function broadcastToUser(userId : string, message: any) {
 export function broadcastMessage(event: string, data: any) {
     try {
         clients.forEach((client) => {
-            console.log('Check readyState of client:', client);
+            // @ts-ignore
+            console.log('Check readyState of client:', client.socket.readyState);
             // @ts-ignore
             if (client.socket.readyState === 1) { // 1 means OPEN
                 console.log('Broadcasting message:', event, data);
                 // @ts-ignore
                 client.socket.send(JSON.stringify({ event, data }));
             } else {
-                console.log('Client not ready:', client);
+                console.log('Client not ready');
             }
         });
     } catch (error : any) {
@@ -68,17 +70,19 @@ export function broadcastMessage(event: string, data: any) {
 // WebSocket route
 // @ts-ignore
 server.get('/ws', { websocket: true }, (connection : WebSocket, req : FastifyRequest) => {
-    console.log('Request query userId:', req.request.query.userId);
     try {
-        connection.userId = req.query.userId; // Store the user ID in the socket to identify the user
+        connection.userId = req.request.query.userId; // Store the user ID in the socket to identify the user
     } catch (error) {
         connection.userId = 'anonymous'; // Set a default user ID
     }
 
-
     clients.add(connection); // Add the connected client to the set
-    console.log('Client connected:', connection);
-    console.log('Clients:', clients);
+    console.log('Client connected:', connection.userId);
+    console.log('Clients:');
+    for (const client of clients) {
+        // @ts-ignore
+        console.log(client.userId);
+    }
     console.log('Client count:', clients.size);
 
     connection.socket.on('message', (msg: any) => {
