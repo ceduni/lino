@@ -29,7 +29,8 @@ const clients = new Set();
 // WebSocket route
 // @ts-ignore
 server.get('/ws', { websocket: true }, (socket : WebSocket, req : FastifyRequest) => {
-    socket.userId = req.query.userId; // Store the user ID in the socket to identify the user
+    console.log('Request:', req);
+    socket.userId = req.query.userId || 'null'; // Store the user ID in the socket to identify the user
 
     clients.add(socket); // Add the connected client to the set
 
