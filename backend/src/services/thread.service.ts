@@ -72,9 +72,8 @@ const ThreadService = {
                 if (!userParent) {
                     throw newErr(404, 'User not found');
                 }
-                const user = await User.findOne({ username: username });
                 // @ts-ignore
-                await notifyUser(user.id, `${userParent.username} in ${thread.title}`, parentMessage.content);
+                await notifyUser(userParent.id, `${username} in ${thread.title}`, message.content);
             }
         }
 
