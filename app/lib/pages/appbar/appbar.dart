@@ -101,10 +101,8 @@ class _LinoAppBarState extends State<LinoAppBar> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
-                  child: IconButton(
-                    icon: Icon(isLoggedIn ? Icons.person : Icons.login),
-                    color: isLoggedIn ? LinoColors.primary : null,
-                    onPressed: () {
+                  child: GestureDetector(
+                    onTap: () {
                       if (!isLoggedIn) {
                         Navigator.of(context).pushReplacementNamed('/login');
                       } else {
@@ -115,6 +113,31 @@ class _LinoAppBarState extends State<LinoAppBar> {
                         );
                       }
                     },
+                    child: Column(
+                      children: [
+                        IconButton(
+                          icon: isLoggedIn ? Icon(Icons.person, color: Colors.white) : Icon(Icons.login, color: Colors.red),
+                          color: isLoggedIn ? LinoColors.primary : null,
+                          padding: EdgeInsets.all(0), // Set padding to zero
+                          constraints: BoxConstraints(), // Remove default constraints
+                          onPressed: () {
+                            if (!isLoggedIn) {
+                              Navigator.of(context).pushReplacementNamed('/login');
+                            } else {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => ProfilePage(),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        Text(
+                          isLoggedIn ? 'Profile' : 'Log In',
+                          style: isLoggedIn ? TextStyle(color: Colors.white) : TextStyle(color: Colors.red),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
@@ -129,7 +152,7 @@ class _LinoAppBarState extends State<LinoAppBar> {
                     child: Stack(
                       children: [
                         IconButton(
-                          icon: Icon(Icons.notifications),
+                          icon: Icon(Icons.notifications, color: Colors.white,),
                           onPressed: () async {
                             await Navigator.of(context).push(
                               MaterialPageRoute(

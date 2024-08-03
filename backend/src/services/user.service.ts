@@ -188,7 +188,7 @@ const UserService = {
         }
         if (request.body.username) {
             const check = await User.findOne({ username: request.body.username });
-            if (check) {
+            if (check && check.username !== user.username) {
                 throw newErr(400, 'Username already taken');
             }
             user.username = request.body.username;
@@ -196,7 +196,7 @@ const UserService = {
         if (request.body.password) {
             user.password = await argon2.hash(request.body.password);
         }
-        if (request.body.email) {
+        if (request.body.email && request.body.email !== user.email) {
             const check = await User.findOne({ email: request.body.email });
             if (check) {
                 throw newErr(400, 'Email already taken');

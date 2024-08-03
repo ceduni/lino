@@ -10,14 +10,15 @@ class UserDashboard extends StatefulWidget {
   final int booksBorrowed;
   final int booksGiven;
 
-  const UserDashboard(
-      {super.key,
-        required this.favoriteBooks,
-        required this.booksHistory,
-        required this.username,
-        required this.savedTrees,
-        this.booksBorrowed = 0,
-        this.booksGiven = 0});
+  const UserDashboard({
+    super.key,
+    required this.favoriteBooks,
+    required this.booksHistory,
+    required this.username,
+    required this.savedTrees,
+    this.booksBorrowed = 0,
+    this.booksGiven = 0,
+  });
 
   @override
   _UserDashboardState createState() => _UserDashboardState();
@@ -74,12 +75,13 @@ class ProfileCard extends StatelessWidget {
   final int booksBorrowed;
   final int booksGiven;
 
-  const ProfileCard(
-      {super.key,
-        required this.username,
-        required this.savedTrees,
-        required this.booksBorrowed,
-        required this.booksGiven});
+  const ProfileCard({
+    super.key,
+    required this.username,
+    required this.savedTrees,
+    required this.booksBorrowed,
+    required this.booksGiven,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -97,8 +99,7 @@ class ProfileCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 40, // Reduced size
-                  // TODO: Add avatar
-                  // backgroundImage: NetworkImage(avatar),
+                  backgroundImage: Image.network('https://imgs.search.brave.com/M3mi-is8_3t7e0PSznN7CZl9wCDVz6B_7hiUc3zgp3o/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG40/Lmljb25maW5kZXIu/Y29tL2RhdGEvaWNv/bnMvc3BvdHMvNTEy/L2ZhY2Utd29tYW4t/MTI4LnBuZw').image,
                 ),
                 SizedBox(width: 16), // Add space between avatar and stats
                 Expanded(
@@ -174,55 +175,81 @@ class TabView extends StatelessWidget {
     if (books.isEmpty) {
       return Center(child: Text('No books'));
     }
-    return GridView.count(
-      padding: EdgeInsets.zero,
-      crossAxisCount: 3,
-      children: books.map((book) {
-        return GestureDetector(
-          onTap: () {
-            showDialog(
-                context: context,
-                builder: (context) => BookDetailsPage(
-                  book: book,
-                  bbid: '',
-                ));
-          },
-          child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              margin: EdgeInsets.only(bottom: 8.0, top: 8.0),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: AspectRatio(
-                      aspectRatio: 1,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: Image.network(
-                          book['coverImage'],
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                          errorBuilder: (BuildContext context, Object exception,
-                              StackTrace? stackTrace) {
-                            return Image.network(
-                              'https://placehold.co/600x400',
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                            );
-                          },
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount = (constraints.maxWidth / 120).floor();
+        return GridView.builder(
+          padding: EdgeInsets.all(8.0),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            childAspectRatio: 0.75,
+          ),
+          itemCount: books.length,
+          itemBuilder: (context, index) {
+            final book = books[index];
+            return GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => BookDetailsPage(
+                    book: book,
+                    bbid: '',
+                  ),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                margin: EdgeInsets.only(bottom: 8.0, top: 8.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: AspectRatio(
+                        aspectRatio: 0.75,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.network(
+                            book['coverImage'],
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                              return Container(
+                                color: Colors.grey,
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      book['title'],
+                                      style: TextStyle(color: Colors.white),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 8.0),
-                  Text(book['title']),
-                ],
-              )),
+                    SizedBox(height: 8.0),
+                    Text(
+                      book['title'],
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
-      }).toList(),
+      },
     );
   }
 }

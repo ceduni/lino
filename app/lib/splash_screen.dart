@@ -17,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _initializeApp() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
-    await Future.delayed(Duration(seconds: 2)); // Simulate some loading time
+    await Future.delayed(Duration(seconds: 1)); // Simulate some loading time
     Get.offNamed('/home'); // Navigate to home page
   }
 

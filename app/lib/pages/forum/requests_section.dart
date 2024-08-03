@@ -111,6 +111,7 @@ class RequestsSectionState extends State<RequestsSection> {
               ),
             ),
           ),
+          SizedBox(width: 10),  // Added margin to the right of 'My requests'
         ],
       ),
       body: Container(
