@@ -596,7 +596,7 @@ const getBookRequestsSchema = {
     querystring: {
         type: 'object',
         properties: {
-            status: {type: 'string'}
+            username: {type: 'string'}
         }
     },
     response: {
