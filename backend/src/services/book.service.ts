@@ -406,7 +406,7 @@ const bookService = {
 
 
     async getBookRequests(request: any) {
-        let username = request.params.username;
+        let username = request.query.username;
         if (!username) {
             return Request.find();
         } else {
