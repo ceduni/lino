@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/user_services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class KeywordInputPage extends StatefulWidget {
@@ -40,19 +41,23 @@ class _KeywordInputPageState extends State<KeywordInputPage> {
       var us = UserService();
       await us.updateUser(widget.token, keyWords: keyWords);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Keywords added successfully'), duration: Duration(seconds: 1)),
-      );
+      showToast('User preferences updated successfully!');
 
-      // Navigate after a short delay to show the Snackbar
-      Future.delayed(Duration(seconds: 1), () {
-        Navigator.pushReplacementNamed(context, '/home');
-      });
+      Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update user preferences: $e')),
-      );
+      showToast('Error updating user preferences: $e');
     }
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.grey[800],
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   void _pass() {

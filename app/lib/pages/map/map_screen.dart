@@ -42,37 +42,31 @@ class MapScreen extends HookWidget {
         actions: [
           Row(
             children: [
-              Text('Order: '),
+              Text('Sort: '),
               PopupMenuButton<String>(
                 onSelected: (String value) {
-                  bookBoxController.sortBy.value = value;
-                  bookBoxController.getBookBoxes();
-                },
-                itemBuilder: (BuildContext context) {
-                  return {'by location', 'by number of books', 'by name'}
-                      .map((String choice) {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Text(choice),
-                    );
-                  }).toList();
-                },
-                icon: Icon(Icons.filter_list),
-              ),
-              Text('Sort: '),
-              PopupMenuButton<bool>(
-                onSelected: (bool value) {
-                  bookBoxController.isAscending.value = value;
+                  switch (value) {
+                    case 'nearest first':
+                      bookBoxController.sortBy.value = 'by location';
+                      bookBoxController.isAscending.value = true;
+                    case 'most books first':
+                      bookBoxController.sortBy.value = 'by number of books';
+                      bookBoxController.isAscending.value = false;
+                    case 'by name':
+                      bookBoxController.sortBy.value = 'by name';
+                      bookBoxController.isAscending.value = true;
+                  }
                   bookBoxController.getBookBoxes();
                 },
                 itemBuilder: (BuildContext context) {
                   return {
-                    true: 'Ascending',
-                    false: 'Descending',
-                  }.entries.map((entry) {
-                    return PopupMenuItem<bool>(
-                      value: entry.key,
-                      child: Text(entry.value),
+                    'nearest first',
+                    'most books first',
+                    'by name',
+                  }.map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: choice,
+                      child: Text(choice),
                     );
                   }).toList();
                 },
@@ -90,22 +84,22 @@ class MapScreen extends HookWidget {
               final bboxes = bookBoxController.bookBoxes;
               List<Marker> markers = bboxes
                   .map((bbox) => Marker(
-                        markerId: MarkerId(bbox['id']),
-                        position: bbox['location'],
-                        infoWindow: InfoWindow(
-                          title: bbox['name'],
-                          snippet: bbox['infoText'],
-                        ),
-                        onTap: () {
-                          bookBoxController.highlightBookBox(bbox['id']);
-                        },
-                      ))
+                markerId: MarkerId(bbox['id']),
+                position: bbox['location'],
+                infoWindow: InfoWindow(
+                  title: bbox['name'],
+                  snippet: bbox['infoText'],
+                ),
+                onTap: () {
+                  bookBoxController.highlightBookBox(bbox['id']);
+                },
+              ))
                   .toList();
 
               return GoogleMap(
                 onMapCreated: bookBoxController.mapController.onMapCreated,
                 initialCameraPosition:
-                    bookBoxController.mapController.cameraPosition.value,
+                bookBoxController.mapController.cameraPosition.value,
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,
                 markers: Set<Marker>.of(markers),
@@ -136,12 +130,12 @@ class MapScreen extends HookWidget {
 
                   return Opacity(
                     opacity: highlightedBookBoxId == bbox['id'] ||
-                            highlightedBookBoxId == null
+                        highlightedBookBoxId == null
                         ? 1.0
                         : 0.5,
                     child: Container(
                       margin:
-                          EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                      EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                       decoration: BoxDecoration(
                         color: LinoColors.secondary,
                         borderRadius: BorderRadius.circular(15),

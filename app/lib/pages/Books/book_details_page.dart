@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
@@ -78,15 +79,25 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
             _isFavorite = true;
           });
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_isFavorite ? 'Added to favorites' : 'Removed from favorites')),
-        );
+        _isFavorite
+            ? showToast('Added to favorites')
+            : showToast('Removed from favorites');
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+        print(e);
+        showToast('Failed to add to favorites');
       }
     }
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.grey[800],
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   void _showAddThreadForm(BuildContext context, String bookId) {

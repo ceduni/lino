@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/services/thread_services.dart';
@@ -19,7 +20,7 @@ class ThreadsSectionState extends State<ThreadsSection> {
   List<Card> threadCards = [];
   bool isLoading = true;
   String? currentUsername;
-  String selectedOrder = 'by creation date';
+  String selectedOrder = 'by recent activity';
   bool ascending = false;
 
   @override
@@ -67,7 +68,7 @@ class ThreadsSectionState extends State<ThreadsSection> {
         title: ElevatedButton(
           onPressed: () {
             widget.query = null;
-            fetchThreadTiles(cls: 'by creation date', asc: false);
+            fetchThreadTiles(cls: 'by recent activity', asc: false);
           },
           child: const Text(
             'Reset',
@@ -77,41 +78,36 @@ class ThreadsSectionState extends State<ThreadsSection> {
         actions: [
           Row(
             children: [
-              Text('Order: '),
+              Text('Sort: '),
               PopupMenuButton<String>(
                 onSelected: (String value) {
                   setState(() {
-                    selectedOrder = value;
-                  });
-                  fetchThreadTiles(q: widget.query, cls: selectedOrder, asc: ascending);
-                },
-                itemBuilder: (BuildContext context) {
-                  return {'by recent activity', 'by number of messages', 'by creation date'}
-                      .map((String choice) {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Text(choice),
-                    );
-                  }).toList();
-                },
-                icon: Icon(Icons.filter_list),
-              ),
-              Text('Sort: '),
-              PopupMenuButton<bool>(
-                onSelected: (bool value) {
-                  setState(() {
-                    ascending = value;
+                    switch (value) {
+                      case 'with most recent activity':
+                        selectedOrder = 'by recent activity';
+                        ascending = false;
+                        break;
+                      case 'created most recently':
+                        selectedOrder = 'by creation date';
+                        ascending = false;
+                        break;
+                      case 'with the most number of messages':
+                        selectedOrder = 'by number of messages';
+                        ascending = false;
+                        break;
+                    }
                   });
                   fetchThreadTiles(q: widget.query, cls: selectedOrder, asc: ascending);
                 },
                 itemBuilder: (BuildContext context) {
                   return {
-                    true: 'Ascending',
-                    false: 'Descending',
-                  }.entries.map((entry) {
-                    return PopupMenuItem<bool>(
-                      value: entry.key,
-                      child: Text(entry.value),
+                    'with most recent activity',
+                    'created most recently',
+                    'with the most number of messages',
+                  }.map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: choice,
+                      child: Text(choice),
                     );
                   }).toList();
                 },
@@ -221,18 +217,25 @@ class ThreadsSectionState extends State<ThreadsSection> {
       if (token != null) {
         try {
           await ThreadService().deleteThread(token, threadId);
-          fetchThreadTiles(cls: 'by creation date', asc: false); // Re-fetch threads
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Thread deleted successfully!')),
-          );
+          fetchThreadTiles(cls: 'by recent activity', asc: false); // Re-fetch threads
+          showToast('Thread deleted successfully!');
         } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${e.toString()}')),
-          );
+          showToast('Error: ${e.toString()}');
         }
       }
     }
 
     return deleteConfirmed;
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.grey[800],
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 }

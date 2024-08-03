@@ -156,4 +156,21 @@ class UserService {
     }
     return data;
   }
+
+  Future<void> markNotificationAsRead(String token, String id) async {
+    final response = await http.post(
+        Uri.parse('$url/users/notifications/read'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(<String, String>{
+          'notificationId': id,
+        }));
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      print(data);
+      throw Exception(data['error']);
+    }
+  }
 }

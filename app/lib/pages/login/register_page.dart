@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:Lino_app/services/user_services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'keyword_input_page.dart';
 import 'login_page.dart';
@@ -59,7 +60,7 @@ class _RegisterPageState extends State<RegisterPage> {
             (route) => false, // Remove all previous routes
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration failed: $e')));
+      showToast('Error registering user: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -67,12 +68,23 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.grey[800],
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
+
   bool _isValidEmail(String email) {
     return RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email);
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    showToast(message);
   }
 
   void _togglePasswordVisibility() {

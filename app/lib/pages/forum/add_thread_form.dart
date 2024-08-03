@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/book_services.dart';
@@ -75,14 +76,12 @@ class _AddThreadFormState extends State<AddThreadForm> {
 
         Navigator.of(context).pop(); // Close the modal
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Thread created successfully!')),
-        );
+        showToast('Thread created successfully');
       } catch (e) {
         Navigator.of(context).pop(); // Close the modal if there's an error
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(content: Text('Error creating thread')),
         );
       } finally {
         setState(() {
@@ -90,6 +89,17 @@ class _AddThreadFormState extends State<AddThreadForm> {
         });
       }
     }
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.grey[800],
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -153,13 +154,19 @@ class BarcodeScanner extends StatelessWidget {
           barcodeController.barcodeObs.value); // Temp hard coded bbox id valu);
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content:
-            Text('Barcode submitted: ${barcodeController.barcodeObs.value}'),
-      ),
-    );
+    showToast('Barcode submitted: ${barcodeController.barcodeObs.value}');
 
     Navigator.of(context).pop(); // Close the dialog after submission
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.grey[800],
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 }

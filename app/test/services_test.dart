@@ -10,7 +10,6 @@ var env = DotEnv(includePlatformEnvironment: true)..load();
 Future<void> main() async {
   final userService = UserService();
   final bookService = BookService();
-  final threadService = ThreadService();
 
   try {
     final r1 = await bookService.searchBooks();

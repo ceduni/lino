@@ -34,7 +34,6 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
     fetchThreadMessages();
     checkUser();
   }
-
   @override
   void dispose() {
     print('Disconnecting websocket');
@@ -53,6 +52,7 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
   }
+
 
   Future<void> checkUser() async {
     final prefs = await SharedPreferences.getInstance();

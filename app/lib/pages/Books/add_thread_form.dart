@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/thread_services.dart';
@@ -30,20 +31,28 @@ class _AddThreadFormState extends State<AddThreadForm> {
         if (token != null) {
           await ThreadService().createThread(token, widget.bookId, _titleController.text);
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Thread created successfully!')),
-          );
+          showToast('Thread created successfully');
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+        print(e);
+        showToast('Failed to create thread');
       } finally {
         setState(() {
           _isLoading = false;
         });
       }
     }
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.grey[800],
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   @override

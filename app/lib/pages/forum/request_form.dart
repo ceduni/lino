@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/book_services.dart';
@@ -37,21 +38,28 @@ class _RequestFormState extends State<RequestForm> {
 
         Navigator.of(context).pop(); // Close the modal
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Request sent successfully!')),
-        );
+        showToast('Request sent successfully');
       } catch (e) {
         Navigator.of(context).pop(); // Close the modal if there's an error
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+        showToast('Error sending request');
       } finally {
         setState(() {
           _isLoading = false;
         });
       }
     }
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.grey[800],
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   @override

@@ -32,6 +32,7 @@ dependencies:
   intl_phone_number_input: ^0.7.0
   nfc_manager: ^3.5.0
   web_socket_channel: ^2.2.0
+  fluttertoast: ^8.0.8
 
 
 dev_dependencies:
