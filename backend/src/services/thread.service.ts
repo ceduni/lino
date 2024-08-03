@@ -60,9 +60,8 @@ const ThreadService = {
         thread.messages.push(message);
         await thread.save();
 
-        // Notify the user that their message has been added
+        // Notify the user that someone has responded to their message
         if (respondsTo != null) {
-            // Notify the user that their message has been added
             // @ts-ignore
             const parentMessage = thread.messages.id(respondsTo);
             if (!parentMessage) {
@@ -73,8 +72,9 @@ const ThreadService = {
                 if (!userParent) {
                     throw newErr(404, 'User not found');
                 }
+                const user = await User.findOne({ username: username });
                 // @ts-ignore
-                await notifyUser(userParent.id, `${userParent.username} in ${thread.title}`, parentMessage.content);
+                await notifyUser(user.id, `${userParent.username} in ${thread.title}`, parentMessage.content);
             }
         }
 

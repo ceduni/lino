@@ -34,7 +34,6 @@ export function broadcastToUser(userId : string, message: any) {
         console.log('Broadcasting message to user:', userId, message);
         clients.forEach((client) => {
             // @ts-ignore
-            console.log('Check readyState and userId of client:', client.readyState);
             // @ts-ignore
             if (client.userId === userId && client.readyState === 1) {
                 console.log('Broadcasting message to user:', userId, message);
