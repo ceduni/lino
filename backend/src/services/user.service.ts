@@ -66,7 +66,7 @@ const UserService = {
         return { user: user, token: token };
     },
 
-    async readUserNotifications(request: any) {
+    async getUserNotifications(request: any) {
         const userId = request.user.id;
         const user = await User.findById(userId);
         if (!user) {
@@ -84,12 +84,23 @@ const UserService = {
             return notificationDate >= thirtyDaysAgo;
         });
 
-        // Set all remaining notifications to read
-        user.notifications.forEach(notification => {
-            notification.read = true;
-        });
-
         // Save the updated user document
+        await user.save();
+        return user.notifications;
+    },
+
+    async readNotification(request: any) {
+        const userId = request.user.id;
+        const user = await User.findById(userId);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }
+        const notificationId = request.params.id;
+        const notification = user.notifications.id(notificationId);
+        if (!notification) {
+            throw newErr(404, 'Notification not found');
+        }
+        notification.read = true;
         await user.save();
         return user.notifications;
     },

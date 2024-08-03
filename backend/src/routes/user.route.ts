@@ -206,9 +206,9 @@ const getUserSchema = {
     }
 };
 
-async function readUserNotifications(request : FastifyRequest, reply : FastifyReply) {
+async function getUserNotifications(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const notifications = await UserService.readUserNotifications(request);
+        const notifications = await UserService.getUserNotifications(request);
         reply.send({ notifications : notifications });
     } catch (error : any) {
         reply.code(error.statusCode).send({ error: error.message });
@@ -246,6 +246,61 @@ const getUserNotificationsSchema = {
         },
         404: {
             description: 'User not found',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
+        }
+    }
+}
+
+async function readNotification(request : FastifyRequest, reply : FastifyReply) {
+    try {
+        const notifications = await UserService.readNotification(request);
+        reply.code(200).send({ notifications : notifications });
+    } catch (error : any) {
+        reply.code(error.statusCode).send({ error: error.message });
+    }
+}
+
+const readNotificationSchema = {
+    description: 'Read a user notification',
+    tags: ['users'],
+    headers: {
+        type: 'object',
+        required: ['authorization'],
+        properties: {
+            authorization: {type: 'string'} // JWT token
+        }
+    },
+    params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+            id: { type: 'string' }
+        }
+    },
+    response: {
+        200: {
+            description: 'Notification read',
+            type: 'object',
+            properties: {
+                notifications: {
+                    type: 'array', items:
+                        {
+                            type: 'object',
+                            properties: {
+                                title: { type: 'string' },
+                                timestamp: { type: 'string' },
+                                content: { type: 'string' },
+                                read: { type: 'boolean' }
+                            }
+                        }
+                }
+            }
+        },
+        404: {
+            description: 'User or notification not found',
             type: 'object',
             properties: {
                 error: {type: 'string'}
@@ -358,7 +413,8 @@ interface MyFastifyInstance extends FastifyInstance {
 export default async function userRoutes(server: MyFastifyInstance) {
     server.get('/users', { preValidation: [server.authenticate], schema : getUserSchema }, getUser);
     server.get('/users/favorites', { preValidation: [server.authenticate], schema : getUserFavoritesSchema }, getUserFavorites);
-    server.get('/users/notifications', { preValidation: [server.authenticate], schema : getUserNotificationsSchema }, readUserNotifications);
+    server.get('/users/notifications', { preValidation: [server.authenticate], schema : getUserNotificationsSchema }, getUserNotifications);
+    server.post('/users/notifications/read/:id', { preValidation: [server.authenticate], schema : readNotificationSchema }, readNotification);
     server.post('/users/register', { schema : registerUserSchema }, registerUser);
     server.post('/users/login', { schema : loginUserSchema }, loginUser);
     server.post('/users/update', { preValidation: [server.authenticate], schema : updateUserSchema }, updateUser);
