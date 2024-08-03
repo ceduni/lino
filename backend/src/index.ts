@@ -36,7 +36,7 @@ export function broadcastToUser(userId : string, message: any) {
             // @ts-ignore
             console.log('Check readyState and userId of client:', client.readyState);
             // @ts-ignore
-            if (client.userId === userId && client.readyState === 'open') {
+            if (client.userId === userId && client.readyState === 1) {
                 console.log('Broadcasting message to user:', userId, message);
                 // @ts-ignore
                 client.send(JSON.stringify(message));
@@ -54,7 +54,7 @@ export function broadcastMessage(event: string, data: any) {
             // @ts-ignore
             console.log('Check readyState of client:', client.readyState);
             // @ts-ignore
-            if (client.readyState === 'open') {
+            if (client.readyState === 1) {
                 console.log('Broadcasting message:', event, data);
                 // @ts-ignore
                 client.send(JSON.stringify({ event, data }));
