@@ -274,11 +274,11 @@ const readNotificationSchema = {
             authorization: {type: 'string'} // JWT token
         }
     },
-    params: {
+    body: {
         type: 'object',
-        required: ['id'],
+        required: ['notificationId'],
         properties: {
-            id: { type: 'string' }
+            notificationId: { type: 'string' }
         }
     },
     response: {
@@ -416,7 +416,7 @@ export default async function userRoutes(server: MyFastifyInstance) {
     server.get('/users', { preValidation: [server.authenticate], schema : getUserSchema }, getUser);
     server.get('/users/favorites', { preValidation: [server.authenticate], schema : getUserFavoritesSchema }, getUserFavorites);
     server.get('/users/notifications', { preValidation: [server.authenticate], schema : getUserNotificationsSchema }, getUserNotifications);
-    server.post('/users/notifications/read/:id', { preValidation: [server.authenticate], schema : readNotificationSchema }, readNotification);
+    server.post('/users/notifications/read', { preValidation: [server.authenticate], schema : readNotificationSchema }, readNotification);
     server.post('/users/register', { schema : registerUserSchema }, registerUser);
     server.post('/users/login', { schema : loginUserSchema }, loginUser);
     server.post('/users/update', { preValidation: [server.authenticate], schema : updateUserSchema }, updateUser);

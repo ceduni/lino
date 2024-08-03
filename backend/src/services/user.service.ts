@@ -95,7 +95,7 @@ const UserService = {
         if (!user) {
             throw newErr(404, 'User not found');
         }
-        const notificationId = request.params.id;
+        const notificationId = request.body.notificationId;
         const notification = user.notifications.id(notificationId);
         if (!notification) {
             throw newErr(404, 'Notification not found');
