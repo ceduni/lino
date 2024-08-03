@@ -1,5 +1,6 @@
 import {WebSocket} from "@fastify/websocket";
 import {newErr} from "./services/utilities";
+import {FastifyRequest} from "fastify";
 
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
@@ -33,9 +34,9 @@ export function broadcastToUser(userId : string, message: any) {
         console.log('Broadcasting message to user:', userId, message);
         clients.forEach((client) => {
             // @ts-ignore
-            console.log('Check readyState and userId of client:', client.socket.readyState);
+            console.log('Check readyState and userId of client:', client.readyState);
             // @ts-ignore
-            if (client.userId === userId && client.socket.readyState === 'open') {
+            if (client.userId === userId && client.readyState === 'open') {
                 console.log('Broadcasting message to user:', userId, message);
                 // @ts-ignore
                 client.send(JSON.stringify(message));
@@ -51,9 +52,9 @@ export function broadcastMessage(event: string, data: any) {
     try {
         clients.forEach((client) => {
             // @ts-ignore
-            console.log('Check readyState of client:', client.socket.readyState);
+            console.log('Check readyState of client:', client.readyState);
             // @ts-ignore
-            if (client.socket.readyState === 'open') {
+            if (client.readyState === 'open') {
                 console.log('Broadcasting message:', event, data);
                 // @ts-ignore
                 client.send(JSON.stringify({ event, data }));
@@ -68,35 +69,37 @@ export function broadcastMessage(event: string, data: any) {
 }
 
 // WebSocket route
-// @ts-ignore
-server.get('/ws', { websocket: true }, (socket : WebSocket, req : FastifyRequest) => {
-    try {
-        socket.userId = req.request.query.userId; // Store the user ID in the socket to identify the user
-    } catch (error) {
-        socket.userId = 'anonymous'; // Set a default user ID
-    }
+server.register(async function (server: any) {
+    server.get('/ws', { websocket: true }, (socket : WebSocket, req : FastifyRequest) => {
+        try {
+            // @ts-ignore
+            socket.userId = req.query.userId; // Store the user ID in the socket to identify the user
+        } catch (error) {
+            socket.userId = 'anonymous'; // Set a default user ID
+        }
 
-    clients.add(socket); // Add the connected client to the set
-    console.log('Client connected:', socket.userId);
-    console.log('Clients:');
-    for (const client of clients) {
-        // @ts-ignore
-        console.log(client.userId);
-    }
-    console.log('Client count:', clients.size);
-
-    socket.socket.on('message', (msg: any) => {
-        console.log('Received message:', msg);
-    });
-    socket.socket.on('close', () => {
-        clients.delete(socket);
-        console.log('Client disconnected:', socket.userId);
-        console.log('Remaining clients:');
-        // @ts-ignore
-        clients.forEach((client) => console.log(client.userId));
+        clients.add(socket); // Add the connected client to the set
+        console.log('Client connected:', socket.userId);
+        console.log('Clients:');
+        for (const client of clients) {
+            // @ts-ignore
+            console.log(client.userId);
+        }
         console.log('Client count:', clients.size);
+
+        socket.on('message', (msg: any) => {
+            console.log('Received message:', msg);
+        });
+        socket.on('close', () => {
+            clients.delete(socket);
+            console.log('Client disconnected:', socket.userId);
+            console.log('Remaining clients:');
+            // @ts-ignore
+            clients.forEach((client) => console.log(client.userId));
+            console.log('Client count:', clients.size);
+        });
     });
-});
+})
 
 
 
