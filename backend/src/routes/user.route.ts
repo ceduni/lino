@@ -235,6 +235,7 @@ const getUserNotificationsSchema = {
                         {
                             type: 'object',
                             properties: {
+                                _id: { type: 'string' },
                                 title: { type: 'string' },
                                 timestamp: { type: 'string' },
                                 content: { type: 'string' },
@@ -290,6 +291,7 @@ const readNotificationSchema = {
                         {
                             type: 'object',
                             properties: {
+                                _id: { type: 'string' },
                                 title: { type: 'string' },
                                 timestamp: { type: 'string' },
                                 content: { type: 'string' },
