@@ -36,11 +36,15 @@ exports.clients = clients;
 // Function to broadcast a message to a specific user
 function broadcastToUser(userId, message) {
     try {
+        console.log('Broadcasting message to user:', userId, message);
         clients.forEach((client) => {
             // @ts-ignore
-            if (client.userId === userId && client.socket.readyState === 1) {
+            console.log('Check readyState and userId of client:', client.socket.readyState);
+            // @ts-ignore
+            if (client.userId === userId && client.socket.readyState === 'open') {
+                console.log('Broadcasting message to user:', userId, message);
                 // @ts-ignore
-                client.socket.send(JSON.stringify(message));
+                client.send(JSON.stringify(message));
             }
         });
     }
@@ -54,9 +58,15 @@ function broadcastMessage(event, data) {
     try {
         clients.forEach((client) => {
             // @ts-ignore
-            if (client.socket.readyState === 1) { // 1 means OPEN
+            console.log('Check readyState of client:', client.socket.readyState);
+            // @ts-ignore
+            if (client.socket.readyState === 'open') {
+                console.log('Broadcasting message:', event, data);
                 // @ts-ignore
-                client.socket.send(JSON.stringify({ event, data }));
+                client.send(JSON.stringify({ event, data }));
+            }
+            else {
+                console.log('Client not ready');
             }
         });
     }
@@ -68,20 +78,31 @@ function broadcastMessage(event, data) {
 exports.broadcastMessage = broadcastMessage;
 // WebSocket route
 // @ts-ignore
-server.get('/ws', { websocket: true }, (connection, req) => {
-    console.log('Request query userId:', req.request.query.userId);
+server.get('/ws', { websocket: true }, (socket, req) => {
     try {
-        connection.userId = req.query.userId; // Store the user ID in the socket to identify the user
+        socket.userId = req.request.query.userId; // Store the user ID in the socket to identify the user
     }
     catch (error) {
-        connection.userId = 'anonymous'; // Set a default user ID
+        socket.userId = 'anonymous'; // Set a default user ID
     }
-    clients.add(connection); // Add the connected client to the set
-    connection.socket.on('message', (msg) => {
+    clients.add(socket); // Add the connected client to the set
+    console.log('Client connected:', socket.userId);
+    console.log('Clients:');
+    for (const client of clients) {
+        // @ts-ignore
+        console.log(client.userId);
+    }
+    console.log('Client count:', clients.size);
+    socket.on('message', (msg) => {
         console.log('Received message:', msg);
     });
-    connection.socket.on('close', () => {
-        clients.delete(connection);
+    socket.on('close', () => {
+        clients.delete(socket);
+        console.log('Client disconnected:', socket.userId);
+        console.log('Remaining clients:');
+        // @ts-ignore
+        clients.forEach((client) => console.log(client.userId));
+        console.log('Client count:', clients.size);
     });
 });
 // Register JWT plugin

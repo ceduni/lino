@@ -85,10 +85,10 @@ server.get('/ws', { websocket: true }, (socket : WebSocket, req : FastifyRequest
     }
     console.log('Client count:', clients.size);
 
-    socket.on('message', (msg: any) => {
+    socket.socket.on('message', (msg: any) => {
         console.log('Received message:', msg);
     });
-    socket.on('close', () => {
+    socket.socket.on('close', () => {
         clients.delete(socket);
         console.log('Client disconnected:', socket.userId);
         console.log('Remaining clients:');
