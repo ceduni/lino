@@ -1,6 +1,8 @@
 import 'package:Lino_app/pages/Books/book_details_page.dart';
 import 'package:flutter/material.dart';
 
+import '../../utils/constants/colors.dart';
+
 class UserDashboard extends StatefulWidget {
   final List<Map<String, dynamic>> favoriteBooks;
   final List<Map<String, dynamic>> booksHistory;
@@ -86,6 +88,7 @@ class ProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: LinoColors.primary,
       elevation: 4,
       margin: EdgeInsets.all(16),
       child: Padding(

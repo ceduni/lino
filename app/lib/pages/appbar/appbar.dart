@@ -114,27 +114,20 @@ class _LinoAppBarState extends State<LinoAppBar> {
                       }
                     },
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        IconButton(
-                          icon: isLoggedIn ? Icon(Icons.person, color: Colors.white) : Icon(Icons.login, color: Colors.red),
-                          color: isLoggedIn ? LinoColors.primary : null,
-                          padding: EdgeInsets.all(0), // Set padding to zero
-                          constraints: BoxConstraints(), // Remove default constraints
-                          onPressed: () {
-                            if (!isLoggedIn) {
-                              Navigator.of(context).pushReplacementNamed('/login');
-                            } else {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => ProfilePage(),
-                                ),
-                              );
-                            }
-                          },
+                        Icon(
+                          isLoggedIn ? Icons.person : Icons.login,
+                          color: isLoggedIn ? Colors.white : Colors.red,
                         ),
+                        SizedBox(height: 2), // Minimal space between icon and text
                         Text(
                           isLoggedIn ? 'Profile' : 'Log In',
-                          style: isLoggedIn ? TextStyle(color: Colors.white) : TextStyle(color: Colors.red),
+                          style: TextStyle(
+                            color: isLoggedIn ? Colors.white : Colors.red,
+                            fontSize: 12, // Adjust font size if needed
+                          ),
                         ),
                       ],
                     ),

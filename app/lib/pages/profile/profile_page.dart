@@ -73,11 +73,10 @@ class ProfilePage extends HookWidget {
     if (confirmed == true) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('token');
-      Navigator.pushReplacement(
+      Navigator.pushNamedAndRemoveUntil(
         context,
-        MaterialPageRoute(
-          builder: (context) => LoginPage(prefs: prefs),
-        ),
+        '/login',
+            (Route<dynamic> route) => false,
       );
     }
   }
