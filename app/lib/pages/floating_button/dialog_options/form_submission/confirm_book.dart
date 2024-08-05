@@ -261,7 +261,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
               child: Text('Save'),
               onPressed: () {
                 setState(() {
-                  editableBookInfo[key] = controller.text;
+                  editableBookInfo[key] = key == 'authors' ? controller.text.split(',') : controller.text;
                 });
                 Navigator.of(context).pop();
               },

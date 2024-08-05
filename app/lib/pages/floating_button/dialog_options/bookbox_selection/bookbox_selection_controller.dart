@@ -10,6 +10,7 @@ class BookBoxSelectionController extends GetxController {
   final selectedBookBox = <String, dynamic>{}.obs;
   final bookBoxes = <Map<String, dynamic>>[].obs;
   final userLocation = Rxn<Position>();
+  final isLoading = true.obs; // Add this line
   final BarcodeController barcodeController = Get.find<BarcodeController>();
   final FormController formController = Get.find<FormController>();
 
@@ -19,6 +20,7 @@ class BookBoxSelectionController extends GetxController {
   }
 
   Future<void> getBookBoxes() async {
+    isLoading.value = true; // Set loading to true before fetching data
     try {
       dynamic bbs;
       if (userLocation.value != null) {
@@ -46,6 +48,8 @@ class BookBoxSelectionController extends GetxController {
       }).toList();
     } catch (e) {
       print('Error fetching book boxes: $e');
+    } finally {
+      isLoading.value = false; // Set loading to false after fetching data
     }
   }
 

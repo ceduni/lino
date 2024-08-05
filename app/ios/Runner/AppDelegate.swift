@@ -18,27 +18,4 @@ import GoogleMaps
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
-
-  override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-    // Handle the custom URL scheme
-    if let scheme = url.scheme, scheme == "lino", let host = url.host {
-      // Parse your URI here and navigate to the appropriate page
-      // Example: lino://bookbox?bookBoxId=idblabla
-      let bookBoxId = url.queryParameters?["bookBoxId"]
-      // Use the parsed bookBoxId to navigate or show dialog
-      // For example, use GetX to navigate or show dialog
-      // Get.dialog(BookBoxAction(bbid: bookBoxId));
-    }
-    return true
-  }
-}
-
-// Extension to parse query parameters
-extension URL {
-  var queryParameters: [String: String]? {
-    guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true) else { return nil }
-    return components.queryItems?.reduce(into: [String: String](), { result, item in
-      result[item.name] = item.value
-    })
-  }
 }

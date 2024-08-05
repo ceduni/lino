@@ -46,6 +46,10 @@ class BookQRAssignDialog extends StatelessWidget {
     return ElevatedButton(
       onPressed: () {
         final String barcode = Get.find<BarcodeController>().barcodeObs.value;
+        if (barcode.isEmpty || barcode == '') {
+          print('no');
+          return;
+        }
         Get.find<FormController>().setSelectedQRCode(barcode);
         Get.find<BookQRAssignController>().submitQRCode();
       },

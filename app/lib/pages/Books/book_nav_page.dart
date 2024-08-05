@@ -63,11 +63,11 @@ class _NavigationPageState extends State<NavigationPage> {
                       children: [
                         Container(
                           width: double.infinity,
-                          height: 75,
+                          height: 50,
                           color: Color.fromRGBO(239, 175, 132, 1),
                           padding: const EdgeInsets.symmetric(vertical: 7.0),
                           child: Text(
-                            "Liked books",
+                            'Liked books',
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 24,

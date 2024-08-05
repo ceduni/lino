@@ -14,7 +14,7 @@ class BookBoxSelectionDialog extends StatelessWidget {
     Get.lazyPut(() => FormController());
     final BarcodeController barcodeController = Get.put(BarcodeController());
     final BookBoxSelectionController bookboxController =
-        Get.put(BookBoxSelectionController());
+    Get.put(BookBoxSelectionController());
 
     return Dialog(
       backgroundColor: Colors.white,
@@ -50,53 +50,59 @@ class BookBoxSelectionDialog extends StatelessWidget {
 
   Widget _buildBookBoxDropdown(BookBoxSelectionController bookBoxController) {
     return Obx(() {
-      return Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8.0),
-          color: Colors.grey[200],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: DropdownButton<String>(
-          isExpanded: true,
-          hint: const Text('Select a bookbox'),
-          value: bookBoxController.selectedBookBox['id'],
-          items: bookBoxController.bookBoxes.map((bookBox) {
-            final bool knownLocation =
-                bookBoxController.userLocation.value != null;
-            final double? distance = knownLocation
-                ? Geolocator.distanceBetween(
-                    bookBoxController.userLocation.value!.latitude,
-                    bookBoxController.userLocation.value!.longitude,
-                    bookBox['location'].latitude,
-                    bookBox['location'].longitude,
-                  )
-                : null;
-            return DropdownMenuItem<String>(
-              value: bookBox['id'],
-              child: Container(
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(8.0)),
-                child: ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(bookBox['name']),
-                  trailing: knownLocation
-                      ? Text(
-                          '${(distance! / 1000).toStringAsFixed(2)} km',
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12.0,
-                          ),
-                        )
-                      : null,
+      if (bookBoxController.isLoading.value) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      } else {
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8.0),
+            color: Colors.grey[200],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: DropdownButton<String>(
+            isExpanded: true,
+            hint: const Text('Select a bookbox'),
+            value: bookBoxController.selectedBookBox['id'],
+            items: bookBoxController.bookBoxes.map((bookBox) {
+              final bool knownLocation =
+                  bookBoxController.userLocation.value != null;
+              final double? distance = knownLocation
+                  ? Geolocator.distanceBetween(
+                bookBoxController.userLocation.value!.latitude,
+                bookBoxController.userLocation.value!.longitude,
+                bookBox['location'].latitude,
+                bookBox['location'].longitude,
+              )
+                  : null;
+              return DropdownMenuItem<String>(
+                value: bookBox['id'],
+                child: Container(
+                  decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(8.0)),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(bookBox['name']),
+                    trailing: knownLocation
+                        ? Text(
+                      '${(distance! / 1000).toStringAsFixed(2)} km',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12.0,
+                      ),
+                    )
+                        : null,
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
-          onChanged: (String? value) {
-            bookBoxController.setSelectedBookBox(value!);
-          },
-        ),
-      );
+              );
+            }).toList(),
+            onChanged: (String? value) {
+              bookBoxController.setSelectedBookBox(value!);
+            },
+          ),
+        );
+      }
     });
   }
 
