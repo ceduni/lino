@@ -27,7 +27,7 @@ import GoogleMaps
       let bookBoxId = url.queryParameters?["bookBoxId"]
       // Use the parsed bookBoxId to navigate or show dialog
       // For example, use GetX to navigate or show dialog
-      Get.dialog(BookBoxAction(bbid: bookBoxId));
+      // Get.dialog(BookBoxAction(bbid: bookBoxId));
     }
     return true
   }
