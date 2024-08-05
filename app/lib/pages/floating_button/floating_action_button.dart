@@ -1,11 +1,11 @@
+import 'package:Lino_app/pages/floating_button/dialog_options/bookbox_selection/bookbox_selection_dialog.dart';
+import 'package:Lino_app/pages/floating_button/dialog_options/isbn_entry/isbn_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../forum/add_thread_form.dart';
 import '../forum/request_form.dart';
-import 'add_book_screen.dart';
-import 'dialog_options/scan_qr_code.dart';
 
 class LinoFloatingButton extends StatefulWidget {
   final int selectedIndex;
@@ -46,24 +46,26 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
       // Forum page is active
       return SpeedDial(
         icon: Icons.add,
-        backgroundColor: isUserAuthenticated ? Colors.blue.shade100 : Colors.grey,
+        backgroundColor:
+            isUserAuthenticated ? Colors.blue.shade100 : Colors.grey,
         children: isUserAuthenticated
             ? [
-          SpeedDialChild(
-            backgroundColor: Colors.blue.shade300,
-            labelBackgroundColor: Colors.blue.shade300,
-            child: Icon(Icons.add),
-            label: 'Add Thread',
-            onTap: () => _addThread(context, widget.onThreadCreated),
-          ),
-          SpeedDialChild(
-            backgroundColor: Colors.blue.shade300,
-            labelBackgroundColor: Colors.blue.shade300,
-            child: Icon(Icons.add),
-            label: 'Add Request',
-            onTap: () => _showRequestForm(context, widget.onRequestCreated),
-          ),
-        ]
+                SpeedDialChild(
+                  backgroundColor: Colors.blue.shade300,
+                  labelBackgroundColor: Colors.blue.shade300,
+                  child: Icon(Icons.add),
+                  label: 'Add Thread',
+                  onTap: () => _addThread(context, widget.onThreadCreated),
+                ),
+                SpeedDialChild(
+                  backgroundColor: Colors.blue.shade300,
+                  labelBackgroundColor: Colors.blue.shade300,
+                  child: Icon(Icons.add),
+                  label: 'Add Request',
+                  onTap: () =>
+                      _showRequestForm(context, widget.onRequestCreated),
+                ),
+              ]
             : [],
       );
     }
@@ -86,7 +88,7 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
             onTap: () async {
               String? scannedCode = await showDialog(
                 context: context,
-                builder: (context) => ScanQRCode(),
+                builder: (context) => Container(),
               );
               if (scannedCode != null) {
                 // Handle the scanned code, for example, navigate to another page
@@ -97,10 +99,12 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
           SpeedDialChild(
             child: Icon(Icons.remove),
             label: 'Remove Book',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => RemoveBookScreen()),
-            ),
+            onTap: () async {
+              showDialog(
+                context: context,
+                builder: (context) => BookBoxSelectionDialog(),
+              );
+            },
           ),
         ],
       ),
