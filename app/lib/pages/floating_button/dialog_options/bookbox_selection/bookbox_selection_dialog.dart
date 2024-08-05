@@ -12,8 +12,9 @@ class BookBoxSelectionDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => FormController());
-    final barcodeController = Get.put(BarcodeController());
-    final bookboxController = Get.put(BookBoxSelectionController());
+    final BarcodeController barcodeController = Get.put(BarcodeController());
+    final BookBoxSelectionController bookboxController =
+        Get.put(BookBoxSelectionController());
 
     return Dialog(
       backgroundColor: Colors.white,
@@ -27,16 +28,16 @@ class BookBoxSelectionDialog extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text("Scan the bookbox's QR code"),
-                  SizedBox(height: 16.0),
+                  const Text("Scan the bookbox's QR code"),
+                  const SizedBox(height: 16.0),
                   buildScanner(barcodeController),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   buildCustomDivider(),
-                  SizedBox(height: 16.0),
-                  Text('Choose from the list'),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
+                  const Text('Choose from the list'),
+                  const SizedBox(height: 16.0),
                   _buildBookBoxDropdown(bookboxController),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   _buildSubmitButton(bookboxController),
                 ],
               ),
@@ -48,21 +49,21 @@ class BookBoxSelectionDialog extends StatelessWidget {
   }
 
   Widget _buildBookBoxDropdown(BookBoxSelectionController bookBoxController) {
-    print('bookboxes: ${bookBoxController.bookBoxes}');
     return Obx(() {
       return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.0),
           color: Colors.grey[200],
         ),
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: DropdownButton<String>(
           isExpanded: true,
-          hint: Text('Select a bookbox'),
+          hint: const Text('Select a bookbox'),
           value: bookBoxController.selectedBookBox['id'],
           items: bookBoxController.bookBoxes.map((bookBox) {
-            bool knownLocation = bookBoxController.userLocation.value != null;
-            var distance = knownLocation
+            final bool knownLocation =
+                bookBoxController.userLocation.value != null;
+            final double? distance = knownLocation
                 ? Geolocator.distanceBetween(
                     bookBoxController.userLocation.value!.latitude,
                     bookBoxController.userLocation.value!.longitude,
@@ -76,7 +77,7 @@ class BookBoxSelectionDialog extends StatelessWidget {
                 decoration:
                     BoxDecoration(borderRadius: BorderRadius.circular(8.0)),
                 child: ListTile(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+                  contentPadding: EdgeInsets.zero,
                   title: Text(bookBox['name']),
                   trailing: knownLocation
                       ? Text(
@@ -91,8 +92,7 @@ class BookBoxSelectionDialog extends StatelessWidget {
               ),
             );
           }).toList(),
-          onChanged: (value) {
-            print('selected bookbox: $value');
+          onChanged: (String? value) {
             bookBoxController.setSelectedBookBox(value!);
           },
         ),
@@ -102,9 +102,8 @@ class BookBoxSelectionDialog extends StatelessWidget {
 
   Widget _buildSubmitButton(BookBoxSelectionController bookBoxController) {
     return ElevatedButton(
-        child: Text('Submit'),
-        onPressed: () {
-          bookBoxController.submitBookBox();
-        });
+      onPressed: bookBoxController.submitBookBox,
+      child: const Text('Submit'),
+    );
   }
 }

@@ -13,6 +13,7 @@ class ISBNController extends GetxController {
 
   var isLoading = false.obs;
   var errorMessage = ''.obs;
+  var isbnText = ''.obs;
 
   @override
   void onInit() {
@@ -23,11 +24,23 @@ class ISBNController extends GetxController {
           value != 'Unknown Barcode' &&
           value != 'No Barcode Detected') {
         textEditingController.text = value;
-        // isbnText.value = value; // Update the reactive variable
       }
+    });
+
+    // Listen to changes in the ISBN text
+    textEditingController.addListener(() {
+      isbnText.value = textEditingController.text;
     });
   }
 
+  // Dispose the TextEditingController to avoid memory leaks
+  @override
+  void onClose() {
+    textEditingController.dispose();
+    super.onClose();
+  }
+
+  // Method to handle ISBN submission
   Future<void> submitISBN() async {
     final isbn = textEditingController.text;
     if (isbn.isEmpty) {
@@ -38,11 +51,11 @@ class ISBNController extends GetxController {
     isLoading.value = true;
     errorMessage.value = '';
     try {
-      await bookService.getBookInfo(isbn); // to check if the ISBN is valid
+      // Validate the ISBN by fetching book info
+      await bookService.getBookInfo(isbn);
       formController.setSelectedISBN(isbn);
       Get.delete<BarcodeController>();
       Get.dialog(BookQRAssignDialog());
-      // Get.dialog(BookConfirmDialog(bookInfoFuture: Future.value(bookInfo)));
     } catch (error) {
       errorMessage.value = "An error occurred: $error";
     } finally {
@@ -50,6 +63,7 @@ class ISBNController extends GetxController {
     }
   }
 
+  // Method to handle submission without ISBN
   void submitWithoutISBN() {
     formController.setSelectedISBN('');
     Get.delete<BarcodeController>();

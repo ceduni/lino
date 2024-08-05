@@ -1,20 +1,23 @@
 import 'package:Lino_app/pages/floating_button/common/barcode_controller.dart';
-import 'package:Lino_app/pages/floating_button/dialog_options/confirm_book.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/form_submission/form_controller.dart';
-import 'package:Lino_app/services/book_services.dart';
 import 'package:get/get.dart';
 
 class BookQRAssignController extends GetxController {
+  // Observable for the selected QR Code
   var selectedQRCode = ''.obs;
+
+  // Reference to BarcodeController and FormController
   final BarcodeController barcodeController = Get.find<BarcodeController>();
   final FormController formController = Get.find<FormController>();
 
+  // Submit the QR Code by setting it in the FormController
   Future<void> submitQRCode() async {
     formController.setSelectedQRCode(barcodeController.barcodeObs.value);
-    print('selectedQRCode: ${formController.selectedQRCode.value}');
-    print('selectedISBN: ${formController.selectedISBN.value}');
-    print('selectedBookBox: ${formController.selectedBookbox.value}');
+
+    // Delete the BarcodeController after using it
     Get.delete<BarcodeController>();
+
+    // Check if ISBN is available and submit the form accordingly
     if (formController.selectedISBN.value.isEmpty) {
       formController.submitFormWithoutISBN();
     } else {
@@ -25,6 +28,7 @@ class BookQRAssignController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // React to changes in the barcode value
     ever(barcodeController.barcodeObs, (value) {
       if (value.isNotEmpty &&
           value != 'Unknown Barcode' &&

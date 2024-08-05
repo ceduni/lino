@@ -1,6 +1,7 @@
 import 'package:Lino_app/pages/floating_button/common/build_banner.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class BookConfirmDialog extends StatefulWidget {
   final Future<Map<String, dynamic>> bookInfoFuture;
@@ -207,6 +208,9 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
       pages: editableBookInfo['pages'],
       coverImage: editableBookInfo['coverImage'],
     );
+    while (Get.isDialogOpen ?? false) {
+      Get.back();
+    }
   }
 
   Widget _buildInfoRow(String title, String content, String key) {

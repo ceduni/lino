@@ -1,8 +1,7 @@
 import 'package:Lino_app/pages/floating_button/dialog_options/bookbox_selection/bookbox_selection_dialog.dart';
-import 'package:Lino_app/pages/floating_button/dialog_options/isbn_entry/isbn_dialog.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../forum/add_thread_form.dart';
 import '../forum/request_form.dart';
@@ -86,14 +85,15 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
             child: Icon(Icons.add),
             label: 'Add Book',
             onTap: () async {
-              String? scannedCode = await showDialog(
-                context: context,
-                builder: (context) => Container(),
-              );
-              if (scannedCode != null) {
-                // Handle the scanned code, for example, navigate to another page
-                // with the scanned UUID
-              }
+              Get.dialog(BookBoxSelectionDialog());
+              // String? scannedCode = await showDialog(
+              //   context: context,
+              //   builder: (context) => BookBoxSelectionDialog(),
+              // );
+              // if (scannedCode != null) {
+              //   // Handle the scanned code, for example, navigate to another page
+              //   // with the scanned UUID
+              // }
             },
           ),
           SpeedDialChild(
@@ -102,7 +102,7 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
             onTap: () async {
               showDialog(
                 context: context,
-                builder: (context) => BookBoxSelectionDialog(),
+                builder: (context) => Container(),
               );
             },
           ),

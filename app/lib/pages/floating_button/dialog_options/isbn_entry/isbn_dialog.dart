@@ -11,9 +11,9 @@ import 'package:get/get.dart';
 class IsbnDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final barcodeController = Get.put(BarcodeController());
-    final isbnController = Get.put(ISBNController());
-    final formController = Get.put(FormController());
+    final BarcodeController barcodeController = Get.put(BarcodeController());
+    final ISBNController isbnController = Get.put(ISBNController());
+    final FormController formController = Get.put(FormController());
 
     return Dialog(
       backgroundColor: Colors.white,
@@ -27,20 +27,20 @@ class IsbnDialog extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text("Scan the book's ISBN code"),
-                  SizedBox(height: 16.0),
+                  const Text("Scan the book's ISBN code"),
+                  const SizedBox(height: 16.0),
                   buildScanner(barcodeController),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   buildCustomDivider(),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   _buildISBNTextField(isbnController),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   _buildSubmitButton(isbnController, formController),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   _buildLoadingOrErrorMessage(isbnController),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   _buildExpandButton(formController),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   _buildAdditionalFields(formController),
                 ],
               ),
@@ -54,7 +54,7 @@ class IsbnDialog extends StatelessWidget {
   Widget _buildISBNTextField(ISBNController isbnController) {
     return TextField(
       controller: isbnController.textEditingController,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'ISBN',
       ),
@@ -69,8 +69,7 @@ class IsbnDialog extends StatelessWidget {
   Widget _buildSubmitButton(
       ISBNController isbnController, FormController formController) {
     return Obx(() {
-      bool isISBNNotEmpty =
-          isbnController.textEditingController.text.isNotEmpty;
+      bool isISBNNotEmpty = isbnController.isbnText.value.isNotEmpty;
       bool isAdditionalFieldsNotEmpty = !formController.isAdditionalFieldsEmpty;
 
       return ElevatedButton(
@@ -96,22 +95,22 @@ class IsbnDialog extends StatelessWidget {
   Widget _buildExpandButton(FormController formController) {
     return ElevatedButton(
       onPressed: formController.toggleExpand,
-      child: Text("My book doesn't have ISBN"),
+      child: const Text("My book doesn't have ISBN"),
     );
   }
 
   Widget _buildLoadingOrErrorMessage(ISBNController isbnController) {
     return Obx(() {
       if (isbnController.isLoading.value) {
-        return CircularProgressIndicator();
+        return const CircularProgressIndicator();
       }
       if (isbnController.errorMessage.isNotEmpty) {
         return Text(
           isbnController.errorMessage.value,
-          style: TextStyle(color: Colors.red),
+          style: const TextStyle(color: Colors.red),
         );
       }
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     });
   }
 
@@ -125,7 +124,7 @@ class IsbnDialog extends StatelessWidget {
                     child: TextField(
                       controller: entry.value,
                       decoration: InputDecoration(
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                         labelText: entry.key,
                       ),
                     ),
@@ -133,9 +132,7 @@ class IsbnDialog extends StatelessWidget {
               .toList(),
         );
       }
-      print(
-          'expandController.additionalFields: ${expandController.additionalFieldsForISBN}');
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     });
   }
 }

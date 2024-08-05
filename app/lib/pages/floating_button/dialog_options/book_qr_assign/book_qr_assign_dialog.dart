@@ -9,7 +9,7 @@ import 'package:Lino_app/pages/floating_button/common/build_banner.dart';
 class BookQRAssignDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final barcodeController = Get.put(BarcodeController());
+    final BarcodeController barcodeController = Get.put(BarcodeController());
     Get.lazyPut(() => FormController());
     Get.lazyPut(() => BookQRAssignController());
 
@@ -25,12 +25,12 @@ class BookQRAssignDialog extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text("Scan the book's new QR code"),
-                  SizedBox(height: 16.0),
+                  const Text("Scan the book's new QR code"),
+                  const SizedBox(height: 16.0),
                   buildScanner(barcodeController),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   _buildSubmitButton(),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   Obx(() =>
                       Text(Get.find<BarcodeController>().barcodeObs.value)),
                 ],
@@ -45,12 +45,11 @@ class BookQRAssignDialog extends StatelessWidget {
   Widget _buildSubmitButton() {
     return ElevatedButton(
       onPressed: () {
-        var barcode = Get.find<BarcodeController>().barcodeObs.value;
+        final String barcode = Get.find<BarcodeController>().barcodeObs.value;
         Get.find<FormController>().setSelectedQRCode(barcode);
-        print('QR code: $barcode');
         Get.find<BookQRAssignController>().submitQRCode();
       },
-      child: Text('Submit'),
+      child: const Text('Submit'),
     );
   }
 }

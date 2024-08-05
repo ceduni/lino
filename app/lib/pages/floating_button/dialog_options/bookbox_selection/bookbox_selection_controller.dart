@@ -7,9 +7,9 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class BookBoxSelectionController extends GetxController {
-  var selectedBookBox = <String, dynamic>{}.obs;
-  var bookBoxes = <Map<String, dynamic>>[].obs;
-  var userLocation = Rxn<Position>();
+  final selectedBookBox = <String, dynamic>{}.obs;
+  final bookBoxes = <Map<String, dynamic>>[].obs;
+  final userLocation = Rxn<Position>();
   final BarcodeController barcodeController = Get.find<BarcodeController>();
   final FormController formController = Get.find<FormController>();
 
@@ -20,10 +20,10 @@ class BookBoxSelectionController extends GetxController {
 
   Future<void> getBookBoxes() async {
     try {
-      var bbs;
+      dynamic bbs;
       if (userLocation.value != null) {
-        var longitude = userLocation.value?.longitude;
-        var latitude = userLocation.value?.latitude;
+        final longitude = userLocation.value?.longitude;
+        final latitude = userLocation.value?.latitude;
 
         bbs = await BookService().searchBookboxes(
           cls: 'by location',
@@ -45,30 +45,34 @@ class BookBoxSelectionController extends GetxController {
         };
       }).toList();
     } catch (e) {
-      print(e);
+      print('Error fetching book boxes: $e');
     }
   }
 
   Future<void> getUserLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied.');
+    try {
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return Future.error('Location services are disabled.');
       }
-    }
 
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error('Location permissions are permanently denied.');
-    }
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('Location permissions are denied.');
+        }
+      }
 
-    userLocation.value = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error('Location permissions are permanently denied.');
+      }
+
+      userLocation.value = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+    } catch (e) {
+      print('Error getting user location: $e');
+    }
   }
 
   void submitBookBox() {
@@ -85,7 +89,7 @@ class BookBoxSelectionController extends GetxController {
         getBookBoxes();
       }
     });
-    ever(barcodeController.barcodeObs, (value) {
+    ever(barcodeController.barcodeObs, (String value) {
       if (value.isNotEmpty &&
           value != 'Unknown Barcode' &&
           value != 'No Barcode Detected') {
