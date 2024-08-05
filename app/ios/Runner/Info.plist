@@ -13,6 +13,17 @@
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
+	<key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>lino</string>
+            </array>
+        </dict>
+    </array>
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>LinoApp</string>

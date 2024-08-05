@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'options_page.dart';
+
 class ProfilePage extends HookWidget {
   ProfilePage({Key? key}) : super(key: key);
 
@@ -48,14 +50,35 @@ class ProfilePage extends HookWidget {
   }
 
   Future<void> _disconnect(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token');
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => LoginPage(prefs: prefs),
-      ),
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Confirm Logout'),
+          content: Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('Logout'),
+            ),
+          ],
+        );
+      },
     );
+
+    if (confirmed == true) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('token');
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/login',
+            (Route<dynamic> route) => false,
+      );
+    }
   }
 
   @override
@@ -131,22 +154,41 @@ class ProfilePage extends HookWidget {
         backgroundColor: Color.fromRGBO(125, 200, 237, 1),
         title: Text(username),
         actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              // TODO: add onPressed function here
-              // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => LoginPage(),
-              //   ),
-              // );
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => OptionsPage(),
+                ),
+              );
             },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.settings, color: Colors.white),
+                Text(
+                  'Options',
+                  style: TextStyle(color: Colors.white, fontSize: 10),
+                ),
+              ],
+            ),
           ),
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () => _disconnect(context),
+          SizedBox(width: 10),
+          GestureDetector(
+            onTap: () => _disconnect(context),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.logout, color: Colors.red),
+                Text(
+                  'Disconnect',
+                  style: TextStyle(color: Colors.red, fontSize: 10),
+                ),
+              ],
+            ),
           ),
+          SizedBox(width: 10),
         ],
       ),
       body: buildContent(context, modifiedUserData),

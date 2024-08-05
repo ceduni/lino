@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -15,9 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initializeApp() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.remove('token');
-    await Future.delayed(Duration(seconds: 2)); // Simulate some loading time
+    await Future.delayed(Duration(seconds: 1));  // Simulate some loading time
     Get.offNamed('/home'); // Navigate to home page
   }
 

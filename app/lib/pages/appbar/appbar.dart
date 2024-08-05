@@ -101,10 +101,8 @@ class _LinoAppBarState extends State<LinoAppBar> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
-                  child: IconButton(
-                    icon: Icon(isLoggedIn ? Icons.person : Icons.login),
-                    color: isLoggedIn ? LinoColors.primary : null,
-                    onPressed: () {
+                  child: GestureDetector(
+                    onTap: () {
                       if (!isLoggedIn) {
                         Navigator.of(context).pushReplacementNamed('/login');
                       } else {
@@ -115,6 +113,24 @@ class _LinoAppBarState extends State<LinoAppBar> {
                         );
                       }
                     },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isLoggedIn ? Icons.person : Icons.login,
+                          color: isLoggedIn ? Colors.white : Colors.red,
+                        ),
+                        SizedBox(height: 2), // Minimal space between icon and text
+                        Text(
+                          isLoggedIn ? 'Profile' : 'Log In',
+                          style: TextStyle(
+                            color: isLoggedIn ? Colors.white : Colors.red,
+                            fontSize: 12, // Adjust font size if needed
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
@@ -129,7 +145,7 @@ class _LinoAppBarState extends State<LinoAppBar> {
                     child: Stack(
                       children: [
                         IconButton(
-                          icon: Icon(Icons.notifications),
+                          icon: Icon(Icons.notifications, color: Colors.white,),
                           onPressed: () async {
                             await Navigator.of(context).push(
                               MaterialPageRoute(
