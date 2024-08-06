@@ -2,6 +2,7 @@ import 'package:Lino_app/pages/floating_button/common/build_banner.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BookConfirmDialog extends StatefulWidget {
   final Future<Map<String, dynamic>> bookInfoFuture;
@@ -23,6 +24,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
   final BookService bookService = BookService();
   late Map<String, dynamic> editableBookInfo;
   bool isEditing = false;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +91,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
             SizedBox(height: 16),
             _buildBookInfoContainer(),
             SizedBox(height: 16),
-            _buildConfirmButton(),
+            isLoading ? CircularProgressIndicator() : _buildConfirmButton(),
           ],
         ),
       ),
@@ -121,23 +123,23 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
   Widget _buildBookCoverImage() {
     return editableBookInfo['coverImage'] != null
         ? Image.network(
-            editableBookInfo['coverImage']!,
-            height: 150,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                width: 150,
-                height: 200,
-                color: Colors.grey,
-                child: Center(
-                  child: Text(
-                    editableBookInfo['title'] ?? 'No Image',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              );
-            },
-          )
+      editableBookInfo['coverImage']!,
+      height: 150,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          width: 150,
+          height: 200,
+          color: Colors.grey,
+          child: Center(
+            child: Text(
+              editableBookInfo['title'] ?? 'No Image',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      },
+    )
         : Text('No Image Available');
   }
 
@@ -189,27 +191,42 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
   Widget _buildConfirmButton() {
     return Center(
       child: ElevatedButton(
-        onPressed: _onConfirmPressed,
+        onPressed: isLoading ? null : _onConfirmPressed,
         child: Text('Confirm'),
       ),
     );
   }
 
-  void _onConfirmPressed() {
-    bookService.addBookToBB(
-      widget.bookBoxId,
-      widget.bookQrCode,
-      isbn: editableBookInfo['isbn'],
-      authors: editableBookInfo['authors'],
-      description: editableBookInfo['description'],
-      publisher: editableBookInfo['publisher'],
-      parutionYear: editableBookInfo['parutionYear'],
-      title: editableBookInfo['title'],
-      pages: editableBookInfo['pages'],
-      coverImage: editableBookInfo['coverImage'],
-    );
-    while (Get.isDialogOpen ?? false) {
+  Future<void> _onConfirmPressed() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    var prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    try {
+      await bookService.addBookToBB(
+        widget.bookQrCode,
+        widget.bookBoxId,
+        token: token,
+        isbn: editableBookInfo['isbn'],
+        authors: editableBookInfo['authors'],
+        description: editableBookInfo['description'],
+        publisher: editableBookInfo['publisher'],
+        parutionYear: editableBookInfo['parutionYear'],
+        title: editableBookInfo['title'],
+        pages: editableBookInfo['pages'],
+        coverImage: editableBookInfo['coverImage'],
+      );
       Get.back();
+    } catch (e) {
+      print('Error adding book: $e');
+      // Optionally, show an error message to the user
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -240,7 +257,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
   void _editField(
       BuildContext context, String title, String currentValue, String key) {
     TextEditingController controller =
-        TextEditingController(text: currentValue);
+    TextEditingController(text: currentValue);
     showDialog(
       context: context,
       builder: (context) {
