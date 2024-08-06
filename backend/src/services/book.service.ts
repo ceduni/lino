@@ -147,15 +147,18 @@ const bookService = {
                 throw newErr(404, 'User not found');
             }
             const username = user.username;
+            console.log('Updating book history for user ' + username);
+            console.log('User book history before update: ' + user.bookHistory);
             if (given) { // if the book is given
                 book.givenHistory.push({username: username, timestamp: new Date()});
                 // push in the user's book history
-                user.bookHistory.push({bookId: book.id, given: true});
+                user.bookHistory.push({bookId: book.id, timestamp: new Date(), given: true});
             } else { // if the book is taken
                 book.takenHistory.push({username: username, timestamp: new Date()});
                 // push in the user's book history
-                user.bookHistory.push({bookId: book.id, given: false});
+                user.bookHistory.push({bookId: book.id, timestamp: new Date(), given: false});
             }
+            console.log('User book history after update: ' + user.bookHistory);
         } else { // if the user is not authenticated, username is 'guest'
             if (given) { // if the book is given
                 book.givenHistory.push({username: "guest", timestamp: new Date()});
