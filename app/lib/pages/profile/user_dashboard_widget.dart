@@ -1,5 +1,6 @@
 import 'package:Lino_app/pages/Books/book_details_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../utils/constants/colors.dart';
 
@@ -12,14 +13,15 @@ class UserDashboard extends StatefulWidget {
   final int booksBorrowed;
   final int booksGiven;
 
+
   const UserDashboard({
     super.key,
     required this.favoriteBooks,
     required this.booksHistory,
     required this.username,
     required this.savedTrees,
-    this.booksBorrowed = 0,
-    this.booksGiven = 0,
+    required this.booksBorrowed,
+    required this.booksGiven,
   });
 
   @override
@@ -39,7 +41,7 @@ class _UserDashboardState extends State<UserDashboard> {
                 [
                   ProfileCard(
                     username: widget.username,
-                    savedTrees: widget.savedTrees,
+                    savedTrees: widget.savedTrees.toPrecision(2),
                     booksBorrowed: widget.booksBorrowed,
                     booksGiven: widget.booksGiven,
                   )

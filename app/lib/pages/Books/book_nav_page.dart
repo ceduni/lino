@@ -54,108 +54,139 @@ class _NavigationPageState extends State<NavigationPage> {
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : error != null
-              ? Center(child: Text('Error: $error'))
-              : RefreshIndicator(
-                  onRefresh: _loadBookBoxes,
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          height: 50,
-                          color: Color.fromRGBO(239, 175, 132, 1),
-                          padding: const EdgeInsets.symmetric(vertical: 7.0),
-                          child: Text(
-                            'Liked books',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromRGBO(3, 51, 86, 1),
-                            ),
+          ? Center(child: Text('Error: $error'))
+          : RefreshIndicator(
+        onRefresh: _loadBookBoxes,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              FutureBuilder<bool>(
+                future: _isValidUser(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.hasError || !snapshot.data!) {
+                    return SizedBox.shrink();
+                  }
+
+                  return Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 50,
+                        color: Color.fromRGBO(239, 175, 132, 1),
+                        padding: const EdgeInsets.symmetric(vertical: 7.0),
+                        child: Text(
+                          'Liked books',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(3, 51, 86, 1),
                           ),
                         ),
-                        FavoriteBooksSection(),
-                        for (var bb in bookBoxes) ...[
-                          Container(
-                            width: double.infinity,
-                            height: 50,
-                            color: Color.fromRGBO(125, 201, 236, 1),
-                            padding: const EdgeInsets.symmetric(vertical: 7.0),
-                            child: Text(
-                              bb['name'],
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromRGBO(3, 51, 86, 1),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            color: Color.fromRGBO(250, 250, 240, 1),
-                            child: Container(
-                              height: 150,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: bb['books'].length,
-                                itemBuilder: (context, index) {
-                                  var book = bb['books'][index];
-                                  return GestureDetector(
-                                    onTap: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => BookDetailsPage(
-                                          book: book,
-                                          bbid: bb['id'],
-                                        ),
-                                      );
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Image.network(
-                                        book['coverImage'],
-                                        errorBuilder: (BuildContext context,
-                                            Object exception,
-                                            StackTrace? stackTrace) {
-                                          return ConstrainedBox(
-                                            constraints: BoxConstraints(
-                                                maxWidth: 100),
-                                            child: Container(
-                                              color: Colors.grey,
-                                              child: Center(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    book['title'],
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                    ),
-                                                    textAlign: TextAlign.center,
-                                                    maxLines: null,
-                                                    overflow:
-                                                        TextOverflow.visible,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
+                      ),
+                      FavoriteBooksSection(),
+                    ],
+                  );
+                },
+              ),
+              for (var bb in bookBoxes) ...[
+                Container(
+                  width: double.infinity,
+                  height: 50,
+                  color: Color.fromRGBO(125, 201, 236, 1),
+                  padding: const EdgeInsets.symmetric(vertical: 7.0),
+                  child: Text(
+                    bb['name'],
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromRGBO(3, 51, 86, 1),
                     ),
                   ),
                 ),
+                Container(
+                  color: Color.fromRGBO(250, 250, 240, 1),
+                  child: Container(
+                    height: 150,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: bb['books'].length,
+                      itemBuilder: (context, index) {
+                        var book = bb['books'][index];
+                        return GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => BookDetailsPage(
+                                book: book,
+                                bbid: bb['id'],
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Image.network(
+                              book['coverImage'],
+                              errorBuilder: (BuildContext context,
+                                  Object exception,
+                                  StackTrace? stackTrace) {
+                                return ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                      maxWidth: 100),
+                                  child: Container(
+                                    color: Colors.grey,
+                                    child: Center(
+                                      child: Padding(
+                                        padding:
+                                        const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          book['title'],
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          maxLines: null,
+                                          overflow:
+                                          TextOverflow.visible,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
+  }
+
+  Future<bool> _isValidUser() async {
+    var prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    if (token == null) {
+      return false;
+    }
+    try {
+      var user = await userService.getUser(token);
+      return user['user'] != null;
+    } catch (e) {
+      return false;
+    }
   }
 }
 
@@ -172,7 +203,7 @@ class FavoriteBooksSection extends HookWidget {
     }, []);
 
     final favoriteBooksFuture =
-        useFuture(useMemoized(() => getUserFavoriteBooks(token.value!), [token.value]));
+    useFuture(useMemoized(() => getUserFavoriteBooks(token.value!), [token.value]));
 
     if (favoriteBooksFuture.connectionState != ConnectionState.done) {
       return Center(child: CircularProgressIndicator());
@@ -189,56 +220,56 @@ class FavoriteBooksSection extends HookWidget {
       height: 250,
       child: favoriteBooks.isEmpty
           ? Center(
-              child: Text(
-                'None are available yet',
-                style: TextStyle(fontSize: 16, color: Colors.black),
-              ),
-            )
+        child: Text(
+          'None are available yet',
+          style: TextStyle(fontSize: 16, color: Colors.black),
+        ),
+      )
           : ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: favoriteBooks.length,
-              itemBuilder: (context, index) {
-                var book = favoriteBooks[index];
-                return GestureDetector(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => BookDetailsPage(
-                        book: book,
-                        bbid: "null",
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Image.network(
-                      book['coverImage'],
-                      errorBuilder: (BuildContext context, Object exception,
-                          StackTrace? stackTrace) {
-                        return ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: 100),
-                          child: Container(
-                            color: Colors.grey,
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  book['title'],
-                                  style: TextStyle(color: Colors.white),
-                                  textAlign: TextAlign.center,
-                                  maxLines: null,
-                                  overflow: TextOverflow.visible,
-                                ),
-                              ),
-                            ),
+        scrollDirection: Axis.horizontal,
+        itemCount: favoriteBooks.length,
+        itemBuilder: (context, index) {
+          var book = favoriteBooks[index];
+          return GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => BookDetailsPage(
+                  book: book,
+                  bbid: "null",
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.network(
+                book['coverImage'],
+                errorBuilder: (BuildContext context, Object exception,
+                    StackTrace? stackTrace) {
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: 100),
+                    child: Container(
+                      color: Colors.grey,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            book['title'],
+                            style: TextStyle(color: Colors.white),
+                            textAlign: TextAlign.center,
+                            maxLines: null,
+                            overflow: TextOverflow.visible,
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
+          );
+        },
+      ),
     );
   }
 

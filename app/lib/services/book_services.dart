@@ -49,7 +49,7 @@ class BookService {
       Uri.parse('$url/books/add'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
+        if (token != null) 'Authorization': 'Bearer $token',
       },
       body: jsonEncode(<String, dynamic>{
         'qrCodeId': qrCode,

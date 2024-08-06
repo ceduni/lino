@@ -3,6 +3,7 @@ import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'options_page.dart';
@@ -20,9 +21,19 @@ class ProfilePage extends HookWidget {
   }
 
   Future<Map<String, dynamic>> getBooksListFromUserData(
-      List<dynamic> bookIds) async {
+      List<dynamic> bookIds,
+      bool isFavoriteBooks
+      ) async {
     List<Map<String, dynamic>> books = await Future.wait(
-      bookIds.map((id) => BookService().getBook(id)).toList(),
+      bookIds.map((id) async {
+        Map<String, dynamic> book = await BookService().getBook(
+            isFavoriteBooks ? id : id['bookId']
+        );
+        if (!isFavoriteBooks) {
+          book['given'] = id['given'];
+        }
+        return book;
+      }).toList(),
     );
     return {'books': books};
   }
@@ -37,14 +48,29 @@ class ProfilePage extends HookWidget {
 
     List<Map<String, dynamic>> booksHistory = userData['user']['bookHistory'];
     List<Map<String, dynamic>> favoriteBooks = userData['user']['favoriteBooks'];
+    print('booksHistory: $booksHistory');
+
+    int booksBorrowed = 0;
+    for (var book in booksHistory) {
+      if (!book['given']) {
+        booksBorrowed++;
+      }
+    }
+    int booksGiven = 0;
+    for (var book in booksHistory) {
+      if (book['given']) {
+        booksGiven++;
+      }
+    }
+
 
     return UserDashboard(
       favoriteBooks: favoriteBooks,
       booksHistory: booksHistory,
       username: userData['user']['username'],
       savedTrees: savedTrees,
-      booksBorrowed: 0,
-      booksGiven: 0,
+      booksBorrowed: booksBorrowed,
+      booksGiven: booksGiven,
     );
   }
 
@@ -120,10 +146,10 @@ class ProfilePage extends HookWidget {
     final bookDataFutures = [
       useFuture(useMemoized(
               () =>
-              getBooksListFromUserData(userData.data!['user']['favoriteBooks']),
+              getBooksListFromUserData(userData.data!['user']['favoriteBooks'], true),
           [userData.data])),
       useFuture(useMemoized(
-              () => getBooksListFromUserData(userData.data!['user']['bookHistory']),
+              () => getBooksListFromUserData(userData.data!['user']['bookHistory'], false),
           [userData.data])),
     ];
 
