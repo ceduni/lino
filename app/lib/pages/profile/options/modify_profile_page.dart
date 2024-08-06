@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import '../../../services/user_services.dart';
 
 class ModifyProfilePage extends StatefulWidget {
@@ -13,14 +10,13 @@ class ModifyProfilePage extends StatefulWidget {
 }
 
 class _ModifyProfilePageState extends State<ModifyProfilePage> {
-  final _formKey = GlobalKey<FormState>();
   late TextEditingController _usernameController;
   late TextEditingController _passwordController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
-  bool? _getAlerted;
   late String _token;
-  bool _isLoading = true; // Add loading state
+  bool _isLoading = true;
+  bool _obscureText = true;
 
   @override
   void initState() {
@@ -39,21 +35,19 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
       _passwordController = TextEditingController(text: '');
       _emailController = TextEditingController(text: user['user']['email']);
       _phoneController = TextEditingController(text: user['user']['phone']);
-      _getAlerted = user['user']['getAlerted'];
-      _isLoading = false; // Set loading state to false
+      _isLoading = false;
     });
   }
 
   Future<void> _updateUser() async {
     final userService = UserService();
     try {
-      final response = await userService.updateUser(
+      await userService.updateUser(
         _token,
         username: _usernameController.text,
         password: _passwordController.text.isEmpty ? null : _passwordController.text,
         email: _emailController.text,
         phone: _phoneController.text,
-        getAlerted: _getAlerted,
       );
       showToast('Profile updated successfully');
       Navigator.pop(context);
@@ -97,65 +91,94 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
     );
   }
 
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Modify Profile'),
       ),
-      body: _isLoading // Show loading indicator if still loading
+      body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
+          : Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: LinoColors.primary,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextFormField(
-                controller: _usernameController,
-                decoration: InputDecoration(labelText: 'Username'),
-              ),
-              TextFormField(
-                controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-              ),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
-              ),
-              TextFormField(
-                controller: _phoneController,
-                decoration: InputDecoration(labelText: 'Phone'),
-              ),
-              SwitchListTile(
-                title: Text('Get Alerts'),
-                value: _getAlerted ?? false,
-                onChanged: (bool value) {
-                  setState(() {
-                    _getAlerted = value;
-                  });
-                },
-              ),
+              Spacer(flex: 1),
+              Image.asset('assets/logos/logo_without_bird.png', height: 150),
+              Spacer(flex: 1),
+              _buildTextField(_usernameController, 'Username', Icons.person),
+              SizedBox(height: 20),
+              _buildTextField(_passwordController, 'Password', Icons.lock, obscureText: _obscureText),
+              SizedBox(height: 20),
+              _buildTextField(_emailController, 'Email', Icons.email),
+              SizedBox(height: 20),
+              _buildTextField(_phoneController, 'Phone', Icons.phone),
+              SizedBox(height: 20),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
-                    child: Text('Dismiss'),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                    child: Text('Dismiss', style: TextStyle(color: LinoColors.accent)),
                   ),
                   ElevatedButton(
                     onPressed: _showConfirmationDialog,
-                    style: ElevatedButton.styleFrom(backgroundColor: LinoColors.primary),
-                    child: Text('Submit'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: LinoColors.accent,
+                    ),
+                    child: Text(
+                      'Submit',
+                      style: TextStyle(
+                        color: Colors.white, // Change this to your desired text color
+                      ),
+                    ),
                   ),
                 ],
               ),
+              Spacer(flex: 2),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String hintText, IconData icon, {bool obscureText = false}) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
+        filled: true,
+        fillColor: LinoColors.secondary,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0),
+          borderSide: BorderSide.none,
+        ),
+        prefixIcon: Icon(icon, color: Colors.black.withOpacity(0.5)),
+        suffixIcon: hintText == 'Password'
+            ? IconButton(
+          icon: Icon(
+            _obscureText ? Icons.visibility_off : Icons.visibility,
+            color: Colors.black.withOpacity(0.5),
+          ),
+          onPressed: _togglePasswordVisibility,
+        )
+            : null,
+      ),
+      obscureText: obscureText,
     );
   }
 }

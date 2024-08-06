@@ -224,7 +224,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     Future.delayed(Duration(seconds: 1), () {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => KeywordInputPage(username: widget.username, token: widget.token, prefs: widget.prefs)),
+        MaterialPageRoute(builder: (context) => KeywordInputPage(token: widget.token, prefs: widget.prefs)),
             (route) => false, // Remove all previous routes
       );
     });

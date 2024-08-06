@@ -1,5 +1,4 @@
 import 'package:Lino_app/pages/Books/book_nav_page.dart';
-import 'package:Lino_app/pages/nfc_dialog/first_loaded_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Lino_app/pages/map/map_screen.dart';
@@ -14,8 +13,6 @@ class BookNavPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(
-        Duration.zero, () => NFCConnectDialog().openFirstLoadedPrompt(context));
     final controller = Get.put(NavigationController());
     final searchController = Get.put(sb.SearchController());
 

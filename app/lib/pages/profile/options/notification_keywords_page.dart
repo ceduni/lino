@@ -3,20 +3,18 @@ import 'package:Lino_app/services/user_services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class KeywordInputPage extends StatefulWidget {
-  final String token;
-  final SharedPreferences prefs;
+import '../../../utils/constants/colors.dart';
 
-  const KeywordInputPage({required this.token, required this.prefs, super.key});
-
+class NotificationKeywordsPage extends StatefulWidget {
   @override
-  _KeywordInputPageState createState() => _KeywordInputPageState();
+  _NotificationKeywordsPageState createState() => _NotificationKeywordsPageState();
 }
 
-class _KeywordInputPageState extends State<KeywordInputPage> {
+class _NotificationKeywordsPageState extends State<NotificationKeywordsPage> {
   final TextEditingController _keywordController = TextEditingController();
   final List<String> _keywords = [];
   bool _isLoading = true;
+  String? _token;
 
   @override
   void initState() {
@@ -26,11 +24,15 @@ class _KeywordInputPageState extends State<KeywordInputPage> {
 
   Future<void> _loadUserKeywords() async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      _token = prefs.getString('token');
+      if (_token == null) throw Exception('No token found');
+
       final userService = UserService();
-      final user = await userService.getUser(widget.token);
-      final keyWords = user['user']['keyWords'] ?? '';
+      final user = await userService.getUser(_token!);
+      final keyWords = user['user']['notificationKeyWords'] ?? [];
       setState(() {
-        _keywords.addAll(keyWords.split(',').where((keyword) => keyword.isNotEmpty));
+        _keywords.addAll(List<String>.from(keyWords));
         _isLoading = false;
       });
     } catch (e) {
@@ -62,11 +64,9 @@ class _KeywordInputPageState extends State<KeywordInputPage> {
 
     try {
       var us = UserService();
-      await us.updateUser(widget.token, keyWords: keyWords);
-
+      await us.updateUser(_token!, keyWords: keyWords);
       showToast('User preferences updated successfully!');
-
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pop(context);
     } catch (e) {
       showToast('Error updating user preferences: $e');
     }
@@ -84,13 +84,16 @@ class _KeywordInputPageState extends State<KeywordInputPage> {
   }
 
   void _pass() {
-    Navigator.pushReplacementNamed(context, '/home');
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF4277B8), // Same blue background
+      appBar: AppBar(
+        title: Text('Setup Notification Keywords'),
+      ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : Padding(
@@ -169,6 +172,7 @@ class _KeywordInputPageState extends State<KeywordInputPage> {
                   onPressed: _finish,
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    backgroundColor: LinoColors.buttonPrimary, // Lighter blue background
                   ),
                   child: Text(
                     'Finished!',
