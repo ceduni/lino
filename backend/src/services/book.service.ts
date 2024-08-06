@@ -159,6 +159,7 @@ const bookService = {
                 user.bookHistory.push({bookId: book.id, timestamp: new Date(), given: false});
             }
             console.log('User book history after update: ' + user.bookHistory);
+            await user.save(); // save the user's book history
         } else { // if the user is not authenticated, username is 'guest'
             if (given) { // if the book is given
                 book.givenHistory.push({username: "guest", timestamp: new Date()});
