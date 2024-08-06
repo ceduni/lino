@@ -7,6 +7,13 @@ const notificationSchema = new mongoose.Schema({
     read: { type: Boolean, default: false }
 });
 
+
+const historySchema = new mongoose.Schema({
+    bookId: {type: String, required: true},
+    timestamp: {type: Date, default: Date.now},
+    given: {type: Boolean, default: false}
+});
+
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true }, // It's gonna be hashed
@@ -22,7 +29,7 @@ const userSchema = new mongoose.Schema({
     },
     notifications: {type: [notificationSchema], default: []},
     getAlerted: { type: Boolean, default: true },
-    bookHistory: {type: [{bookId: String, timestamp: {type: Date, default: Date.now}, given: Boolean}], default: []},
+    bookHistory: {type: [historySchema], default: []},
 });
 
 const User = mongoose.model('User', userSchema, "users");

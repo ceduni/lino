@@ -150,11 +150,11 @@ const bookService = {
             if (given) { // if the book is given
                 book.givenHistory.push({username: username, timestamp: new Date()});
                 // push in the user's book history
-                user.bookHistory.push({bookId: book.id, timestamp: new Date(), given: true});
+                user.bookHistory.push({bookId: book.id, given: true});
             } else { // if the book is taken
                 book.takenHistory.push({username: username, timestamp: new Date()});
                 // push in the user's book history
-                user.bookHistory.push({bookId: book.id, timestamp: new Date(), given: false});
+                user.bookHistory.push({bookId: book.id, given: false});
             }
         } else { // if the user is not authenticated, username is 'guest'
             if (given) { // if the book is given

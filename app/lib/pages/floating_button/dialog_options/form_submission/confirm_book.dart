@@ -144,6 +144,10 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
   }
 
   Widget _buildBookInfoContainer() {
+    final List<String> categories = editableBookInfo['categories'] != null
+        ? List<String>.from(editableBookInfo['categories'])
+        : [];
+
     return Container(
       decoration: BoxDecoration(
         color: const Color.fromRGBO(244, 226, 193, 1).withOpacity(0.9),
@@ -168,7 +172,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
           SizedBox(height: 8),
           _buildInfoRow(
               'Categories',
-              editableBookInfo['categories']?.join(', ') ??
+              categories.isNotEmpty? categories.join(', ') :
                   'No categories available',
               'categories'),
           SizedBox(height: 8),
@@ -211,13 +215,14 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
         widget.bookBoxId,
         token: token,
         isbn: editableBookInfo['isbn'],
-        authors: editableBookInfo['authors'],
+        authors: List<String>.from(editableBookInfo['authors']),
         description: editableBookInfo['description'],
         publisher: editableBookInfo['publisher'],
         parutionYear: editableBookInfo['parutionYear'],
         title: editableBookInfo['title'],
         pages: editableBookInfo['pages'],
         coverImage: editableBookInfo['coverImage'],
+        categories: List<String>.from(editableBookInfo['categories']),
       );
       Get.back();
     } catch (e) {
@@ -278,7 +283,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
               child: Text('Save'),
               onPressed: () {
                 setState(() {
-                  editableBookInfo[key] = key == 'authors' ? controller.text.split(',') : controller.text;
+                  editableBookInfo[key] = (key == 'authors' || key == 'categories') ? controller.text.split(',') : controller.text;
                 });
                 Navigator.of(context).pop();
               },
