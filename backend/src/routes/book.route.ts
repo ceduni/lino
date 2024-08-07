@@ -279,7 +279,6 @@ const sendBookRequestSchema = {
                 bookTitle: { type: 'string' },
                 timestamp: { type: 'string' },
                 customMessage: { type: 'string' },
-                isFulfilled: { type: 'boolean' }
             }
         },
         400: {
@@ -611,7 +610,6 @@ const getBookRequestsSchema = {
                     bookTitle: {type: 'string'},
                     timestamp: {type: 'string'},
                     customMessage: {type: 'string'},
-                    isFulfilled: {type: 'boolean'}
                 }
             },
         },

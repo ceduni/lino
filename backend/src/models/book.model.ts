@@ -16,8 +16,6 @@ const bookSchema = new mongoose.Schema({
     dateLastAction: { type: Date, default: Date.now }
 });
 
-// Create a text index on title, authors
-bookSchema.index({ title: 'text', authors: 'text' });
 
 const Book = mongoose.model('Book', bookSchema, "books"); // "books" specifies the collection to use
 

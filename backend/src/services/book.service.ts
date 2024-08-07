@@ -331,7 +331,15 @@ const bookService = {
     },
 
     async getBook(id: string) {
-        return Book.findById(id);
+        const book = await Book.findById(id);
+        if (!book) {
+            const book2 = await Book.findOne({qrCodeId: id});
+            if (book2) {
+                return book2;
+            } else {
+                throw newErr(404, 'Book not found');
+            }
+        }
     },
 
     async requestBookToUsers(request : any) {
