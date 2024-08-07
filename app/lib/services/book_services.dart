@@ -11,7 +11,7 @@ class BookService {
     // If the server returns a 201 status code, the bookbox is added
     // If the server returns another status code, the bookbox is not added
     final r = await http.post(
-      Uri.parse('$url/books/bookbox/new'),
+      Uri.parse('$url/bookboxes/new'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
@@ -113,7 +113,7 @@ class BookService {
 
   Future<Map<String, dynamic>> getBookBox(String bookBoxId) async {
     final r = await http.get(
-      Uri.parse('$url/books/bookbox/$bookBoxId'),
+      Uri.parse('$url/bookboxes/$bookBoxId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -216,7 +216,7 @@ class BookService {
     };
 
     final r = await http.get(
-      Uri.https('lino-1.onrender.com', '/books/bookbox/search', queryParams),
+      Uri.https('lino-1.onrender.com', '/bookboxes/search', queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

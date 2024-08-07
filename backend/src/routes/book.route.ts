@@ -641,15 +641,15 @@ interface MyFastifyInstance extends FastifyInstance {
 }
 export default async function bookRoutes(server: MyFastifyInstance) {
     server.get('/books/get/:id', { schema : getBookSchema }, getBook);
-    server.get('/books/bookbox/:bookboxId', { schema: getBookboxSchema }, getBookbox);
+    server.get('/bookboxes/:bookboxId', { schema: getBookboxSchema }, getBookbox);
     server.get('/books/:bookQRCode/:bookboxId', { preValidation: [server.optionalAuthenticate], schema: getBookFromBookBoxSchema }, getBookFromBookBox);
     server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate], schema: getBookInfoFromISBNSchema }, getBookInfoFromISBN);
     server.get('/books/search', { schema: searchBooksSchema }, searchBooks);
-    server.get('/books/bookbox/search', { schema: searchBookboxesSchema }, searchBookboxes);
+    server.get('/bookboxes/search', { schema: searchBookboxesSchema }, searchBookboxes);
     server.post('/books/add', { preValidation: [server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
     server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);
     server.delete('/books/request/:id', { preValidation: [server.authenticate], schema: deleteBookRequestSchema }, deleteBookRequest);
     server.get('/books/requests', { schema: getBookRequestsSchema }, getBookRequests);
-    server.post('/books/bookbox/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);
+    server.post('/bookboxes/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);
     server.delete('/books/clear', { preValidation: [server.adminAuthenticate], schema: clearCollectionSchema }, clearCollection);
 }
