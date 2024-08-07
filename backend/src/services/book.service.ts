@@ -5,6 +5,7 @@ import BookBox from "../models/bookbox.model";
 import Request from "../models/book.request.model";
 import {notifyUser} from "./user.service";
 import {newErr} from "./utilities";
+import {ObjectId} from "mongodb";
 
 const bookService = {
     async getBookBox(bookBoxId: string) {
@@ -331,15 +332,17 @@ const bookService = {
     },
 
     async getBook(id: string) {
-        const book = await Book.findById(id);
-        if (!book) {
-            const book2 = await Book.findOne({qrCodeId: id});
-            if (book2) {
-                return book2;
-            } else {
-                throw newErr(404, 'Book not found');
-            }
+        let objectId;
+        if (ObjectId.isValid(id)) {
+            objectId = new ObjectId(id);
         }
+
+        return Book.findOne({
+            $or: [
+                {qrCodeId: id},
+                {_id: objectId},
+            ],
+        });
     },
 
     async requestBookToUsers(request : any) {
