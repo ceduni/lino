@@ -63,7 +63,11 @@ class BookBoxScreen extends HookWidget {
                       bbLocation: bbLocation,
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 15),
+                  Center(
+                    child: DirectionButton(bookBoxLocation: bbLocation),
+                  ),
+                  const SizedBox(height: 15),
                   Center(
                     child: BookInBookBoxRow(
                       books: (bbBooks as List<dynamic>).map((item) => item as Map<String, dynamic>).toList(),

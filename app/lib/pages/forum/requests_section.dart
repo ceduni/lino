@@ -72,7 +72,7 @@ class RequestsSectionState extends State<RequestsSection> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Book Requests', ),
+        title: Text('Book Requests'),
         actions: [
           TextButton(
             onPressed: () {
@@ -82,7 +82,8 @@ class RequestsSectionState extends State<RequestsSection> {
               });
             },
             style: TextButton.styleFrom(
-              foregroundColor: showAllRequests ? LinoColors.primary : LinoColors.accent, backgroundColor: showAllRequests ? LinoColors.accent : LinoColors.primary,
+              foregroundColor: showAllRequests ? LinoColors.primary : LinoColors.accent,
+              backgroundColor: showAllRequests ? LinoColors.accent : LinoColors.primary,
             ),
             child: Text(
               'All requests',
@@ -101,7 +102,8 @@ class RequestsSectionState extends State<RequestsSection> {
               });
             },
             style: TextButton.styleFrom(
-              foregroundColor: !showAllRequests ? LinoColors.primary : LinoColors.accent, backgroundColor: !showAllRequests ? LinoColors.accent : LinoColors.primary,
+              foregroundColor: !showAllRequests ? LinoColors.primary : LinoColors.accent,
+              backgroundColor: !showAllRequests ? LinoColors.accent : LinoColors.primary,
             ),
             child: Text(
               'My requests',
@@ -134,7 +136,8 @@ class RequestsSectionState extends State<RequestsSection> {
                         request['bookTitle']);
                   }
                       : null,
-                  child: Dismissible(
+                  child: isOwner
+                      ? Dismissible(
                     key: Key(request['_id']),
                     direction: DismissDirection.endToStart,
                     background: Container(
@@ -155,39 +158,31 @@ class RequestsSectionState extends State<RequestsSection> {
                       }
                       return false;
                     },
-                    child: Card(
-                      color: isOwner
-                          ? LinoColors.accent
-                          : LinoColors.secondary,
-                      margin: EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 15), // Add margin between cards
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0), // Match the border radius
-                      ),
-                      child: ListTile(
-                        title: Text(request['bookTitle'],
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold)),
-                        subtitle: request['customMessage'] != null
-                            ? Text(request['customMessage'])
-                            : null,
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (request['isFulfilled'])
-                              Icon(Icons.check_circle,
-                                  color: Colors.green),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                    child: _buildRequestCard(request, isOwner),
+                  )
+                      : _buildRequestCard(request, isOwner),
                 );
               },
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildRequestCard(Map<String, dynamic> request, bool isOwner) {
+    return Card(
+      color: isOwner ? LinoColors.accent : LinoColors.secondary,
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Add margin between cards
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0), // Match the border radius
+      ),
+      child: ListTile(
+        title: Text(request['bookTitle'],
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        subtitle: request['customMessage'] != null
+            ? Text(request['customMessage'])
+            : null,
       ),
     );
   }

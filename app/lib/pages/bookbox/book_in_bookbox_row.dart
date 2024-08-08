@@ -70,20 +70,33 @@ class BookInBookBoxRow extends StatelessWidget {
   }
 
   Widget _buildBookCover(Map<String, dynamic> book) {
-    return Container(
-      width: 100, // Adjust the width and height as necessary
-      height: 160,
-      margin: const EdgeInsets.symmetric(horizontal: 4.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        image: DecorationImage(
-          image: Image.network(book['coverImage']!).image,
+    return SizedBox(
+      width: 100, // Define the width
+      height: 150, // Define the height
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Image.network(
+          book['coverImage'],
           fit: BoxFit.cover,
-          onError: (Object exception, StackTrace? stackTrace) {
-            DecorationImage(
-              image: const NetworkImage(
-                  'https://placehold.co/100x160.png'), // Path to a placeholder image in your assets
-              fit: BoxFit.cover,
+          errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+            return Container(
+              width: 100,
+              height: 150,
+              color: Colors.grey,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    book['title'],
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: null,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+              ),
             );
           },
         ),

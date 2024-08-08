@@ -9,6 +9,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 
 class BookBoxSelectionDialog extends StatelessWidget {
+  final bool isAddBook;
+
+  const BookBoxSelectionDialog({super.key, required this.isAddBook});
+
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => FormController());
@@ -108,7 +112,7 @@ class BookBoxSelectionDialog extends StatelessWidget {
 
   Widget _buildSubmitButton(BookBoxSelectionController bookBoxController) {
     return ElevatedButton(
-      onPressed: bookBoxController.submitBookBox,
+      onPressed: isAddBook? bookBoxController.submitBookBox : bookBoxController.submitBookBox2,
       child: const Text('Submit'),
     );
   }

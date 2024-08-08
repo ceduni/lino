@@ -7,6 +7,10 @@ import 'package:get/get.dart';
 import 'package:Lino_app/pages/floating_button/common/build_banner.dart';
 
 class BookQRAssignDialog extends StatelessWidget {
+  final bool isAddBook;
+
+  const BookQRAssignDialog({super.key, required this.isAddBook});
+
   @override
   Widget build(BuildContext context) {
     final BarcodeController barcodeController = Get.put(BarcodeController());
@@ -25,7 +29,7 @@ class BookQRAssignDialog extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text("Scan the book's new QR code"),
+                  isAddBook? const Text("Scan the book's new QR code") : const Text("Scan the chosen book's QR code"),
                   const SizedBox(height: 16.0),
                   buildScanner(barcodeController),
                   const SizedBox(height: 16.0),
@@ -45,13 +49,20 @@ class BookQRAssignDialog extends StatelessWidget {
   Widget _buildSubmitButton() {
     return ElevatedButton(
       onPressed: () {
-        final String barcode = Get.find<BarcodeController>().barcodeObs.value;
-        if (barcode.isEmpty || barcode == '') {
-          print('no');
-          return;
+        if (isAddBook) {
+          final String barcode = Get.find<BarcodeController>().barcodeObs.value;
+          if (barcode.isEmpty || barcode == '') {
+            return;
+          }
+          Get.find<FormController>().setSelectedQRCode(barcode);
+          Get.find<BookQRAssignController>().submitQRCode();
+        } else {
+          final String barcode = Get.find<BarcodeController>().barcodeObs.value;
+          if (barcode.isEmpty || barcode == '') {
+            return;
+          }
+          Get.find<BookQRAssignController>().submitQRCode2(barcode);
         }
-        Get.find<FormController>().setSelectedQRCode(barcode);
-        Get.find<BookQRAssignController>().submitQRCode();
       },
       child: const Text('Submit'),
     );

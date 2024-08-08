@@ -15,7 +15,4 @@
     <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
-
-    <string name="google_maps_api_key">YOUR_API_KEY</string>
-
 </resources>

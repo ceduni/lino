@@ -139,56 +139,78 @@ class ThreadsSectionState extends State<ThreadsSection> {
       final bookTitle = thread['bookTitle'];
       final isOwner = thread['username'] == currentUsername;
 
-      return Card(
-        margin: EdgeInsets.symmetric(vertical: 10),
-        color: isOwner ? LinoColors.accent : LinoColors.secondary,
-        child: GestureDetector(
-          onLongPress: isOwner
-              ? () {
-            _showDeleteDialog(context, thread['_id'], threadTitle);
-          }
-              : null,
-          child: Dismissible(
-            key: Key(thread['_id']),
-            direction: DismissDirection.endToStart,
-            background: Container(
-              alignment: Alignment.centerRight,
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Icon(Icons.delete, color: Colors.white),
-            ),
-            confirmDismiss: (direction) async {
-              if (isOwner) {
-                return await _showDeleteDialog(context, thread['_id'], threadTitle);
-              }
-              return false;
+      if (isOwner) {
+        return Card(
+          margin: EdgeInsets.symmetric(vertical: 10),
+          color: LinoColors.accent,
+          child: GestureDetector(
+            onLongPress: () {
+              _showDeleteDialog(context, thread['_id'], threadTitle);
             },
-            child: ListTile(
-              leading: Image.network(thread['image']),
-              title: Text('$bookTitle : $threadTitle'),
-              subtitle: Text('Thread created $timeAgo'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.person),
-                  Text(thread['username']),
-                ],
+            child: Dismissible(
+              key: Key(thread['_id']),
+              direction: DismissDirection.endToStart,
+              background: Container(
+                alignment: Alignment.centerRight,
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Icon(Icons.delete, color: Colors.white),
               ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ThreadMessagesScreen(threadId: thread['_id'], title: threadTitle),
-                  ),
-                );
+              confirmDismiss: (direction) async {
+                return await _showDeleteDialog(context, thread['_id'], threadTitle);
               },
+              child: ListTile(
+                leading: Image.network(thread['image']),
+                title: Text('$bookTitle : $threadTitle'),
+                subtitle: Text('Thread created $timeAgo'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.person),
+                    Text(thread['username']),
+                  ],
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ThreadMessagesScreen(threadId: thread['_id'], title: threadTitle),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      );
+        );
+      } else {
+        return Card(
+          margin: EdgeInsets.symmetric(vertical: 10),
+          color: LinoColors.secondary,
+          child: ListTile(
+            leading: Image.network(thread['image']),
+            title: Text('$bookTitle : $threadTitle'),
+            subtitle: Text('Thread created $timeAgo'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.person),
+                Text(thread['username']),
+              ],
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ThreadMessagesScreen(threadId: thread['_id'], title: threadTitle),
+                ),
+              );
+            },
+          ),
+        );
+      }
     }).toList();
   }
 

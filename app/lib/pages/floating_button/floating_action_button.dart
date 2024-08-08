@@ -85,25 +85,14 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
             child: Icon(Icons.add),
             label: 'Add Book',
             onTap: () async {
-              Get.dialog(BookBoxSelectionDialog());
-              // String? scannedCode = await showDialog(
-              //   context: context,
-              //   builder: (context) => BookBoxSelectionDialog(),
-              // );
-              // if (scannedCode != null) {
-              //   // Handle the scanned code, for example, navigate to another page
-              //   // with the scanned UUID
-              // }
+              Get.dialog(BookBoxSelectionDialog(isAddBook: true));
             },
           ),
           SpeedDialChild(
             child: Icon(Icons.remove),
             label: 'Remove Book',
             onTap: () async {
-              showDialog(
-                context: context,
-                builder: (context) => Container(),
-              );
+              Get.dialog(BookBoxSelectionDialog(isAddBook: false));
             },
           ),
         ],

@@ -55,7 +55,7 @@ class ISBNController extends GetxController {
       await bookService.getBookInfo(isbn);
       formController.setSelectedISBN(isbn);
       Get.delete<BarcodeController>();
-      Get.dialog(BookQRAssignDialog());
+      Get.dialog(BookQRAssignDialog(isAddBook: true));
     } catch (error) {
       errorMessage.value = "An error occurred: $error";
     } finally {
@@ -67,6 +67,6 @@ class ISBNController extends GetxController {
   void submitWithoutISBN() {
     formController.setSelectedISBN('');
     Get.delete<BarcodeController>();
-    Get.dialog(BookQRAssignDialog());
+    Get.dialog(BookQRAssignDialog(isAddBook: true));
   }
 }

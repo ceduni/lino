@@ -56,7 +56,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 });
               },
               child: Text(
-                'Find results for bookboxes',
+                'Show results for bookboxes',
                 style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
               ),
             ),
@@ -70,7 +70,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 });
               },
               child: Text(
-                'Find results for threads',
+                'Show results for threads',
                 style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
               ),
             ),
@@ -89,7 +89,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 });
               },
               child: Text(
-                'Find results for books',
+                'Show results for books',
                 style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
               ),
             ),
@@ -103,7 +103,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 });
               },
               child: Text(
-                'Find results for threads',
+                'Show results for threads',
                 style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
               ),
             ),
@@ -122,7 +122,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 });
               },
               child: Text(
-                'Find results for books',
+                'Show results for books',
                 style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
               ),
             ),
@@ -136,7 +136,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 });
               },
               child: Text(
-                'Find results for bookboxes',
+                'Show results for bookboxes',
                 style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
               ),
             ),
@@ -155,7 +155,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 });
               },
               child: Text(
-                'Find results for bookboxes',
+                'Show results for bookboxes',
                 style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
               ),
             ),
@@ -169,7 +169,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 });
               },
               child: Text(
-                'Find results for threads',
+                'Show results for threads',
                 style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
               ),
             ),

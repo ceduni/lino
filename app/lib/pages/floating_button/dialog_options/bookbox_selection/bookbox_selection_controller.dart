@@ -1,4 +1,5 @@
 import 'package:Lino_app/pages/floating_button/common/barcode_controller.dart';
+import 'package:Lino_app/pages/floating_button/dialog_options/book_qr_assign/book_qr_assign_dialog.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/form_submission/form_controller.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/isbn_entry/isbn_dialog.dart';
 import 'package:Lino_app/services/book_services.dart';
@@ -83,6 +84,12 @@ class BookBoxSelectionController extends GetxController {
     formController.setSelectedBookBox(selectedBookBox['id']);
     Get.delete<BarcodeController>();
     Get.dialog(IsbnDialog());
+  }
+
+  void submitBookBox2() {
+    formController.setSelectedBookBox(selectedBookBox['id']);
+    Get.delete<BarcodeController>();
+    Get.dialog(BookQRAssignDialog(isAddBook: false));
   }
 
   @override
