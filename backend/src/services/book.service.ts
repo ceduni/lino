@@ -99,6 +99,8 @@ const bookService = {
             throw newErr(404, 'Bookbox not found');
         }
         // check if the book is in the bookbox
+        console.log('books:'+bookBox.books);
+        console.log('bookId:'+book.id);
         if (bookBox.books.includes(book.id)) {
             bookBox.books.splice(bookBox.books.indexOf(book.id), 1);
         } else {
