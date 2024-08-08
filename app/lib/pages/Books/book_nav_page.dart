@@ -203,7 +203,7 @@ class FavoriteBooksSection extends HookWidget {
     }, []);
 
     final favoriteBooksFuture =
-    useFuture(useMemoized(() => getUserFavoriteBooks(token.value!), [token.value]));
+    useFuture(useMemoized(() => getUserFavoriteBooks(token.value), [token.value]));
 
     if (favoriteBooksFuture.connectionState != ConnectionState.done) {
       return Center(child: CircularProgressIndicator());

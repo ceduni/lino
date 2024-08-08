@@ -72,7 +72,7 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
           onEvent: (event, data) {
             print('Received event: $event');
             print('Data: $data');
-            if (event == 'newMessage' || event == 'messageReaction') {
+            if ((event == 'newMessage' || event == 'messageReaction') && data['threadId'] == widget.threadId) {
               fetchThreadMessages();
             }
           },
