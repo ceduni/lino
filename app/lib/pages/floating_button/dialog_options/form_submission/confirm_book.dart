@@ -1,4 +1,5 @@
 import 'package:Lino_app/pages/floating_button/common/build_banner.dart';
+import 'package:Lino_app/pages/floating_button/dialog_options/book_qr_assign/book_qr_assign_dialog.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,13 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class BookConfirmDialog extends StatefulWidget {
   final Future<Map<String, dynamic>> bookInfoFuture;
   final String bookBoxId;
-  final String bookQrCode;
 
   const BookConfirmDialog({
     Key? key,
     required this.bookInfoFuture,
     required this.bookBoxId,
-    required this.bookQrCode,
   }) : super(key: key);
 
   @override
@@ -210,21 +209,30 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
     var token = prefs.getString('token');
 
     try {
-      await bookService.addBookToBB(
-        widget.bookQrCode,
-        widget.bookBoxId,
-        token: token,
-        isbn: editableBookInfo['isbn'],
-        authors: List<String>.from(editableBookInfo['authors']),
-        description: editableBookInfo['description'],
-        publisher: editableBookInfo['publisher'],
-        parutionYear: editableBookInfo['parutionYear'],
-        title: editableBookInfo['title'],
-        pages: editableBookInfo['pages'],
-        coverImage: editableBookInfo['coverImage'],
-        categories: List<String>.from(editableBookInfo['categories']),
-      );
-      Get.back();
+      print('Categories: ${editableBookInfo['categories']}');
+      final cat = List<String>.from(editableBookInfo['categories'] ?? []);
+      if (cat.isEmpty) {
+        cat.add('Unknown category');
+      }
+
+      print('Authors: ${editableBookInfo['authors']}');
+      final authors = List<String>.from(editableBookInfo['authors'] ?? []);
+
+      final Map<String, dynamic> formInfo = {
+        'bookBoxId': widget.bookBoxId,
+        'token': token,
+        'isbn': editableBookInfo['isbn'],
+        'authors': authors,
+        'description': editableBookInfo['description'],
+        'publisher': editableBookInfo['publisher'],
+        'parutionYear': editableBookInfo['parutionYear'],
+        'title': editableBookInfo['title'],
+        'pages': editableBookInfo['pages'],
+        'coverImage': editableBookInfo['coverImage'],
+        'categories': cat,
+      };
+
+      Get.dialog(BookQRAssignDialog(isAddBook: true, formInfo: formInfo, isNewBook: true,));
     } catch (e) {
       print('Error adding book: $e');
       // Optionally, show an error message to the user
@@ -234,6 +242,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
       });
     }
   }
+
 
   Widget _buildInfoRow(String title, String content, String key) {
     return Row(

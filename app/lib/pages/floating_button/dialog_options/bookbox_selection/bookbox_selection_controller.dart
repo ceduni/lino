@@ -3,6 +3,7 @@ import 'package:Lino_app/pages/floating_button/dialog_options/book_qr_assign/boo
 import 'package:Lino_app/pages/floating_button/dialog_options/form_submission/form_controller.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/isbn_entry/isbn_dialog.dart';
 import 'package:Lino_app/services/book_services.dart';
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -83,13 +84,13 @@ class BookBoxSelectionController extends GetxController {
   void submitBookBox() {
     formController.setSelectedBookBox(selectedBookBox['id']);
     Get.delete<BarcodeController>();
-    Get.dialog(IsbnDialog());
+    Get.dialog(NewOrOldBookDialog(selectedBookBox: selectedBookBox['id'])); // Show the new dialog
   }
 
   void submitBookBox2() {
     formController.setSelectedBookBox(selectedBookBox['id']);
     Get.delete<BarcodeController>();
-    Get.dialog(BookQRAssignDialog(isAddBook: false));
+    Get.dialog(BookQRAssignDialog(isAddBook: false, formInfo: const {}, isNewBook: true,)); // Show the new dialog
   }
 
   @override
@@ -107,5 +108,40 @@ class BookBoxSelectionController extends GetxController {
         setSelectedBookBox(value);
       }
     });
+  }
+}
+
+
+class NewOrOldBookDialog extends StatelessWidget {
+  final String selectedBookBox;
+
+  const NewOrOldBookDialog({super.key, required this.selectedBookBox});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Add a Book'),
+      content: Text('Is it a new book or does it already have a QR code?'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Get.back(); // Close the dialog
+            Get.dialog(IsbnDialog()); // Open ISBNDialog for new books
+          },
+          child: Text('New Book'),
+        ),
+        TextButton(
+          onPressed: () {
+            Get.back(); // Close the dialog
+            Get.dialog(BookQRAssignDialog(isAddBook: true,
+              formInfo: {
+              'bookBoxId': selectedBookBox,
+              },
+              isNewBook: false,)); // Open your custom logic for existing books
+          },
+          child: Text('Already has QR Code'),
+        ),
+      ],
+    );
   }
 }

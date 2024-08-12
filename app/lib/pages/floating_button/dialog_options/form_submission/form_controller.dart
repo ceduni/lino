@@ -1,6 +1,7 @@
 import 'package:Lino_app/pages/floating_button/dialog_options/form_submission/confirm_book.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 class FormController extends GetxController {
@@ -50,8 +51,7 @@ class FormController extends GetxController {
       final bookInfo = await BookService().getBookInfo(selectedISBN.value);
       Get.dialog(BookConfirmDialog(
           bookInfoFuture: Future.value(bookInfo),
-          bookBoxId: selectedBookBox.value,
-          bookQrCode: selectedQRCode.value));
+          bookBoxId: selectedBookBox.value));
     } catch (e) {
       Get.snackbar('Error', 'Failed to fetch book info: $e');
     }
@@ -59,17 +59,34 @@ class FormController extends GetxController {
 
   // Submit form without ISBN
   void submitFormWithoutISBN() {
+    // Check if the title field is empty
+    if (additionalFieldsForISBN['Title']!.text.isEmpty) {
+      showToast('Title field cannot be empty');
+      return;
+    }
+
     final bookInfo = {
       'title': additionalFieldsForISBN['Title']!.text,
       'authors': [additionalFieldsForISBN['Author']!.text],
-      'parutionYear': int.tryParse(additionalFieldsForISBN['Year']!.text) ?? 0,
+      'parutionYear': int.tryParse(additionalFieldsForISBN['Year']!.text) ?? 2000,
     };
 
     Get.dialog(BookConfirmDialog(
         bookInfoFuture: Future.value(bookInfo),
-        bookBoxId: selectedBookBox.value,
-        bookQrCode: selectedQRCode.value));
+        bookBoxId: selectedBookBox.value));
   }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.grey[800],
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
+
 
   @override
   void onClose() {

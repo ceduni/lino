@@ -27,21 +27,33 @@ class IsbnDialog extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text("Scan the book's ISBN code"),
+                  Obx(() {
+                    return formController.isISBNDialogExpanded.value
+                        ? Column(
+                      children: [
+                        _buildAdditionalFields(formController),
+                        const SizedBox(height: 16.0),
+                        _buildSubmitWithoutISBNButton(formController),
+                      ],
+                    )
+                        : Column(
+                      children: [
+                        const Text("Scan the book's ISBN code"),
+                        const SizedBox(height: 16.0),
+                        buildScanner(barcodeController),
+                        const SizedBox(height: 16.0),
+                        buildCustomDivider(),
+                        const SizedBox(height: 16.0),
+                        _buildISBNTextField(isbnController),
+                        const SizedBox(height: 16.0),
+                        _buildSubmitButton(isbnController),
+                        const SizedBox(height: 16.0),
+                        _buildLoadingOrErrorMessage(isbnController),
+                      ],
+                    );
+                  }),
                   const SizedBox(height: 16.0),
-                  buildScanner(barcodeController),
-                  const SizedBox(height: 16.0),
-                  buildCustomDivider(),
-                  const SizedBox(height: 16.0),
-                  _buildISBNTextField(isbnController),
-                  const SizedBox(height: 16.0),
-                  _buildSubmitButton(isbnController, formController),
-                  const SizedBox(height: 16.0),
-                  _buildLoadingOrErrorMessage(isbnController),
-                  const SizedBox(height: 16.0),
-                  _buildExpandButton(formController),
-                  const SizedBox(height: 16.0),
-                  _buildAdditionalFields(formController),
+                  _buildToggleExpandButton(formController),
                 ],
               ),
             ),
@@ -66,37 +78,27 @@ class IsbnDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildSubmitButton(
-      ISBNController isbnController, FormController formController) {
+  Widget _buildSubmitButton(ISBNController isbnController) {
     return Obx(() {
       bool isISBNNotEmpty = isbnController.isbnText.value.isNotEmpty;
-      bool isAdditionalFieldsNotEmpty = !formController.isAdditionalFieldsEmpty;
 
       return ElevatedButton(
-        onPressed: isISBNNotEmpty
-            ? isbnController.submitISBN
-            : (isAdditionalFieldsNotEmpty && !isISBNNotEmpty
-                ? isbnController.submitWithoutISBN
-                : null),
+        onPressed: isISBNNotEmpty ? isbnController.submitISBN : null,
         style: ElevatedButton.styleFrom(
-          foregroundColor: isISBNNotEmpty || isAdditionalFieldsNotEmpty
-              ? Colors.blue
-              : Colors.grey,
+          foregroundColor: isISBNNotEmpty ? Colors.blue : Colors.grey,
         ),
-        child: Text(
-          isISBNNotEmpty
-              ? 'Submit'
-              : (isAdditionalFieldsNotEmpty ? 'Submit without ISBN' : 'Submit'),
-        ),
+        child: const Text('Submit'),
       );
     });
   }
 
-  Widget _buildExpandButton(FormController formController) {
-    return ElevatedButton(
-      onPressed: formController.toggleExpand,
-      child: const Text("My book doesn't have ISBN"),
-    );
+  Widget _buildSubmitWithoutISBNButton(FormController formController) {
+    return Obx(() {
+      return ElevatedButton(
+        onPressed: formController.submitFormWithoutISBN,
+        child: const Text('Submit without ISBN'),
+      );
+    });
   }
 
   Widget _buildLoadingOrErrorMessage(ISBNController isbnController) {
@@ -114,25 +116,31 @@ class IsbnDialog extends StatelessWidget {
     });
   }
 
-  Widget _buildAdditionalFields(FormController expandController) {
-    return Obx(() {
-      if (expandController.isISBNDialogExpanded.value) {
-        return Column(
-          children: expandController.additionalFieldsForISBN.entries
-              .map((entry) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: TextField(
-                      controller: entry.value,
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        labelText: entry.key,
-                      ),
-                    ),
-                  ))
-              .toList(),
-        );
-      }
-      return const SizedBox.shrink();
-    });
+  Widget _buildToggleExpandButton(FormController formController) {
+    return ElevatedButton(
+      onPressed: formController.toggleExpand,
+      child: Obx(() {
+        return Text(formController.isISBNDialogExpanded.value
+            ? "I have an ISBN"
+            : "My book doesn't have ISBN");
+      }),
+    );
+  }
+
+  Widget _buildAdditionalFields(FormController formController) {
+    return Column(
+      children: formController.additionalFieldsForISBN.entries
+          .map((entry) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: TextField(
+          controller: entry.value,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            labelText: entry.key,
+          ),
+        ),
+      ))
+          .toList(),
+    );
   }
 }
