@@ -189,22 +189,16 @@ async function searchBooks(request: FastifyRequest, reply: FastifyReply) {
     }
 }
 
+
 const searchBooksSchema = {
     description: 'Search books',
     tags: ['books'],
     querystring: {
         type: 'object',
         properties: {
-            cat: {type: 'array', items: {type: 'string'}},
-            kw: {type: 'string'},
-            pmt: {type: 'boolean'},
-            pg: {type: 'number'},
-            bf: {type: 'boolean'},
-            py: {type: 'number'},
-            pub: {type: 'string'},
-            bbid: {type: 'string'},
-            cls: {type: 'string'},
-            asc: {type: 'boolean'},
+            kw: { type: 'string' },
+            cls: { type: 'string' },
+            asc: { type: 'boolean' }
         }
     },
     response: {
@@ -228,14 +222,14 @@ const searchBooksSchema = {
             description: 'Error message',
             type: 'object',
             properties: {
-                error: {type: 'string'}
+                error: { type: 'string' }
             }
         },
         500: {
             description: 'Internal server error',
             type: 'object',
             properties: {
-                error: {type: 'string'}
+                error: { type: 'string' }
             }
         }
     }

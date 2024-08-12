@@ -207,17 +207,11 @@ const bookService = {
     },
 
 
-    // Function that searches for books based on the query parameters
-    async searchBooks(request : any) {
-        const { cat, kw, pmt, pg, bf, py, pub, bbid, cls = 'by title', asc = true } = request.query;
+    // Function that searches for books based on keyword search and ordering filters
+    async searchBooks(request: any) {
+        const { kw, cls = 'by title', asc = true } = request.query;
 
-        let filter : any = {};
-
-        if (cat) {
-            const categories = Array.isArray(cat) ? cat : [cat];
-            const categoryArray = categories.map((c) => new RegExp(c.trim(), 'i'));
-            filter.categories = { $in: categoryArray };
-        }
+        let filter: any = {};
 
         if (kw) {
             const regex = new RegExp(kw, 'i');
@@ -227,34 +221,8 @@ const bookService = {
             ];
         }
 
-        if (py) {
-            filter.parutionYear = bf ? { $lte: py } : { $gte: py };
-        }
-
-        if (pub) {
-            filter.publisher = new RegExp(pub, 'i');
-        }
-
-        if (bbid) {
-            const bookBox = await BookBox.findById(bbid);
-            if (!bookBox) {
-                throw new Error('Bookbox not found');
-            }
-            filter._id = { $in: bookBox.books };
-        }
-
-        let books = await Book.find(filter);
-
-        if (pg) {
-            const pageCount = parseInt(pg);
-            books = books.filter((book) => {
-                const bookPages = book.pages || 0;
-                return pmt ? bookPages >= pageCount : bookPages <= pageCount;
-            });
-        }
-
         // Sorting
-        const sortOptions : any = {};
+        const sortOptions: any = {};
         if (cls === 'by title') {
             sortOptions.title = asc ? 1 : -1;
         } else if (cls === 'by author') {
@@ -265,7 +233,7 @@ const bookService = {
             sortOptions.dateLastAction = asc ? 1 : -1;
         }
 
-        books = await Book.find(filter).sort(sortOptions);
+        let books = await Book.find(filter).sort(sortOptions);
 
         const bookBoxes = await BookBox.find();
         const finalBooks = [];
@@ -280,7 +248,6 @@ const bookService = {
 
         return finalBooks;
     },
-
 
     async searchBookboxes(request: any) {
         const kw = request.query.kw;
