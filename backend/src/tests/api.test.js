@@ -547,6 +547,7 @@ async function getUser(token) {
 }
 
 afterAll(async () => {
+    console.log('Tests done!');
     await reinitDatabase(server);
     await server.close();
 });
