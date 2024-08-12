@@ -31,18 +31,15 @@ const clients = new Set();
 // Function to broadcast a message to a specific user
 export function broadcastToUser(userId : string, message: any) {
     try {
-        console.log('Broadcasting message to user:', userId, message);
         clients.forEach((client) => {
             // @ts-ignore
             // @ts-ignore
             if (client.userId === userId && client.readyState === 1) {
-                console.log('Broadcasting message to user:', userId, message);
                 // @ts-ignore
                 client.send(JSON.stringify(message));
             }
         });
     } catch (error : any) {
-        console.log('Failed to broadcast message to user:', error.message);
         throw newErr(500, error.message);
     }
 }
@@ -51,18 +48,12 @@ export function broadcastMessage(event: string, data: any) {
     try {
         clients.forEach((client) => {
             // @ts-ignore
-            console.log('Check readyState of client:', client.readyState);
-            // @ts-ignore
             if (client.readyState === 1) {
-                console.log('Broadcasting message:', event, data);
                 // @ts-ignore
                 client.send(JSON.stringify({ event, data }));
-            } else {
-                console.log('Client not ready');
             }
         });
     } catch (error : any) {
-        console.log('Failed to broadcast message:', error.message);
         throw newErr(500, error.message);
     }
 }
@@ -78,24 +69,11 @@ server.register(async function (server: any) {
         }
 
         clients.add(socket); // Add the connected client to the set
-        console.log('Client connected:', socket.userId);
-        console.log('Clients:');
-        for (const client of clients) {
-            // @ts-ignore
-            console.log(client.userId);
-        }
-        console.log('Client count:', clients.size);
-
         socket.on('message', (msg: any) => {
             console.log('Received message:', msg);
         });
         socket.on('close', () => {
-            clients.delete(socket);
-            console.log('Client disconnected:', socket.userId);
-            console.log('Remaining clients:');
-            // @ts-ignore
-            clients.forEach((client) => console.log(client.userId));
-            console.log('Client count:', clients.size);
+            clients.delete(socket); // Remove the disconnected client from the set
         });
     });
 })
@@ -192,8 +170,9 @@ server.register(threadRoutes);
 
 const start = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI);
-        console.log('MongoDB connected...');
+        const dbUri = process.env.NODE_ENV === 'test' ? process.env.TEST_MONGODB_URI : process.env.MONGODB_URI;
+        await mongoose.connect(dbUri);
+        console.log(`MongoDB connected to ${mongoose.connection.db.databaseName}...`);
 
         const port = process.env.PORT || 3000;
         const host = process.env.RENDER ? '0.0.0.0' : 'localhost';

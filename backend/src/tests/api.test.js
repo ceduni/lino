@@ -1,4 +1,4 @@
-const server = require('../index');
+const {server} = require('../index');
 const { reinitDatabase } = require('../services/utilities');
 const {randomInt} = require("node:crypto");
 
@@ -12,27 +12,18 @@ let fakeQRCodeCounter = 0;
 
 
 beforeAll(async () => {
-    const response = await server.inject({
-        method: 'POST',
-        url: '/users/login',
-        payload: {
-            identifier: process.env.ADMIN_USERNAME,
-            password: process.env.ADMIN_PASSWORD
-        }
-    });
-    const payload = JSON.parse(response.payload);
-    token = payload.token;
-    console.log('Admin token : ' + token);
+    token = await reinitDatabase(server);
 
     for (let i = 0; i < 3; i++) {
         const response = await server.inject({
             method: 'POST',
-            url: '/books/bookbox/new',
+            url: '/bookboxes/new',
             payload: {
                 name: `Box${i+1}`,
                 infoText: 'Find it yourself',
                 latitude: randomInt(-180, 180) + Math.random(),
-                longitude: randomInt(-180, 180) + Math.random()
+                longitude: randomInt(-180, 180) + Math.random(),
+                image: 'https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png'
             },
             headers: {
                 Authorization: `Bearer ${token}`
@@ -174,6 +165,10 @@ describe('Test book adding by guest users', () => {
         const response = await server.inject({
             method: 'POST',
             url: '/books/add',
+            headers: {
+                Authorization: `Bearer ptdrinexistent`,
+                'Content-Type': 'application/json; charset=UTF-8',
+            },
             payload: {
                 bookboxId: bbids[0],
                 qrCodeId: `b${fakeQRCodeCounter++}`,
@@ -309,7 +304,7 @@ describe('Test book actions by connected users', () => {
     test('Send an alert to users', async () => {
         const response = await server.inject({
             method: 'POST',
-            url: '/books/alert',
+            url: '/books/request',
             headers: {
                 Authorization: `Bearer ${token}`
             },
@@ -317,10 +312,7 @@ describe('Test book actions by connected users', () => {
                 title: 'Harry Potter à l\'école des sorciers',
             }
         });
-        const payload = JSON.parse(response.payload);
-        expect(response.statusCode).toBe(200);
-        expect(payload).toHaveProperty('message');
-        expect(payload.message).toBe("Alert sent");
+        expect(response.statusCode).toBe(201);
         const token2 = await server.inject({
            method: 'POST',
               url: '/users/login',
@@ -357,6 +349,7 @@ describe('Test book actions by connected users', () => {
             }
         });
         const payload = JSON.parse(response.payload); // new book adding has already been tested
+        console.log(payload);
         portedBookId = payload.bookId;
         // check if the user's ecological impact has been updated
         const user = await getUser(token);
@@ -519,7 +512,6 @@ describe('Test book searching among the database', () => {
             url: '/books/search?asc=true&cls=by+title&bf=false&py=2016'
         });
         const payload = JSON.parse(response.payload);
-        console.log(payload.books);
         expect(payload).toHaveProperty('books');
         for (let i = 0; i < payload.books.length-1; i++) {
             if (payload.books[i].hasOwnProperty('parutionYear')) {

@@ -77,7 +77,11 @@ const bookService = {
         const regex = new RegExp(book.title, 'i');
         requests = requests.filter(request => regex.test(request.bookTitle));
         for (let i = 0; i < requests.length; i++) {
-            await notifyUser(requests[i].username, "Book notification",
+            const user = await User.findOne({username: requests[i].username});
+            if (!user) {
+                throw newErr(404, 'User not found');
+            }
+            await notifyUser(user.id, "Book notification",
                 `The book "${book.title}" has been added to the bookbox "${bookBox.name}" to fulfill your request !`);
         }
 
@@ -99,10 +103,10 @@ const bookService = {
             throw newErr(404, 'Bookbox not found');
         }
         // check if the book is in the bookbox
-        console.log('books:'+bookBox.books);
-        console.log('bookId:'+book.id);
         if (bookBox.books.includes(book.id)) {
+            console.log('Before:', bookBox.books);
             bookBox.books.splice(bookBox.books.indexOf(book.id), 1);
+            console.log('After:', bookBox.books);
         } else {
             throw newErr(404, 'Book not found in bookbox');
         }
@@ -143,15 +147,12 @@ const bookService = {
     async updateBooks(book: any, request: any, given: boolean) {
         if (request.user) {
             // Push the user's username and the current timestamp to the book's history
-            // @ts-ignore
             const userId = request.user.id;
             const user = await User.findById(userId);
             if (!user) {
                 throw newErr(404, 'User not found');
             }
             const username = user.username;
-            console.log('Updating book history for user ' + username);
-            console.log('User book history before update: ' + user.bookHistory);
             if (given) { // if the book is given
                 book.givenHistory.push({username: username, timestamp: new Date()});
                 // push in the user's book history
@@ -161,7 +162,6 @@ const bookService = {
                 // push in the user's book history
                 user.bookHistory.push({bookId: book.id, timestamp: new Date(), given: false});
             }
-            console.log('User book history after update: ' + user.bookHistory);
             await user.save(); // save the user's book history
         } else { // if the user is not authenticated, username is 'guest'
             if (given) { // if the book is given

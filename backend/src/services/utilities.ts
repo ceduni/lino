@@ -216,4 +216,5 @@ export async function reinitDatabase(server: any) {
             },
     });
     console.log('Database reinitialized.');
+    return token;
 }

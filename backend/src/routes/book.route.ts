@@ -7,7 +7,6 @@ async function addBookToBookbox(request: FastifyRequest, reply: FastifyReply) {
         const response = await BookService.addBook(request);
         reply.code(201).send(response);
     } catch (error : any) {
-        console.log(error);
         reply.code(error.statusCode).send({error: error.message});
     }
 }
