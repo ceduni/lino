@@ -131,7 +131,7 @@ const ThreadService = {
             );
         }
 
-        // classify : ['by recent activity', 'by number of messages', by creation date']
+        // classify : ['by recent activity', 'by number of messages', 'by creation date']
         let classify = request.query.cls || 'by recent activity';
         const asc = request.query.asc; // Boolean
 
