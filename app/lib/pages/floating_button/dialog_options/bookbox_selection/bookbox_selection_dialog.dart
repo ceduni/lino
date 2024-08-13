@@ -38,9 +38,19 @@ class BookBoxSelectionDialog extends StatelessWidget {
                   const SizedBox(height: 16.0),
                   buildCustomDivider(),
                   const SizedBox(height: 16.0),
-                  const Text('Choose from the list'),
-                  const SizedBox(height: 16.0),
-                  _buildBookBoxDropdown(bookboxController),
+                  Obx(() {
+                    if (bookboxController.isBookBoxFound.value) {
+                      return _buildBookBoxInfo(bookboxController);
+                    } else {
+                      return Column(
+                        children: [
+                          const Text('Choose from the list'),
+                          const SizedBox(height: 16.0),
+                          _buildBookBoxDropdown(bookboxController),
+                        ],
+                      );
+                    }
+                  }),
                   const SizedBox(height: 16.0),
                   _buildSubmitButton(bookboxController),
                 ],
@@ -52,10 +62,28 @@ class BookBoxSelectionDialog extends StatelessWidget {
     );
   }
 
+  Widget _buildBookBoxInfo(BookBoxSelectionController bookBoxController) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        color: Colors.grey[200],
+      ),
+      child: Column(
+        children: [
+          Text('Selected Bookbox: ${bookBoxController.selectedBookBox['name']}'),
+          const SizedBox(height: 8.0),
+          Text(
+              'Number of books: ${bookBoxController.selectedBookBox['books'].length}'),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBookBoxDropdown(BookBoxSelectionController bookBoxController) {
     return Obx(() {
       if (bookBoxController.isLoading.value) {
-        return Center(
+        return const Center(
           child: CircularProgressIndicator(),
         );
       } else {
@@ -112,7 +140,9 @@ class BookBoxSelectionDialog extends StatelessWidget {
 
   Widget _buildSubmitButton(BookBoxSelectionController bookBoxController) {
     return ElevatedButton(
-      onPressed: isAddBook? bookBoxController.submitBookBox : bookBoxController.submitBookBox2,
+      onPressed: isAddBook
+          ? bookBoxController.submitBookBox
+          : bookBoxController.submitBookBox2,
       child: const Text('Submit'),
     );
   }

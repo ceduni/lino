@@ -12,17 +12,19 @@ class BookBoxSelectionController extends GetxController {
   final selectedBookBox = <String, dynamic>{}.obs;
   final bookBoxes = <Map<String, dynamic>>[].obs;
   final userLocation = Rxn<Position>();
-  final isLoading = true.obs; // Add this line
+  final isLoading = true.obs;
+  final isBookBoxFound = false.obs;
   final BarcodeController barcodeController = Get.find<BarcodeController>();
   final FormController formController = Get.find<FormController>();
 
   void setSelectedBookBox(String bbid) {
     selectedBookBox.value = bookBoxes
         .firstWhere((element) => element['id'] == bbid, orElse: () => {});
+    isBookBoxFound.value = true;
   }
 
   Future<void> getBookBoxes() async {
-    isLoading.value = true; // Set loading to true before fetching data
+    isLoading.value = true;
     try {
       dynamic bbs;
       if (userLocation.value != null) {
@@ -51,7 +53,25 @@ class BookBoxSelectionController extends GetxController {
     } catch (e) {
       print('Error fetching book boxes: $e');
     } finally {
-      isLoading.value = false; // Set loading to false after fetching data
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> getBookBoxById(String id) async {
+    isLoading.value = true;
+    try {
+      final bookBox = await BookService().getBookBox(id);
+      selectedBookBox.value = {
+        'id': bookBox['id'],
+        'name': bookBox['name'],
+        'books': bookBox['books']
+      };
+      isBookBoxFound.value = true;
+    } catch (e) {
+      print('Error fetching book box: $e');
+      isBookBoxFound.value = false;
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -84,13 +104,17 @@ class BookBoxSelectionController extends GetxController {
   void submitBookBox() {
     formController.setSelectedBookBox(selectedBookBox['id']);
     Get.delete<BarcodeController>();
-    Get.dialog(NewOrOldBookDialog(selectedBookBox: selectedBookBox['id'])); // Show the new dialog
+    Get.dialog(NewOrOldBookDialog(selectedBookBox: selectedBookBox['id']));
   }
 
   void submitBookBox2() {
     formController.setSelectedBookBox(selectedBookBox['id']);
     Get.delete<BarcodeController>();
-    Get.dialog(BookQRAssignDialog(isAddBook: false, formInfo: const {}, isNewBook: true,)); // Show the new dialog
+    Get.dialog(BookQRAssignDialog(
+      isAddBook: false,
+      formInfo: const {},
+      isNewBook: true,
+    ));
   }
 
   @override
@@ -101,15 +125,16 @@ class BookBoxSelectionController extends GetxController {
         getBookBoxes();
       }
     });
-    ever(barcodeController.barcodeObs, (String value) {
+    ever(barcodeController.barcodeObs, (String value) async {
       if (value.isNotEmpty &&
           value != 'Unknown Barcode' &&
           value != 'No Barcode Detected') {
-        setSelectedBookBox(value);
+        await getBookBoxById(value);
       }
     });
   }
 }
+
 
 
 class NewOrOldBookDialog extends StatelessWidget {
