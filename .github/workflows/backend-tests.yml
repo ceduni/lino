@@ -23,6 +23,9 @@ jobs:
           cd backend
           npm install
 
+      - name: Ensure cross-env is executable
+        run: chmod +x ./backend/node_modules/.bin/cross-env
+
       - name: Run tests
         run: |
           cd backend
