@@ -41,7 +41,7 @@ jobs:
       - name: Run tests
         run: |
           cd backend
-          NODE_ENV=test TS_NODE_COMPILER_OPTIONS="{\"module\": \"commonjs\" }" npx jest --runInBand --forceExit src/tests/api.test.js
+          NODE_ENV=test TS_NODE_COMPILER_OPTIONS="{\"module\": \"commonjs\" }" npx jest --runInBand --forceExit src/tests/api.test.js --silent=false
 
       - name: Upload test results
         if: failure()
