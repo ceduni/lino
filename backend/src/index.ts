@@ -16,7 +16,7 @@ const fastifyWebSocket = require('@fastify/websocket');
 
 dotenv.config();
 
-const server = Fastify({ logger: { level: 'error' } });
+const server = Fastify({ logger: { level: 'info' } });
 
 server.register(fastifyCors, {
     origin: true,
