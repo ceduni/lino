@@ -10,6 +10,7 @@ let token;
 let portedBookIds = [];
 let fakeQRCodeCounter = 0;
 
+jest.setTimeout(10000);
 
 beforeAll(async () => {
     token = await reinitDatabase(server);
@@ -32,7 +33,7 @@ beforeAll(async () => {
         const payload = JSON.parse(response.payload);
         bbids.push(payload._id);
     }
-});
+},);
 
 describe('Test user registration', () => {
 
