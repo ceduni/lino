@@ -171,6 +171,7 @@ server.register(threadRoutes);
 
 const start = async () => {
     try {
+        console.log('Starting server initialization...');
         const dbUri = process.env.NODE_ENV === 'test' ? process.env.TEST_MONGODB_URI : process.env.MONGODB_URI;
         await mongoose.connect(dbUri);
         console.log(`MongoDB connected to ${mongoose.connection.db.databaseName}...`);
