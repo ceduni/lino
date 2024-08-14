@@ -37,6 +37,7 @@ export function broadcastToUser(userId : string, message: any) {
             if (client.userId === userId && client.readyState === 1) {
                 // @ts-ignore
                 client.send(JSON.stringify(message));
+                console.log('Sent message to user', userId, message);
             }
         });
     } catch (error : any) {
@@ -51,6 +52,7 @@ export function broadcastMessage(event: string, data: any) {
             if (client.readyState === 1) {
                 // @ts-ignore
                 client.send(JSON.stringify({ event, data }));
+                console.log(event, data);
             }
         });
     } catch (error : any) {
