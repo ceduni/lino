@@ -109,6 +109,7 @@ server.decorate('adminAuthenticate', async (request, reply) => {
         const token = request.headers.authorization.split(' ')[1];
         const user = await server.jwt.verify(token);
         if (user.username !== process.env.ADMIN_USERNAME) {
+            console.log('Non-user tried to access admin route: ', user.username);
             reply.status(401).send({ error: 'Unauthorized' });
         }
     } catch (error) {
