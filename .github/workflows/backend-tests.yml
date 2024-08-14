@@ -35,6 +35,13 @@ jobs:
           echo "ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}" >> $GITHUB_ENV
           echo "GOOGLE_BOOKS_API_KEY=${{ secrets.GOOGLE_BOOKS_API_KEY }}" >> $GITHUB_ENV
 
+
+      - name: Test environment variables
+        run: |
+          echo "TEST_MONGODB_URI=$TEST_MONGODB_URI"
+          echo "MONGODB_URI=$MONGODB_URI"
+          echo "JWT_SECRET_KEY=$JWT_SECRET_KEY"
+
       - name: Ensure executables have correct permissions
         run: |
           chmod +x ./backend/node_modules/.bin/cross-env
