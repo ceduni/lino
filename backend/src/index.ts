@@ -186,7 +186,6 @@ const start = async () => {
         await server.ready();
         server.swagger(); // Ensure swagger is called after server starts
 
-
     } catch (err) {
         console.error(err);
         process.exit(1);
