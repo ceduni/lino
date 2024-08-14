@@ -16,12 +16,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Adjust to match your project's Node.js version
+          node-version: '18'  # Adjust to match your project's Node.js version
 
       - name: Install dependencies
         run: |
           cd backend
           npm install
+
+      - name: Ensure jest is executable
+        run: chmod +x ./backend/node_modules/.bin/jest
 
       - name: Set environment variables
         run: |
