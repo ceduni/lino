@@ -170,7 +170,6 @@ server.register(userRoutes);
 server.register(threadRoutes);
 
 
-
 const start = async () => {
     try {
         const dbUri = process.env.NODE_ENV === 'test' ? process.env.TEST_MONGODB_URI : process.env.MONGODB_URI;
