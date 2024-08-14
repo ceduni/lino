@@ -16,32 +16,22 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Adjust to match your project's Node.js version
+          node-version: '20'  # Ensure this matches your local Node.js version
 
       - name: Install dependencies
         run: |
           cd backend
           npm install
 
-      - name: Ensure jest is executable
-        run: chmod +x ./backend/node_modules/.bin/jest
-
-      - name: Set environment variables
+      - name: Ensure executables have correct permissions
         run: |
-          echo "NODE_ENV=test" >> $GITHUB_ENV
-          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> $GITHUB_ENV
-          echo "TEST_MONGODB_URI=${{ secrets.TEST_MONGODB_URI }}" >> $GITHUB_ENV
-          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
-          echo "PORT=3000" >> $GITHUB_ENV
-          echo "ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}" >> $GITHUB_ENV
-          echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" >> $GITHUB_ENV
-          echo "ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}" >> $GITHUB_ENV
-          echo "GOOGLE_BOOKS_API_KEY=${{ secrets.GOOGLE_BOOKS_API_KEY }}" >> $GITHUB_ENV
+          chmod +x ./backend/node_modules/.bin/cross-env
+          chmod +x ./backend/node_modules/.bin/jest
 
       - name: Run tests
         run: |
           cd backend
-          NODE_ENV=test TS_NODE_COMPILER_OPTIONS="{\"module\": \"commonjs\" }" npx jest --runInBand --forceExit src/tests/api.test.js --silent=false
+          npx cross-env NODE_ENV=test TS_NODE_COMPILER_OPTIONS="{\"module\": \"commonjs\" }" npx jest --runInBand --forceExit src/tests/api.test.js --silent=false
 
       - name: Upload test results
         if: failure()
