@@ -50,6 +50,7 @@ class BookService {
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         if (token != null) 'Authorization': 'Bearer $token',
+        'bm_token': 'LinoCanIAddOrRemoveBooksPlsThanksLmao',
       },
       body: jsonEncode(<String, dynamic>{
         'qrCodeId': qrCode,
@@ -77,6 +78,7 @@ class BookService {
     final headers = {
       'Content-Type': 'application/json; charset=UTF-8',
       if (token != null) 'Authorization': 'Bearer $token',
+      'bm_token': 'LinoCanIAddOrRemoveBooksPlsThanksLmao',
     };
 
     // Make a GET request to the server
