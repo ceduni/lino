@@ -19,6 +19,7 @@ class _NavigationPageState extends State<NavigationPage> {
   List<Map<String, dynamic>> bookBoxes = [];
   bool isLoading = true;
   String? error;
+  bool isGridMode = false; // Track if we are in grid mode
 
   @override
   void initState() {
@@ -48,9 +49,24 @@ class _NavigationPageState extends State<NavigationPage> {
     }
   }
 
+  void _toggleViewMode() {
+    setState(() {
+      isGridMode = !isGridMode; // Toggle between grid and horizontal mode
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Books Overview'),
+        actions: [
+          IconButton(
+            icon: Icon(isGridMode ? Icons.view_list : Icons.view_module),
+            onPressed: _toggleViewMode,
+          ),
+        ],
+      ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : error != null
@@ -97,14 +113,16 @@ class _NavigationPageState extends State<NavigationPage> {
               for (var bb in bookBoxes) ...[
                 Container(
                   width: double.infinity,
-                  height: 50,
+                  height: 32,
+                  margin: const EdgeInsets.only(bottom: 0),
                   color: Color.fromRGBO(125, 201, 236, 1),
-                  padding: const EdgeInsets.symmetric(vertical: 7.0),
+                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 16.0),
+                  alignment: Alignment.centerLeft,
                   child: Text(
-                    bb['name'],
-                    textAlign: TextAlign.center,
+                    'Bookbox ${bb['name']}',
+                    textAlign: TextAlign.left,
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Color.fromRGBO(3, 51, 86, 1),
                     ),
@@ -112,63 +130,106 @@ class _NavigationPageState extends State<NavigationPage> {
                 ),
                 Container(
                   color: Color.fromRGBO(250, 250, 240, 1),
-                  child: Container(
-                    height: 150,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: bb['books'].length,
-                      itemBuilder: (context, index) {
-                        var book = bb['books'][index];
-                        return GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => BookDetailsPage(
-                                book: book,
-                                bbid: bb['id'],
-                              ),
-                            );
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Image.network(
-                              book['coverImage'],
-                              errorBuilder: (BuildContext context,
-                                  Object exception,
-                                  StackTrace? stackTrace) {
-                                return ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                      maxWidth: 100),
-                                  child: Container(
-                                    color: Colors.grey,
-                                    child: Center(
-                                      child: Padding(
-                                        padding:
-                                        const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          book['title'],
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                          maxLines: null,
-                                          overflow:
-                                          TextOverflow.visible,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: isGridMode
+                      ? _buildGridBooks(bb['books']) // Grid view mode
+                      : _buildHorizontalBooks(bb['books']), // Horizontal scroll mode
                 ),
               ],
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Horizontal book list (default)
+  Widget _buildHorizontalBooks(List books) {
+    return Container(
+      height: 150,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: books.length,
+        itemBuilder: (context, index) {
+          var book = books[index];
+          return GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => BookDetailsPage(
+                  book: book,
+                  bbid: "null",
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.network(
+                book['coverImage'],
+                errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                  return _errorImage(book['title']);
+                },
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // Grid book list
+  Widget _buildGridBooks(List books) {
+    double bookWidth = 100; // Fixed width for the book covers
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(), // Disable GridView scrolling, rely on outer ScrollView
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: MediaQuery.of(context).size.width ~/ bookWidth, // Calculate books per row
+        childAspectRatio: 0.7, // Adjust aspect ratio to fit book covers
+      ),
+      itemCount: books.length,
+      itemBuilder: (context, index) {
+        var book = books[index];
+        return GestureDetector(
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => BookDetailsPage(
+                book: book,
+                bbid: "null",
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.network(
+              book['coverImage'],
+              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                return _errorImage(book['title']);
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _errorImage(String title) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 100),
+      child: Container(
+        color: Colors.grey,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              title,
+              style: TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+              maxLines: null,
+              overflow: TextOverflow.visible,
+            ),
           ),
         ),
       ),
@@ -244,8 +305,7 @@ class FavoriteBooksSection extends HookWidget {
               padding: const EdgeInsets.all(8.0),
               child: Image.network(
                 book['coverImage'],
-                errorBuilder: (BuildContext context, Object exception,
-                    StackTrace? stackTrace) {
+                errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
                   return ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: 100),
                     child: Container(
@@ -278,17 +338,11 @@ class FavoriteBooksSection extends HookWidget {
       return [];
     }
     try {
-      // Fetch user data
       Map<String, dynamic> userData = await UserService().getUser(token);
-
-      // Extract favorite book IDs
       List<dynamic> favoriteBookIds = userData['user']['favoriteBooks'];
-
-      // Fetch favorite books details
       List<Map<String, dynamic>> favoriteBooks = await Future.wait(
         favoriteBookIds.map((id) => BookService().getBook(id)).toList(),
       );
-
       return favoriteBooks;
     } catch (e) {
       print('Error fetching favorite books: $e');
