@@ -96,6 +96,26 @@ server.decorate('authenticate', async (request, reply) => {
     }
 });
 
+
+
+// Book manipulation token validation preValidation
+// @ts-ignore
+server.decorate('bookManipAuth', async (request, reply) => {
+    try {
+        const bookManipToken = request.headers['bm_token']; // Get custom header
+        const predefinedToken = 'LinoCanIAddOrRemoveBooksPlsThanksLmao';
+
+        if (bookManipToken !== predefinedToken) {
+            console.log('Invalid book manipulation token:', bookManipToken);
+            return reply.status(401).send({ error: 'Unauthorized' });
+        }
+
+        console.log('Valid book manipulation token');
+    } catch (error) {
+        return reply.status(401).send({ error: 'Unauthorized' });
+    }
+});
+
 // @ts-ignore
 server.decorate('optionalAuthenticate', async (request) => {
     try {

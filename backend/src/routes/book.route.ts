@@ -34,8 +34,10 @@ const addBookToBookboxSchema = {
     headers: {
         type: 'object',
         properties: {
-            authorization: { type: 'string' }
+            authorization: { type: 'string' },
+            bm_token: { type: 'string' }
         },
+        required: ['bm_token']
     },
     response: {
         201: {
@@ -93,8 +95,10 @@ const getBookFromBookBoxSchema = {
     headers: {
         type: 'object',
         properties: {
-            authorization: { type: 'string' }
+            authorization: { type: 'string' },
+            bm_token: { type: 'string' }
         },
+        required: ['bm_token']
     },
     response: {
         200: {
@@ -629,15 +633,16 @@ interface MyFastifyInstance extends FastifyInstance {
     optionalAuthenticate: (request: FastifyRequest) => void;
     authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
     adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
+    bookManipAuth: (request: FastifyRequest, reply: FastifyReply) => void;
 }
 export default async function bookRoutes(server: MyFastifyInstance) {
     server.get('/books/get/:id', { schema : getBookSchema }, getBook);
     server.get('/bookboxes/:bookboxId', { schema: getBookboxSchema }, getBookbox);
-    server.get('/books/:bookQRCode/:bookboxId', { preValidation: [server.optionalAuthenticate], schema: getBookFromBookBoxSchema }, getBookFromBookBox);
+    server.get('/books/:bookQRCode/:bookboxId', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: getBookFromBookBoxSchema }, getBookFromBookBox);
     server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate], schema: getBookInfoFromISBNSchema }, getBookInfoFromISBN);
     server.get('/books/search', { schema: searchBooksSchema }, searchBooks);
     server.get('/bookboxes/search', { schema: searchBookboxesSchema }, searchBookboxes);
-    server.post('/books/add', { preValidation: [server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
+    server.post('/books/add', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
     server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);
     server.delete('/books/request/:id', { preValidation: [server.authenticate], schema: deleteBookRequestSchema }, deleteBookRequest);
     server.get('/books/requests', { schema: getBookRequestsSchema }, getBookRequests);

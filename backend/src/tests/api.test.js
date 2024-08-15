@@ -169,6 +169,7 @@ describe('Test book adding by guest users', () => {
             headers: {
                 Authorization: `Bearer ptdrinexistent`,
                 'Content-Type': 'application/json; charset=UTF-8',
+                bm_token: 'LinoCanIAddOrRemoveBooksPlsThanksLmao'
             },
             payload: {
                 bookboxId: bbids[0],
@@ -201,6 +202,9 @@ describe('Test book adding by guest users', () => {
         const response = await server.inject({
             method: 'POST',
             url: '/books/add',
+            headers: {
+                bm_token: 'LinoCanIAddOrRemoveBooksPlsThanksLmao'
+            },
             payload: {
                 bookboxId: '',
                 qrCodeId: '',
@@ -221,6 +225,9 @@ describe('Test book adding by guest users', () => {
         const response = await server.inject({
             method: 'POST',
             url: '/books/add',
+            headers: {
+                bm_token: 'LinoCanIAddOrRemoveBooksPlsThanksLmao'
+            },
             payload: { // No title
                 bookboxId: "6660ec640a7261a8b1131165",
                 qrCodeId: `b${fakeQRCodeCounter++}`,
@@ -248,7 +255,10 @@ describe('Test book fetching by guest users', () => {
     test('Getting a book from a book box', async () => {
         const response = await server.inject({
             method: 'GET',
-            url: `/books/b0/${bbids[0]}` // book with qrCodeId b0 in bookbox with id bbids[0]
+            url: `/books/b0/${bbids[0]}`, // book with qrCodeId b0 in bookbox with id bbids[0]
+            headers: {
+                bm_token: 'LinoCanIAddOrRemoveBooksPlsThanksLmao'
+            }
         });
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(200);
@@ -261,7 +271,10 @@ describe('Test book fetching by guest users', () => {
     test('Trying to get the same book from the same book box', async () => {
         const response = await server.inject({
             method: 'GET',
-            url: `/books/b0/${bbids[0]}`
+            url: `/books/b0/${bbids[0]}`,
+            headers: {
+                bm_token: 'LinoCanIAddOrRemoveBooksPlsThanksLmao'
+            }
         });
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(404);
@@ -272,6 +285,9 @@ describe('Test book fetching by guest users', () => {
         const response = await server.inject({
             method: 'POST',
             url: `/books/add`,
+            headers: {
+                bm_token: 'LinoCanIAddOrRemoveBooksPlsThanksLmao'
+            },
             payload : {
                 bookboxId: bbids[1],
                 qrCodeId: `b0`,
@@ -288,6 +304,9 @@ describe('Test book fetching by guest users', () => {
         const response = await server.inject({
             method: 'POST',
             url: `/books/add`,
+            headers: {
+                bm_token: 'LinoCanIAddOrRemoveBooksPlsThanksLmao'
+            },
             payload : {
                 bookboxId : bbids[2],
                 qrCodeId: 'b0',
@@ -346,7 +365,8 @@ describe('Test book actions by connected users', () => {
                 categories: ["Juvenile Fiction"]
             },
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${token}`,
+                bm_token: 'LinoCanIAddOrRemoveBooksPlsThanksLmao'
             }
         });
         const payload = JSON.parse(response.payload); // new book adding has already been tested
@@ -380,7 +400,10 @@ describe('Test book actions by connected users', () => {
     test('A guest getting the same book from the book box', async () => {
         const response = await server.inject({
             method: 'GET',
-            url: `/books/b1/${bbids[0]}`
+            url: `/books/b1/${bbids[0]}`,
+            headers: {
+                bm_token: 'LinoCanIAddOrRemoveBooksPlsThanksLmao'
+            }
         });
         const payload = JSON.parse(response.payload);
         expect(response.statusCode).toBe(200);
