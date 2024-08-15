@@ -93,7 +93,11 @@ const bookService = {
         const qrCode = request.params.bookQRCode;
         const bookboxId = request.params.bookboxId;
         // check if the book exists
-        let book = await Book.findOne({qrCodeId: qrCode});
+        let book;
+        book = await Book.findOne({qrCodeId: qrCode});
+        if (!book) {
+            book = await Book.findById(qrCode);
+        }
         if (!book) {
             throw newErr(404, 'Book not found');
         }
