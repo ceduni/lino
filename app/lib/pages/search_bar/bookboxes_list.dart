@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:Lino_app/services/book_services.dart';
-import '../BookBox/book_box_screen.dart'; // Update this import based on your project structure
+import '../bookbox/book_box_screen.dart'; 
 
 class BookBoxesList extends StatelessWidget {
   final String query;

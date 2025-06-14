@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="Lino Database">
-  <database-model serializer="dbm" dbms="MONGO" family-id="MONGO" format-version="4.52">
+  <database-model serializer="dbm" dbms="MONGO" family-id="MONGO" format-version="4.53">
     <root id="1">
       <ServerVersion>7.0.8</ServerVersion>
     </root>
@@ -15,88 +15,88 @@
     <table id="8" parent="2" name="threads"/>
     <table id="9" parent="2" name="users"/>
     <column id="10" parent="6" name="_id">
-      <DasType>ObjectId|12s</DasType>
       <Position>1</Position>
+      <StoredType>ObjectId|12s</StoredType>
     </column>
     <column id="11" parent="6" name="books">
-      <DasType>Array|2003s</DasType>
       <Position>1</Position>
+      <StoredType>Array|2003s</StoredType>
     </column>
     <column id="12" parent="6" name="infoText">
-      <DasType>String|12s</DasType>
       <Position>1</Position>
+      <StoredType>String|12s</StoredType>
     </column>
     <column id="13" parent="6" name="name">
-      <DasType>String|12s</DasType>
       <Position>1</Position>
+      <StoredType>String|12s</StoredType>
     </column>
     <column id="14" parent="6" name="location">
-      <DasType>Object|4999544s</DasType>
       <Position>2</Position>
+      <StoredType>Object|4999544s</StoredType>
     </column>
     <column id="15" parent="6" name="location.coordinates">
-      <DasType>Array|2003s</DasType>
       <Position>3</Position>
+      <StoredType>Array|2003s</StoredType>
     </column>
     <column id="16" parent="6" name="location.type">
-      <DasType>String|12s</DasType>
       <Position>4</Position>
+      <StoredType>String|12s</StoredType>
     </column>
     <column id="17" parent="7" name="_id">
-      <DasType>ObjectId|12s</DasType>
       <Position>1</Position>
+      <StoredType>ObjectId|12s</StoredType>
     </column>
     <column id="18" parent="7" name="author">
-      <DasType>String|12s</DasType>
       <Position>1</Position>
+      <StoredType>String|12s</StoredType>
     </column>
     <column id="19" parent="7" name="description">
-      <DasType>String|12s</DasType>
       <Position>1</Position>
+      <StoredType>String|12s</StoredType>
     </column>
     <column id="20" parent="7" name="title">
-      <DasType>String|12s</DasType>
       <Position>1</Position>
+      <StoredType>String|12s</StoredType>
     </column>
     <column id="21" parent="8" name="_id">
-      <DasType>ObjectId|12s</DasType>
       <Position>1</Position>
+      <StoredType>ObjectId|12s</StoredType>
     </column>
     <column id="22" parent="8" name="book_id">
-      <DasType>ObjectId|12s</DasType>
       <Position>1</Position>
+      <StoredType>ObjectId|12s</StoredType>
     </column>
     <column id="23" parent="8" name="messages">
-      <DasType>list|4999545s</DasType>
       <Position>1</Position>
+      <StoredType>list|4999545s</StoredType>
     </column>
     <column id="24" parent="8" name="messages.text">
-      <DasType>String|12s</DasType>
       <Position>2</Position>
+      <StoredType>String|12s</StoredType>
     </column>
     <column id="25" parent="8" name="messages.timestamp">
-      <DasType>String|12s</DasType>
       <Position>3</Position>
+      <StoredType>String|12s</StoredType>
     </column>
     <column id="26" parent="8" name="messages.user_id">
-      <DasType>ObjectId|12s</DasType>
       <Position>4</Position>
+      <StoredType>ObjectId|12s</StoredType>
     </column>
     <column id="27" parent="9" name="_id">
-      <DasType>ObjectId|12s</DasType>
       <Position>1</Position>
+      <StoredType>ObjectId|12s</StoredType>
     </column>
     <column id="28" parent="9" name="favorites">
-      <DasType>list|4999545s</DasType>
       <Position>1</Position>
+      <StoredType>list|4999545s</StoredType>
     </column>
     <column id="29" parent="9" name="password">
-      <DasType>String|12s</DasType>
       <Position>1</Position>
+      <StoredType>String|12s</StoredType>
     </column>
     <column id="30" parent="9" name="username">
-      <DasType>String|12s</DasType>
       <Position>1</Position>
+      <StoredType>String|12s</StoredType>
     </column>
   </database-model>
 </dataSource>
