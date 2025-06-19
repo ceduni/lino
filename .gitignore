@@ -7,3 +7,6 @@ app/ios/Flutter/Debug.xcconfig
 app/ios/Flutter/Release.xcconfig
 app/macos/Flutter/Flutter-Debug.xcconfig
 app/macos/Flutter/Flutter-Release.xcconfig
+
+.vscode
+.vscode/settings.json
