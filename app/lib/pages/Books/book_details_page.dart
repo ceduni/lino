@@ -27,27 +27,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   @override
   void initState() {
     super.initState();
-    _checkIfFavorite();
     _checkUserLoggedIn();
   }
 
-  Future<void> _checkIfFavorite() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    if (token != null) {
-      final user = await UserService().getUser(token);
-      final favs = user['user']['favoriteBooks'];
-      if (user['user'] != null && user['user'].isEmpty) {
-        return;
-      }
-      setState(() {
-        _isFavorite = favs.contains(widget.book['_id']);
-      });
-    }
-    setState(() {
-      _isLoading = false;
-    });
-  }
 
   Future<void> _checkUserLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
@@ -60,33 +42,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
     }
     setState(() {
       _isCheckingUser = false;
+      _isLoading = false;  // Set loading to false when done checking user
     });
-  }
-
-  Future<void> _toggleFavorite() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    if (token != null) {
-      try {
-        if (_isFavorite) {
-          await UserService().removeFromFavorites(token, widget.book['_id']);
-          setState(() {
-            _isFavorite = false;
-          });
-        } else {
-          await UserService().addToFavorites(token, widget.book['_id']);
-          setState(() {
-            _isFavorite = true;
-          });
-        }
-        _isFavorite
-            ? showToast('Added to favorites')
-            : showToast('Removed from favorites');
-      } catch (e) {
-        print(e);
-        showToast('Failed to add to favorites');
-      }
-    }
   }
 
   void showToast(String message) {
@@ -176,18 +133,6 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                               _showAddThreadForm(context, widget.book['_id']);
                             },
                             child: Text('+ Add Thread', style: TextStyle(color: Colors.white)),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: LinoColors.primary,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            ),
-                            onPressed: _isLoading ? null : _toggleFavorite,
-                            child: Icon(
-                              _isFavorite ? Icons.favorite : Icons.favorite_border,
-                              color: Colors.redAccent,
-                            ),
                           ),
                         ],
                       ),

@@ -163,7 +163,7 @@ class ThreadsSectionState extends State<ThreadsSection> {
                 return await _showDeleteDialog(context, thread['_id'], threadTitle);
               },
               child: ListTile(
-                leading: Image.network(thread['image']),
+                leading: _buildBookCover(thread['image'], bookTitle),
                 title: Text('$bookTitle : $threadTitle'),
                 subtitle: Text('Thread created $timeAgo'),
                 trailing: Row(
@@ -190,7 +190,7 @@ class ThreadsSectionState extends State<ThreadsSection> {
           margin: EdgeInsets.symmetric(vertical: 10),
           color: LinoColors.secondary,
           child: ListTile(
-            leading: Image.network(thread['image']),
+            leading: _buildBookCover(thread['image'], bookTitle),
             title: Text('$bookTitle : $threadTitle'),
             subtitle: Text('Thread created $timeAgo'),
             trailing: Row(
@@ -248,6 +248,46 @@ class ThreadsSectionState extends State<ThreadsSection> {
     }
 
     return deleteConfirmed;
+  }
+
+  Widget _buildBookCover(String? imageUrl, String bookTitle) {
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      return Image.network(
+        imageUrl,
+        width: 56,
+        height: 56,
+        fit: BoxFit.cover,
+        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+          return _buildDefaultCover(bookTitle);
+        },
+      );
+    } else {
+      return _buildDefaultCover(bookTitle);
+    }
+  }
+
+  Widget _buildDefaultCover(String bookTitle) {
+    return Container(
+      width: 56,
+      height: 56,
+      color: Colors.grey,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Text(
+            bookTitle,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    );
   }
 
   void showToast(String message) {

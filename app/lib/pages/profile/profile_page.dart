@@ -1,13 +1,11 @@
 import 'package:Lino_app/pages/profile/user_dashboard_widget.dart';
-import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'options_page.dart';
-
+ 
 class ProfilePage extends HookWidget {
   ProfilePage({Key? key}) : super(key: key);
 
@@ -20,57 +18,25 @@ class ProfilePage extends HookWidget {
     return await UserService().getUser(token);
   }
 
-  Future<Map<String, dynamic>> getBooksListFromUserData(
-      List<dynamic> bookIds,
-      bool isFavoriteBooks
-      ) async {
-    List<Map<String, dynamic>> books = await Future.wait(
-      bookIds.map((id) async {
-        Map<String, dynamic> book = await BookService().getBook(
-            isFavoriteBooks ? id : id['bookId']
-        );
-        if (!isFavoriteBooks) {
-          book['given'] = id['given'];
-        }
-        return book;
-      }).toList(),
-    );
-    return {'books': books};
-  }
 
   Widget buildContent(BuildContext context, Map<String, dynamic> userData) {
-    double savedTrees;
-    if (userData['user']['ecologicalImpact']['savedTrees'] is int) {
-      savedTrees = (userData['user']['ecologicalImpact']['savedTrees'] as int).toDouble();
-    } else {
-      savedTrees = userData['user']['ecologicalImpact']['savedTrees'];
-    }
+    int numSavedBooks = userData['user']['numSavedBooks'] ?? 0;
+    
+    // Calculate ecological impact based on numSavedBooks
+    double carbonSavings = numSavedBooks * 27.71;
+    double savedWater = numSavedBooks * 2000.0;
+    double savedTrees = numSavedBooks * 0.05;
 
-    List<Map<String, dynamic>> booksHistory = userData['user']['bookHistory'];
-    List<Map<String, dynamic>> favoriteBooks = userData['user']['favoriteBooks'];
-    print('booksHistory: $booksHistory');
-
-    int booksBorrowed = 0;
-    for (var book in booksHistory) {
-      if (!book['given']) {
-        booksBorrowed++;
-      }
-    }
-    int booksGiven = 0;
-    for (var book in booksHistory) {
-      if (book['given']) {
-        booksGiven++;
-      }
-    }
-
+    // Parse createdAt date
+    DateTime createdAt = DateTime.parse(userData['user']['createdAt']);
 
     return UserDashboard(
-      favoriteBooks: favoriteBooks,
-      booksHistory: booksHistory,
       username: userData['user']['username'],
+      carbonSavings: carbonSavings,
+      savedWater: savedWater,
       savedTrees: savedTrees,
-      booksBorrowed: booksBorrowed,
-      booksGiven: booksGiven,
+      numSavedBooks: numSavedBooks,
+      createdAt: createdAt,
     );
   }
 
@@ -143,36 +109,7 @@ class ProfilePage extends HookWidget {
       return Center(child: Text('Error loading data or user data is null'));
     }
 
-    final bookDataFutures = [
-      useFuture(useMemoized(
-              () =>
-              getBooksListFromUserData(userData.data!['user']['favoriteBooks'], true),
-          [userData.data])),
-      useFuture(useMemoized(
-              () => getBooksListFromUserData(userData.data!['user']['bookHistory'], false),
-          [userData.data])),
-    ];
-
-    if (bookDataFutures
-        .any((future) => future.connectionState != ConnectionState.done)) {
-      return Center(child: CircularProgressIndicator());
-    }
-
-    if (bookDataFutures
-        .any((future) => future.hasError || future.data == null)) {
-      return Center(
-          child: Text('Error loading book data or book data is null'));
-    }
-
-    final modifiedUserData = {
-      'user': {
-        ...userData.data!['user'],
-        'favoriteBooks': bookDataFutures[0].data!['books'],
-        'bookHistory': bookDataFutures[1].data!['books'],
-      }
-    };
-
-    final username = modifiedUserData['user']!['username'];
+    final username = userData.data!['user']['username'];
 
     return Scaffold(
       appBar: AppBar(
@@ -216,7 +153,7 @@ class ProfilePage extends HookWidget {
           SizedBox(width: 10),
         ],
       ),
-      body: buildContent(context, modifiedUserData),
+      body: buildContent(context, userData.data!),
     );
   }
 }

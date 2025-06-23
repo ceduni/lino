@@ -1,8 +1,10 @@
+import 'book_model.dart';
+
 class BookBox {
   final String name;
   final List<double> location;
   final String? infoText;
-  final List<String> books;
+  final List<Book> books;
 
   BookBox({
     required this.name,
@@ -16,7 +18,7 @@ class BookBox {
     List<double> location = locationList.cast<double>();
 
     var booksList = json['books'] as List;
-    List<String> books = booksList.cast<String>();
+    List<Book> books = booksList.map((bookJson) => Book.fromJson(bookJson)).toList();
 
     return BookBox(
       name: json['name'],

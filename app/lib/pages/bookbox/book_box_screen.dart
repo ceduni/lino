@@ -1,39 +1,73 @@
 import 'package:Lino_app/services/book_services.dart';
+import 'package:Lino_app/services/bookbox_state_service.dart';
 import 'package:Lino_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'book_in_bookbox_row.dart';
 
-class BookBoxScreen extends HookWidget {
-  BookBoxScreen({super.key, required this.bookBoxId});
+class BookBoxScreen extends StatefulWidget {
+  const BookBoxScreen({super.key, required this.bookBoxId});
 
   final String bookBoxId;
 
-  Future<Map<String, dynamic>> getBookBoxData(String bookBoxId) async {
+  @override
+  State<BookBoxScreen> createState() => _BookBoxScreenState();
+}
+
+class _BookBoxScreenState extends State<BookBoxScreen> {
+  final BookBoxStateService _stateService = Get.find<BookBoxStateService>();
+  Future<Map<String, dynamic>>? _bookBoxDataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBookBoxData();
+    
+    // Listen for refresh triggers
+    _stateService.listenToRefresh(() {
+      if (mounted) {
+        _loadBookBoxData();
+      }
+    });
+  }
+
+  void _loadBookBoxData() {
+    setState(() {
+      _bookBoxDataFuture = _getBookBoxData(widget.bookBoxId);
+    });
+  }
+
+  Future<Map<String, dynamic>> _getBookBoxData(String bookBoxId) async {
     var bb = await BookService().getBookBox(bookBoxId);
     return {
       'name': bb['name'],
       'image': bb['image'],
       'infoText': bb['infoText'],
-      'location': LatLng(bb['location'][0], bb['location'][1]),
+      'location': LatLng(bb['location'][0].toDouble(), bb['location'][1].toDouble()),
       'books': bb['books']
     };
   }
 
   @override
   Widget build(BuildContext context) {
-    final bookBoxData = useFuture(useMemoized(() => getBookBoxData(bookBoxId), [bookBoxId]));
-
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: bookBoxData.connectionState == ConnectionState.waiting
-          ? Center(child: CircularProgressIndicator())
-          : bookBoxData.hasError
-          ? Center(child: Text('Error loading data'))
-          : buildContent(context, bookBoxData.data!),
+      child: FutureBuilder<Map<String, dynamic>>(
+        future: _bookBoxDataFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Error loading data'));
+          } else if (!snapshot.hasData) {
+            return const Center(child: Text('No data available'));
+          }
+          return buildContent(context, snapshot.data!);
+        },
+      ),
     );
   }
 
@@ -71,7 +105,7 @@ class BookBoxScreen extends HookWidget {
                   Center(
                     child: BookInBookBoxRow(
                       books: (bbBooks as List<dynamic>).map((item) => item as Map<String, dynamic>).toList(),
-                      bbid: bookBoxId,
+                      bbid: widget.bookBoxId,
                     ),
                   ),
                 ],

@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+import '../utils/constants/api_constants.dart';
 
 class ThreadService {
-  final String url = 'https://lino-1.onrender.com';
+  final String url = baseApiUrl;
 
   Future<Map<String, dynamic>> createThread(String token, String bookid, String title) async {
     final r = await http.post(
@@ -14,7 +14,7 @@ class ThreadService {
       },
       body: jsonEncode(<String, dynamic>{
         'bookId': bookid,
-        'title': title,
+        'title': title, 
       }),
     );
     final response = jsonDecode(r.body);
@@ -100,7 +100,7 @@ class ThreadService {
       if (asc != null) 'asc': asc.toString(),
     };
 
-    final r = await http.get(Uri.https('lino-1.onrender.com', '/threads/search', queryParams),
+    final r = await http.get(Uri.parse('$url/threads/search').replace(queryParameters: queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

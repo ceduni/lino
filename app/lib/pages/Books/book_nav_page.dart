@@ -1,8 +1,5 @@
-import 'package:Lino_app/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/book_services.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'book_details_page.dart';
 
 class NavigationPage extends StatefulWidget {
@@ -14,7 +11,6 @@ class NavigationPage extends StatefulWidget {
 
 class _NavigationPageState extends State<NavigationPage> {
   final bookService = BookService();
-  final userService = UserService();
 
   List<Map<String, dynamic>> bookBoxes = [];
   bool isLoading = true;
@@ -77,39 +73,6 @@ class _NavigationPageState extends State<NavigationPage> {
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
-              FutureBuilder<bool>(
-                future: _isValidUser(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasError || !snapshot.data!) {
-                    return SizedBox.shrink();
-                  }
-
-                  return Column(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        height: 50,
-                        color: Color.fromRGBO(239, 175, 132, 1),
-                        padding: const EdgeInsets.symmetric(vertical: 7.0),
-                        child: Text(
-                          'Liked books',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromRGBO(3, 51, 86, 1),
-                          ),
-                        ),
-                      ),
-                      FavoriteBooksSection(),
-                    ],
-                  );
-                },
-              ),
               for (var bb in bookBoxes) ...[
                 Container(
                   width: double.infinity,
@@ -164,12 +127,14 @@ class _NavigationPageState extends State<NavigationPage> {
             },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Image.network(
-                book['coverImage'],
-                errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                  return _errorImage(book['title']);
-                },
-              ),
+              child: book['coverImage'] != null
+                  ? Image.network(
+                      book['coverImage']!,
+                      errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                        return _errorImage(book['title']);
+                      },
+                    )
+                  : _errorImage(book['title']),
             ),
           );
         },
@@ -203,12 +168,14 @@ class _NavigationPageState extends State<NavigationPage> {
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Image.network(
-              book['coverImage'],
-              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                return _errorImage(book['title']);
-              },
-            ),
+            child: book['coverImage'] != null
+                ? Image.network(
+                    book['coverImage']!,
+                    errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                      return _errorImage(book['title']);
+                    },
+                  )
+                : _errorImage(book['title']),
           ),
         );
       },
@@ -236,117 +203,4 @@ class _NavigationPageState extends State<NavigationPage> {
     );
   }
 
-  Future<bool> _isValidUser() async {
-    var prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString('token');
-    if (token == null) {
-      return false;
-    }
-    try {
-      var user = await userService.getUser(token);
-      return user['user'] != null;
-    } catch (e) {
-      return false;
-    }
-  }
-}
-
-class FavoriteBooksSection extends HookWidget {
-  @override
-  Widget build(BuildContext context) {
-    final token = useState<String?>(null);
-
-    useEffect(() {
-      SharedPreferences.getInstance().then((prefs) {
-        token.value = prefs.getString('token');
-      });
-      return null;
-    }, []);
-
-    final favoriteBooksFuture =
-    useFuture(useMemoized(() => getUserFavoriteBooks(token.value), [token.value]));
-
-    if (favoriteBooksFuture.connectionState != ConnectionState.done) {
-      return Center(child: CircularProgressIndicator());
-    }
-
-    if (favoriteBooksFuture.hasError || favoriteBooksFuture.data == null) {
-      return Center(child: Text('Error loading favorite books or favorite books data is null'));
-    }
-
-    final favoriteBooks = favoriteBooksFuture.data!;
-
-    return Container(
-      color: Color.fromRGBO(250, 250, 240, 1),
-      height: 250,
-      child: favoriteBooks.isEmpty
-          ? Center(
-        child: Text(
-          'None are available yet',
-          style: TextStyle(fontSize: 16, color: Colors.black),
-        ),
-      )
-          : ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: favoriteBooks.length,
-        itemBuilder: (context, index) {
-          var book = favoriteBooks[index];
-          return GestureDetector(
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (context) => BookDetailsPage(
-                  book: book,
-                  bbid: "null",
-                ),
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image.network(
-                book['coverImage'],
-                errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                  return ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 100),
-                    child: Container(
-                      color: Colors.grey,
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            book['title'],
-                            style: TextStyle(color: Colors.white),
-                            textAlign: TextAlign.center,
-                            maxLines: null,
-                            overflow: TextOverflow.visible,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Future<List<Map<String, dynamic>>> getUserFavoriteBooks(String? token) async {
-    if (token == null) {
-      return [];
-    }
-    try {
-      Map<String, dynamic> userData = await UserService().getUser(token);
-      List<dynamic> favoriteBookIds = userData['user']['favoriteBooks'];
-      List<Map<String, dynamic>> favoriteBooks = await Future.wait(
-        favoriteBookIds.map((id) => BookService().getBook(id)).toList(),
-      );
-      return favoriteBooks;
-    } catch (e) {
-      print('Error fetching favorite books: $e');
-      return [];
-    }
-  }
 }

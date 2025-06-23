@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../utils/constants/api_constants.dart';
 
 class UserService {
-  final String url = 'https://lino-1.onrender.com';
+  final String url = baseApiUrl;
 
 
   Future<String> registerUser(String username, String email, String password, {String phone = '', bool getAlerted = true}) async {
@@ -14,7 +15,7 @@ class UserService {
       Uri.parse('$url/users/register'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-      },
+      }, 
       body: jsonEncode(<String, dynamic>{
         'username': username,
         'email': email,
