@@ -14,129 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const book_service_1 = __importDefault(require("../services/book.service"));
 const utilities_1 = require("../services/utilities");
-function addBookToBookbox(request, reply) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield book_service_1.default.addBook(request);
-            reply.code(201).send(response);
-        }
-        catch (error) {
-            console.log(error);
-            reply.code(error.statusCode).send({ error: error.message });
-        }
-    });
-}
-const addBookToBookboxSchema = {
-    description: 'Add a book to a bookbox',
-    tags: ['books', 'bookboxes'],
-    body: {
-        type: 'object',
-        properties: {
-            qrCodeId: { type: 'string' },
-            bookboxId: { type: 'string' },
-            title: { type: 'string' },
-            authors: { type: 'array', items: { type: 'string' } },
-            isbn: { type: 'string' },
-            description: { type: 'string' },
-            coverImage: { type: 'string' },
-            publisher: { type: 'string' },
-            categories: { type: 'array', items: { type: 'string' } },
-            parutionYear: { type: "number" },
-            pages: { type: "number" }
-        },
-        required: ['qrCodeId', 'bookboxId'],
-    },
-    headers: {
-        type: 'object',
-        properties: {
-            authorization: { type: 'string' }
-        },
-    },
-    response: {
-        201: {
-            description: 'Book added to bookbox',
-            type: 'object',
-            properties: {
-                bookId: { type: 'string' },
-                books: { type: 'array', items: { type: 'string' } }
-            }
-        },
-        400: {
-            description: 'Error in the request',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        404: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
-function getBookFromBookBox(request, reply) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield book_service_1.default.getBookFromBookBox(request);
-            reply.send(response);
-        }
-        catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
-        }
-    });
-}
-const getBookFromBookBoxSchema = {
-    description: 'Get book from bookbox',
-    tags: ['books', 'bookboxes'],
-    params: {
-        type: 'object',
-        properties: {
-            bookQRCode: { type: 'string' },
-            bookboxId: { type: 'string' }
-        },
-        required: ['bookQRCode', 'bookboxId']
-    },
-    headers: {
-        type: 'object',
-        properties: {
-            authorization: { type: 'string' }
-        },
-    },
-    response: {
-        200: {
-            description: 'Book found',
-            type: 'object',
-            properties: {
-                book: utilities_1.bookSchema,
-                books: { type: 'array', items: { type: 'string' } }
-            }
-        },
-        404: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function getBookInfoFromISBN(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -144,7 +21,9 @@ function getBookInfoFromISBN(request, reply) {
             reply.send(book);
         }
         catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
@@ -197,26 +76,21 @@ function searchBooks(request, reply) {
             reply.send({ books: books });
         }
         catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
 const searchBooksSchema = {
-    description: 'Search books',
+    description: 'Search books across all bookboxes',
     tags: ['books'],
     querystring: {
         type: 'object',
         properties: {
-            cat: { type: 'array', items: { type: 'string' } },
             kw: { type: 'string' },
-            pmt: { type: 'boolean' },
-            pg: { type: 'number' },
-            bf: { type: 'boolean' },
-            py: { type: 'number' },
-            pub: { type: 'string' },
-            bbid: { type: 'string' },
             cls: { type: 'string' },
-            asc: { type: 'boolean' },
+            asc: { type: 'boolean' }
         }
     },
     response: {
@@ -228,7 +102,21 @@ const searchBooksSchema = {
                     type: 'array',
                     items: {
                         type: 'object',
-                        properties: Object.assign(Object.assign({}, utilities_1.bookSchema.properties), { bookboxPresence: { type: 'array', items: { type: 'string' } } })
+                        properties: {
+                            _id: { type: 'string' },
+                            isbn: { type: 'string' },
+                            title: { type: 'string' },
+                            authors: { type: 'array', items: { type: 'string' } },
+                            description: { type: 'string' },
+                            coverImage: { type: 'string' },
+                            publisher: { type: 'string' },
+                            categories: { type: 'array', items: { type: 'string' } },
+                            parutionYear: { type: 'number' },
+                            pages: { type: 'number' },
+                            dateLastAction: { type: 'string' },
+                            bookboxId: { type: 'string' },
+                            bookboxName: { type: 'string' }
+                        }
                     }
                 }
             }
@@ -256,7 +144,9 @@ function sendBookRequest(request, reply) {
             reply.code(201).send(response);
         }
         catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
@@ -288,7 +178,6 @@ const sendBookRequestSchema = {
                 bookTitle: { type: 'string' },
                 timestamp: { type: 'string' },
                 customMessage: { type: 'string' },
-                isFulfilled: { type: 'boolean' }
             }
         },
         400: {
@@ -314,7 +203,9 @@ function deleteBookRequest(request, reply) {
             reply.code(204).send({ message: 'Book request deleted' });
         }
         catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
@@ -373,7 +264,8 @@ function getBook(request, reply) {
             reply.send(book);
         }
         catch (error) {
-            reply.code(404).send({ error: error.message });
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(404).send({ error: message });
         }
     });
 }
@@ -405,178 +297,6 @@ const getBookSchema = {
         }
     }
 };
-function getBookbox(request, reply) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield book_service_1.default.getBookBox(request.params.bookboxId);
-            reply.send(response);
-        }
-        catch (error) {
-            reply.code(404).send({ error: error.message });
-        }
-    });
-}
-const getBookboxSchema = {
-    description: 'Get bookbox',
-    tags: ['bookboxes'],
-    params: {
-        type: 'object',
-        properties: {
-            bookboxId: { type: 'string' }
-        },
-        required: ['bookboxId']
-    },
-    response: {
-        200: {
-            description: 'Bookbox found',
-            type: 'object',
-            properties: {
-                id: { type: 'string' },
-                name: { type: 'string' },
-                location: { type: 'array', items: { type: 'number' } },
-                infoText: { type: 'string' },
-                image: { type: 'string' },
-                books: { type: 'array', items: utilities_1.bookSchema }
-            }
-        },
-        404: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
-function addNewBookbox(request, reply) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield book_service_1.default.addNewBookbox(request);
-            reply.code(201).send(response);
-        }
-        catch (error) {
-            reply.code(400).send({ error: error.message });
-        }
-    });
-}
-const addNewBookboxSchema = {
-    description: 'Add new bookbox',
-    tags: ['bookboxes'],
-    body: {
-        type: 'object',
-        properties: {
-            name: { type: 'string' },
-            infoText: { type: 'string' },
-            latitude: { type: 'number' },
-            longitude: { type: 'number' },
-            image: { type: 'string' }
-        },
-        required: ['name', 'infoText', 'latitude', 'longitude', 'image'],
-    },
-    headers: {
-        type: 'object',
-        properties: {
-            authorization: { type: 'string' }
-        },
-        required: ['authorization']
-    },
-    response: {
-        201: {
-            description: 'Bookbox added',
-            type: 'object',
-            properties: {
-                _id: { type: 'string' },
-                name: { type: 'string' },
-                location: { type: 'array', items: { type: 'number' } },
-                image: { type: 'string' },
-                infoText: { type: 'string' },
-                books: { type: 'array', items: { type: 'string' } }
-            }
-        },
-        400: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
-function searchBookboxes(request, reply) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const bookboxes = yield book_service_1.default.searchBookboxes(request);
-            reply.send({ bookboxes: bookboxes });
-        }
-        catch (error) {
-            reply.code(400).send({ error: error.message });
-        }
-    });
-}
-const searchBookboxesSchema = {
-    description: 'Search bookboxes',
-    tags: ['bookboxes'],
-    querystring: {
-        type: 'object',
-        properties: {
-            kw: { type: 'string' },
-            cls: { type: 'string' },
-            asc: { type: 'boolean' },
-            longitude: { type: 'number' },
-            latitude: { type: 'number' },
-        }
-    },
-    response: {
-        200: {
-            description: 'Bookboxes found',
-            type: 'object',
-            properties: {
-                bookboxes: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            id: { type: 'string' },
-                            name: { type: 'string' },
-                            location: { type: 'array', items: { type: 'number' } },
-                            infoText: { type: 'string' },
-                            image: { type: 'string' },
-                            books: { type: 'array', items: utilities_1.bookSchema }
-                        }
-                    }
-                }
-            }
-        },
-        400: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function getBookRequests(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -584,7 +304,8 @@ function getBookRequests(request, reply) {
             reply.code(200).send(response);
         }
         catch (error) {
-            reply.code(500).send({ error: error.message });
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(500).send({ error: message });
         }
     });
 }
@@ -594,7 +315,7 @@ const getBookRequestsSchema = {
     querystring: {
         type: 'object',
         properties: {
-            status: { type: 'string' }
+            username: { type: 'string' }
         }
     },
     response: {
@@ -609,7 +330,6 @@ const getBookRequestsSchema = {
                     bookTitle: { type: 'string' },
                     timestamp: { type: 'string' },
                     customMessage: { type: 'string' },
-                    isFulfilled: { type: 'boolean' }
                 }
             },
         },
@@ -622,31 +342,69 @@ const getBookRequestsSchema = {
         }
     }
 };
-function clearCollection(request, reply) {
+function getTransactionHistory(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield book_service_1.default.clearCollection();
-            reply.send({ message: 'Books cleared' });
+            const transactions = yield book_service_1.default.getTransactionHistory(request);
+            reply.send({ transactions });
         }
         catch (error) {
-            reply.code(500).send({ error: error.message });
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(500).send({ error: message });
         }
     });
 }
+const getTransactionHistorySchema = {
+    description: 'Get transaction history',
+    tags: ['books', 'transactions'],
+    querystring: {
+        type: 'object',
+        properties: {
+            username: { type: 'string' },
+            bookTitle: { type: 'string' },
+            bookboxName: { type: 'string' },
+            limit: { type: 'number' }
+        }
+    },
+    response: {
+        200: {
+            description: 'Transaction history found',
+            type: 'object',
+            properties: {
+                transactions: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            _id: { type: 'string' },
+                            username: { type: 'string' },
+                            action: { type: 'string' },
+                            bookTitle: { type: 'string' },
+                            bookboxName: { type: 'string' },
+                            timestamp: { type: 'string' }
+                        }
+                    }
+                }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
 function bookRoutes(server) {
     return __awaiter(this, void 0, void 0, function* () {
-        server.get('/books/get/:id', { schema: getBookSchema }, getBook);
-        server.get('/books/bookbox/:bookboxId', { schema: getBookboxSchema }, getBookbox);
-        server.get('/books/:bookQRCode/:bookboxId', { preValidation: [server.optionalAuthenticate], schema: getBookFromBookBoxSchema }, getBookFromBookBox);
-        server.get('/books/:isbn', { preValidation: [server.optionalAuthenticate], schema: getBookInfoFromISBNSchema }, getBookInfoFromISBN);
+        server.get('/books/:id', { schema: getBookSchema }, getBook);
+        server.get('/books/info-from-isbn/:isbn', { preValidation: [server.optionalAuthenticate], schema: getBookInfoFromISBNSchema }, getBookInfoFromISBN);
         server.get('/books/search', { schema: searchBooksSchema }, searchBooks);
-        server.get('/books/bookbox/search', { schema: searchBookboxesSchema }, searchBookboxes);
-        server.post('/books/add', { preValidation: [server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
         server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);
         server.delete('/books/request/:id', { preValidation: [server.authenticate], schema: deleteBookRequestSchema }, deleteBookRequest);
         server.get('/books/requests', { schema: getBookRequestsSchema }, getBookRequests);
-        server.post('/books/bookbox/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);
-        server.delete('/books/clear', { preValidation: [server.adminAuthenticate], schema: utilities_1.clearCollectionSchema }, clearCollection);
+        server.get('/books/transactions', { schema: getTransactionHistorySchema }, getTransactionHistory);
     });
 }
 exports.default = bookRoutes;

@@ -4,12 +4,19 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { newErr } from "./utilities";
 import {broadcastToUser} from '../index';
+import { 
+    UserRegistrationData, 
+    UserLoginCredentials, 
+    IUser,
+    INotification 
+} from '../types/user.types';
+import { AuthenticatedRequest } from '../types/common.types';
 
 dotenv.config();
 
 const UserService = {
     // User service to register a new user's account
-    async registerUser(userData: any) {
+    async registerUser(userData: UserRegistrationData) {
         const { username, email, phone, password, getAlerted } = userData;
         if (username === 'guest') {
             throw newErr(400, 'Username not allowed');
@@ -49,7 +56,7 @@ const UserService = {
     },
 
     // User service to log in a user if they exist (can log with either a username or an email)
-    async loginUser(credentials: any) {
+    async loginUser(credentials: UserLoginCredentials) {
         const identifier = credentials.identifier;
         const user = await User.findOne({ $or: [{ username : identifier }, { email : identifier }]});
         if (!user) {
@@ -60,13 +67,12 @@ const UserService = {
             throw newErr(400, 'Invalid password');
         }
         // User authenticated successfully, generate tokens
-        // @ts-ignore
-        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY);
+        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY as string);
 
         return { user: user, token: token };
     },
 
-    async getUserNotifications(request: any) {
+    async getUserNotifications(request: AuthenticatedRequest) {
         const userId = request.user.id;
         const user = await User.findById(userId);
         if (!user) {
@@ -78,18 +84,18 @@ const UserService = {
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
         // Filter out notifications older than 30 days
-        // @ts-ignore
-        user.notifications = user.notifications.filter(notification => {
+        const filteredNotifications = user.notifications.filter(notification => {
             const notificationDate = new Date(notification.timestamp);
             return notificationDate >= thirtyDaysAgo;
         });
+        user.notifications = filteredNotifications as any;
 
         // Save the updated user document
         await user.save();
         return user.notifications;
     },
 
-    async readNotification(request: any) {
+    async readNotification(request: AuthenticatedRequest & { body: { notificationId: string } }) {
         const userId = request.user.id;
         const user = await User.findById(userId);
         if (!user) {
@@ -106,70 +112,6 @@ const UserService = {
     },
 
 
-    // User service to add a book's ID to a user's favorites
-    async addToFavorites(request: any) {
-        const userId = request.user.id;  // Extract user ID from JWT token
-        const bookId = request.body.bookId;
-        let user = await User.findById(userId);
-        if (!user) {
-            throw newErr(404, 'User not found');
-        }
-        if (user.favoriteBooks.includes(bookId)) {
-            throw newErr(400, 'Book already in favorites');
-        }
-        user.favoriteBooks.push(bookId);
-        await user.save();
-        return user;
-    },
-
-
-    // User service to remove a book's ID from a user's favorites
-    async removeFromFavorites(request: any) {
-        // @ts-ignore
-        const userId = request.user.id;  // Extract user ID from JWT token
-        // @ts-ignore
-        const id = request.params.id;
-        let user = await User.findById(userId);
-        if (!user) {
-            throw newErr(404, 'User not found');
-        }
-        const index = user.favoriteBooks.indexOf(id);
-        if (index === -1) { // Book not found in favorites
-            throw newErr(404, 'Book not found in favorites');
-        }
-        user.favoriteBooks.splice(index, 1);
-        await user.save();
-        return user;
-    },
-
-
-    // User service to get the infos of the user's favorite books
-    async getFavorites(userId: string) {
-        let user = await User.findById(userId);
-        if (!user) {
-            throw newErr(404, 'User not found');
-        }
-        // array to store the favorite books
-        const favoriteBooks = [];
-        for (const bookId of user.favoriteBooks) {
-            // @ts-ignore
-            const book = await Book.findById(bookId);
-            if (book) {
-                favoriteBooks.push(book);
-            }
-        }
-        return favoriteBooks;
-    },
-
-
-    // User service to get the user's ecological impact
-    async getEcologicalImpact(userId: string) {
-        const user = await User.findById(userId);
-        if (!user) {
-            throw newErr(404, 'User not found');
-        }
-        return user.ecologicalImpact;
-    },
     async getUserName(userId: string) {
         const user = await User.findById(userId);
         if (!user) {
@@ -181,7 +123,16 @@ const UserService = {
         return text.split(',');
     },
 
-    async updateUser(request: any) {
+    async updateUser(request: AuthenticatedRequest & { 
+        body: { 
+            username?: string; 
+            password?: string; 
+            email?: string; 
+            phone?: string; 
+            getAlerted?: boolean; 
+            keyWords?: string; 
+        } 
+    }) {
         const user = await User.findById(request.user.id);
         if (!user) {
             throw newErr(404, 'User not found');
@@ -226,14 +177,15 @@ export async function notifyUser(userId: string, title: string, message: string)
     if (!user) {
         throw newErr(404, 'User not found');
     }
-    const notification = { title: title, content: message, timestamp: new Date(), read: false };
+    const notification: INotification = { title: title, content: message, timestamp: new Date(), read: false };
 
     // Validate and push the notification into the user's notifications array
     try {
-        user.notifications.push(notification); // Type assertion to avoid TypeScript errors
+        user.notifications.push(notification);
         await user.save();
-    } catch (error: any) {
-        throw new Error(`Failed to save notification: ${error.message}`);
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        throw new Error(`Failed to save notification: ${errorMessage}`);
     }
 
     // Broadcast the notification to the user if they are connected via WebSocket

@@ -3,9 +3,15 @@ import UserService, {notifyUser} from "./user.service";
 import User from "../models/user.model";
 import BookService from "./book.service";
 import {newErr} from "./utilities";
+import { 
+    ThreadCreateData, 
+    MessageCreateData, 
+    ReactionData
+} from '../types/thread.types';
+import { AuthenticatedRequest } from '../types/common.types';
 
 const ThreadService = {
-    async createThread(request: any) {
+    async createThread(request: AuthenticatedRequest & { body: ThreadCreateData }) {
         const username = await UserService.getUserName(request.user.id);
         if (!username) {
             throw newErr(401, 'Unauthorized');
@@ -30,7 +36,7 @@ const ThreadService = {
         return thread;
     },
 
-    async deleteThread(request: any) {
+    async deleteThread(request: { params: { threadId: string } }) {
         const threadId = request.params.threadId;
         const thread = await Thread.findById(threadId);
         if (!thread) {
@@ -39,8 +45,7 @@ const ThreadService = {
         await thread.deleteOne();
     },
 
-    async addThreadMessage(request: any) {
-        // @ts-ignore
+    async addThreadMessage(request: AuthenticatedRequest & { body: MessageCreateData }) {
         const username = await UserService.getUserName(request.user.id);
         if (!username) {
             throw newErr(401, 'Unauthorized');
@@ -62,7 +67,6 @@ const ThreadService = {
 
         // Notify the user that someone has responded to their message
         if (respondsTo != null) {
-            // @ts-ignore
             const parentMessage = thread.messages.id(respondsTo);
             if (!parentMessage) {
                 throw newErr(404, 'Parent message not found');
@@ -72,7 +76,6 @@ const ThreadService = {
                 if (!userParent) {
                     throw newErr(404, 'User not found');
                 }
-                // @ts-ignore
                 await notifyUser(userParent.id, `${username} in ${thread.title}`, message.content);
             }
         }
@@ -83,7 +86,7 @@ const ThreadService = {
         return { messageId };
     },
 
-    async toggleMessageReaction(request: any) {
+    async toggleMessageReaction(request: AuthenticatedRequest & { body: ReactionData }) {
         const username = await UserService.getUserName(request.user.id);
         if (!username) {
             throw newErr(401, 'Unauthorized');
@@ -103,11 +106,10 @@ const ThreadService = {
         // Check if the user has already reacted to this message with the same icon
         if (message.reactions.find(r => r.username === username && r.reactIcon === reactIcon)) {
             // Remove the reaction
-            // @ts-ignore
-            message.reactions = message.reactions.filter(r => r.username !== username || r.reactIcon !== reactIcon);
+            message.reactions = message.reactions.filter(r => r.username !== username || r.reactIcon !== reactIcon) as any;
         } else {
             // Add the reaction
-            message.reactions.push({ username: username, reactIcon: reactIcon });
+            message.reactions.push({ username: username, reactIcon: reactIcon, timestamp: new Date() });
         }
 
         await thread.save();
@@ -119,7 +121,7 @@ const ThreadService = {
     },
 
 
-    async searchThreads(request: any) {
+    async searchThreads(request: { query: { q?: string; cls?: string; asc?: boolean } }) {
         const query = request.query.q;
         let threads = await Thread.find();
 

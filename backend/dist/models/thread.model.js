@@ -24,7 +24,5 @@ const threadSchema = new mongoose_1.default.Schema({
     timestamp: { type: Date, default: Date.now },
     messages: { type: [messageSchema], default: [] }
 });
-// Create a text index on bookTitle, title, and username
-threadSchema.index({ bookTitle: 'text', title: 'text', username: 'text' });
 const Thread = mongoose_1.default.model('Thread', threadSchema, "threads");
 exports.default = Thread;

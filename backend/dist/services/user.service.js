@@ -18,7 +18,7 @@ const argon2_1 = __importDefault(require("argon2"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const utilities_1 = require("./utilities");
-const server = require('../index');
+const index_1 = require("../index");
 dotenv_1.default.config();
 const UserService = {
     // User service to register a new user's account
@@ -71,12 +71,11 @@ const UserService = {
                 throw (0, utilities_1.newErr)(400, 'Invalid password');
             }
             // User authenticated successfully, generate tokens
-            // @ts-ignore
             const token = jsonwebtoken_1.default.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY);
             return { user: user, token: token };
         });
     },
-    readUserNotifications(request) {
+    getUserNotifications(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = request.user.id;
             const user = yield user_model_1.default.findById(userId);
@@ -87,84 +86,31 @@ const UserService = {
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
             // Filter out notifications older than 30 days
-            // @ts-ignore
-            user.notifications = user.notifications.filter(notification => {
+            const filteredNotifications = user.notifications.filter(notification => {
                 const notificationDate = new Date(notification.timestamp);
                 return notificationDate >= thirtyDaysAgo;
             });
-            // Set all remaining notifications to read
-            user.notifications.forEach(notification => {
-                notification.read = true;
-            });
+            user.notifications = filteredNotifications;
             // Save the updated user document
             yield user.save();
             return user.notifications;
         });
     },
-    // User service to add a book's ID to a user's favorites
-    addToFavorites(request) {
+    readNotification(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            const userId = request.user.id; // Extract user ID from JWT token
-            const bookId = request.body.bookId;
-            let user = yield user_model_1.default.findById(userId);
-            if (!user) {
-                throw (0, utilities_1.newErr)(404, 'User not found');
-            }
-            if (user.favoriteBooks.includes(bookId)) {
-                throw (0, utilities_1.newErr)(400, 'Book already in favorites');
-            }
-            user.favoriteBooks.push(bookId);
-            yield user.save();
-            return user;
-        });
-    },
-    // User service to remove a book's ID from a user's favorites
-    removeFromFavorites(request) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // @ts-ignore
-            const userId = request.user.id; // Extract user ID from JWT token
-            // @ts-ignore
-            const id = request.params.id;
-            let user = yield user_model_1.default.findById(userId);
-            if (!user) {
-                throw (0, utilities_1.newErr)(404, 'User not found');
-            }
-            const index = user.favoriteBooks.indexOf(id);
-            if (index === -1) { // Book not found in favorites
-                throw (0, utilities_1.newErr)(404, 'Book not found in favorites');
-            }
-            user.favoriteBooks.splice(index, 1);
-            yield user.save();
-            return user;
-        });
-    },
-    // User service to get the infos of the user's favorite books
-    getFavorites(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let user = yield user_model_1.default.findById(userId);
-            if (!user) {
-                throw (0, utilities_1.newErr)(404, 'User not found');
-            }
-            // array to store the favorite books
-            const favoriteBooks = [];
-            for (const bookId of user.favoriteBooks) {
-                // @ts-ignore
-                const book = yield Book.findById(bookId);
-                if (book) {
-                    favoriteBooks.push(book);
-                }
-            }
-            return favoriteBooks;
-        });
-    },
-    // User service to get the user's ecological impact
-    getEcologicalImpact(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
+            const userId = request.user.id;
             const user = yield user_model_1.default.findById(userId);
             if (!user) {
                 throw (0, utilities_1.newErr)(404, 'User not found');
             }
-            return user.ecologicalImpact;
+            const notificationId = request.body.notificationId;
+            const notification = user.notifications.id(notificationId);
+            if (!notification) {
+                throw (0, utilities_1.newErr)(404, 'Notification not found');
+            }
+            notification.read = true;
+            yield user.save();
+            return user.notifications;
         });
     },
     getUserName(userId) {
@@ -189,7 +135,7 @@ const UserService = {
             }
             if (request.body.username) {
                 const check = yield user_model_1.default.findOne({ username: request.body.username });
-                if (check) {
+                if (check && check.username !== user.username) {
                     throw (0, utilities_1.newErr)(400, 'Username already taken');
                 }
                 user.username = request.body.username;
@@ -197,7 +143,7 @@ const UserService = {
             if (request.body.password) {
                 user.password = yield argon2_1.default.hash(request.body.password);
             }
-            if (request.body.email) {
+            if (request.body.email && request.body.email !== user.email) {
                 const check = yield user_model_1.default.findOne({ email: request.body.email });
                 if (check) {
                     throw (0, utilities_1.newErr)(400, 'Email already taken');
@@ -232,14 +178,15 @@ function notifyUser(userId, title, message) {
         const notification = { title: title, content: message, timestamp: new Date(), read: false };
         // Validate and push the notification into the user's notifications array
         try {
-            user.notifications.push(notification); // Type assertion to avoid TypeScript errors
+            user.notifications.push(notification);
             yield user.save();
         }
         catch (error) {
-            throw new Error(`Failed to save notification: ${error.message}`);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            throw new Error(`Failed to save notification: ${errorMessage}`);
         }
         // Broadcast the notification to the user if they are connected via WebSocket
-        server.broadcastToUser(userId, { event: 'newNotification', data: notification });
+        (0, index_1.broadcastToUser)(userId, { event: 'newNotification', data: notification });
         return user;
     });
 }
