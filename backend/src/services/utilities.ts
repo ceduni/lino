@@ -81,17 +81,8 @@ export const userSchema = {
         password: { type: 'string' },
         email: { type: 'string' },
         phone: { type: 'string' },
-        favoriteBooks: { type: 'array', items: { type: 'string' } },
-        trackedBooks: { type: 'array', items: { type: 'string' } },
         notificationKeyWords: { type: 'array', items: { type: 'string' } },
-        ecologicalImpact: {
-            type: 'object',
-            properties: {
-                carbonSavings: { type: 'number' },
-                savedWater: { type: 'number' },
-                savedTrees: { type: 'number' }
-            }
-        },
+        numSavedBooks: { type: 'number' },
         notifications: {
             type: 'array',
             items: {
@@ -115,7 +106,8 @@ export const userSchema = {
                     given: { type: 'boolean' }
                 }
             }
-        }
+        },
+        createdAt: { type: 'string', format: 'date-time' }
     }
 };
 
@@ -160,7 +152,7 @@ export function newErr(statusCode: number, message: string): CustomError {
     return new CustomError(message, statusCode);
 }
 
-async function createAdminUser(server: any) {
+async function createAdminUser(server: any): Promise<string> {
     try {
         await server.inject({
             method: 'POST',
@@ -180,16 +172,18 @@ async function createAdminUser(server: any) {
             },
         });
         return response.json().token;
-    } catch (err : any) {
-        if (err.message.includes('already taken')) {
+    } catch (err : unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        if (errorMessage.includes('already taken')) {
             console.log('Admin user already exists.');
         } else {
             throw err;
         }
+        return '';
     }
 }
 
-export async function reinitDatabase(server: any) {
+export async function reinitDatabase(server: any): Promise<string> {
     const token = await createAdminUser(server);
     await server.inject({
         method: 'DELETE',

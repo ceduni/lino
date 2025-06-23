@@ -79,7 +79,6 @@ const ThreadService = {
     },
     addThreadMessage(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            // @ts-ignore
             const username = yield user_service_1.default.getUserName(request.user.id);
             if (!username) {
                 throw (0, utilities_1.newErr)(401, 'Unauthorized');
@@ -98,10 +97,8 @@ const ThreadService = {
             };
             thread.messages.push(message);
             yield thread.save();
-            // Notify the user that their message has been added
+            // Notify the user that someone has responded to their message
             if (respondsTo != null) {
-                // Notify the user that their message has been added
-                // @ts-ignore
                 const parentMessage = thread.messages.id(respondsTo);
                 if (!parentMessage) {
                     throw (0, utilities_1.newErr)(404, 'Parent message not found');
@@ -111,8 +108,7 @@ const ThreadService = {
                     if (!userParent) {
                         throw (0, utilities_1.newErr)(404, 'User not found');
                     }
-                    // @ts-ignore
-                    yield (0, user_service_1.notifyUser)(userParent.id, `${userParent.username} in ${thread.title}`, parentMessage.content);
+                    yield (0, user_service_1.notifyUser)(userParent.id, `${username} in ${thread.title}`, message.content);
                 }
             }
             // Get the _id of the newly created message
@@ -140,12 +136,11 @@ const ThreadService = {
             // Check if the user has already reacted to this message with the same icon
             if (message.reactions.find(r => r.username === username && r.reactIcon === reactIcon)) {
                 // Remove the reaction
-                // @ts-ignore
                 message.reactions = message.reactions.filter(r => r.username !== username || r.reactIcon !== reactIcon);
             }
             else {
                 // Add the reaction
-                message.reactions.push({ username: username, reactIcon: reactIcon });
+                message.reactions.push({ username: username, reactIcon: reactIcon, timestamp: new Date() });
             }
             yield thread.save();
             if (message.reactions.length > 0) {
@@ -165,7 +160,7 @@ const ThreadService = {
                 const regex = new RegExp(query, 'i');
                 threads = threads.filter(thread => regex.test(thread.bookTitle) || regex.test(thread.title) || regex.test(thread.username));
             }
-            // classify : ['by recent activity', 'by number of messages', by creation date']
+            // classify : ['by recent activity', 'by number of messages', 'by creation date']
             let classify = request.query.cls || 'by recent activity';
             const asc = request.query.asc; // Boolean
             if (classify === 'by recent activity') {

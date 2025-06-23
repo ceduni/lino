@@ -189,12 +189,14 @@ function createAdminUser(server) {
             return response.json().token;
         }
         catch (err) {
-            if (err.message.includes('already taken')) {
+            const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+            if (errorMessage.includes('already taken')) {
                 console.log('Admin user already exists.');
             }
             else {
                 throw err;
             }
+            return '';
         }
     });
 }
@@ -223,6 +225,7 @@ function reinitDatabase(server) {
             },
         });
         console.log('Database reinitialized.');
+        return token;
     });
 }
 exports.reinitDatabase = reinitDatabase;

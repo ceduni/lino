@@ -23,7 +23,9 @@ function registerUser(request, reply) {
             reply.code(201).send(response);
         }
         catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
@@ -66,7 +68,9 @@ function loginUser(request, reply) {
             reply.send({ token: response.token });
         }
         catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
@@ -99,100 +103,18 @@ const loginUserSchema = {
         }
     },
 };
-function addToFavorites(request, reply) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const user = yield user_service_2.default.addToFavorites(request);
-            reply.code(200).send({ favorites: user.favoriteBooks });
-        }
-        catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
-        }
-    });
-}
-const addToFavoritesSchema = {
-    description: 'Add a book to user favorites',
-    tags: ['users', 'books'],
-    body: {
-        type: 'object',
-        required: ['bookId'],
-        properties: {
-            bookId: { type: 'string' }
-        }
-    },
-    response: {
-        200: {
-            description: 'Book added to favorites',
-            type: 'object',
-            properties: {
-                favorites: { type: 'array', items: { type: 'string' } }
-            }
-        },
-        404: {
-            description: 'User not found',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        400: {
-            description: 'Book already in favorites',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
-function removeFromFavorites(request, reply) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const user = yield user_service_2.default.removeFromFavorites(request);
-            // @ts-ignore
-            reply.send({ favorites: user.favoriteBooks });
-        }
-        catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
-        }
-    });
-}
-const removeFromFavoritesSchema = {
-    description: 'Remove a book from user favorites',
-    tags: ['users', 'books'],
-    params: {
-        type: 'object',
-        required: ['id'],
-        properties: {
-            id: { type: 'string' }
-        }
-    },
-    response: {
-        200: {
-            description: 'Book removed from favorites',
-            type: 'object',
-            properties: {
-                favorites: { type: 'array', items: { type: 'string' } }
-            }
-        },
-        404: {
-            description: 'User or book not found',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function getUser(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // @ts-ignore
-            const userId = request.user.id; // Extract user ID from JWT token
+            const authRequest = request;
+            const userId = authRequest.user.id; // Extract user ID from JWT token
             const user = yield user_model_1.default.findById(userId);
             reply.send({ user: user });
         }
         catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
@@ -223,14 +145,16 @@ const getUserSchema = {
         }
     }
 };
-function readUserNotifications(request, reply) {
+function getUserNotifications(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const notifications = yield user_service_2.default.readUserNotifications(request);
+            const notifications = yield user_service_2.default.getUserNotifications(request);
             reply.send({ notifications: notifications });
         }
         catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
@@ -253,6 +177,7 @@ const getUserNotificationsSchema = {
                     type: 'array', items: {
                         type: 'object',
                         properties: {
+                            _id: { type: 'string' },
                             title: { type: 'string' },
                             timestamp: { type: 'string' },
                             content: { type: 'string' },
@@ -271,22 +196,22 @@ const getUserNotificationsSchema = {
         }
     }
 };
-function getUserFavorites(request, reply) {
+function readNotification(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // @ts-ignore
-            const userId = request.user.id; // Extract user ID from JWT token
-            const favorites = yield user_service_2.default.getFavorites(userId);
-            reply.send({ favorites: favorites });
+            const notifications = yield user_service_2.default.readNotification(request);
+            reply.code(200).send({ notifications: notifications });
         }
         catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
-const getUserFavoritesSchema = {
-    description: 'Get user favorite books',
-    tags: ['users', 'books'],
+const readNotificationSchema = {
+    description: 'Read a user notification',
+    tags: ['users'],
     headers: {
         type: 'object',
         required: ['authorization'],
@@ -294,16 +219,34 @@ const getUserFavoritesSchema = {
             authorization: { type: 'string' } // JWT token
         }
     },
+    body: {
+        type: 'object',
+        required: ['notificationId'],
+        properties: {
+            notificationId: { type: 'string' }
+        }
+    },
     response: {
         200: {
-            description: 'User favorite books',
+            description: 'Notification read',
             type: 'object',
             properties: {
-                favorites: { type: 'array', items: utilities_1.bookSchema }
+                notifications: {
+                    type: 'array', items: {
+                        type: 'object',
+                        properties: {
+                            _id: { type: 'string' },
+                            title: { type: 'string' },
+                            timestamp: { type: 'string' },
+                            content: { type: 'string' },
+                            read: { type: 'boolean' }
+                        }
+                    }
+                }
             }
         },
-        500: {
-            description: 'Internal server error',
+        404: {
+            description: 'User or notification not found',
             type: 'object',
             properties: {
                 error: { type: 'string' }
@@ -318,7 +261,9 @@ function updateUser(request, reply) {
             reply.send({ user: user });
         }
         catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
@@ -367,20 +312,19 @@ function clearCollection(request, reply) {
             reply.send({ message: 'Users cleared' });
         }
         catch (error) {
-            reply.code(500).send({ error: error.message });
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(500).send({ error: message });
         }
     });
 }
 function userRoutes(server) {
     return __awaiter(this, void 0, void 0, function* () {
         server.get('/users', { preValidation: [server.authenticate], schema: getUserSchema }, getUser);
-        server.get('/users/favorites', { preValidation: [server.authenticate], schema: getUserFavoritesSchema }, getUserFavorites);
-        server.get('/users/notifications', { preValidation: [server.authenticate], schema: getUserNotificationsSchema }, readUserNotifications);
+        server.get('/users/notifications', { preValidation: [server.authenticate], schema: getUserNotificationsSchema }, getUserNotifications);
+        server.post('/users/notifications/read', { preValidation: [server.authenticate], schema: readNotificationSchema }, readNotification);
         server.post('/users/register', { schema: registerUserSchema }, registerUser);
         server.post('/users/login', { schema: loginUserSchema }, loginUser);
         server.post('/users/update', { preValidation: [server.authenticate], schema: updateUserSchema }, updateUser);
-        server.post('/users/favorites', { preValidation: [server.authenticate], schema: addToFavoritesSchema }, addToFavorites);
-        server.delete('/users/favorites/:id', { preValidation: [server.authenticate], schema: removeFromFavoritesSchema }, removeFromFavorites);
         server.delete('/users/clear', { preValidation: [server.adminAuthenticate], schema: utilities_1.clearCollectionSchema }, clearCollection);
     });
 }

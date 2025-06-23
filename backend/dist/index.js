@@ -19,6 +19,7 @@ const fastifyCors = require('@fastify/cors');
 const fastifySwagger = require('@fastify/swagger');
 const fastifySwaggerUi = require('@fastify/swagger-ui');
 const bookRoutes = require('./routes/book.route');
+const bookboxRoutes = require('./routes/bookbox.route');
 const userRoutes = require('./routes/user.route');
 const threadRoutes = require('./routes/thread.route');
 const fastifyWebSocket = require('@fastify/websocket');
@@ -36,79 +37,59 @@ exports.clients = clients;
 // Function to broadcast a message to a specific user
 function broadcastToUser(userId, message) {
     try {
-        console.log('Broadcasting message to user:', userId, message);
         clients.forEach((client) => {
-            // @ts-ignore
-            console.log('Check readyState and userId of client:', client.socket.readyState);
-            // @ts-ignore
-            if (client.userId === userId && client.socket.readyState === 'open') {
-                console.log('Broadcasting message to user:', userId, message);
-                // @ts-ignore
+            if (client.userId === userId && client.readyState === 1) {
                 client.send(JSON.stringify(message));
+                console.log('Sent message to user', userId, message);
             }
         });
     }
     catch (error) {
-        console.log('Failed to broadcast message to user:', error.message);
-        throw (0, utilities_1.newErr)(500, error.message);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        throw (0, utilities_1.newErr)(500, errorMessage);
     }
 }
 exports.broadcastToUser = broadcastToUser;
 function broadcastMessage(event, data) {
     try {
         clients.forEach((client) => {
-            // @ts-ignore
-            console.log('Check readyState of client:', client.socket.readyState);
-            // @ts-ignore
-            if (client.socket.readyState === 'open') {
-                console.log('Broadcasting message:', event, data);
-                // @ts-ignore
+            if (client.readyState === 1) {
                 client.send(JSON.stringify({ event, data }));
-            }
-            else {
-                console.log('Client not ready');
+                console.log(event, data);
             }
         });
     }
     catch (error) {
-        console.log('Failed to broadcast message:', error.message);
-        throw (0, utilities_1.newErr)(500, error.message);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        throw (0, utilities_1.newErr)(500, errorMessage);
     }
 }
 exports.broadcastMessage = broadcastMessage;
 // WebSocket route
-// @ts-ignore
-server.get('/ws', { websocket: true }, (socket, req) => {
-    try {
-        socket.userId = req.request.query.userId; // Store the user ID in the socket to identify the user
-    }
-    catch (error) {
-        socket.userId = 'anonymous'; // Set a default user ID
-    }
-    clients.add(socket); // Add the connected client to the set
-    console.log('Client connected:', socket.userId);
-    console.log('Clients:');
-    for (const client of clients) {
-        // @ts-ignore
-        console.log(client.userId);
-    }
-    console.log('Client count:', clients.size);
-    socket.on('message', (msg) => {
-        console.log('Received message:', msg);
-    });
-    socket.on('close', () => {
-        clients.delete(socket);
-        console.log('Client disconnected:', socket.userId);
-        console.log('Remaining clients:');
-        // @ts-ignore
-        clients.forEach((client) => console.log(client.userId));
-        console.log('Client count:', clients.size);
+server.register(function (server) {
+    return __awaiter(this, void 0, void 0, function* () {
+        server.get('/ws', { websocket: true }, (socket, req) => {
+            const wsClient = socket;
+            try {
+                const query = req.query;
+                wsClient.userId = query.userId; // Store the user ID in the socket to identify the user
+            }
+            catch (error) {
+                wsClient.userId = 'anonymous'; // Set a default user ID
+            }
+            clients.add(wsClient); // Add the connected client to the set
+            wsClient.on('message', (msg) => {
+                console.log('Received message:', msg.toString());
+            });
+            wsClient.on('close', () => {
+                clients.delete(wsClient); // Remove the disconnected client from the set
+            });
+        });
     });
 });
 // Register JWT plugin
 server.register(fastifyJwt, { secret: process.env.JWT_SECRET_KEY });
 // Authentication hooks
-// @ts-ignore
 server.decorate('authenticate', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield request.jwtVerify();
@@ -117,26 +98,50 @@ server.decorate('authenticate', (request, reply) => __awaiter(void 0, void 0, vo
         reply.send(err); // will send an error 401
     }
 }));
-// @ts-ignore
+// Book manipulation token validation preValidation
+server.decorate('bookManipAuth', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const bookManipToken = request.headers['bm_token']; // Get custom header
+        const predefinedToken = 'LinoCanIAddOrRemoveBooksPlsThanksLmao';
+        if (bookManipToken !== predefinedToken) {
+            console.log('Invalid book manipulation token:', bookManipToken);
+            return reply.status(401).send({ error: 'Unauthorized' });
+        }
+        console.log('Valid book manipulation token');
+    }
+    catch (error) {
+        return reply.status(401).send({ error: 'Unauthorized' });
+    }
+}));
 server.decorate('optionalAuthenticate', (request) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        request.user = yield server.jwt.verify(request.headers.authorization.split(' ')[1]);
+        const authHeader = request.headers.authorization;
+        if (authHeader) {
+            request.user = yield server.jwt.verify(authHeader.split(' ')[1]);
+        }
+        else {
+            request.user = null;
+        }
     }
     catch (error) {
         request.user = null;
     }
 }));
-// @ts-ignore
 server.decorate('adminAuthenticate', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const token = request.headers.authorization.split(' ')[1];
+        const authHeader = request.headers.authorization;
+        if (!authHeader) {
+            return reply.status(401).send({ error: 'Unauthorized' });
+        }
+        const token = authHeader.split(' ')[1];
         const user = yield server.jwt.verify(token);
         if (user.username !== process.env.ADMIN_USERNAME) {
+            console.log('Non-user tried to access admin route: ', user.username);
             reply.status(401).send({ error: 'Unauthorized' });
         }
     }
     catch (error) {
-        reply.status(401).send(error);
+        reply.status(401).send({ error: 'Unauthorized' });
     }
 }));
 server.register(fastifySwagger, {
@@ -184,12 +189,16 @@ server.register(fastifySwaggerUi, {
 });
 // Register routes
 server.register(bookRoutes);
+server.register(bookboxRoutes);
 server.register(userRoutes);
 server.register(threadRoutes);
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mongoose.connect(process.env.MONGODB_URI);
-        console.log('MongoDB connected...');
+        console.log('Starting server initialization...');
+        const dbUri = process.env.NODE_ENV === 'test' ? process.env.TEST_MONGODB_URI : process.env.MONGODB_URI;
+        console.log(dbUri);
+        yield mongoose.connect(dbUri);
+        console.log(`MongoDB connected to ${mongoose.connection.db.databaseName}...`);
         const port = process.env.PORT || 3000;
         const host = process.env.RENDER ? '0.0.0.0' : 'localhost';
         yield server.listen({ host, port });

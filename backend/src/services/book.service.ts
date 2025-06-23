@@ -1,194 +1,22 @@
 import axios from 'axios';
-import Book from "../models/book.model";
-import User from "../models/user.model";
+import mongoose from 'mongoose';
 import BookBox from "../models/bookbox.model";
+import User from "../models/user.model";
 import Request from "../models/book.request.model";
+import Transaction from "../models/transaction.model";
 import {notifyUser} from "./user.service";
 import {newErr} from "./utilities";
-import {ObjectId} from "mongodb";
+import { 
+    BookSearchQuery,
+    IBook,
+    ITransaction
+} from '../types/book.types';
+import { IUser } from '../types/user.types';
+import { AuthenticatedRequest } from '../types/common.types';
 
 const bookService = {
-    async getBookBox(bookBoxId: string) {
-        const bookBox = await BookBox.findById(bookBoxId);
-        if (!bookBox) {
-            throw new Error('Bookbox not found');
-        }
-        const books = [];
-        for (const bookId of bookBox.books) {
-            const book = await Book.findById(bookId);
-            if (book) {
-                books.push(book);
-            }
-        }
-        return {
-            id: bookBox.id,
-            name: bookBox.name,
-            image: bookBox.image,
-            location: bookBox.location,
-            infoText: bookBox.infoText,
-            books: books,
-        };
-    },
 
-    // Helper function to fetch or create a book
-    async addBook(request: any) {
-        let book = await Book.findOne({qrCodeId: request.body.qrCodeId});
-        if (!book) {
-            book = new Book({
-                qrCodeId: request.body.qrCodeId,
-                isbn: request.body.isbn,
-                title: request.body.title,
-                authors: request.body.authors,
-                description: request.body.description,
-                coverImage: request.body.coverImage,
-                publisher: request.body.publisher,
-                parutionYear: request.body.parutionYear,
-                pages: request.body.pages,
-                categories: request.body.categories,
-            });
-        }
-        if (!book.qrCodeId) {
-            throw newErr(400, 'Book\'s QR code ID is required');
-        }
-        if (!book.title) {
-            throw newErr(400, 'Book\'s title is required');
-        }
-        let bookBox = await BookBox.findById(request.body.bookboxId);
-        if (!bookBox) {
-            throw newErr(404, 'Bookbox not found');
-        }
-
-        // check if the book is already in a bookbox somewhere
-        const bookBoxes = await BookBox.find({ books: book.id });
-        if (bookBoxes.length > 0) {
-            throw newErr(400, 'Book is supposed to be in the book box ' + bookBoxes[0].name);
-        }
-
-        bookBox.books.push(book.id);
-        await this.updateBooks(book, request, true);
-        await this.notifyAllUsers(book, 'added to', bookBox.name);
-        await book.save();
-        await bookBox.save();
-        await this.updateUserEcoImpact(request, book.id);
-
-        // send a notification to the user who requested the book
-        let requests = await Request.find();
-        // Filter requests using regex to match similar titles
-        const regex = new RegExp(book.title, 'i');
-        requests = requests.filter(request => regex.test(request.bookTitle));
-        for (let i = 0; i < requests.length; i++) {
-            const user = await User.findOne({username: requests[i].username});
-            if (!user) {
-                throw newErr(404, 'User not found');
-            }
-            await notifyUser(user.id, "Book notification",
-                `The book "${book.title}" has been added to the bookbox "${bookBox.name}" to fulfill your request !`);
-        }
-
-
-        return {bookId : book.id, books : bookBox.books};
-    },
-
-    async getBookFromBookBox(request: any) {
-        const qrCode = request.params.bookQRCode;
-        const bookboxId = request.params.bookboxId;
-        // check if the book exists
-        let book;
-        book = await Book.findOne({qrCodeId: qrCode});
-        if (!book) {
-            book = await Book.findById(qrCode);
-        }
-        if (!book) {
-            throw newErr(404, 'Book not found');
-        }
-        // check if the bookbox exists
-        let bookBox = await BookBox.findById(bookboxId);
-        if (!bookBox) {
-            throw newErr(404, 'Bookbox not found');
-        }
-        // check if the book is in the bookbox
-        if (bookBox.books.includes(book.id)) {
-            console.log('Before:', bookBox.books);
-            bookBox.books.splice(bookBox.books.indexOf(book.id), 1);
-            console.log('After:', bookBox.books);
-        } else {
-            throw newErr(404, 'Book not found in bookbox');
-        }
-
-        await this.updateBooks(book, request, false);
-        await this.notifyAllUsers(book, 'removed from', bookBox.name);
-        await book.save();
-        await bookBox.save();
-        await this.updateUserEcoImpact(request, book.id);
-        return {book: book, books: bookBox.books};
-    },
-
-    async updateUserEcoImpact(request: any, bookId: string) {
-        // if user is authenticated, update the user's ecological impact
-        if (request.user) {
-            // @ts-ignore
-            const userId = request.user.id;
-            let user = await User.findById(userId);
-            if (user) {
-
-                if (!user.trackedBooks.includes(bookId)) {
-                    // add the book to the user's tracked books if it's not already there
-                    user.trackedBooks.push(bookId);
-
-                    // the user can't gain ecological impact from the same book twice
-                    // @ts-ignore
-                    user.ecologicalImpact.carbonSavings += 27.71;
-                    // @ts-ignore
-                    user.ecologicalImpact.savedWater += 2000;
-                    // @ts-ignore
-                    user.ecologicalImpact.savedTrees += 0.005;
-                }
-                await user.save();
-            }
-        }
-    },
-
-    async updateBooks(book: any, request: any, given: boolean) {
-        if (request.user) {
-            // Push the user's username and the current timestamp to the book's history
-            const userId = request.user.id;
-            const user = await User.findById(userId);
-            if (!user) {
-                throw newErr(404, 'User not found');
-            }
-            const username = user.username;
-            if (given) { // if the book is given
-                book.givenHistory.push({username: username, timestamp: new Date()});
-                // push in the user's book history
-                user.bookHistory.push({bookId: book.id, timestamp: new Date(), given: true});
-            } else { // if the book is taken
-                book.takenHistory.push({username: username, timestamp: new Date()});
-                // push in the user's book history
-                user.bookHistory.push({bookId: book.id, timestamp: new Date(), given: false});
-            }
-            await user.save(); // save the user's book history
-        } else { // if the user is not authenticated, username is 'guest'
-            if (given) { // if the book is given
-                book.givenHistory.push({username: "guest", timestamp: new Date()});
-            } else { // if the book is taken
-                book.takenHistory.push({username: "guest", timestamp: new Date()});
-            }
-        }
-
-        let books = await Book.find();
-        // Filter books using regex to match similar titles
-        const regex = new RegExp(book.title, 'i');
-        books = books.filter(b => regex.test(b.title));
-        for (let i = 0; i < books.length; i++) {
-            // Update the dateLastAction field for all books with the same title
-            // to indicate that this book has been looked at recently
-            // @ts-ignore
-            books[i].dateLastAction = Date.now();
-            await books[i].save();
-        }
-    },
-
-    async getBookInfoFromISBN(request: any) {
+    async getBookInfoFromISBN(request: { params: { isbn: string } }) {
         const isbn = request.params.isbn;
         const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${process.env.GOOGLE_BOOKS_API_KEY}`);
         if (response.data.totalItems === 0) {
@@ -210,115 +38,124 @@ const bookService = {
         };
     },
 
-
-    // Function that searches for books based on keyword search and ordering filters
-    async searchBooks(request: any) {
+    // Function that searches for books across all bookboxes based on keyword search and ordering filters
+    // Optimized using MongoDB aggregation pipeline for better performance
+    async searchBooks(request: { query: BookSearchQuery }) {
         const { kw, cls = 'by title', asc = true } = request.query;
 
-        let filter: any = {};
-
-        if (kw) {
-            const regex = new RegExp(kw, 'i');
-            filter.$or = [
-                { title: regex },
-                { authors: regex }
-            ];
-        }
-
-        // Sorting
-        const sortOptions: any = {};
-        if (cls === 'by title') {
-            sortOptions.title = asc ? 1 : -1;
-        } else if (cls === 'by author') {
-            sortOptions['authors.0'] = asc ? 1 : -1;
-        } else if (cls === 'by year') {
-            sortOptions.parutionYear = asc ? 1 : -1;
-        } else if (cls === 'by recent activity') {
-            sortOptions.dateLastAction = asc ? 1 : -1;
-        }
-
-        let books = await Book.find(filter).sort(sortOptions);
-
-        const bookBoxes = await BookBox.find();
-        const finalBooks = [];
-        for (let i = 0; i < books.length; i++) {
-            const book = books[i].toObject();
-            // @ts-ignore
-            book.bookboxPresence = bookBoxes.filter((box) =>
-                box.books.includes(book._id.toString())
-            ).map(box => box._id);
-            finalBooks.push(book);
-        }
-
-        return finalBooks;
-    },
-
-    async searchBookboxes(request: any) {
-        const kw = request.query.kw;
-        let bookBoxes = await BookBox.find();
-
-        if (kw) {
-            // Filter using regex for more flexibility
-            const regex = new RegExp(kw, 'i');
-            bookBoxes = bookBoxes.filter((bookBox) =>
-                regex.test(bookBox.name) || regex.test(bookBox.infoText || '')
-            );
-        }
-
-        const cls = request.query.cls;
-        const asc = request.query.asc; // Boolean
-
-        if (cls === 'by name') {
-            bookBoxes.sort((a, b) => {
-                return asc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-            });
-        } else if (cls === 'by location') {
-            const selfLoc = [request.query.longitude, request.query.latitude];
-            if (!selfLoc[0] || !selfLoc[1]) {
-                throw newErr(401, 'Location is required for this classification');
+        // Build aggregation pipeline
+        const pipeline: any[] = [
+            // Unwind the books array to work with individual books
+            { $unwind: '$books' },
+            
+            // Add bookbox information to each book
+            {
+                $addFields: {
+                    'books.bookboxId': { $toString: '$_id' },
+                    'books.bookboxName': '$name'
+                }
             }
-            bookBoxes.sort((a, b) => {
-                const aLoc = a.location;
-                const bLoc = b.location;
-                // calculate the distance between the user's location and the bookbox's location
-                const aDist = Math.sqrt((aLoc[0] - selfLoc[0]) ** 2 + (aLoc[1] - selfLoc[1]) ** 2);
-                const bDist = Math.sqrt((bLoc[0] - selfLoc[0]) ** 2 + (bLoc[1] - selfLoc[1]) ** 2);
-                // sort in ascending or descending order of distance
-                return asc ? aDist - bDist : bDist - aDist;
-            });
-        } else if (cls === 'by number of books') {
-            bookBoxes.sort((a, b) => {
-                return asc ? a.books.length - b.books.length : b.books.length - a.books.length;
+        ];
+
+        // Add keyword filtering stage if keyword is provided
+        if (kw) {
+            // Use text search if available, otherwise use regex
+            pipeline.push({
+                $match: {
+                    $or: [
+                        { 'books.title': { $regex: kw, $options: 'i' } },
+                        { 'books.authors': { $regex: kw, $options: 'i' } },
+                        { 'books.categories': { $regex: kw, $options: 'i' } }
+                    ]
+                }
             });
         }
 
+        // Add sorting stage
+        let sortField: string;
+        let sortOrder = asc ? 1 : -1;
 
-        // only return the ids of the bookboxes
-        const bookBoxIds = bookBoxes.map((bookBox) => bookBox._id.toString());
-        // get the full bookbox objects
-        const finalBookBoxes = [];
-        for (let i = 0; i < bookBoxIds.length; i++) {
-            finalBookBoxes.push(await this.getBookBox(bookBoxIds[i]));
+        switch (cls) {
+            case 'by title':
+                sortField = 'books.title';
+                break;
+            case 'by author':
+                sortField = 'books.authors';
+                break;
+            case 'by year':
+                sortField = 'books.parutionYear';
+                break;
+            case 'by recent activity':
+                sortField = 'books.dateAdded';
+                break;
+            default:
+                sortField = 'books.title';
         }
 
-        return finalBookBoxes;
+        pipeline.push({ $sort: { [sortField]: sortOrder } });
+
+        // Project the final structure
+        pipeline.push({
+            $project: {
+                _id: { $toString: '$books._id' },
+                isbn: { $ifNull: ['$books.isbn', 'Unknown ISBN'] },
+                title: '$books.title',
+                authors: { $ifNull: ['$books.authors', []] },
+                description: { $ifNull: ['$books.description', 'No description available'] },
+                coverImage: { $ifNull: ['$books.coverImage', 'No cover image available'] },
+                publisher: { $ifNull: ['$books.publisher', 'Unknown publisher'] },
+                categories: { $ifNull: ['$books.categories', ['Uncategorized']] },
+                parutionYear: '$books.parutionYear',
+                pages: '$books.pages',
+                dateAdded: { $ifNull: ['$books.dateAdded', new Date()] },
+                bookboxId: '$books.bookboxId',
+                bookboxName: '$books.bookboxName'
+            }
+        });
+
+        // Execute the aggregation pipeline
+        const results = await BookBox.aggregate(pipeline);
+        
+        return results;
     },
 
     async getBook(id: string) {
-        let objectId;
-        if (ObjectId.isValid(id)) {
-            objectId = new ObjectId(id);
-        }
+        // Use aggregation pipeline to efficiently find book by ID
+        const pipeline = [
+            // Unwind the books array
+            { $unwind: '$books' },
+            
+            // Match the specific book ID
+            { $match: { 'books._id': new mongoose.Types.ObjectId(id) } },
+            
+            // Project the result with bookbox information
+            {
+                $project: {
+                    _id: { $toString: '$books._id' },
+                    isbn: { $ifNull: ['$books.isbn', 'Unknown ISBN'] },
+                    title: '$books.title',
+                    authors: { $ifNull: ['$books.authors', []] },
+                    description: { $ifNull: ['$books.description', 'No description available'] },
+                    coverImage: { $ifNull: ['$books.coverImage', 'No cover image available'] },
+                    publisher: { $ifNull: ['$books.publisher', 'Unknown publisher'] },
+                    categories: { $ifNull: ['$books.categories', ['Uncategorized']] },
+                    parutionYear: '$books.parutionYear',
+                    pages: '$books.pages',
+                    dateAdded: { $ifNull: ['$books.dateAdded', new Date()] },
+                    bookboxId: { $toString: '$_id' },
+                    bookboxName: '$name'
+                }
+            },
+            
+            // Limit to 1 result since we're looking for a specific book
+            { $limit: 1 }
+        ];
 
-        return Book.findOne({
-            $or: [
-                {qrCodeId: id},
-                {_id: objectId},
-            ],
-        });
+        const results = await BookBox.aggregate(pipeline);
+        return results.length > 0 ? results[0] : null;
     },
 
-    async requestBookToUsers(request : any) {
+    async requestBookToUsers(request: AuthenticatedRequest & { body: { title: string; customMessage?: string } }) {
         const user = await User.findById(request.user.id);
         if (!user) {
             throw newErr(404, 'User not found');
@@ -341,7 +178,7 @@ const bookService = {
         return newRequest;
     },
 
-    async deleteBookRequest(request : any) {
+    async deleteBookRequest(request: { params: { id: string } }) {
         const requestId = request.params.id;
         const requestToDelete = await Request.findById(requestId);
         if (!requestToDelete) {
@@ -350,50 +187,8 @@ const bookService = {
         await requestToDelete.deleteOne();
     },
 
-    // Function that returns 1 if the book is relevant to the user by his keywords, 0 otherwise
-    async getBookRelevance(book: any, user: any) {
-        // @ts-ignore
-        const keywords = user.notificationKeyWords.map(keyword => new RegExp(keyword, 'i'));
-        const properties = [book.title, ...book.authors, ...book.categories];
 
-        for (let i = 0; i < properties.length; i++) {
-            for (let j = 0; j < keywords.length; j++) {
-                if (keywords[j].test(properties[i])) {
-                    return 1;
-                }
-            }
-        }
-
-        return 0;
-    },
-
-    async addNewBookbox(request: any) {
-        const bookBox = new BookBox({
-            name: request.body.name,
-            books: [],
-            image: request.body.image,
-            location: [request.body.longitude, request.body.latitude],
-            infoText: request.body.infoText,
-        });
-        await bookBox.save();
-        return bookBox;
-    },
-
-    async notifyAllUsers(book: any, action: string, bookBoxName: string) {
-        const users = await User.find();
-        for (let i = 0; i < users.length; i++) {
-            const relevance = await this.getBookRelevance(book, users[i]);
-            // Notify the user if the book is relevant to him or if it's one of his favorite books
-            if (relevance > 0 || users[i].favoriteBooks.includes(book.id)) {
-                await notifyUser(users[i].id,
-                    "Book notification",
-                    `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
-            }
-        }
-    },
-
-
-    async getBookRequests(request: any) {
+    async getBookRequests(request: { query: { username?: string } }) {
         let username = request.query.username;
         if (!username) {
             return Request.find();
@@ -402,11 +197,34 @@ const bookService = {
         }
     },
 
-    async clearCollection() {
-        await Book.deleteMany({});
-        await BookBox.deleteMany({});
-    }
+    // Get transaction history
+    async getTransactionHistory(request: { query: { username?: string; bookTitle?: string; bookboxName?: string; limit?: number } }) {
+        const { username, bookTitle, bookboxName, limit } = request.query;
+        
+        let filter: any = {};
+        if (username) filter.username = username;
+        if (bookTitle) filter.bookTitle = new RegExp(bookTitle, 'i');
+        if (bookboxName) filter.bookboxName = new RegExp(bookboxName, 'i');
 
+        let query = Transaction.find(filter).sort({ timestamp: -1 });
+        if (limit) {
+            query = query.limit(parseInt(limit.toString()));
+        }
+
+        return await query.exec();
+    },
+
+    // Create a transaction record
+    async createTransaction(username: string, action: 'added' | 'took', bookTitle: string, bookboxName: string) {
+        const transaction = new Transaction({
+            username,
+            action,
+            bookTitle,
+            bookboxName
+        });
+        await transaction.save();
+        return transaction;
+    }
 };
 
 export default bookService;

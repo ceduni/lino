@@ -23,7 +23,9 @@ function createThread(request, reply) {
             reply.code(201).send({ threadId: thread.id });
         }
         catch (error) {
-            reply.code(400).send({ error: error.message });
+            const statusCode = error.statusCode || 400;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
@@ -82,11 +84,13 @@ function deleteThread(request, reply) {
             yield thread_service_1.default.deleteThread(request);
             reply.code(204).send({ message: 'Thread deleted' });
             // Broadcast thread deletion
-            // @ts-ignore
-            server.broadcastMessage('threadDeleted', { threadId: request.params.threadId });
+            const params = request.params;
+            (0, index_1.broadcastMessage)('threadDeleted', { threadId: params.threadId });
         }
         catch (error) {
-            reply.code(error.statusCode).send({ error: error.message });
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
@@ -137,12 +141,14 @@ function addThreadMessage(request, reply) {
             const messageId = yield thread_service_1.default.addThreadMessage(request);
             reply.code(201).send(messageId);
             // Broadcast new message
-            // @ts-ignore
-            (0, index_1.broadcastMessage)('newMessage', { messageId, threadId: request.body.threadId });
+            const body = request.body;
+            (0, index_1.broadcastMessage)('newMessage', { messageId, threadId: body.threadId });
         }
         catch (error) {
             console.log(error);
-            reply.code(error.statusCode).send({ error: error.message });
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
     });
 }
@@ -206,7 +212,8 @@ function toggleMessageReaction(request, reply) {
         }
         catch (error) {
             console.log(error);
-            reply.code(400).send({ error: error.message });
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(400).send({ error: message });
         }
     });
 }
@@ -285,9 +292,12 @@ const searchThreadsSchema = {
     description: 'Search threads',
     tags: ['threads'],
     querystring: {
-        q: { type: 'string' },
-        cls: { type: 'string' },
-        asc: { type: 'boolean' },
+        type: 'object',
+        properties: {
+            q: { type: 'string' },
+            cls: { type: 'string' },
+            asc: { type: 'boolean' }
+        }
     },
     response: {
         200: {
@@ -341,7 +351,8 @@ function clearCollection(request, reply) {
             reply.send({ message: 'Threads collection cleared' });
         }
         catch (error) {
-            reply.code(500).send({ error: error.message });
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(500).send({ error: message });
         }
     });
 }

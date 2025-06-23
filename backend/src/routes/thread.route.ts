@@ -3,14 +3,18 @@ import ThreadService from '../services/thread.service';
 import Thread from "../models/thread.model";
 import {clearCollectionSchema, threadSchema} from "../services/utilities";
 import {broadcastMessage} from "../index";
+import { ThreadCreateData, MessageCreateData, ReactionData } from "../types/thread.types";
+import { AuthenticatedRequest } from "../types/common.types";
 
 
 async function createThread(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const thread = await ThreadService.createThread(request);
+        const thread = await ThreadService.createThread(request as AuthenticatedRequest & { body: ThreadCreateData });
         reply.code(201).send({threadId: thread.id});
-    } catch (error : any) {
-        reply.code(400).send({ error: error.message });
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 400;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
     }
 }
 
@@ -66,13 +70,15 @@ const createThreadSchema = {
 
 async function deleteThread(request : FastifyRequest, reply : FastifyReply) {
     try {
-        await ThreadService.deleteThread(request);
+        await ThreadService.deleteThread(request as { params: { threadId: string } });
         reply.code(204).send({ message: 'Thread deleted' });
         // Broadcast thread deletion
-        // @ts-ignore
-        server.broadcastMessage('threadDeleted', { threadId: request.params.threadId });
-    } catch (error : any) {
-        reply.code(error.statusCode).send({ error: error.message });
+        const params = request.params as { threadId: string };
+        broadcastMessage('threadDeleted', { threadId: params.threadId });
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
     }
 }
 
@@ -120,14 +126,16 @@ const deleteThreadSchema = {
 
 async function addThreadMessage(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const messageId = await ThreadService.addThreadMessage(request);
+        const messageId = await ThreadService.addThreadMessage(request as AuthenticatedRequest & { body: MessageCreateData });
         reply.code(201).send(messageId);
         // Broadcast new message
-        // @ts-ignore
-        broadcastMessage('newMessage', { messageId, threadId: request.body.threadId });
-    } catch (error : any) {
+        const body = request.body as MessageCreateData;
+        broadcastMessage('newMessage', { messageId, threadId: body.threadId });
+    } catch (error : unknown) {
         console.log(error);
-        reply.code(error.statusCode).send({ error: error.message });
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
     }
 }
 
@@ -193,13 +201,14 @@ interface ToggleMessageReactionParams extends RouteGenericInterface {
 }
 async function toggleMessageReaction(request : FastifyRequest<ToggleMessageReactionParams>, reply : FastifyReply) {
     try {
-        const reaction = await ThreadService.toggleMessageReaction(request);
+        const reaction = await ThreadService.toggleMessageReaction(request as AuthenticatedRequest & { body: ReactionData });
         reply.send({reaction : reaction});
         // Broadcast reaction
         broadcastMessage('messageReaction', { reaction, threadId: request.body.threadId });
-    } catch (error : any) {
+    } catch (error : unknown) {
         console.log(error);
-        reply.code(400).send({ error: error.message });
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(400).send({ error: message });
     }
 }
 
@@ -271,7 +280,7 @@ const toggleReactionSchema = {
 };
 
 async function searchThreads(request : FastifyRequest, reply : FastifyReply) {
-    const threads = await ThreadService.searchThreads(request);
+    const threads = await ThreadService.searchThreads(request as { query: { q?: string; cls?: string; asc?: boolean } });
     reply.send(threads);
 }
 
@@ -279,9 +288,12 @@ const searchThreadsSchema = {
     description: 'Search threads',
     tags: ['threads'],
     querystring: {
-        q: { type: 'string' },
-        cls: { type: 'string' },
-        asc: { type: 'boolean' },
+        type: 'object',
+        properties: {
+            q: { type: 'string' },
+            cls: { type: 'string' },
+            asc: { type: 'boolean' }
+        }
     },
     response: {
         200: {
@@ -344,8 +356,9 @@ async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
     try {
         await ThreadService.clearCollection();
         reply.send({ message: 'Threads collection cleared' });
-    } catch (error : any) {
-        reply.code(500).send({ error: error.message });
+    } catch (error : unknown) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(500).send({ error: message });
     }
 }
 

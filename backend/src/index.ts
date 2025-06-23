@@ -1,6 +1,7 @@
 import {WebSocket} from "@fastify/websocket";
 import {newErr} from "./services/utilities";
-import {FastifyRequest} from "fastify";
+import {FastifyRequest, FastifyReply} from "fastify";
+import { WebSocketClient, FastifyRequestWithJWT } from "./types/common.types";
 
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
@@ -10,6 +11,7 @@ const fastifyCors = require('@fastify/cors');
 const fastifySwagger = require('@fastify/swagger');
 const fastifySwaggerUi = require('@fastify/swagger-ui');
 const bookRoutes = require('./routes/book.route');
+const bookboxRoutes = require('./routes/bookbox.route');
 const userRoutes = require('./routes/user.route');
 const threadRoutes = require('./routes/thread.route');
 const fastifyWebSocket = require('@fastify/websocket');
@@ -26,56 +28,54 @@ server.register(fastifyCors, {
 server.register(fastifyWebSocket);
 
 // Store connected WebSocket clients
-const clients = new Set();
+const clients = new Set<WebSocketClient>();
 
 // Function to broadcast a message to a specific user
-export function broadcastToUser(userId : string, message: any) {
+export function broadcastToUser(userId: string, message: unknown) {
     try {
         clients.forEach((client) => {
-            // @ts-ignore
-            // @ts-ignore
             if (client.userId === userId && client.readyState === 1) {
-                // @ts-ignore
                 client.send(JSON.stringify(message));
                 console.log('Sent message to user', userId, message);
             }
         });
-    } catch (error : any) {
-        throw newErr(500, error.message);
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        throw newErr(500, errorMessage);
     }
 }
 
-export function broadcastMessage(event: string, data: any) {
+export function broadcastMessage(event: string, data: unknown) {
     try {
         clients.forEach((client) => {
-            // @ts-ignore
             if (client.readyState === 1) {
-                // @ts-ignore
                 client.send(JSON.stringify({ event, data }));
                 console.log(event, data);
             }
         });
-    } catch (error : any) {
-        throw newErr(500, error.message);
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        throw newErr(500, errorMessage);
     }
 }
 
 // WebSocket route
 server.register(async function (server: any) {
-    server.get('/ws', { websocket: true }, (socket : WebSocket, req : FastifyRequest) => {
+    server.get('/ws', { websocket: true }, (socket: WebSocket, req: FastifyRequest) => {
+        const wsClient = socket as WebSocketClient;
         try {
-            // @ts-ignore
-            socket.userId = req.query.userId; // Store the user ID in the socket to identify the user
+            const query = req.query as { userId?: string };
+            wsClient.userId = query.userId; // Store the user ID in the socket to identify the user
         } catch (error) {
-            socket.userId = 'anonymous'; // Set a default user ID
+            wsClient.userId = 'anonymous'; // Set a default user ID
         }
 
-        clients.add(socket); // Add the connected client to the set
-        socket.on('message', (msg: any) => {
-            console.log('Received message:', msg);
+        clients.add(wsClient); // Add the connected client to the set
+        wsClient.on('message', (msg: Buffer) => {
+            console.log('Received message:', msg.toString());
         });
-        socket.on('close', () => {
-            clients.delete(socket); // Remove the disconnected client from the set
+        wsClient.on('close', () => {
+            clients.delete(wsClient); // Remove the disconnected client from the set
         });
     });
 })
@@ -87,8 +87,7 @@ server.register(async function (server: any) {
 server.register(fastifyJwt, { secret: process.env.JWT_SECRET_KEY });
 
 // Authentication hooks
-// @ts-ignore
-server.decorate('authenticate', async (request, reply) => {
+server.decorate('authenticate', async (request: FastifyRequestWithJWT, reply: FastifyReply) => {
     try {
         await request.jwtVerify();
     } catch (err) {
@@ -99,8 +98,7 @@ server.decorate('authenticate', async (request, reply) => {
 
 
 // Book manipulation token validation preValidation
-// @ts-ignore
-server.decorate('bookManipAuth', async (request, reply) => {
+server.decorate('bookManipAuth', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         const bookManipToken = request.headers['bm_token']; // Get custom header
         const predefinedToken = 'LinoCanIAddOrRemoveBooksPlsThanksLmao';
@@ -116,26 +114,33 @@ server.decorate('bookManipAuth', async (request, reply) => {
     }
 });
 
-// @ts-ignore
-server.decorate('optionalAuthenticate', async (request) => {
+server.decorate('optionalAuthenticate', async (request: FastifyRequestWithJWT) => {
     try {
-        request.user = await server.jwt.verify(request.headers.authorization.split(' ')[1]);
+        const authHeader = request.headers.authorization;
+        if (authHeader) {
+            request.user = await server.jwt.verify(authHeader.split(' ')[1]);
+        } else {
+            request.user = null;
+        }
     } catch (error) {
         request.user = null;
     }
 });
 
-// @ts-ignore
-server.decorate('adminAuthenticate', async (request, reply) => {
+server.decorate('adminAuthenticate', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-        const token = request.headers.authorization.split(' ')[1];
-        const user = await server.jwt.verify(token);
+        const authHeader = request.headers.authorization;
+        if (!authHeader) {
+            return reply.status(401).send({ error: 'Unauthorized' });
+        }
+        const token = authHeader.split(' ')[1];
+        const user = await server.jwt.verify(token) as { username: string };
         if (user.username !== process.env.ADMIN_USERNAME) {
             console.log('Non-user tried to access admin route: ', user.username);
             reply.status(401).send({ error: 'Unauthorized' });
         }
     } catch (error) {
-        reply.status(401).send(error);
+        reply.status(401).send({ error: 'Unauthorized' });
     }
 });
 
@@ -186,6 +191,7 @@ server.register(fastifySwaggerUi, {
 
 // Register routes
 server.register(bookRoutes);
+server.register(bookboxRoutes);
 server.register(userRoutes);
 server.register(threadRoutes);
 

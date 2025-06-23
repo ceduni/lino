@@ -9,9 +9,6 @@ const requestSchema = new mongoose_1.default.Schema({
     bookTitle: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
     customMessage: { type: String },
-    isFulfilled: { type: Boolean, default: false }
 });
-// Create a text index on the bookTitle field
-requestSchema.index({ bookTitle: 'text' });
 const Request = mongoose_1.default.model('Request', requestSchema, "requests");
 exports.default = Request;
