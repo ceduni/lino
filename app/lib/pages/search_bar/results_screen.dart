@@ -77,7 +77,6 @@ class _ResultsPageState extends State<ResultsPage> {
           ),
           BooksList(query: widget.query),
         ]);
-        break;
       case 1:
         sections.addAll([
           Padding(
@@ -110,7 +109,6 @@ class _ResultsPageState extends State<ResultsPage> {
           ),
           BookBoxesList(query: widget.query),
         ]);
-        break;
       case 2:
         sections.addAll([
           Padding(
@@ -143,7 +141,6 @@ class _ResultsPageState extends State<ResultsPage> {
           ),
           ThreadsList(query: widget.query),
         ]);
-        break;
       default:
         sections.addAll([
           Padding(
@@ -176,7 +173,6 @@ class _ResultsPageState extends State<ResultsPage> {
           ),
           BooksList(query: widget.query),
         ]);
-        break;
     }
 
     return sections;

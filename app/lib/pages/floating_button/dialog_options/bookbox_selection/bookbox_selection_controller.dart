@@ -1,5 +1,5 @@
 import 'package:Lino_app/pages/floating_button/common/barcode_controller.dart';
-import 'package:Lino_app/pages/floating_button/dialog_options/book_qr_assign/book_qr_assign_dialog.dart';
+import 'package:Lino_app/pages/floating_button/dialog_options/book_removal/book_removal_dialog.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/form_submission/form_controller.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/isbn_entry/isbn_dialog.dart';
 import 'package:Lino_app/services/book_services.dart';
@@ -46,7 +46,10 @@ class BookBoxSelectionController extends GetxController {
           'id': bb['id'],
           'name': bb['name'],
           'infoText': bb['infoText'],
-          'location': LatLng(bb['location'][1], bb['location'][0]),
+          'location': LatLng(
+            bb['location'][1].toDouble(), 
+            bb['location'][0].toDouble()
+          ),
           'books': bb['books']
         };
       }).toList();
@@ -104,16 +107,26 @@ class BookBoxSelectionController extends GetxController {
   void submitBookBox() {
     formController.setSelectedBookBox(selectedBookBox['id']);
     Get.delete<BarcodeController>();
-    Get.dialog(NewOrOldBookDialog(selectedBookBox: selectedBookBox['id']));
+    Get.dialog(IsbnDialog()); // Directly go to ISBN dialog for adding books
   }
 
   void submitBookBox2() {
-    formController.setSelectedBookBox(selectedBookBox['id']);
+    // Check if the selected bookbox has books
+    final books = selectedBookBox['books'] as List<dynamic>? ?? [];
+    
+    if (books.isEmpty) {
+      Get.snackbar('Info', 'This bookbox has no books to remove',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     Get.delete<BarcodeController>();
-    Get.dialog(BookQRAssignDialog(
-      isAddBook: false,
-      formInfo: const {},
-      isNewBook: true,
+    Get.dialog(BookRemovalDialog(
+      bookBoxId: selectedBookBox['id'],
+      books: books,
     ));
   }
 
@@ -132,41 +145,5 @@ class BookBoxSelectionController extends GetxController {
         await getBookBoxById(value);
       }
     });
-  }
-}
-
-
-
-class NewOrOldBookDialog extends StatelessWidget {
-  final String selectedBookBox;
-
-  const NewOrOldBookDialog({super.key, required this.selectedBookBox});
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Add a Book'),
-      content: Text('Is it a new book or does it already have a QR code?'),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Get.back(); // Close the dialog
-            Get.dialog(IsbnDialog()); // Open ISBNDialog for new books
-          },
-          child: Text('New Book'),
-        ),
-        TextButton(
-          onPressed: () {
-            Get.back(); // Close the dialog
-            Get.dialog(BookQRAssignDialog(isAddBook: true,
-              formInfo: {
-              'bookBoxId': selectedBookBox,
-              },
-              isNewBook: false,)); // Open your custom logic for existing books
-          },
-          child: Text('Already has QR Code'),
-        ),
-      ],
-    );
   }
 }

@@ -3,6 +3,7 @@ import 'package:Lino_app/services/thread_services.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/utils/constants/api_constants.dart';
 import 'message_tile.dart';
 import 'package:Lino_app/services/websocket_service.dart';
 
@@ -67,7 +68,7 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
           currentUsername = response['user']['username'];
         });
         webSocketService.connect(
-          'wss://lino-1.onrender.com/ws',
+          webSocketUrl,
           userId: response['user']['_id'],
           onEvent: (event, data) {
             print('Received event: $event');

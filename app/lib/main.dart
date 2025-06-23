@@ -1,4 +1,5 @@
 import 'package:Lino_app/pages/login/login_page.dart';
+import 'package:Lino_app/services/bookbox_state_service.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:Lino_app/splash_screen.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
@@ -9,6 +10,10 @@ import 'nav_menu.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize GetX services
+  Get.put(BookBoxStateService());
+  
   final prefs = await SharedPreferences.getInstance();
   String? userId = await fetchUserId(prefs);
   runApp(MyApp(prefs: prefs, userId: userId));

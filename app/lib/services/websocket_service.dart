@@ -12,7 +12,7 @@ class WebSocketService {
     return _singleton;
   }
 
-  WebSocketService._internal();
+  WebSocketService._internal(); 
 
   void connect(String url, {String? userId, required Function(String event, dynamic data) onEvent}) {
     this.onEvent = onEvent;

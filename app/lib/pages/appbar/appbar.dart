@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/user_services.dart';
 import '../../utils/constants/colors.dart';
+import '../../utils/constants/api_constants.dart';
 import '../search_bar/search_bar.dart';
 import 'notifications_page.dart';
 import 'package:Lino_app/services/websocket_service.dart';
@@ -41,7 +42,7 @@ class _LinoAppBarState extends State<LinoAppBar> {
       if (user['user'] != null) {
         // Initialize WebSocket connection here
         webSocketService.connect(
-          'wss://lino-1.onrender.com/ws',
+          webSocketUrl,
           userId: user['user']['_id'],
           onEvent: (event, data) async {
             if (event == 'newNotification') {

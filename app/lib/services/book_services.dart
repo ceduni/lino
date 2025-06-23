@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../utils/constants/api_constants.dart';
 
 class BookService {
-  final String url = 'https://lino-1.onrender.com';
+  final String url = baseApiUrl;
 
   Future<Map<String, dynamic>> addNewBB(String name, double longitude,
       double latitude, String infoText, String token) async {
@@ -16,7 +17,7 @@ class BookService {
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode(<String, dynamic>{
+      body: jsonEncode(<String, dynamic>{ 
         'name': name,
         'longitude': longitude,
         'latitude': latitude,
@@ -30,7 +31,7 @@ class BookService {
     return response;
   }
 
-  Future<Map<String, dynamic>> addBookToBB(String qrCode, String bookboxId,
+  Future<Map<String, dynamic>> addBookToBB(String bookboxId,
       {String? token,
       String? isbn,
       String? title,
@@ -42,18 +43,19 @@ class BookService {
       int? pages,
       List<String>? categories}) async {
     // Make a POST request to the server
-    // Send the qrCode, then the infos of the book if it's a new book, else just the qrCode
+    // Send the infos of the book
     // If the server returns a 201 status code, the book is added
     // If the server returns a 400 status code, the book is not added
+    final headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+      if (token != null) 'Authorization': 'Bearer $token',
+      'bm_token': 'LinoCanIAddOrRemoveBooksPlsThanksLmao',  
+    };
+
     final r = await http.post(
-      Uri.parse('$url/books/add'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        if (token != null) 'Authorization': 'Bearer $token',
-        'bm_token': 'LinoCanIAddOrRemoveBooksPlsThanksLmao',
-      },
+      Uri.parse('$url/bookboxes/$bookboxId/books/add'),
+      headers: headers,
       body: jsonEncode(<String, dynamic>{
-        'qrCodeId': qrCode,
         'isbn': isbn,
         'title': title,
         'authors': authors,
@@ -73,7 +75,7 @@ class BookService {
     return response;
   }
 
-  Future<Map<String, dynamic>> getBookFromBB(String qrCode, String bookboxId,
+  Future<Map<String, dynamic>> getBookFromBB(String bookId, String bookboxId,
       {String? token}) async {
     final headers = {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -81,9 +83,9 @@ class BookService {
       'bm_token': 'LinoCanIAddOrRemoveBooksPlsThanksLmao',
     };
 
-    // Make a GET request to the server
-    final r = await http.get(
-      Uri.parse('$url/books/$qrCode/$bookboxId'),
+    // Make a DELETE request to the server
+    final r = await http.delete(
+      Uri.parse('$url/bookboxes/$bookboxId/books/$bookId'),
       headers: headers,
     );
 
@@ -97,11 +99,11 @@ class BookService {
 
   Future<Map<String, dynamic>> getBookInfo(String isbn) async {
     // Make a GET request to the server
-    // Send the isbn to the server
+    // Query the info of the book with the given ISBN
     // If the server returns a 200 status code, the book is found
     // If the server returns another status code, the book is not found
     final r = await http.get(
-      Uri.parse('$url/books/$isbn'),
+      Uri.parse('$url/books/info-from-isbn/$isbn'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -133,7 +135,7 @@ class BookService {
     // If the server returns a 200 status code, the book is found
     // If the server returns another status code, the book is not found
     final r = await http.get(
-      Uri.parse('$url/books/get/$bookId'),
+      Uri.parse('$url/books/$bookId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -162,7 +164,7 @@ class BookService {
     };
 
     final r = await http.get(
-      Uri.https('lino-1.onrender.com', '/books/search', queryParams),
+      Uri.parse('$url/books/search').replace(queryParameters: queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -197,7 +199,7 @@ class BookService {
     };
 
     final r = await http.get(
-      Uri.https('lino-1.onrender.com', '/bookboxes/search', queryParams),
+      Uri.parse('$url/bookboxes/search').replace(queryParameters: queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -228,7 +230,8 @@ class BookService {
   }
 
   Future<void> deleteBookRequest(String token, String requestId) async {
-    final r = await http.delete(Uri.parse('$url/books/request/$requestId'),
+    final r = await http.delete(
+      Uri.parse('$url/books/request/$requestId'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -243,7 +246,7 @@ class BookService {
       if (username != null) 'username': username,
     };
     final r = await http.get(
-      Uri.https('lino-1.onrender.com', '/books/requests', queryParams),
+      Uri.parse('$url/books/requests').replace(queryParameters: queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

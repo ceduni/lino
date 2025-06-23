@@ -1,7 +1,8 @@
 import 'package:Lino_app/pages/floating_button/common/build_banner.dart';
-import 'package:Lino_app/pages/floating_button/dialog_options/book_qr_assign/book_qr_assign_dialog.dart';
 import 'package:Lino_app/services/book_services.dart';
+import 'package:Lino_app/services/bookbox_state_service.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,10 +11,10 @@ class BookConfirmDialog extends StatefulWidget {
   final String bookBoxId;
 
   const BookConfirmDialog({
-    Key? key,
+    super.key,
     required this.bookInfoFuture,
     required this.bookBoxId,
-  }) : super(key: key);
+  });
 
   @override
   _BookConfirmDialogState createState() => _BookConfirmDialogState();
@@ -100,7 +101,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
   Widget _buildBookDetailsContainer(List<String> authors) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(250, 250, 240, 1).withOpacity(0.9),
+        color: const Color.fromRGBO(250, 250, 240, 0.9),
         borderRadius: BorderRadius.circular(10),
       ),
       padding: const EdgeInsets.all(16.0),
@@ -149,7 +150,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(244, 226, 193, 1).withOpacity(0.9),
+        color: const Color.fromRGBO(244, 226, 193, 0.9),
         borderRadius: BorderRadius.circular(10),
       ),
       padding: const EdgeInsets.all(16.0),
@@ -218,29 +219,55 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
       print('Authors: ${editableBookInfo['authors']}');
       final authors = List<String>.from(editableBookInfo['authors'] ?? []);
 
-      final Map<String, dynamic> formInfo = {
-        'bookBoxId': widget.bookBoxId,
-        'token': token,
-        'isbn': editableBookInfo['isbn'],
-        'authors': authors,
-        'description': editableBookInfo['description'],
-        'publisher': editableBookInfo['publisher'],
-        'parutionYear': editableBookInfo['parutionYear'],
-        'title': editableBookInfo['title'],
-        'pages': editableBookInfo['pages'],
-        'coverImage': editableBookInfo['coverImage'],
-        'categories': cat,
-      };
+      // Directly add the book to the bookbox
+      await BookService().addBookToBB(
+        widget.bookBoxId,
+        token: token,
+        isbn: editableBookInfo['isbn'],
+        title: editableBookInfo['title'],
+        authors: authors,
+        description: editableBookInfo['description'],
+        coverImage: editableBookInfo['coverImage'],
+        publisher: editableBookInfo['publisher'],
+        parutionYear: editableBookInfo['parutionYear'],
+        pages: editableBookInfo['pages'],
+        categories: cat,
+      );
 
-      Get.dialog(BookQRAssignDialog(isAddBook: true, formInfo: formInfo, isNewBook: true,));
+      // Trigger refresh for all bookbox displays
+      BookBoxStateService.instance.triggerRefresh();
+      
+      // Show success message
+      showToast('Book has been successfully added to the Book Box.');
+      
+      // Close all dialogs and return to main screen
+      Get.back(); // Close current dialog
+      Get.back(); // Close previous dialog
+      Get.back(); // Close bookbox selection dialog
+      
     } catch (e) {
       print('Error adding book: $e');
-      // Optionally, show an error message to the user
+      Get.snackbar('Error', 'Failed to add book: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     } finally {
       setState(() {
         isLoading = false;
       });
     }
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.grey[800],
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
 
@@ -279,6 +306,9 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
           title: Text('Edit $title'),
           content: TextField(
             controller: controller,
+            keyboardType: (key == 'parutionYear' || key == 'pages') 
+                ? TextInputType.number 
+                : TextInputType.text,
             decoration: InputDecoration(
               hintText: 'Enter new $title',
             ),
@@ -292,7 +322,18 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
               child: Text('Save'),
               onPressed: () {
                 setState(() {
-                  editableBookInfo[key] = (key == 'authors' || key == 'categories') ? controller.text.split(',') : controller.text;
+                  if (key == 'authors' || key == 'categories') {
+                    // Handle list fields
+                    editableBookInfo[key] = controller.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+                  } else if (key == 'parutionYear' || key == 'pages') {
+                    // Handle integer fields
+                    final intValue = int.tryParse(controller.text.trim());
+                    editableBookInfo[key] = intValue;
+                  } else {
+                    // Handle string fields
+                    final stringValue = controller.text.trim();
+                    editableBookInfo[key] = stringValue.isNotEmpty ? stringValue : null;
+                  }
                 });
                 Navigator.of(context).pop();
               },

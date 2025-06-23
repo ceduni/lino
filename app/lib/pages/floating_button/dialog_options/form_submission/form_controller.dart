@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 class FormController extends GetxController {
   // Observables for form fields
   var selectedBookBox = ''.obs;
-  var selectedQRCode = ''.obs;
   var selectedISBN = ''.obs;
 
   // Observable for dialog state
@@ -25,6 +24,10 @@ class FormController extends GetxController {
     additionalFieldsForISBN['Title'] = TextEditingController();
     additionalFieldsForISBN['Author'] = TextEditingController();
     additionalFieldsForISBN['Year'] = TextEditingController();
+    additionalFieldsForISBN['Pages'] = TextEditingController();
+    additionalFieldsForISBN['Description'] = TextEditingController();
+    additionalFieldsForISBN['Publisher'] = TextEditingController();
+    additionalFieldsForISBN['Categories'] = TextEditingController();
   }
 
   // Toggle expand/collapse of ISBN dialog
@@ -35,10 +38,6 @@ class FormController extends GetxController {
   // Setters for form fields
   void setSelectedBookBox(String value) {
     selectedBookBox.value = value;
-  }
-
-  void setSelectedQRCode(String value) {
-    selectedQRCode.value = value;
   }
 
   void setSelectedISBN(String value) {
@@ -65,10 +64,32 @@ class FormController extends GetxController {
       return;
     }
 
+    // Parse categories from comma-separated string
+    final categoriesText = additionalFieldsForISBN['Categories']!.text.trim();
+    final categories = categoriesText.isNotEmpty 
+        ? categoriesText.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
+        : <String>[];
+
+    // Parse authors from comma-separated string
+    final authorsText = additionalFieldsForISBN['Author']!.text.trim();
+    final authors = authorsText.isNotEmpty 
+        ? authorsText.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
+        : <String>[];
+
     final bookInfo = {
-      'title': additionalFieldsForISBN['Title']!.text,
-      'authors': [additionalFieldsForISBN['Author']!.text],
-      'parutionYear': int.tryParse(additionalFieldsForISBN['Year']!.text) ?? 2000,
+      'title': additionalFieldsForISBN['Title']!.text.trim(),
+      'authors': authors,
+      'description': additionalFieldsForISBN['Description']!.text.trim().isNotEmpty 
+          ? additionalFieldsForISBN['Description']!.text.trim() 
+          : null,
+      'publisher': additionalFieldsForISBN['Publisher']!.text.trim().isNotEmpty 
+          ? additionalFieldsForISBN['Publisher']!.text.trim() 
+          : null,
+      'parutionYear': int.tryParse(additionalFieldsForISBN['Year']!.text.trim()),
+      'pages': int.tryParse(additionalFieldsForISBN['Pages']!.text.trim()),
+      'categories': categories.isNotEmpty ? categories : null,
+      'isbn': null, // No ISBN for manual entry
+      'coverImage': null, // No cover image for manual entry
     };
 
     Get.dialog(BookConfirmDialog(
@@ -91,8 +112,9 @@ class FormController extends GetxController {
   @override
   void onClose() {
     // Dispose controllers to avoid memory leaks
-    additionalFieldsForISBN.values
-        .forEach((controller) => controller.dispose());
+    for (final controller in additionalFieldsForISBN.values) {
+      controller.dispose();
+    }
     super.onClose();
   }
 }

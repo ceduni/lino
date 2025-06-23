@@ -1,27 +1,23 @@
-import 'package:Lino_app/pages/Books/book_details_page.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import '../../utils/constants/colors.dart';
 
 class UserDashboard extends StatefulWidget {
-  final List<Map<String, dynamic>> favoriteBooks;
-  final List<Map<String, dynamic>> booksHistory;
-
   final String username;
+  final double carbonSavings;
+  final double savedWater;
   final double savedTrees;
-  final int booksBorrowed;
-  final int booksGiven;
-
+  final int numSavedBooks;
+  final DateTime createdAt;
 
   const UserDashboard({
     super.key,
-    required this.favoriteBooks,
-    required this.booksHistory,
     required this.username,
+    required this.carbonSavings,
+    required this.savedWater,
     required this.savedTrees,
-    required this.booksBorrowed,
-    required this.booksGiven,
+    required this.numSavedBooks,
+    required this.createdAt,
   });
 
   @override
@@ -31,43 +27,24 @@ class UserDashboard extends StatefulWidget {
 class _UserDashboardState extends State<UserDashboard> {
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: NestedScrollView(
-        headerSliverBuilder: (context, _) {
-          return [
-            SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  ProfileCard(
-                    username: widget.username,
-                    savedTrees: widget.savedTrees.toPrecision(2),
-                    booksBorrowed: widget.booksBorrowed,
-                    booksGiven: widget.booksGiven,
-                  )
-                ],
-              ),
-            ),
-          ];
-        },
-        body: Column(
-          children: <Widget>[
-            TabBar(
-              tabs: const [
-                Tab(icon: Icon(Icons.favorite)),
-                Tab(icon: Icon(Icons.history))
-              ],
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  TabView(books: widget.favoriteBooks),
-                  TabView(books: widget.booksHistory),
-                ],
-              ),
-            ),
-          ],
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          ProfileCard(
+            username: widget.username,
+            carbonSavings: widget.carbonSavings,
+            savedWater: widget.savedWater,
+            savedTrees: widget.savedTrees,
+            numSavedBooks: widget.numSavedBooks,
+            createdAt: widget.createdAt,
+          ),
+          EcologicalImpactCard(
+            carbonSavings: widget.carbonSavings,
+            savedWater: widget.savedWater,
+            savedTrees: widget.savedTrees,
+            numSavedBooks: widget.numSavedBooks,
+          ),
+        ],
       ),
     );
   }
@@ -75,16 +52,20 @@ class _UserDashboardState extends State<UserDashboard> {
 
 class ProfileCard extends StatelessWidget {
   final String username;
+  final double carbonSavings;
+  final double savedWater;
   final double savedTrees;
-  final int booksBorrowed;
-  final int booksGiven;
+  final int numSavedBooks;
+  final DateTime createdAt;
 
   const ProfileCard({
     super.key,
     required this.username,
+    required this.carbonSavings,
+    required this.savedWater,
     required this.savedTrees,
-    required this.booksBorrowed,
-    required this.booksGiven,
+    required this.numSavedBooks,
+    required this.createdAt,
   });
 
   @override
@@ -103,19 +84,18 @@ class ProfileCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CircleAvatar(
-                  radius: 40, // Reduced size
+                  radius: 40,
                   backgroundImage: Image.network('https://imgs.search.brave.com/M3mi-is8_3t7e0PSznN7CZl9wCDVz6B_7hiUc3zgp3o/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG40/Lmljb25maW5kZXIu/Y29tL2RhdGEvaWNv/bnMvc3BvdHMvNTEy/L2ZhY2Utd29tYW4t/MTI4LnBuZw').image,
                 ),
-                SizedBox(width: 16), // Add space between avatar and stats
+                SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Expanded(child: _buildStatColumn('$booksBorrowed', 'Books Borrowed')),
-                          Expanded(child: _buildStatColumn('$booksGiven', 'Books Given')),
-                          Expanded(child: _buildStatColumn('$savedTrees', 'Saved Trees')),
+                          Expanded(child: _buildStatColumn('$numSavedBooks', 'Books Saved')),
+                          Expanded(child: _buildStatColumn('${savedTrees.toStringAsFixed(2)}', 'Trees Saved')),
                         ],
                       ),
                     ],
@@ -132,7 +112,7 @@ class ProfileCard extends StatelessWidget {
               ),
             ),
             Text(
-              'Member since xx days ago',
+              _getMemberSinceText(),
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
@@ -143,6 +123,27 @@ class ProfileCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getMemberSinceText() {
+    final now = DateTime.now();
+    final difference = now.difference(createdAt);
+    
+    if (difference.inDays >= 365) {
+      final years = (difference.inDays / 365).floor();
+      return 'Member since ${years} year${years > 1 ? 's' : ''} ago';
+    } else if (difference.inDays >= 30) {
+      final months = (difference.inDays / 30).floor();
+      return 'Member since ${months} month${months > 1 ? 's' : ''} ago';
+    } else if (difference.inDays >= 1) {
+      return 'Member since ${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
+    } else if (difference.inHours >= 1) {
+      return 'Member since ${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
+    } else if (difference.inMinutes >= 1) {
+      return 'Member since ${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
+    } else {
+      return 'Member since just now';
+    }
   }
 
   Column _buildStatColumn(String count, String label) {
@@ -158,7 +159,7 @@ class ProfileCard extends StatelessWidget {
         SizedBox(height: 4),
         Text(
           label,
-          textAlign: TextAlign.center, // Center text alignment
+          textAlign: TextAlign.center,
           overflow: TextOverflow.clip,
           style: TextStyle(
             fontSize: 16,
@@ -170,91 +171,113 @@ class ProfileCard extends StatelessWidget {
   }
 }
 
-class TabView extends StatelessWidget {
-  final List<Map<String, dynamic>> books;
+class EcologicalImpactCard extends StatelessWidget {
+  final double carbonSavings;
+  final double savedWater;
+  final double savedTrees;
+  final int numSavedBooks;
 
-  const TabView({super.key, required this.books});
+  const EcologicalImpactCard({
+    super.key,
+    required this.carbonSavings,
+    required this.savedWater,
+    required this.savedTrees,
+    required this.numSavedBooks,
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (books.isEmpty) {
-      return Center(child: Text('No books'));
-    }
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        int crossAxisCount = (constraints.maxWidth / 120).floor();
-        return GridView.builder(
-          padding: EdgeInsets.all(8.0),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 0.75,
-          ),
-          itemCount: books.length,
-          itemBuilder: (context, index) {
-            final book = books[index];
-            return GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => BookDetailsPage(
-                    book: book,
-                    bbid: '',
-                  ),
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                margin: EdgeInsets.only(bottom: 8.0, top: 8.0),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: AspectRatio(
-                        aspectRatio: 0.75,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: Image.network(
-                            book['coverImage'],
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                            errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                              return Container(
-                                color: Colors.grey,
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      book['title'],
-                                      style: TextStyle(color: Colors.white),
-                                      textAlign: TextAlign.center,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 8.0),
-                    Text(
-                      book['title'],
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Ecological Impact',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[700],
               ),
-            );
-          },
-        );
-      },
+            ),
+            SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildImpactItem(
+                    icon: Icons.eco,
+                    value: '${carbonSavings.toStringAsFixed(2)} kg',
+                    label: 'Carbon Saved',
+                    color: Colors.green,
+                  ),
+                ),
+                Expanded(
+                  child: _buildImpactItem(
+                    icon: Icons.water_drop,
+                    value: '${savedWater.toStringAsFixed(0)} L',
+                    label: 'Water Saved',
+                    color: Colors.blue,
+                  ),
+                ),
+                Expanded(
+                  child: _buildImpactItem(
+                    icon: Icons.park,
+                    value: '${savedTrees.toStringAsFixed(2)}',
+                    label: 'Trees Saved',
+                    color: Colors.brown,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Every book you save makes a difference! Keep up the great work.',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImpactItem({
+    required IconData icon,
+    required String value,
+    required String label,
+    required Color color,
+  }) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          size: 32,
+          color: color,
+        ),
+        SizedBox(height: 8),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 4),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
     );
   }
 }
