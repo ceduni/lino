@@ -31,10 +31,10 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
     final user = await userService.getUser(_token);
 
     setState(() {
-      _usernameController = TextEditingController(text: user['user']['username']);
+      _usernameController = TextEditingController(text: user['user']['username'] ?? '');
       _passwordController = TextEditingController(text: '');
-      _emailController = TextEditingController(text: user['user']['email']);
-      _phoneController = TextEditingController(text: user['user']['phone']);
+      _emailController = TextEditingController(text: user['user']['email'] ?? '');
+      _phoneController = TextEditingController(text: user['user']['phone'] ?? '');
       _isLoading = false;
     });
   }
@@ -158,6 +158,7 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
   Widget _buildTextField(TextEditingController controller, String hintText, IconData icon, {bool obscureText = false}) {
     return TextField(
       controller: controller,
+      keyboardType: hintText == 'Phone' ? TextInputType.phone : TextInputType.text,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),

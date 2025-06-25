@@ -78,7 +78,6 @@ class BookService {
   Future<Map<String, dynamic>> getBookFromBB(String bookId, String bookboxId,
       {String? token}) async {
     final headers = {
-      'Content-Type': 'application/json; charset=UTF-8',
       if (token != null) 'Authorization': 'Bearer $token',
       'bm_token': 'LinoCanIAddOrRemoveBooksPlsThanksLmao',
     };

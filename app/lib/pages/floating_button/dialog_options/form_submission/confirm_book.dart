@@ -11,7 +11,7 @@ class BookConfirmDialog extends StatefulWidget {
   final String bookBoxId;
 
   const BookConfirmDialog({
-    super.key,
+    super.key, 
     required this.bookInfoFuture,
     required this.bookBoxId,
   });

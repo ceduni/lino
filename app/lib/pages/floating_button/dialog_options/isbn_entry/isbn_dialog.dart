@@ -4,6 +4,7 @@ import 'package:Lino_app/pages/floating_button/common/build_scanner.dart';
 import 'package:Lino_app/pages/floating_button/common/barcode_controller.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/form_submission/form_controller.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/isbn_entry/isbn_controller.dart';
+import 'package:Lino_app/widgets/image_picker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -94,9 +95,26 @@ class IsbnDialog extends StatelessWidget {
 
   Widget _buildSubmitWithoutISBNButton(FormController formController) {
     return Obx(() {
+      final isUploading = formController.isUploadingImage.value;
       return ElevatedButton(
-        onPressed: formController.submitFormWithoutISBN,
-        child: const Text('Submit without ISBN'),
+        onPressed: isUploading ? null : formController.submitFormWithoutISBN,
+        child: isUploading 
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Text('Uploading...'),
+                ],
+              )
+            : const Text('Submit without ISBN'),
       );
     });
   }
@@ -129,18 +147,33 @@ class IsbnDialog extends StatelessWidget {
 
   Widget _buildAdditionalFields(FormController formController) {
     return Column(
-      children: formController.additionalFieldsForISBN.entries
-          .map((entry) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: TextField(
-          controller: entry.value,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            labelText: entry.key,
-          ),
+      children: [
+        // Image picker widget
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Obx(() => ImagePickerWidget(
+            onImageSelected: formController.onImageSelected,
+            initialImage: formController.selectedCoverImage.value,
+            placeholder: 'Add Book Cover Image',
+          )),
         ),
-      ))
-          .toList(),
+        // Text fields
+        ...formController.additionalFieldsForISBN.entries
+            .map((entry) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: TextField(
+            controller: entry.value,
+            keyboardType: (entry.key == 'Year' || entry.key == 'Pages')
+                ? TextInputType.number
+                : TextInputType.text,
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              labelText: entry.key,
+            ),
+          ),
+        ))
+            .toList(),
+      ],
     );
   }
 }

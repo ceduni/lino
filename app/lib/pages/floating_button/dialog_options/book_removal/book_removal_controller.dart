@@ -11,21 +11,28 @@ class BookRemovalController extends GetxController {
   final selectedBookId = ''.obs;
   final isLoading = false.obs;
   final books = <dynamic>[].obs;
+  final currentISBN = ''.obs;
   
   late BarcodeController barcodeController;
+  late TextEditingController isbnController;
 
   @override
   void onInit() {
     super.onInit();
     barcodeController = Get.find<BarcodeController>();
+    isbnController = TextEditingController();
     
     // Listen to barcode changes when in ISBN mode
     ever(barcodeController.barcodeObs, (String value) {
       if (isISBNMode.value && value.isNotEmpty && 
           value != 'Unknown Barcode' && value != 'No Barcode Detected') {
+        // Auto-fill the ISBN input field
+        isbnController.text = value;
+        currentISBN.value = value;
+        
         final matchingBook = findBookByISBN(value);
         if (matchingBook != null) {
-          selectedBookId.value = matchingBook['id'];
+          selectedBookId.value = matchingBook['id']?.toString() ?? matchingBook['_id']?.toString() ?? '';
         } else {
           selectedBookId.value = '';
         }
@@ -49,10 +56,29 @@ class BookRemovalController extends GetxController {
     isISBNMode.value = !isISBNMode.value;
     selectedBookId.value = ''; // Reset selection when switching modes
     barcodeController.barcodeObs.value = ''; // Clear barcode when switching modes
+    clearISBN(); // Clear ISBN input when switching modes
   }
 
   void setSelectedBook(String bookId) {
     selectedBookId.value = bookId;
+  }
+
+  void onISBNChanged(String value) {
+    currentISBN.value = value;
+    
+    // Update selection based on ISBN
+    final matchingBook = findBookByISBN(value);
+    if (matchingBook != null) {
+      selectedBookId.value = matchingBook['id']?.toString() ?? matchingBook['_id']?.toString() ?? '';
+    } else {
+      selectedBookId.value = '';
+    }
+  }
+
+  void clearISBN() {
+    isbnController.clear();
+    currentISBN.value = '';
+    selectedBookId.value = '';
   }
 
   Map<String, dynamic>? findBookByISBN(String isbn) {
@@ -87,11 +113,7 @@ class BookRemovalController extends GetxController {
 
   bool get canRemove {
     if (isISBNMode.value) {
-      final scannedISBN = barcodeController.barcodeObs.value;
-      return scannedISBN.isNotEmpty && 
-             scannedISBN != 'Unknown Barcode' && 
-             scannedISBN != 'No Barcode Detected' &&
-             findBookByISBN(scannedISBN) != null;
+      return currentISBN.value.isNotEmpty && findBookByISBN(currentISBN.value) != null;
     } else {
       return selectedBookId.value.isNotEmpty;
     }
@@ -109,8 +131,7 @@ class BookRemovalController extends GetxController {
       String bookIdToRemove;
       
       if (isISBNMode.value) {
-        final scannedISBN = barcodeController.barcodeObs.value;
-        final matchingBook = findBookByISBN(scannedISBN);
+        final matchingBook = findBookByISBN(currentISBN.value);
         if (matchingBook == null) {
           throw Exception('Book not found');
         }
@@ -165,6 +186,7 @@ class BookRemovalController extends GetxController {
   @override
   void onClose() {
     // Clean up
+    isbnController.dispose();
     super.onClose();
   }
 }

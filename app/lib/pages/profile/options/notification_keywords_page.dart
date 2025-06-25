@@ -30,13 +30,27 @@ class _NotificationKeywordsPageState extends State<NotificationKeywordsPage> {
 
       final userService = UserService();
       final user = await userService.getUser(_token!);
-      final keyWords = user['user']['notificationKeyWords'] ?? [];
+      final keyWords = user['user']?['notificationKeyWords'];
+      
       setState(() {
-        _keywords.addAll(List<String>.from(keyWords));
+        if (keyWords != null) {
+          if (keyWords is List) {
+            // Handle list of strings or mixed types
+            for (var item in keyWords) {
+              if (item != null) {
+                _keywords.add(item.toString());
+              }
+            }
+          } else if (keyWords is String && keyWords.isNotEmpty) {
+            // Handle comma-separated string
+            _keywords.addAll(keyWords.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty));
+          }
+        }
         _isLoading = false;
       });
     } catch (e) {
-      showToast('Error loading user keywords: $e');
+      print('Error loading user keywords: $e');
+      // Don't show toast for new users - this is expected
       setState(() {
         _isLoading = false;
       });
@@ -93,97 +107,120 @@ class _NotificationKeywordsPageState extends State<NotificationKeywordsPage> {
       backgroundColor: Color(0xFF4277B8), // Same blue background
       appBar: AppBar(
         title: Text('Setup Notification Keywords'),
+        backgroundColor: Color(0xFF4277B8),
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Tell us what you like:',
-              style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Input as many keywords as you want to be notified when a book relevant to your preferences appears in the book network',
-              style: TextStyle(color: Colors.white70, fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    margin: EdgeInsets.only(bottom: 20), // Add bottom margin
-                    child: TextField(
-                      controller: _keywordController,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20), // Adjust padding
-                        hintText: 'Enter keyword',
-                        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)), // Less opaque placeholder text
-                        filled: true,
-                        fillColor: Color(0xFFE0F7FA), // Clearer blue background
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0), // Rounded borders
-                          borderSide: BorderSide.none,
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // Header section
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Tell us what you like:',
+                            style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            'Input as many keywords as you want to be notified when a book relevant to your preferences appears in the book network',
+                            style: TextStyle(color: Colors.white70, fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Input section
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _keywordController,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                              hintText: 'Enter keyword',
+                              hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
+                              filled: true,
+                              fillColor: Color(0xFFE0F7FA),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            onSubmitted: (_) => _addKeyword(),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        IconButton(
+                          icon: Icon(Icons.send, color: Colors.white),
+                          onPressed: _addKeyword,
+                        ),
+                      ],
+                    ),
+                    
+                    SizedBox(height: 20),
+                    
+                    // Keywords display section
+                    Expanded(
+                      flex: 3,
+                      child: SingleChildScrollView(
+                        child: Wrap(
+                          spacing: 8.0,
+                          runSpacing: 4.0,
+                          children: _keywords.map((keyword) {
+                            return Chip(
+                              side: BorderSide(color: Color(0xFF81D4FA)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                              label: Text(keyword),
+                              backgroundColor: Color(0xFFE0F7FA),
+                              deleteIcon: Icon(Icons.close),
+                              onDeleted: () => _removeKeyword(keyword),
+                            );
+                          }).toList(),
                         ),
                       ),
                     ),
-                  ),
+                    
+                    // Bottom buttons section
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: _pass,
+                            child: Text(
+                              'Pass',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: _finish,
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              backgroundColor: LinoColors.buttonPrimary,
+                            ),
+                            child: Text(
+                              'Finished!',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                Container(
-                  margin: EdgeInsets.only(bottom: 20), // Match the bottom margin of the TextField
-                  child: IconButton(
-                    icon: Icon(Icons.send, color: Colors.white),
-                    onPressed: _addKeyword,
-                  ),
-                ),
-              ],
+              ),
             ),
-            Wrap(
-              spacing: 8.0,
-              runSpacing: 4.0,
-              children: _keywords.map((keyword) {
-                return Chip(
-                  side: BorderSide(color: Color(0xFF81D4FA)), // Lighter blue border
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)), // Rounded corners
-                  label: Text(keyword),
-                  backgroundColor: Color(0xFFE0F7FA), // Clearer blue background
-                  deleteIcon: Icon(Icons.close),
-                  onDeleted: () => _removeKeyword(keyword),
-                );
-              }).toList(),
-            ),
-            Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: _pass,
-                  child: Text(
-                    'Pass',
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: _finish,
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    backgroundColor: LinoColors.buttonPrimary, // Lighter blue background
-                  ),
-                  child: Text(
-                    'Finished!',
-                    style: TextStyle(color: Colors.white), // Change text color
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

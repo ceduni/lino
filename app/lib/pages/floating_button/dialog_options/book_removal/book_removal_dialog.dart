@@ -57,16 +57,42 @@ class BookRemovalDialog extends StatelessWidget {
   Widget _buildISBNScanMode(BarcodeController barcodeController, BookRemovalController controller) {
     return Column(
       children: [
-        const Text('Scan the book\'s ISBN to remove it'),
+        const Text('Scan the book\'s ISBN or enter it manually'),
         const SizedBox(height: 16.0),
         buildScanner(barcodeController),
         const SizedBox(height: 16.0),
         buildCustomDivider(),
         const SizedBox(height: 16.0),
+        // ISBN input field
+        TextFormField(
+          controller: controller.isbnController,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            labelText: 'ISBN',
+            hintText: 'Enter ISBN manually or scan barcode',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            suffixIcon: Obx(() {
+              return controller.currentISBN.value.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        controller.clearISBN();
+                      },
+                    )
+                  : const SizedBox.shrink();
+            }),
+          ),
+          onChanged: (value) {
+            controller.onISBNChanged(value);
+          },
+        ),
+        const SizedBox(height: 16.0),
         Obx(() {
-          final scannedISBN = barcodeController.barcodeObs.value;
-          if (scannedISBN.isNotEmpty && scannedISBN != 'Unknown Barcode' && scannedISBN != 'No Barcode Detected') {
-            final matchingBook = controller.findBookByISBN(scannedISBN);
+          final currentISBN = controller.currentISBN.value;
+          if (currentISBN.isNotEmpty) {
+            final matchingBook = controller.findBookByISBN(currentISBN);
             if (matchingBook != null) {
               return Container(
                 padding: const EdgeInsets.all(16.0),
@@ -89,7 +115,7 @@ class BookRemovalDialog extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.0),
                   color: Colors.red[100],
                 ),
-                child: Text('No book found with ISBN: $scannedISBN'),
+                child: Text('No book found with ISBN: $currentISBN'),
               );
             }
           }
