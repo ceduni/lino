@@ -11,12 +11,15 @@ class ImageUploadService {
   /// Returns null if upload fails
   Future<String?> uploadImage(File imageFile) async {
     // Check if API key is configured
-    if (!ImageConfig.isImgbbConfigured) {
+    if (!(await ImageConfig.isImgbbConfigured())) {
       print('ImgBB API key not configured.');
       return null;
     }
     
     try {
+      // Get API key
+      final apiKey = await ImageConfig.getImgbbApiKey();
+      
       // Compress the image before uploading
       final compressedImage = await _compressImage(imageFile);
       if (compressedImage == null) {
@@ -33,7 +36,7 @@ class ImageUploadService {
       final request = http.MultipartRequest('POST', uri);
       
       // Add API key and image data
-      request.fields['key'] = ImageConfig.imgbbApiKey;
+      request.fields['key'] = apiKey;
       request.fields['image'] = base64Image;
       request.fields['expiration'] = '0'; // Never expire
       
