@@ -69,12 +69,22 @@ const bookboxService = {
         await bookService.createTransaction(username, 'added', title, bookBox.name);
 
         // Notify users about the new book
-        await this.notifyRelevantUsers(newBook, 'added to', bookBox.name);
+        await this.notifyRelevantUsers(
+            username,
+            newBook, 
+            'added to', 
+            bookBox.name, 
+            bookBox._id?.toString() || ''
+        );
 
         // Increment user's added books count
         if (request.user) {
             const user = await User.findById(request.user.id);
             if (user) {
+                // Ensure the user has followed the bookbox
+                if (!user.followedBookboxes.includes(bookBox._id.toString())) {
+                    user.followedBookboxes.push(bookBox._id.toString());
+                }
                 user.numSavedBooks++;
                 await user.save();
             }
@@ -123,12 +133,21 @@ const bookboxService = {
             pages: book.pages || undefined,
             dateAdded: book.dateAdded || new Date(),
         };
-        await this.notifyRelevantUsers(bookForNotification, 'removed from', bookBox.name);
+        await this.notifyRelevantUsers(
+            username,
+            bookForNotification, 
+            'removed from', 
+            bookBox.name, 
+            bookBox._id?.toString() || '');
 
         // Increment user's saved books count
         if (request.user) {
             const user = await User.findById(request.user.id);
             if (user) {
+                // If the user doesn't follow this bookbox, add it to their followed bookboxes
+                if (!user.followedBookboxes.includes(bookBox._id.toString())) {
+                    user.followedBookboxes.push(bookBox._id.toString());
+                }
                 user.numSavedBooks++;
                 await user.save();
             }
@@ -246,12 +265,23 @@ const bookboxService = {
         return 0;
     },
 
-    async notifyRelevantUsers(book: IBook, action: string, bookBoxName: string) {
+    async notifyRelevantUsers(username: string, book: IBook, action: string, bookBoxName: string, bookBoxId: string) {
         const users = await User.find();
         for (let i = 0; i < users.length; i++) {
+            if (users[i].username === username) {
+                continue; // Skip the user who added the book
+            }
+
+            var notify = false;
+
             const relevance = await this.getBookRelevance(book, users[i] as any);
+            notify = relevance > 0;
+            if (users[i].followedBookboxes.includes(bookBoxId)) {
+                notify = true; // User follows this bookbox, so notify them
+            }
+
             // Notify the user if the book is relevant to him
-            if (relevance > 0) {
+            if (notify) {
                 await notifyUser(users[i].id,
                     "Book notification",
                     `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);

@@ -24,7 +24,7 @@ const UserService = {
     // User service to register a new user's account
     registerUser(userData) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { username, email, phone, password, getAlerted } = userData;
+            const { username, email, phone, password } = userData;
             if (username === 'guest') {
                 throw (0, utilities_1.newErr)(400, 'Username not allowed');
             }
@@ -51,8 +51,7 @@ const UserService = {
             const user = new user_model_1.default({ username: username,
                 email: email,
                 phone: phone,
-                password: hashedPassword,
-                getAlerted: getAlerted
+                password: hashedPassword
             });
             yield user.save();
             return { username: user.username, password: user.password };
@@ -152,9 +151,6 @@ const UserService = {
             }
             if (request.body.phone) {
                 user.phone = request.body.phone;
-            }
-            if (request.body.getAlerted) {
-                user.getAlerted = request.body.getAlerted;
             }
             if (request.body.keyWords) {
                 user.notificationKeyWords = yield this.parseKeyWords(request.body.keyWords);

@@ -10,21 +10,17 @@ const notificationSchema = new mongoose_1.default.Schema({
     content: { type: String, required: true },
     read: { type: Boolean, default: false }
 });
-const historySchema = new mongoose_1.default.Schema({
-    bookId: { type: String, required: true },
-    timestamp: { type: Date, default: Date.now },
-    given: { type: Boolean, default: false }
-});
 const userSchema = new mongoose_1.default.Schema({
     username: { type: String, required: true, unique: true },
-    password: { type: String, required: true }, // It's gonna be hashed
+    password: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     phone: { type: String },
+    requestNotificationRadius: { type: Number, default: 5 }, // Default radius in km
     notificationKeyWords: [String], // Array of key words
     numSavedBooks: { type: Number, default: 0 },
     notifications: { type: [notificationSchema], default: [] },
-    getAlerted: { type: Boolean, default: true },
-    bookHistory: { type: [historySchema], default: [] },
+    followedBookboxes: { type: [String], default: [] }, // Array of bookbox IDs
+    createdAt: { type: Date, default: Date.now },
 });
 const User = mongoose_1.default.model('User', userSchema, "users");
 exports.default = User;
