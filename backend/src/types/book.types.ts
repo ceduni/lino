@@ -29,7 +29,7 @@ export interface ITransaction extends Document {
   username: string;
   action: 'added' | 'took';
   bookTitle: string;
-  bookboxName: string;
+  bookboxId: string;
   timestamp: Date;
 }
 

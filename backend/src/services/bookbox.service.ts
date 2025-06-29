@@ -66,7 +66,7 @@ const bookboxService = {
 
         // Create transaction record
         const username = request.user ? (await User.findById(request.user.id))?.username || 'guest' : 'guest';
-        await bookService.createTransaction(username, 'added', title, bookBox.name);
+        await bookService.createTransaction(username, 'added', title, bookboxId);
 
         // Notify users about the new book
         await this.notifyRelevantUsers(
@@ -117,7 +117,7 @@ const bookboxService = {
 
         // Create transaction record
         const username = request.user ? (await User.findById(request.user.id))?.username || 'guest' : 'guest';
-        await bookService.createTransaction(username, 'took', book.title, bookBox.name);
+        await bookService.createTransaction(username, 'took', book.title, bookboxId);
 
         // Notify users about the book removal
         const bookForNotification: IBook = {

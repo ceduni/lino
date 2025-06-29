@@ -356,7 +356,7 @@ const getBookRequestsSchema = {
 
 async function getTransactionHistory(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const transactions = await BookService.getTransactionHistory(request as { query: { username?: string; bookTitle?: string; bookboxName?: string; limit?: number } });
+        const transactions = await BookService.getTransactionHistory(request as { query: { username?: string; bookTitle?: string; bookboxId?: string; limit?: number } });
         reply.send({transactions});
     } catch (error : unknown) {
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -372,7 +372,7 @@ const getTransactionHistorySchema = {
         properties: {
             username: { type: 'string' },
             bookTitle: { type: 'string' },
-            bookboxName: { type: 'string' },
+            bookboxId: { type: 'string' },
             limit: { type: 'number' }
         }
     },
@@ -390,7 +390,7 @@ const getTransactionHistorySchema = {
                             username: { type: 'string' },
                             action: { type: 'string' },
                             bookTitle: { type: 'string' },
-                            bookboxName: { type: 'string' },
+                            bookboxId: { type: 'string' },
                             timestamp: { type: 'string' }
                         }
                     }

@@ -225,13 +225,13 @@ const bookService = {
     },
 
     // Get transaction history
-    async getTransactionHistory(request: { query: { username?: string; bookTitle?: string; bookboxName?: string; limit?: number } }) {
-        const { username, bookTitle, bookboxName, limit } = request.query;
+    async getTransactionHistory(request: { query: { username?: string; bookTitle?: string; bookboxId?: string; limit?: number } }) {
+        const { username, bookTitle, bookboxId, limit } = request.query;
         
         let filter: any = {};
         if (username) filter.username = username;
         if (bookTitle) filter.bookTitle = new RegExp(bookTitle, 'i');
-        if (bookboxName) filter.bookboxName = new RegExp(bookboxName, 'i');
+        if (bookboxId) filter.bookboxId = bookboxId;
 
         let query = Transaction.find(filter).sort({ timestamp: -1 });
         if (limit) {
@@ -242,12 +242,12 @@ const bookService = {
     },
 
     // Create a transaction record
-    async createTransaction(username: string, action: 'added' | 'took', bookTitle: string, bookboxName: string) {
+    async createTransaction(username: string, action: 'added' | 'took', bookTitle: string, bookboxId: string) {
         const transaction = new Transaction({
             username,
             action,
             bookTitle,
-            bookboxName
+            bookboxId
         });
         await transaction.save();
         return transaction;
