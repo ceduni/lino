@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:Lino_app/pages/floating_button/floating_action_button.dart';
 import 'package:Lino_app/pages/forum/forum_screen.dart';
+// import 'package:Lino_app/pages/forum/requests_section.dart'; // Direct import for requests section
 import 'package:Lino_app/pages/appbar/observable_appbar.dart';
 import 'package:Lino_app/pages/search_bar/results_screen.dart';
 import 'package:Lino_app/pages/search_bar/search_bar.dart' as sb;
@@ -24,11 +25,11 @@ class BookNavPage extends StatelessWidget {
       ),
       floatingActionButton: Obx(() {
         if (controller.selectedIndex.value == 2) {
-          // Forum page is active
+          // Requests page is active
           return LinoFloatingButton(
             selectedIndex: controller.selectedIndex.value,
-            onThreadCreated: () =>
-                controller.forumScreenKey.currentState?.refreshThreads(),
+            // onThreadCreated: () => // Commented out - threads functionality removed
+            //     controller.forumScreenKey.currentState?.refreshThreads(),
             onRequestCreated: () =>
                 controller.forumScreenKey.currentState?.refreshRequests(),
           );
@@ -63,7 +64,7 @@ class BookNavPage extends StatelessWidget {
   Widget _buildNavigationBar(NavigationController controller) {
     return NavigationBar(
       height: 80,
-      elevation: 10,
+      elevation: 10, 
       selectedIndex: controller.selectedIndex.value,
       indicatorColor: Color.fromRGBO(239, 174, 133, 1),
       onDestinationSelected: (index) => controller.selectedIndex.value = index,
@@ -79,7 +80,7 @@ class BookNavPage extends StatelessWidget {
         ),
         NavigationDestination(
           icon: Icon(Icons.chat),
-          label: 'Forum',
+          label: 'Requests',
         ),
       ],
     );
@@ -106,7 +107,7 @@ class NavigationController extends GetxController {
 
   void navigateToForumWithQuery(String query) {
     forumQuery = query;
-    selectedIndex.value = 2; // Set to Forum tab
+    selectedIndex.value = 2; // Set to Requests tab
     screens[2] = ForumScreen(
         key: forumScreenKey,
         query: forumQuery); // Update ForumScreen with new query

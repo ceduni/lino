@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../forum/add_thread_form.dart';
+// import '../forum/add_thread_form.dart'; // Commented out - threads functionality removed
 import '../forum/request_form.dart';
 
 class LinoFloatingButton extends StatefulWidget {
   final int selectedIndex;
-  final VoidCallback? onThreadCreated;
+  // final VoidCallback? onThreadCreated; // Commented out - threads functionality removed
   final VoidCallback? onRequestCreated;
 
   const LinoFloatingButton({
     required this.selectedIndex,
-    this.onThreadCreated,
+    // this.onThreadCreated, // Commented out - threads functionality removed
     this.onRequestCreated,
     Key? key,
   }) : super(key: key);
@@ -42,20 +42,20 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
   @override
   Widget build(BuildContext context) {
     if (widget.selectedIndex == 2) {
-      // Forum page is active
+      // Requests page is active
       return SpeedDial(
         icon: Icons.add,
         backgroundColor:
             isUserAuthenticated ? Colors.blue.shade100 : Colors.grey,
         children: isUserAuthenticated
             ? [
-                SpeedDialChild(
-                  backgroundColor: Colors.blue.shade300,
-                  labelBackgroundColor: Colors.blue.shade300,
-                  child: Icon(Icons.add),
-                  label: 'Add Thread',
-                  onTap: () => _addThread(context, widget.onThreadCreated),
-                ),
+                // SpeedDialChild( // Commented out - threads functionality removed
+                //   backgroundColor: Colors.blue.shade300,
+                //   labelBackgroundColor: Colors.blue.shade300,
+                //   child: Icon(Icons.add),
+                //   label: 'Add Thread',
+                //   onTap: () => _addThread(context, widget.onThreadCreated),
+                // ),
                 SpeedDialChild(
                   backgroundColor: Colors.blue.shade300,
                   labelBackgroundColor: Colors.blue.shade300,
@@ -100,18 +100,18 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
     );
   }
 
-  void _addThread(BuildContext context, VoidCallback? onThreadCreated) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return Padding(
-          padding: MediaQuery.of(context).viewInsets,
-          child: AddThreadForm(onThreadCreated: onThreadCreated!),
-        );
-      },
-    );
-  }
+  // void _addThread(BuildContext context, VoidCallback? onThreadCreated) { // Commented out - threads functionality removed
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     builder: (context) {
+  //       return Padding(
+  //         padding: MediaQuery.of(context).viewInsets,
+  //         child: AddThreadForm(onThreadCreated: onThreadCreated!),
+  //       );
+  //     },
+  //   );
+  // }
 
   void _showRequestForm(BuildContext context, VoidCallback? onRequestCreated) {
     showModalBottomSheet(

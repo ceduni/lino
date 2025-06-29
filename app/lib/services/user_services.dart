@@ -12,7 +12,7 @@ class UserService {
     // If the server returns a 201 status code, the user is registered
     // If the server returns another status code, the user is not registered
     final userData = await http.post(
-      Uri.parse('$url/users/register'),
+      Uri.parse('$url/users/register'), 
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       }, 
@@ -52,49 +52,6 @@ class UserService {
     }
     final token = response['token'];
     return token;
-  }
-
-  Future<List<String>> addToFavorites(String token, String id) async {
-    // Make a POST request to the server
-    // Send the token and id to the server
-    // If the server returns a 200 status code, the id is added to the user's favorites
-    // If the server returns another status code, the id is not added to the user's favorites
-    final r = await http.post(
-      Uri.parse('$url/users/favorites'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(<String, String>{
-        'bookId': id,
-      }),
-    );
-    final response = jsonDecode(r.body);
-    if (r.statusCode != 200) {
-      throw Exception(response['error']);
-    }
-    final data = response['favorites'];
-    return List<String>.from(data);
-  }
-
-  Future<List<String>> removeFromFavorites(String token, String id) async {
-    // Make a DELETE request to the server
-    // Send the token and id to the server
-    // If the server returns a 200 status code, the id is removed from the user's favorites
-    // If the server returns another status code, the id is not removed from the user's favorites
-    final r = await http.delete(
-      Uri.parse('$url/users/favorites/$id'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
-      },
-    );
-    final response = jsonDecode(r.body);
-    if (r.statusCode != 200) {
-      throw Exception(response['error']);
-    }
-    final data = response['favorites'];
-    return List<String>.from(data);
   }
 
   Future<Map<String, dynamic>> getUser(String token) async {

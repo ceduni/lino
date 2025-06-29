@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'threads_section.dart';
+// import 'threads_section.dart'; // Commented out - threads functionality removed
 import 'requests_section.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 
@@ -11,10 +11,10 @@ class ForumScreen extends StatefulWidget {
 
   @override
   ForumScreenState createState() => ForumScreenState();
-}
+} 
 
 class ForumScreenState extends State<ForumScreen> {
-  final GlobalKey<ThreadsSectionState> threadsSectionKey = GlobalKey<ThreadsSectionState>();
+  // final GlobalKey<ThreadsSectionState> threadsSectionKey = GlobalKey<ThreadsSectionState>(); // Commented out - threads functionality removed
   final GlobalKey<RequestsSectionState> requestsSectionKey = GlobalKey<RequestsSectionState>();
 
   Future<bool> isConnected() async {
@@ -22,16 +22,16 @@ class ForumScreenState extends State<ForumScreen> {
     return prefs.containsKey('token');
   }
 
-  void refreshThreads() {
-    threadsSectionKey.currentState?.fetchThreadTiles(cls: 'by creation date', asc: false, q: '');
-  }
+  // void refreshThreads() { // Commented out - threads functionality removed
+  //   threadsSectionKey.currentState?.fetchThreadTiles(cls: 'by creation date', asc: false, q: '');
+  // }
 
   void refreshRequests() {
     requestsSectionKey.currentState?.fetchRequests();
   }
 
   Future<void> _refresh() async {
-    refreshThreads();
+    // refreshThreads(); // Commented out - threads functionality removed
     refreshRequests();
   }
 
@@ -60,7 +60,7 @@ class ForumScreenState extends State<ForumScreen> {
           return Scaffold(
             body: Center(
               child: Text(
-                'Login or create an account to access the forum page',
+                'Login or create an account to access the requests page',
                 style: TextStyle(fontSize: 20),
                 textAlign: TextAlign.center,
               ),
@@ -68,36 +68,24 @@ class ForumScreenState extends State<ForumScreen> {
           );
         }
 
-        return DefaultTabController(
-          length: 2,
-          child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: LinoColors.primary,
-              centerTitle: true,
-              title: const Text('Forum', style: TextStyle(fontWeight: FontWeight.bold)),
-              bottom: const TabBar(
-                unselectedLabelColor: Colors.black,
-                indicatorColor: LinoColors.secondary,
-                labelColor: LinoColors.secondary,
-                tabs: [
-                  Tab(text: 'Threads'),
-                  Tab(text: 'Requests'),
-                ],
-              ),
-            ),
-            body: TabBarView(
-              children: [
-                RefreshIndicator(
-                  onRefresh: _refresh,
-                  child: ThreadsSection(key: threadsSectionKey, query: widget.query),
-                ),
-                RefreshIndicator(
-                  onRefresh: _refresh,
-                  child: RequestsSection(key: requestsSectionKey),
-                ),
-              ],
-            ),
+        // Removed tab structure - now showing only requests section
+        return Scaffold(
+          body: RefreshIndicator(
+            onRefresh: _refresh,
+            child: RequestsSection(key: requestsSectionKey),
           ),
+          // body: TabBarView( // Commented out - replaced with direct RequestsSection
+          //   children: [
+          //     RefreshIndicator(
+          //       onRefresh: _refresh,
+          //       child: ThreadsSection(key: threadsSectionKey, query: widget.query),
+          //     ),
+          //     RefreshIndicator(
+          //       onRefresh: _refresh,
+          //       child: RequestsSection(key: requestsSectionKey),
+          //     ),
+          //   ],
+          // ),
         );
       },
     );
