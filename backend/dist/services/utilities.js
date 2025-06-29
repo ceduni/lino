@@ -91,17 +91,8 @@ exports.userSchema = {
         password: { type: 'string' },
         email: { type: 'string' },
         phone: { type: 'string' },
-        favoriteBooks: { type: 'array', items: { type: 'string' } },
-        trackedBooks: { type: 'array', items: { type: 'string' } },
         notificationKeyWords: { type: 'array', items: { type: 'string' } },
-        ecologicalImpact: {
-            type: 'object',
-            properties: {
-                carbonSavings: { type: 'number' },
-                savedWater: { type: 'number' },
-                savedTrees: { type: 'number' }
-            }
-        },
+        numSavedBooks: { type: 'number' },
         notifications: {
             type: 'array',
             items: {
@@ -114,7 +105,7 @@ exports.userSchema = {
                 }
             }
         },
-        getAlerted: { type: 'boolean' },
+        requestNotificationRadius: { type: 'number', default: 5 }, // Default radius in km
         bookHistory: {
             type: 'array',
             items: {
@@ -125,7 +116,9 @@ exports.userSchema = {
                     given: { type: 'boolean' }
                 }
             }
-        }
+        },
+        followedBookboxes: { type: 'array', items: { type: 'string' } }, // Array of bookbox IDs
+        createdAt: { type: 'string', format: 'date-time' }
     }
 };
 exports.clearCollectionSchema = {

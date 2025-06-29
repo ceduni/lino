@@ -14,9 +14,11 @@ export interface IUser extends Document {
   email: string;
   phone?: string;
   notificationKeyWords: string[];
+  requestNotificationRadius: number; // Default radius in km
   numSavedBooks: number;
   notifications: INotification[];
-  getAlerted: boolean;
+  followedBookboxes: string[];
+  createdAt: Date;
 }
 
 // User service method types
@@ -25,7 +27,6 @@ export interface UserRegistrationData {
   email: string;
   phone?: string;
   password: string;
-  getAlerted?: boolean;
 }
 
 export interface UserLoginCredentials {

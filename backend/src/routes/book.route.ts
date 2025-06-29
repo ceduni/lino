@@ -34,7 +34,7 @@ const getBookInfoFromISBNSchema = {
         200: {
             description: 'Book found',
             type: 'object',
-            properties: {
+            properties: { 
                 title: {type: 'string'},
                 authors: {type: 'array', items: {type: 'string'}},
                 isbn: {type: 'string'},
@@ -134,7 +134,10 @@ const searchBooksSchema = {
 
 async function sendBookRequest(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const response = await BookService.requestBookToUsers(request as AuthenticatedRequest & { body: { title: string; customMessage?: string } });
+        const response = await BookService.requestBookToUsers(request as AuthenticatedRequest & { 
+            body: { title: string; customMessage?: string }; 
+            query: { latitude?: number; longitude?: number } 
+        });
         reply.code(201).send(response);
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
@@ -153,6 +156,14 @@ const sendBookRequestSchema = {
             customMessage: { type: 'string' }
         },
         required: ['title']
+    },
+    querystring: {
+        type: 'object',
+        properties: {
+            latitude: { type: 'number' },
+            longitude: { type: 'number' }
+        },
+        required: ['latitude', 'longitude']
     },
     headers: {
         type: 'object',

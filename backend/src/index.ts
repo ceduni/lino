@@ -6,6 +6,7 @@ import { WebSocketClient, FastifyRequestWithJWT } from "./types/common.types";
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const path = require('path');
 const fastifyJwt = require('@fastify/jwt');
 const fastifyCors = require('@fastify/cors');
 const fastifySwagger = require('@fastify/swagger');
@@ -13,10 +14,10 @@ const fastifySwaggerUi = require('@fastify/swagger-ui');
 const bookRoutes = require('./routes/book.route');
 const bookboxRoutes = require('./routes/bookbox.route');
 const userRoutes = require('./routes/user.route');
-const threadRoutes = require('./routes/thread.route');
+const threadRoutes = require('./routes/thread.route'); 
 const fastifyWebSocket = require('@fastify/websocket');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const server = Fastify({ logger: { level: 'error' } });
 
