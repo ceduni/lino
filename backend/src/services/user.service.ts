@@ -17,7 +17,7 @@ dotenv.config();
 const UserService = {
     // User service to register a new user's account
     async registerUser(userData: UserRegistrationData) {
-        const { username, email, phone, password, getAlerted } = userData;
+        const { username, email, phone, password } = userData;
         if (username === 'guest') {
             throw newErr(400, 'Username not allowed');
         }
@@ -48,8 +48,7 @@ const UserService = {
             { username : username,
                 email : email,
                 phone : phone,
-                password: hashedPassword,
-                getAlerted: getAlerted
+                password: hashedPassword
             });
         await user.save();
         return {username: user.username, password: user.password};
@@ -129,7 +128,6 @@ const UserService = {
             password?: string; 
             email?: string; 
             phone?: string; 
-            getAlerted?: boolean; 
             keyWords?: string; 
         } 
     }) {
@@ -156,9 +154,6 @@ const UserService = {
         }
         if (request.body.phone) {
             user.phone = request.body.phone;
-        }
-        if (request.body.getAlerted) {
-            user.getAlerted = request.body.getAlerted;
         }
         if (request.body.keyWords) {
             user.notificationKeyWords = await this.parseKeyWords(request.body.keyWords);

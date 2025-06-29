@@ -38,7 +38,7 @@ const bookboxService = {
     // Add a book to a bookbox as a nested document
     addBook(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b;
+            var _a, _b, _c;
             const { title, isbn, authors, description, coverImage, publisher, parutionYear, pages, categories } = request.body;
             const { bookboxId } = request.params;
             if (!title) {
@@ -70,21 +70,25 @@ const bookboxService = {
             const username = request.user ? ((_a = (yield user_model_1.default.findById(request.user.id))) === null || _a === void 0 ? void 0 : _a.username) || 'guest' : 'guest';
             yield book_service_1.default.createTransaction(username, 'added', title, bookBox.name);
             // Notify users about the new book
-            yield this.notifyRelevantUsers(newBook, 'added to', bookBox.name);
+            yield this.notifyRelevantUsers(username, newBook, 'added to', bookBox.name, ((_b = bookBox._id) === null || _b === void 0 ? void 0 : _b.toString()) || '');
             // Increment user's added books count
             if (request.user) {
                 const user = yield user_model_1.default.findById(request.user.id);
                 if (user) {
+                    // Ensure the user has followed the bookbox
+                    if (!user.followedBookboxes.includes(bookBox._id.toString())) {
+                        user.followedBookboxes.push(bookBox._id.toString());
+                    }
                     user.numSavedBooks++;
                     yield user.save();
                 }
             }
-            return { bookId: (_b = addedBook._id) === null || _b === void 0 ? void 0 : _b.toString(), books: bookBox.books };
+            return { bookId: (_c = addedBook._id) === null || _c === void 0 ? void 0 : _c.toString(), books: bookBox.books };
         });
     },
     getBookFromBookBox(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b;
+            var _a, _b, _c;
             const bookId = request.params.bookId;
             const bookboxId = request.params.bookboxId;
             // Find the bookbox
@@ -118,11 +122,15 @@ const bookboxService = {
                 pages: book.pages || undefined,
                 dateAdded: book.dateAdded || new Date(),
             };
-            yield this.notifyRelevantUsers(bookForNotification, 'removed from', bookBox.name);
+            yield this.notifyRelevantUsers(username, bookForNotification, 'removed from', bookBox.name, ((_c = bookBox._id) === null || _c === void 0 ? void 0 : _c.toString()) || '');
             // Increment user's saved books count
             if (request.user) {
                 const user = yield user_model_1.default.findById(request.user.id);
                 if (user) {
+                    // If the user doesn't follow this bookbox, add it to their followed bookboxes
+                    if (!user.followedBookboxes.includes(bookBox._id.toString())) {
+                        user.followedBookboxes.push(bookBox._id.toString());
+                    }
                     user.numSavedBooks++;
                     yield user.save();
                 }
@@ -216,13 +224,21 @@ const bookboxService = {
             return 0;
         });
     },
-    notifyRelevantUsers(book, action, bookBoxName) {
+    notifyRelevantUsers(username, book, action, bookBoxName, bookBoxId) {
         return __awaiter(this, void 0, void 0, function* () {
             const users = yield user_model_1.default.find();
             for (let i = 0; i < users.length; i++) {
+                if (users[i].username === username) {
+                    continue; // Skip the user who added the book
+                }
+                var notify = false;
                 const relevance = yield this.getBookRelevance(book, users[i]);
+                notify = relevance > 0;
+                if (users[i].followedBookboxes.includes(bookBoxId)) {
+                    notify = true; // User follows this bookbox, so notify them
+                }
                 // Notify the user if the book is relevant to him
-                if (relevance > 0) {
+                if (notify) {
                     yield (0, user_service_1.notifyUser)(users[i].id, "Book notification", `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
                 }
             }

@@ -95,7 +95,7 @@ export const userSchema = {
                 }
             }
         },
-        getAlerted: { type: 'boolean' },
+        requestNotificationRadius: { type: 'number', default: 5 }, // Default radius in km
         bookHistory: {
             type: 'array',
             items: {
@@ -107,6 +107,7 @@ export const userSchema = {
                 }
             }
         },
+        followedBookboxes: { type: 'array', items: { type: 'string' } }, // Array of bookbox IDs
         createdAt: { type: 'string', format: 'date-time' }
     }
 };

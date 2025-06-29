@@ -9,13 +9,14 @@ const notificationSchema = new mongoose.Schema({
 
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
-    password: { type: String, required: true }, // It's gonna be hashed
+    password: { type: String, required: true }, 
     email : { type: String, required: true, unique: true },
     phone: {type: String},
+    requestNotificationRadius: { type: Number, default: 5 }, // Default radius in km
     notificationKeyWords: [String],  // Array of key words
     numSavedBooks: { type: Number, default: 0 },
     notifications: {type: [notificationSchema], default: []},
-    getAlerted: { type: Boolean, default: true },
+    followedBookboxes: { type: [String], default: [] }, // Array of bookbox IDs
     createdAt: { type: Date, default: Date.now },
 });
 

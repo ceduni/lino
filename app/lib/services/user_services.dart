@@ -6,9 +6,9 @@ class UserService {
   final String url = baseApiUrl;
 
 
-  Future<String> registerUser(String username, String email, String password, {String phone = '', bool getAlerted = true}) async {
+  Future<String> registerUser(String username, String email, String password, {String phone = ''}) async {
     // Make a POST request to the server
-    // Send the username, email, phone, password, and getAlerted to the server
+    // Send the username, email, phone, and password to the server
     // If the server returns a 201 status code, the user is registered
     // If the server returns another status code, the user is not registered
     final userData = await http.post(
@@ -21,7 +21,6 @@ class UserService {
         'email': email,
         'phone': phone,
         'password': password,
-        'getAlerted': getAlerted,
       }),
     );
     final data = jsonDecode(userData.body);
@@ -117,7 +116,7 @@ class UserService {
     return data;
   }
 
-  Future<Map<String, dynamic>> updateUser(String token, {String? username, String? password, String? email, String? phone, bool? getAlerted, String? keyWords}) async {
+  Future<Map<String, dynamic>> updateUser(String token, {String? username, String? password, String? email, String? phone, String? keyWords}) async {
     // Make a PUT request to the server
     // Send the token and the updated user information to the server
     // If the server returns a 200 status code, the user is updated
@@ -133,7 +132,6 @@ class UserService {
         'password': password,
         'email': email,
         'phone': phone,
-        'getAlerted': getAlerted,
         'keyWords': keyWords,
       }),
     );

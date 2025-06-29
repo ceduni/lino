@@ -154,16 +154,43 @@ const bookService = {
         const results = await BookBox.aggregate(pipeline);
         return results.length > 0 ? results[0] : null;
     },
-
-    async requestBookToUsers(request: AuthenticatedRequest & { body: { title: string; customMessage?: string } }) {
+ 
+    async requestBookToUsers(request: AuthenticatedRequest & { 
+        body: { title: string; customMessage?: string }; 
+        query: { latitude?: number; longitude?: number } 
+    }) {
         const user = await User.findById(request.user.id);
         if (!user) {
             throw newErr(404, 'User not found');
         }
-        const users = await User.find({getAlerted: true});
-        for (let i = 0; i < users.length; i++) {
-            if (users[i].username !== user.username) {
-                await notifyUser(users[i].id,
+
+        const { latitude, longitude } = request.query;
+        if (!latitude || !longitude) {
+            throw newErr(400, 'User location (latitude and longitude) is required');
+        }
+
+        // Get all bookboxes and filter by distance using Haversine formula
+        const allBookboxes = await BookBox.find();
+        const nearbyBookboxes = allBookboxes.filter(bookbox => {
+            if (!bookbox.location || bookbox.location.length !== 2) {
+                return false;
+            }
+            
+            const [boxLongitude, boxLatitude] = bookbox.location;
+            const distance = this.calculateDistance(latitude, longitude, boxLatitude, boxLongitude);
+            return distance <= user.requestNotificationRadius;
+        });
+
+        // Get all unique users who follow any of these nearby bookboxes
+        const bookboxIds = nearbyBookboxes.map(bookbox => bookbox._id.toString());
+        const usersToNotify = await User.find({
+            followedBookboxes: { $in: bookboxIds }
+        });
+
+        // Notify all relevant users
+        for (let i = 0; i < usersToNotify.length; i++) {
+            if (usersToNotify[i].username !== user.username) {
+                await notifyUser(usersToNotify[i].id,
                     "Book request",
                     `The user ${user.username} wants to get the book "${request.body.title}" ! If you have it, please feel free to add it to one of our book boxes !`);
             }
@@ -224,6 +251,25 @@ const bookService = {
         });
         await transaction.save();
         return transaction;
+    },
+
+    // Calculate distance between two points using Haversine formula
+    calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+        const R = 6371; // Radius of the Earth in kilometers
+        const dLat = this.deg2rad(lat2 - lat1);
+        const dLon = this.deg2rad(lon2 - lon1);
+        const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c; // Distance in kilometers
+        return distance;
+    },
+
+    // Convert degrees to radians
+    deg2rad(deg: number): number {
+        return deg * (Math.PI/180);
     }
 };
 

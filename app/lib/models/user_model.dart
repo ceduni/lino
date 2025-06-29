@@ -3,10 +3,11 @@ class User {
   final String password;
   final String email;
   final String? phone;
+  final double requestNotificationRadius;
   final List<String> notificationKeyWords;
   final int numSavedBooks;
   final List<Notification> notifications;
-  final bool getAlerted;
+  final List<String> followedBookboxes;
   final DateTime createdAt;
 
   User({
@@ -14,10 +15,11 @@ class User {
     required this.password, 
     required this.email,
     this.phone,
+    this.requestNotificationRadius = 5.0,
     required this.notificationKeyWords,
     this.numSavedBooks = 0,
     required this.notifications,
-    required this.getAlerted,
+    required this.followedBookboxes,
     required this.createdAt,
   });
 
@@ -31,25 +33,29 @@ class User {
   }
 
   factory User.fromJson(Map<String, dynamic> json) {
-    var notificationKeyWordsList = json['notificationKeyWords'] as List;
+    var notificationKeyWordsList = json['notificationKeyWords'] as List? ?? [];
     List<String> notificationKeyWords = notificationKeyWordsList.cast<String>();
 
-    var notificationsList = json['notifications'] as List;
+    var notificationsList = json['notifications'] as List? ?? [];
     List<Notification> notifications = notificationsList.map((i) => Notification.fromJson(i)).toList();
+
+    var followedBookboxesList = json['followedBookboxes'] as List? ?? [];
+    List<String> followedBookboxes = followedBookboxesList.cast<String>();
 
     return User(
       username: json['username'],
       password: json['password'],
       email: json['email'],
       phone: json['phone'],
+      requestNotificationRadius: (json['requestNotificationRadius'] ?? 5.0).toDouble(),
       notificationKeyWords: notificationKeyWords,
       numSavedBooks: json['numSavedBooks'] ?? 0,
       notifications: notifications,
-      getAlerted: json['getAlerted'],
+      followedBookboxes: followedBookboxes,
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
-}
+} 
 
 class Notification {
   final DateTime timestamp;
