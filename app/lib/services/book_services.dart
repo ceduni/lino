@@ -232,7 +232,6 @@ class BookService {
     final r = await http.delete(
       Uri.parse('$url/books/request/$requestId'),
         headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
         });
     if (r.statusCode != 204 && r.statusCode != 200) {
