@@ -383,6 +383,89 @@ const deleteBookBoxSchema = {
     }
 };
 
+
+async function updateBookBox(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const response = await BookboxService.updateBookBox(request as AuthenticatedRequest & { body: { 
+            name?: string;
+            image?: string;
+            longitude?: number; 
+            latitude?: number;
+            infoText?: string;
+        }; params: { bookboxId: string } });
+        reply.code(200).send(response);
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({error: message});
+    }
+}
+
+const updateBookBoxSchema = {
+    description: 'Update a bookbox',
+    tags: ['bookboxes'],
+    params: {
+        type: 'object',
+        properties: {
+            bookboxId: { type: 'string' }
+        },
+        required: ['bookboxId']
+    },
+    body: {
+        type: 'object',
+        properties: {
+            name: { type: 'string' },   
+            infoText: { type: 'string' },
+            latitude: { type: 'number' },
+            longitude: { type: 'number' },
+            image: { type: 'string' }
+        },
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' },
+        },
+        required: ['authorization']
+    },
+    response: {
+        200: {
+            description: 'Bookbox updated',
+            type: 'object',
+            properties: {
+                _id: { type: 'string' },
+                name: { type: 'string' },
+                latitude: { type: 'number' },
+                longitude: { type: 'number' },
+                image: { type: 'string' },
+                infoText: { type: 'string' },
+            }
+        },
+        400: {
+            description: 'Error message',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Bookbox not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+
+
 interface MyFastifyInstance extends FastifyInstance {
     optionalAuthenticate: (request: FastifyRequest) => void;
     authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
@@ -397,4 +480,5 @@ export default async function bookBoxRoutes(server: MyFastifyInstance) {
     server.delete('/bookboxes/:bookboxId/books/:bookId', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: getBookFromBookBoxSchema }, getBookFromBookBox);
     server.post('/bookboxes/:bookboxId/books/add', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
     server.delete('/bookboxes/:bookboxId', { preValidation: [server.adminAuthenticate], schema: deleteBookBoxSchema }, deleteBookBox);
+    server.put('/bookboxes/:bookboxId', { preValidation: [server.adminAuthenticate], schema: updateBookBoxSchema }, updateBookBox);
 }

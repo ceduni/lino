@@ -321,6 +321,42 @@ const bookboxService = {
                 throw newErr(500, errorMessage);
             }
         );
+    },
+
+    async updateBookBox(request: AuthenticatedRequest & { body: { name?: string; image?: string; longitude?: number; latitude?: number; infoText?: string }; params: { bookboxId: string } }) {
+        const bookBoxId = request.params.bookboxId;
+        const updateData = request.body;    
+        const bookBox = await BookBox.findById(bookBoxId);
+        if (!bookBox) {
+            throw newErr(404, 'Bookbox not found');
+        }   
+
+        // Update the bookbox fields if they are provided
+        if (updateData.name) {
+            bookBox.name = updateData.name;
+        }
+        if (updateData.image) {
+            bookBox.image = updateData.image;
+        }
+        if (updateData.longitude) {
+            bookBox.longitude = updateData.longitude;
+        }   
+        if (updateData.latitude) {
+            bookBox.latitude = updateData.latitude;
+        }   
+        if (updateData.infoText) {
+            bookBox.infoText = updateData.infoText;
+        }
+        await bookBox.save();
+    
+        return {
+            id: bookBox._id.toString(),
+            name: bookBox.name,
+            image: bookBox.image,
+            longitude: bookBox.longitude,
+            latitude: bookBox.latitude,
+            infoText: bookBox.infoText
+        };
     }
 };
 
