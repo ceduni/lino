@@ -170,7 +170,8 @@ const getBookboxSchema = {
             properties: {
                 id: { type: 'string' },
                 name: { type: 'string' },
-                location: { type: 'array', items: { type: 'number' } },
+                latitude: { type: 'number' },
+                longitude: { type: 'number' },
                 infoText: { type: 'string' },
                 image: { type: 'string' },
                 books: { type: 'array', items: bookSchema }
@@ -240,7 +241,8 @@ const addNewBookboxSchema = {
             properties: {
                 _id: { type: 'string' },
                 name: { type: 'string' },
-                location: { type: 'array', items: { type: 'number' } },
+                latitude: { type: 'number' },
+                longitude: { type: 'number' },
                 image: { type: 'string' },
                 infoText: { type: 'string' },
                 books: { type: 'array', items: { type: 'string' } }
@@ -306,10 +308,11 @@ const searchBookboxesSchema = {
                         properties: {
                             id: { type: 'string' },
                             name: { type: 'string' },
-                            location: { type: 'array', items: { type: 'number' } },
                             infoText: { type: 'string' },
                             image: { type: 'string' },
-                            books: { type: 'array', items: bookSchema }
+                            books: { type: 'array', items: bookSchema },
+                            latitude: { type: 'number' },
+                            longitude: { type: 'number' }
                         }
                     }
                 }

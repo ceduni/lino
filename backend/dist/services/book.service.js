@@ -164,11 +164,10 @@ const bookService = {
             // Get all bookboxes and filter by distance using Haversine formula
             const allBookboxes = yield bookbox_model_1.default.find();
             const nearbyBookboxes = allBookboxes.filter(bookbox => {
-                if (!bookbox.location || bookbox.location.length !== 2) {
+                if (!bookbox.longitude || !bookbox.latitude) {
                     return false;
                 }
-                const [boxLongitude, boxLatitude] = bookbox.location;
-                const distance = this.calculateDistance(latitude, longitude, boxLatitude, boxLongitude);
+                const distance = this.calculateDistance(latitude, longitude, bookbox.latitude, bookbox.longitude);
                 return distance <= user.requestNotificationRadius;
             });
             // Get all unique users who follow any of these nearby bookboxes
@@ -215,14 +214,14 @@ const bookService = {
     // Get transaction history
     getTransactionHistory(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { username, bookTitle, bookboxName, limit } = request.query;
+            const { username, bookTitle, bookboxId, limit } = request.query;
             let filter = {};
             if (username)
                 filter.username = username;
             if (bookTitle)
                 filter.bookTitle = new RegExp(bookTitle, 'i');
-            if (bookboxName)
-                filter.bookboxName = new RegExp(bookboxName, 'i');
+            if (bookboxId)
+                filter.bookboxId = bookboxId;
             let query = transaction_model_1.default.find(filter).sort({ timestamp: -1 });
             if (limit) {
                 query = query.limit(parseInt(limit.toString()));
@@ -231,13 +230,13 @@ const bookService = {
         });
     },
     // Create a transaction record
-    createTransaction(username, action, bookTitle, bookboxName) {
+    createTransaction(username, action, bookTitle, bookboxId) {
         return __awaiter(this, void 0, void 0, function* () {
             const transaction = new transaction_model_1.default({
                 username,
                 action,
                 bookTitle,
-                bookboxName
+                bookboxId
             });
             yield transaction.save();
             return transaction;

@@ -46,7 +46,7 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
       'name': bb['name'],
       'image': bb['image'],
       'infoText': bb['infoText'],
-      'location': LatLng(bb['location'][0].toDouble(), bb['location'][1].toDouble()),
+      'location': LatLng(bb['latitude'].toDouble(), bb['longitude'].toDouble()),
       'books': bb['books']
     };
   }

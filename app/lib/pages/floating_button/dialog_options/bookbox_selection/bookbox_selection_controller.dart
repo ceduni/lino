@@ -46,10 +46,8 @@ class BookBoxSelectionController extends GetxController {
           'id': bb['id'],
           'name': bb['name'],
           'infoText': bb['infoText'],
-          'location': LatLng(
-            bb['location'][1].toDouble(), 
-            bb['location'][0].toDouble()
-          ),
+          'latitude': bb['latitude'].toDouble(),
+          'longitude': bb['longitude'].toDouble(),
           'books': bb['books']
         };
       }).toList();

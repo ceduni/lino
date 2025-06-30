@@ -29,7 +29,8 @@ const bookboxService = {
                 id: bookBox.id,
                 name: bookBox.name,
                 image: bookBox.image,
-                location: bookBox.location,
+                longitude: bookBox.longitude,
+                latitude: bookBox.latitude,
                 infoText: bookBox.infoText,
                 books: bookBox.books,
             };
@@ -68,7 +69,7 @@ const bookboxService = {
             const addedBook = bookBox.books[bookBox.books.length - 1];
             // Create transaction record
             const username = request.user ? ((_a = (yield user_model_1.default.findById(request.user.id))) === null || _a === void 0 ? void 0 : _a.username) || 'guest' : 'guest';
-            yield book_service_1.default.createTransaction(username, 'added', title, bookBox.name);
+            yield book_service_1.default.createTransaction(username, 'added', title, bookboxId);
             // Notify users about the new book
             yield this.notifyRelevantUsers(username, newBook, 'added to', bookBox.name, ((_b = bookBox._id) === null || _b === void 0 ? void 0 : _b.toString()) || '');
             // Increment user's added books count
@@ -107,7 +108,7 @@ const bookboxService = {
             yield bookBox.save();
             // Create transaction record
             const username = request.user ? ((_a = (yield user_model_1.default.findById(request.user.id))) === null || _a === void 0 ? void 0 : _a.username) || 'guest' : 'guest';
-            yield book_service_1.default.createTransaction(username, 'took', book.title, bookBox.name);
+            yield book_service_1.default.createTransaction(username, 'took', book.title, bookboxId);
             // Notify users about the book removal
             const bookForNotification = {
                 _id: (_b = book._id) === null || _b === void 0 ? void 0 : _b.toString(),
@@ -155,17 +156,16 @@ const bookboxService = {
                 });
             }
             else if (cls === 'by location') {
-                const selfLoc = [request.query.longitude, request.query.latitude];
-                if (!selfLoc[0] || !selfLoc[1]) {
+                const userLongitude = request.query.longitude;
+                const userLatitude = request.query.latitude;
+                if (!userLongitude || !userLatitude) {
                     throw (0, utilities_1.newErr)(401, 'Location is required for this classification');
                 }
                 bookBoxes.sort((a, b) => {
-                    const aLoc = a.location;
-                    const bLoc = b.location;
-                    if (aLoc && bLoc && selfLoc[0] && selfLoc[1]) {
+                    if (a.longitude && a.latitude && b.longitude && b.latitude) {
                         // calculate the distance between the user's location and the bookbox's location
-                        const aDist = Math.sqrt(Math.pow((aLoc[0] - selfLoc[0]), 2) + Math.pow((aLoc[1] - selfLoc[1]), 2));
-                        const bDist = Math.sqrt(Math.pow((bLoc[0] - selfLoc[0]), 2) + Math.pow((bLoc[1] - selfLoc[1]), 2));
+                        const aDist = Math.sqrt(Math.pow((a.longitude - userLongitude), 2) + Math.pow((a.latitude - userLatitude), 2));
+                        const bDist = Math.sqrt(Math.pow((b.longitude - userLongitude), 2) + Math.pow((b.latitude - userLatitude), 2));
                         // sort in ascending or descending order of distance
                         return asc ? aDist - bDist : bDist - aDist;
                     }
@@ -193,7 +193,8 @@ const bookboxService = {
                 name: request.body.name,
                 books: [],
                 image: request.body.image,
-                location: [request.body.longitude, request.body.latitude],
+                longitude: request.body.longitude,
+                latitude: request.body.latitude,
                 infoText: request.body.infoText,
             });
             yield bookBox.save();

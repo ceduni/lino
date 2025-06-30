@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.populateDatabase = void 0;
+exports.populateDatabase = populateDatabase;
 const faker_1 = require("@faker-js/faker");
 const url = "https://lino-1.onrender.com";
 const bookBoxIds = [];
@@ -290,4 +290,3 @@ function populateDatabase() {
         console.log("Database populated!");
     });
 }
-exports.populateDatabase = populateDatabase;

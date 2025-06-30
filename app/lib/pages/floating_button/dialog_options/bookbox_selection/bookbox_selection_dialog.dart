@@ -104,8 +104,8 @@ class BookBoxSelectionDialog extends StatelessWidget {
                   ? Geolocator.distanceBetween(
                 bookBoxController.userLocation.value!.latitude,
                 bookBoxController.userLocation.value!.longitude,
-                bookBox['location'].latitude,
-                bookBox['location'].longitude,
+                bookBox['latitude'],
+                bookBox['longitude'],
               )
                   : null;
               return DropdownMenuItem<String>(

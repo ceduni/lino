@@ -172,12 +172,11 @@ const bookService = {
         // Get all bookboxes and filter by distance using Haversine formula
         const allBookboxes = await BookBox.find();
         const nearbyBookboxes = allBookboxes.filter(bookbox => {
-            if (!bookbox.location || bookbox.location.length !== 2) {
+            if (!bookbox.longitude || !bookbox.latitude) {
                 return false;
             }
             
-            const [boxLongitude, boxLatitude] = bookbox.location;
-            const distance = this.calculateDistance(latitude, longitude, boxLatitude, boxLongitude);
+            const distance = this.calculateDistance(latitude, longitude, bookbox.latitude, bookbox.longitude);
             return distance <= user.requestNotificationRadius;
         });
 

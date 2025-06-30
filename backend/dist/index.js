@@ -9,11 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clients = exports.server = exports.broadcastMessage = exports.broadcastToUser = void 0;
+exports.clients = exports.server = void 0;
+exports.broadcastToUser = broadcastToUser;
+exports.broadcastMessage = broadcastMessage;
 const utilities_1 = require("./services/utilities");
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const path = require('path');
 const fastifyJwt = require('@fastify/jwt');
 const fastifyCors = require('@fastify/cors');
 const fastifySwagger = require('@fastify/swagger');
@@ -23,7 +26,7 @@ const bookboxRoutes = require('./routes/bookbox.route');
 const userRoutes = require('./routes/user.route');
 const threadRoutes = require('./routes/thread.route');
 const fastifyWebSocket = require('@fastify/websocket');
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '../.env') });
 const server = Fastify({ logger: { level: 'error' } });
 exports.server = server;
 server.register(fastifyCors, {
@@ -49,7 +52,6 @@ function broadcastToUser(userId, message) {
         throw (0, utilities_1.newErr)(500, errorMessage);
     }
 }
-exports.broadcastToUser = broadcastToUser;
 function broadcastMessage(event, data) {
     try {
         clients.forEach((client) => {
@@ -64,7 +66,6 @@ function broadcastMessage(event, data) {
         throw (0, utilities_1.newErr)(500, errorMessage);
     }
 }
-exports.broadcastMessage = broadcastMessage;
 // WebSocket route
 server.register(function (server) {
     return __awaiter(this, void 0, void 0, function* () {

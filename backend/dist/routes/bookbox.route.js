@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = bookBoxRoutes;
 const bookbox_service_1 = __importDefault(require("../services/bookbox.service"));
 const utilities_1 = require("../services/utilities");
 function addBookToBookbox(request, reply) {
@@ -333,4 +334,3 @@ function bookBoxRoutes(server) {
         server.post('/bookboxes/:bookboxId/books/add', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
     });
 }
-exports.default = bookBoxRoutes;

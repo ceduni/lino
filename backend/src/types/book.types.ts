@@ -19,7 +19,8 @@ export interface IBook {
 export interface IBookBox extends Document {
   name: string;
   image?: string;
-  location: number[];
+  longitude: number;
+  latitude: number;
   infoText?: string;
   books: IBook[];
 }

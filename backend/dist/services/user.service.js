@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.notifyUser = void 0;
+exports.notifyUser = notifyUser;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const argon2_1 = __importDefault(require("argon2"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -186,5 +186,4 @@ function notifyUser(userId, title, message) {
         return user;
     });
 }
-exports.notifyUser = notifyUser;
 exports.default = UserService;
