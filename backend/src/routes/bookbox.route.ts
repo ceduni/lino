@@ -335,6 +335,54 @@ const searchBookboxesSchema = {
     }
 }
 
+async function deleteBookBox(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const response = await BookboxService.deleteBookBox(request as AuthenticatedRequest & { params: { bookboxId: string } });
+        reply.code(204).send(response);
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';  
+        reply.code(statusCode).send({error: message});
+    }
+}
+
+const deleteBookBoxSchema = {
+    description: 'Delete a bookbox',
+    tags: ['bookboxes'],
+    params: {
+        type: 'object',
+        properties: {
+            bookboxId: { type: 'string' }
+        },
+        required: ['bookboxId']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' },
+        },
+    },
+    response: {
+        204: {
+            description: 'Bookbox deleted'
+        },
+        404: {
+            description: 'Error message',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            }
+        }
+    }
+};
+
 interface MyFastifyInstance extends FastifyInstance {
     optionalAuthenticate: (request: FastifyRequest) => void;
     authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
@@ -348,4 +396,5 @@ export default async function bookBoxRoutes(server: MyFastifyInstance) {
     server.post('/bookboxes/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);
     server.delete('/bookboxes/:bookboxId/books/:bookId', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: getBookFromBookBoxSchema }, getBookFromBookBox);
     server.post('/bookboxes/:bookboxId/books/add', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
+    server.delete('/bookboxes/:bookboxId', { preValidation: [server.adminAuthenticate], schema: deleteBookBoxSchema }, deleteBookBox);
 }

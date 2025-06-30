@@ -44,9 +44,33 @@ class BookBoxSelectionDialog extends StatelessWidget {
                     } else {
                       return Column(
                         children: [
-                          const Text('Choose from the list'),
-                          const SizedBox(height: 16.0),
-                          _buildBookBoxDropdown(bookboxController),
+                          if (bookboxController.userLocation.value != null && 
+                              bookboxController.nearbyBookBoxes.isNotEmpty)
+                            ...[
+                              const Text('Nearby Bookboxes'),
+                              const Text(
+                                'Select from the 5 closest bookboxes to you:',
+                                style: TextStyle(fontSize: 12, color: Colors.grey),
+                              ),
+                              const SizedBox(height: 16.0),
+                              _buildNearbyBookBoxList(bookboxController),
+                            ]
+                          else if (bookboxController.userLocation.value == null)
+                            ...[
+                              const Text('Choose from the list'),
+                              const Text(
+                                'Enable location for smart bookbox selection',
+                                style: TextStyle(fontSize: 12, color: Colors.grey),
+                              ),
+                              const SizedBox(height: 16.0),
+                              _buildBookBoxDropdown(bookboxController),
+                            ]
+                          else
+                            ...[
+                              const Text('Choose from the list'),
+                              const SizedBox(height: 16.0),
+                              _buildBookBoxDropdown(bookboxController),
+                            ],
                         ],
                       );
                     }
@@ -67,14 +91,58 @@ class BookBoxSelectionDialog extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.0),
-        color: Colors.grey[200],
+        color: bookBoxController.isAutoSelected.value 
+            ? Colors.green[100] 
+            : Colors.grey[200],
+        border: bookBoxController.isAutoSelected.value
+            ? Border.all(color: Colors.green, width: 2)
+            : null,
       ),
       child: Column(
         children: [
-          Text('Selected Bookbox: ${bookBoxController.selectedBookBox['name']}'),
-          const SizedBox(height: 8.0),
+          if (bookBoxController.isAutoSelected.value)
+            Row(
+              children: [
+                Icon(Icons.location_on, color: Colors.green, size: 20),
+                SizedBox(width: 8),
+                Text(
+                  'Auto-Selected (Nearby)',
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          if (bookBoxController.isAutoSelected.value)
+            const SizedBox(height: 8.0),
           Text(
-              'Number of books: ${bookBoxController.selectedBookBox['books'].length}'),
+            'Selected Bookbox: ${bookBoxController.selectedBookBox['name']}',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 8.0),
+          Text('Number of books: ${bookBoxController.selectedBookBox['books'].length}'),
+          if (bookBoxController.selectedBookBox['distance'] != null)
+            Text(
+              'Distance: ${(bookBoxController.selectedBookBox['distance'] as double).toStringAsFixed(1)}m',
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            ),
+          if (bookBoxController.isAutoSelected.value) ...[
+            const SizedBox(height: 12.0),
+            TextButton(
+              onPressed: () {
+                bookBoxController.isBookBoxFound.value = false;
+                bookBoxController.isAutoSelected.value = false;
+                bookBoxController.selectedBookBox.clear();
+              },
+              child: Text('Choose Different Bookbox'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.blue,
+                textStyle: TextStyle(fontSize: 12),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -136,6 +204,57 @@ class BookBoxSelectionDialog extends StatelessWidget {
         );
       }
     });
+  }
+
+  Widget _buildNearbyBookBoxList(BookBoxSelectionController bookBoxController) {
+    return Container(
+      constraints: BoxConstraints(maxHeight: 200),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        color: Colors.grey[100],
+      ),
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: bookBoxController.nearbyBookBoxes.length,
+        itemBuilder: (context, index) {
+          final bookBox = bookBoxController.nearbyBookBoxes[index];
+          final distance = bookBox['distance'] as double? ?? 0.0;
+          
+          return Card(
+            margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+            child: ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+              title: Text(
+                bookBox['name'],
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              subtitle: Text(
+                '${bookBox['books'].length} books',
+                style: TextStyle(fontSize: 12),
+              ),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${distance.toStringAsFixed(0)}m',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: distance <= 50 ? Colors.green : Colors.orange,
+                    ),
+                  ),
+                  if (distance <= 50)
+                    Icon(Icons.location_on, size: 16, color: Colors.green),
+                ],
+              ),
+              onTap: () {
+                bookBoxController.setSelectedBookBox(bookBox['id']);
+              },
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildSubmitButton(BookBoxSelectionController bookBoxController) {

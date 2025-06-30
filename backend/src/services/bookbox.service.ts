@@ -292,6 +292,35 @@ const bookboxService = {
 
     async clearCollection() {
         await BookBox.deleteMany({});
+    },
+
+    async deleteBookBox(request: AuthenticatedRequest & { params: { bookboxId: string } }) {
+        BookBox.findByIdAndDelete(request.params.bookboxId)
+            .then(async (bookBox) => {
+                if (!bookBox) {
+                    throw newErr(404, 'Bookbox not found');
+                }
+
+                // Notify users about the deletion
+                const users = await User.find();
+                for (const user of users) {
+                    if (user.followedBookboxes.includes(request.params.bookboxId)) {
+                        await notifyUser(user.id,
+                            "Bookbox deleted",
+                            `The bookbox "${bookBox.name}" has been deleted.`);
+                    }
+                }
+
+                // Delete all transactions related to this bookbox
+                await Transaction.deleteMany({ bookboxId: request.params.bookboxId });
+
+                return { message: 'Bookbox deleted successfully' };
+            })
+            .catch((error) => {
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                throw newErr(500, errorMessage);
+            }
+        );
     }
 };
 
