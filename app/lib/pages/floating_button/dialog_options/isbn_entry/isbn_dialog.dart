@@ -47,6 +47,7 @@ class IsbnDialog extends StatelessWidget {
                         const SizedBox(height: 16.0),
                         _buildISBNTextField(isbnController),
                         const SizedBox(height: 16.0),
+                        _buildBookTitleDisplay(isbnController),
                         _buildSubmitButton(isbnController),
                         const SizedBox(height: 16.0),
                         _buildLoadingOrErrorMessage(isbnController),
@@ -65,18 +66,34 @@ class IsbnDialog extends StatelessWidget {
   }
 
   Widget _buildISBNTextField(ISBNController isbnController) {
-    return TextField(
-      controller: isbnController.textEditingController,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: 'ISBN',
-      ),
-      keyboardType: TextInputType.number,
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly,
-        LengthLimitingTextInputFormatter(13),
-      ],
-    );
+    return Obx(() {
+      return TextField(
+        controller: isbnController.textEditingController,
+        decoration: InputDecoration(
+          border: const OutlineInputBorder(),
+          labelText: 'ISBN',
+          suffixIcon: isbnController.isLoading.value && 
+                     isbnController.textEditingController.text.length >= 10
+              ? Container(
+                  padding: const EdgeInsets.all(12.0),
+                  child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                    ),
+                  ),
+                )
+              : null,
+        ),
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(13),
+        ],
+      );
+    });
   }
 
   Widget _buildSubmitButton(ISBNController isbnController) {
@@ -175,5 +192,49 @@ class IsbnDialog extends StatelessWidget {
             .toList(),
       ],
     );
+  }
+
+  Widget _buildBookTitleDisplay(ISBNController isbnController) {
+    return Obx(() {
+      if (isbnController.bookTitle.value.isNotEmpty) {
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12.0),
+          margin: const EdgeInsets.only(bottom: 16.0),
+          decoration: BoxDecoration(
+            color: Colors.green.shade50,
+            border: Border.all(color: Colors.green.shade300),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Book Found:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green.shade700,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                isbnController.bookTitle.value + " - " +isbnController.bookAuthor.value,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+      return const SizedBox.shrink();
+    });
   }
 }
