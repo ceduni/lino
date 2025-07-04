@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../utils/constants/colors.dart';
+import 'recent_transactions_widget.dart';
+import 'options/modify_profile_page.dart';
 
 class UserDashboard extends StatefulWidget {
   final String username;
@@ -43,6 +45,9 @@ class _UserDashboardState extends State<UserDashboard> {
             savedWater: widget.savedWater,
             savedTrees: widget.savedTrees,
             numSavedBooks: widget.numSavedBooks,
+          ),
+          RecentTransactionsCard(
+            username: widget.username,
           ),
         ],
       ),
@@ -111,52 +116,31 @@ class ProfileCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    _getMemberSinceText(),
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
+            Text(
+              _getMemberSinceText(),
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 12),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ModifyProfilePage(),
                   ),
+                );
+              },
+              child: Text(
+                'Update profile',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
                 ),
-                Transform.translate(
-                  offset: Offset(0, -30),
-                  child: Container(
-                    width: 64,
-                    height: 70,
-                    decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    ),
-                    
-                    child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                    IconButton(
-                    onPressed: () {
-                      print("todo");
-                    },
-                    icon: Icon(
-                      Icons.history,
-                      size: 30,
-                      color: Colors.grey[600],
-                    ),
-                    padding: EdgeInsets.zero,
-                    ),
-                    Text(
-                    'History',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                    ),
-                  ],
-                  ),
-                ),
-                ),
-              ],
+              ),
             ),
             SizedBox(height: 0),
           ],

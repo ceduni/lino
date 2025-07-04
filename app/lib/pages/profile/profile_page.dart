@@ -5,7 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'options_page.dart';
- 
+  
 class ProfilePage extends HookWidget {
   ProfilePage({Key? key}) : super(key: key);
 

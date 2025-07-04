@@ -48,20 +48,26 @@ class _NavigationPageState extends State<NavigationPage> {
 
       userLocation = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
+      
+      // pour forcer le reload
+      if (mounted) {
+        setState(() {});
+      }
     } catch (e) {
       print('Error getting user location: $e');
     }
   }
 
-  Future<String> _getClosest() async {
+  String _getClosestSync() {
     if (bookBoxes.isEmpty) {
-      return 'No bookboxes available';
+      return 'Loading bookboxes...';
     }
 
     if (userLocation == null) {
-      return bookBoxes.first['name'] ?? 'Unknown';
+      return 'Getting location...';
     }
 
+    // closest bb
     Map<String, dynamic>? closestBookBox;
     double minDistance = double.infinity;
 
@@ -86,7 +92,6 @@ class _NavigationPageState extends State<NavigationPage> {
       return '${closestBookBox['name']} (${distanceInKm.toStringAsFixed(1)}km)';
     }
 
-    // Au cas ou si on a pas la localisation
     return bookBoxes.first['name'] ?? 'Unknown';
   }
 
@@ -104,6 +109,14 @@ class _NavigationPageState extends State<NavigationPage> {
         );
         isLoading = false;
       });
+      
+      
+      if (userLocation == null) {
+        await Future.delayed(Duration(milliseconds: 500));
+        if (mounted) {
+          setState(() {}); 
+        }
+      }
     } catch (e) {
       setState(() {
         error = e.toString();
@@ -146,14 +159,9 @@ class _NavigationPageState extends State<NavigationPage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-              FutureBuilder<String>(
-                future: _getClosest(),
-                builder: (context, snapshot) {
-                  return Text(
-                    snapshot.data ?? 'Loading...',
-                    style: TextStyle(fontSize: 16),
-                  );
-                },
+              Text(
+                _getClosestSync(),
+                style: TextStyle(fontSize: 16),
               ),
               Icon(Icons.arrow_drop_down),
                   ],
