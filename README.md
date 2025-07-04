@@ -18,43 +18,6 @@ Lino est un projet visant à **bonifier l'initiative des boîtes à livres et en
 
 ## Fonctionnalités📱
 
-## 📅 Échéancier
-
-> Début du projet: 6 mai 2024  
-> Fin du projet: 19 aout 2024
-
-Le développement du projet sera divisé en plusieurs phases:
-
-### Phase 1: Élaboration des exigences
-
-- Semaine 1
-- Semaine 2
-
-### Phase 2: Prototypage et conception
-
-- Semaine 3
-- Semaine 4
-- Semaine 5
-- Semaine 6
-
-### Phase 3: Développement 
-
-- Semaine 7
-- Semaine 8
-- Semaine 9
-- Semaine 10
-- Semaine 11
-- Semaine 12
-
-### Phase 4: Tests & Rapports
-
-- Semaine 13
-- Semaine 14
-- Semaine 15
-- Semaine 16
-
-Le suivi du projet est présenté dans le fichier [**TIMELINE**](TIMELINE.md).
-
 
 ## 🌐 Infrastructure
 
