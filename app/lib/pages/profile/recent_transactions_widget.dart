@@ -90,10 +90,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
+            Text(
                   'Recent Transactions',
                   style: TextStyle(
                     fontSize: 20,
@@ -101,13 +98,6 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
                     color: Colors.blue[700],
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.refresh, color: Colors.blue[700]),
-                  onPressed: _loadTransactions,
-                  tooltip: 'Refresh transactions',
-                ),
-              ],
-            ),
             SizedBox(height: 16),
             _buildTransactionsList(),
           ],
