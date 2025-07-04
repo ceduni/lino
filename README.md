@@ -46,3 +46,4 @@ Si vous êtes intéressé à participer au projet, contactez [Louis-Edouard LAFO
 - Hoang Quan Tran [@benhoangquan](https://github.com/benhoangquan)
 - Oscar Lavolet [@Gelehead](https://github.com/Gelehead)
 - Nathan Riantsoa Razafindrakoto [@NathanRazaf](https://github.com/NathanRazaf)
+- Jalal Fatouaki [@jalalfatouakii](https://github.com/jalalfatouakii)
