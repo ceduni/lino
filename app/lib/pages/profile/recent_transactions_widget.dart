@@ -1,0 +1,256 @@
+import 'package:flutter/material.dart';
+import '../../models/transaction_model.dart';
+import '../../services/transaction_services.dart';
+import '../../services/book_services.dart';
+
+class RecentTransactionsCard extends StatefulWidget {
+  final String username;
+
+  const RecentTransactionsCard({
+    super.key,
+    required this.username,
+  });
+
+  @override
+  _RecentTransactionsCardState createState() => _RecentTransactionsCardState();
+}
+
+class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
+  List<Transaction> transactions = [];
+  bool isLoading = true;
+  String? error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTransactions();
+  }
+
+  Future<void> _loadTransactions() async {
+    try {
+      setState(() {
+        isLoading = true;
+        error = null;
+      });
+
+      final transactionService = TransactionServices();
+      final bookService = BookService();
+      
+      // Fetch transactions
+      final fetchedTransactions = await transactionService.getUserTransactionsList(
+        widget.username,
+        limit: 10, // Show 10 most recent transactions
+      );
+
+      // Get unique bookbox IDs
+      final uniqueBookboxIds = fetchedTransactions
+          .map((t) => t.bookboxId)
+          .toSet()
+          .toList();
+
+      // Fetch bookbox names efficiently
+      final Map<String, String> bookboxNames = {};
+      for (String bookboxId in uniqueBookboxIds) {
+        try {
+          final bookboxData = await bookService.getBookBox(bookboxId);
+          if (bookboxData['name'] != null) {
+            bookboxNames[bookboxId] = bookboxData['name'];
+          }
+        } catch (e) {
+          print('Error fetching bookbox $bookboxId: $e');
+          // Continue with other bookboxes even if one fails
+        }
+      }
+
+      // Update transactions with bookbox names
+      final transactionsWithNames = fetchedTransactions.map((transaction) {
+        final bookboxName = bookboxNames[transaction.bookboxId];
+        return transaction.copyWith(bookboxName: bookboxName);
+      }).toList();
+
+      setState(() {
+        transactions = transactionsWithNames;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = 'Failed to load transactions';
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Recent Transactions',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue[700],
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.refresh, color: Colors.blue[700]),
+                  onPressed: _loadTransactions,
+                  tooltip: 'Refresh transactions',
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            _buildTransactionsList(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTransactionsList() {
+    if (isLoading) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (error != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              Icon(Icons.error_outline, color: Colors.red, size: 48),
+              SizedBox(height: 8),
+              Text(
+                error!,
+                style: TextStyle(color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: _loadTransactions,
+                child: Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (transactions.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              Icon(Icons.history, color: Colors.grey, size: 48),
+              SizedBox(height: 8),
+              Text(
+                'No transactions yet',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                'Start adding or taking books to see your transaction history!',
+                style: TextStyle(
+                  color: Colors.grey[500],
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: transactions.length,
+      separatorBuilder: (context, index) => Divider(height: 1),
+      itemBuilder: (context, index) {
+        final transaction = transactions[index];
+        return _buildTransactionItem(transaction);
+      },
+    );
+  }
+
+  Widget _buildTransactionItem(Transaction transaction) {
+    final isAdded = transaction.action.toLowerCase() == 'added';
+    final actionColor = isAdded ? Colors.green : Colors.orange;
+    final actionIcon = isAdded ? Icons.add_circle_outline : Icons.remove_circle_outline;
+
+    return ListTile(
+      contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
+      leading: CircleAvatar(
+        backgroundColor: actionColor.withOpacity(0.1),
+        child: Icon(
+          actionIcon,
+          color: actionColor,
+          size: 20,
+        ),
+      ),
+      title: Text(
+        transaction.bookTitle,
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 14,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text(
+        _buildSubtitleText(transaction),
+        style: TextStyle(
+          color: Colors.grey[600],
+          fontSize: 12,
+        ),
+      ),
+      trailing: Container(
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: actionColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          transaction.actionDisplayText,
+          style: TextStyle(
+            color: actionColor,
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _buildSubtitleText(Transaction transaction) {
+    final parts = <String>[
+      transaction.actionDisplayText,
+      transaction.timeAgo,
+    ];
+    
+    if (transaction.bookboxName != null && transaction.bookboxName!.isNotEmpty) {
+      parts.insert(1, 'at ${transaction.bookboxName}');
+    }
+    
+    return parts.join(' • ');
+  }
+}
