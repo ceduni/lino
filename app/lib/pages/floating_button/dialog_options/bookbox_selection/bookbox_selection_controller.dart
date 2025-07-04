@@ -11,11 +11,17 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class BookBoxSelectionController extends GetxController {
   final selectedBookBox = <String, dynamic>{}.obs;
   final bookBoxes = <Map<String, dynamic>>[].obs;
+  final nearbyBookBoxes = <Map<String, dynamic>>[].obs;
   final userLocation = Rxn<Position>();
   final isLoading = true.obs;
   final isBookBoxFound = false.obs;
+  final isAutoSelected = false.obs;
   final BarcodeController barcodeController = Get.find<BarcodeController>();
   final FormController formController = Get.find<FormController>();
+  
+  // Constants for smart selection
+  static const double AUTO_SELECT_DISTANCE = 10.0; // meters
+  static const int MAX_NEARBY_BOOKBOXES = 5;
 
   void setSelectedBookBox(String bbid) {
     selectedBookBox.value = bookBoxes
@@ -41,22 +47,74 @@ class BookBoxSelectionController extends GetxController {
         bbs = await BookService().searchBookboxes();
       }
 
-      bookBoxes.value = bbs['bookboxes'].map<Map<String, dynamic>>((bb) {
+      // Map bookboxes and calculate distances
+      List<Map<String, dynamic>> allBookBoxes = bbs['bookboxes'].map<Map<String, dynamic>>((bb) {
+        double? distance;
+        if (userLocation.value != null) {
+          distance = Geolocator.distanceBetween(
+            userLocation.value!.latitude,
+            userLocation.value!.longitude,
+            bb['latitude'].toDouble(),
+            bb['longitude'].toDouble(),
+          );
+        }
+        
         return {
           'id': bb['id'],
           'name': bb['name'],
           'infoText': bb['infoText'],
-          'location': LatLng(
-            bb['location'][1].toDouble(), 
-            bb['location'][0].toDouble()
-          ),
-          'books': bb['books']
+          'latitude': bb['latitude'].toDouble(),
+          'longitude': bb['longitude'].toDouble(),
+          'books': bb['books'],
+          'distance': distance,
         };
       }).toList();
+
+      bookBoxes.value = allBookBoxes;
+      
+      // Smart selection logic
+      if (userLocation.value != null) {
+        await _performSmartSelection(allBookBoxes);
+      }
     } catch (e) {
       print('Error fetching book boxes: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> _performSmartSelection(List<Map<String, dynamic>> allBookBoxes) async {
+    // Sort by distance (closest first)
+    allBookBoxes.sort((a, b) {
+      final distanceA = a['distance'] as double? ?? double.infinity;
+      final distanceB = b['distance'] as double? ?? double.infinity;
+      return distanceA.compareTo(distanceB);
+    });
+
+    // Check if the closest bookbox is within auto-select distance
+    if (allBookBoxes.isNotEmpty) {
+      final closest = allBookBoxes.first;
+      final distance = closest['distance'] as double? ?? double.infinity;
+      
+      if (distance <= AUTO_SELECT_DISTANCE) {
+        // Auto-select the closest bookbox
+        selectedBookBox.value = closest;
+        isBookBoxFound.value = true;
+        isAutoSelected.value = true;
+        
+        Get.snackbar(
+          'Bookbox Auto-Selected',
+          'Found "${closest['name']}" ${distance.toStringAsFixed(1)}m away',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 3),
+        );
+      } else {
+        // Show only the top 5 nearest bookboxes
+        nearbyBookBoxes.value = allBookBoxes.take(MAX_NEARBY_BOOKBOXES).toList();
+        isAutoSelected.value = false;
+      }
     }
   }
 

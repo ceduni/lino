@@ -23,7 +23,8 @@ const bookboxService = {
             id: bookBox.id,
             name: bookBox.name,
             image: bookBox.image,
-            location: bookBox.location,
+            longitude: bookBox.longitude,
+            latitude: bookBox.latitude,
             infoText: bookBox.infoText,
             books: bookBox.books,
         };
@@ -66,7 +67,7 @@ const bookboxService = {
 
         // Create transaction record
         const username = request.user ? (await User.findById(request.user.id))?.username || 'guest' : 'guest';
-        await bookService.createTransaction(username, 'added', title, bookBox.name);
+        await bookService.createTransaction(username, 'added', title, bookboxId);
 
         // Notify users about the new book
         await this.notifyRelevantUsers(
@@ -117,7 +118,7 @@ const bookboxService = {
 
         // Create transaction record
         const username = request.user ? (await User.findById(request.user.id))?.username || 'guest' : 'guest';
-        await bookService.createTransaction(username, 'took', book.title, bookBox.name);
+        await bookService.createTransaction(username, 'took', book.title, bookboxId);
 
         // Notify users about the book removal
         const bookForNotification: IBook = {
@@ -185,17 +186,16 @@ const bookboxService = {
                 return asc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
             });
         } else if (cls === 'by location') {
-            const selfLoc = [request.query.longitude, request.query.latitude];
-            if (!selfLoc[0] || !selfLoc[1]) {
+            const userLongitude = request.query.longitude;
+            const userLatitude = request.query.latitude;
+            if (!userLongitude || !userLatitude) {
                 throw newErr(401, 'Location is required for this classification');
             }
             bookBoxes.sort((a, b) => {
-                const aLoc = a.location;
-                const bLoc = b.location;
-                if (aLoc && bLoc && selfLoc[0] && selfLoc[1]) {
+                if (a.longitude && a.latitude && b.longitude && b.latitude) {
                     // calculate the distance between the user's location and the bookbox's location
-                    const aDist = Math.sqrt((aLoc[0] - selfLoc[0]) ** 2 + (aLoc[1] - selfLoc[1]) ** 2);
-                    const bDist = Math.sqrt((bLoc[0] - selfLoc[0]) ** 2 + (bLoc[1] - selfLoc[1]) ** 2);
+                    const aDist = Math.sqrt((a.longitude - userLongitude) ** 2 + (a.latitude - userLatitude) ** 2);
+                    const bDist = Math.sqrt((b.longitude - userLongitude) ** 2 + (b.latitude - userLatitude) ** 2);
                     // sort in ascending or descending order of distance
                     return asc ? aDist - bDist : bDist - aDist;
                 }
@@ -231,7 +231,8 @@ const bookboxService = {
             name: request.body.name,
             books: [],
             image: request.body.image,
-            location: [request.body.longitude, request.body.latitude],
+            longitude: request.body.longitude,
+            latitude: request.body.latitude,
             infoText: request.body.infoText,
         });
         await bookBox.save();
@@ -291,6 +292,71 @@ const bookboxService = {
 
     async clearCollection() {
         await BookBox.deleteMany({});
+    },
+
+    async deleteBookBox(request: AuthenticatedRequest & { params: { bookboxId: string } }) {
+        BookBox.findByIdAndDelete(request.params.bookboxId)
+            .then(async (bookBox) => {
+                if (!bookBox) {
+                    throw newErr(404, 'Bookbox not found');
+                }
+
+                // Notify users about the deletion
+                const users = await User.find();
+                for (const user of users) {
+                    if (user.followedBookboxes.includes(request.params.bookboxId)) {
+                        await notifyUser(user.id,
+                            "Bookbox deleted",
+                            `The bookbox "${bookBox.name}" has been deleted.`);
+                    }
+                }
+
+                // Delete all transactions related to this bookbox
+                await Transaction.deleteMany({ bookboxId: request.params.bookboxId });
+
+                return { message: 'Bookbox deleted successfully' };
+            })
+            .catch((error) => {
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                throw newErr(500, errorMessage);
+            }
+        );
+    },
+
+    async updateBookBox(request: AuthenticatedRequest & { body: { name?: string; image?: string; longitude?: number; latitude?: number; infoText?: string }; params: { bookboxId: string } }) {
+        const bookBoxId = request.params.bookboxId;
+        const updateData = request.body;    
+        const bookBox = await BookBox.findById(bookBoxId);
+        if (!bookBox) {
+            throw newErr(404, 'Bookbox not found');
+        }   
+
+        // Update the bookbox fields if they are provided
+        if (updateData.name) {
+            bookBox.name = updateData.name;
+        }
+        if (updateData.image) {
+            bookBox.image = updateData.image;
+        }
+        if (updateData.longitude) {
+            bookBox.longitude = updateData.longitude;
+        }   
+        if (updateData.latitude) {
+            bookBox.latitude = updateData.latitude;
+        }   
+        if (updateData.infoText) {
+            bookBox.infoText = updateData.infoText;
+        }
+        await bookBox.save();
+    
+        return {
+            id: bookBox._id.toString(),
+            name: bookBox.name,
+            image: bookBox.image,
+            longitude: bookBox.longitude,
+            latitude: bookBox.latitude,
+            infoText: bookBox.infoText
+        };
     }
 };
 

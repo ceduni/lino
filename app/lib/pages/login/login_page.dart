@@ -71,12 +71,29 @@ class _LoginPageState extends State<LoginPage> {
         width: double.infinity,
         height: double.infinity,
         color: Color(0xFF4277B8),
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Spacer(flex: 2),
+        child: Stack(
+          children: [
+            Positioned(
+              top: 50,
+              left: 16,
+              child: IconButton(
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/home');
+                },
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 30,
+                ),
+              ),
+            ),
+            // Main content
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Spacer(flex: 2),
               Image.asset('assets/logos/logo_with_bird.png', height: 150),
               Spacer(flex: 1),
               _buildTextField(_identifierController, 'Username or Email', Icons.person),
@@ -97,8 +114,10 @@ class _LoginPageState extends State<LoginPage> {
               Spacer(flex: 1),
               _buildFooterText(),
               Spacer(flex: 2),
-            ],
-          ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'book_details_page.dart';
+import 'package:Lino_app/pages/map/map_screen.dart';
+import 'package:geolocator/geolocator.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
@@ -16,11 +18,76 @@ class _NavigationPageState extends State<NavigationPage> {
   bool isLoading = true;
   String? error;
   bool isGridMode = false; // Track if we are in grid mode
+  Position? userLocation;
 
   @override
   void initState() {
     super.initState();
+    _getUserLocation();
     _loadBookBoxes();
+  }
+
+  Future<void> _getUserLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return;
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        return;
+      }
+
+      userLocation = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+    } catch (e) {
+      print('Error getting user location: $e');
+    }
+  }
+
+  Future<String> _getClosest() async {
+    if (bookBoxes.isEmpty) {
+      return 'No bookboxes available';
+    }
+
+    if (userLocation == null) {
+      return bookBoxes.first['name'] ?? 'Unknown';
+    }
+
+    Map<String, dynamic>? closestBookBox;
+    double minDistance = double.infinity;
+
+    for (var bookBox in bookBoxes) {
+      if (bookBox['latitude'] != null && bookBox['longitude'] != null) {
+        double distance = Geolocator.distanceBetween(
+          userLocation!.latitude,
+          userLocation!.longitude,
+          bookBox['latitude'].toDouble(),
+          bookBox['longitude'].toDouble(),
+        );
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestBookBox = bookBox;
+        }
+      }
+    }
+
+    if (closestBookBox != null) {
+      double distanceInKm = minDistance / 1000;
+      return '${closestBookBox['name']} (${distanceInKm.toStringAsFixed(1)}km)';
+    }
+
+    // Au cas ou si on a pas la localisation
+    return bookBoxes.first['name'] ?? 'Unknown';
   }
 
   Future<void> _loadBookBoxes() async {
@@ -62,6 +129,40 @@ class _NavigationPageState extends State<NavigationPage> {
             onPressed: _toggleViewMode,
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(50.0),
+          child: Center(
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MapScreen(),
+                ),
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+              FutureBuilder<String>(
+                future: _getClosest(),
+                builder: (context, snapshot) {
+                  return Text(
+                    snapshot.data ?? 'Loading...',
+                    style: TextStyle(fontSize: 16),
+                  );
+                },
+              ),
+              Icon(Icons.arrow_drop_down),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())

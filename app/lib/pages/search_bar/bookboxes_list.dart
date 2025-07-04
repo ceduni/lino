@@ -32,12 +32,12 @@ class BookBoxesList extends StatelessWidget {
     return await Geolocator.getCurrentPosition();
   }
 
-  double _calculateDistance(Position userLocation, List<dynamic> bookboxLocation) {
+  double _calculateDistance(Position userLocation, double bookboxLatitude, double bookboxLongitude) {
     return Geolocator.distanceBetween(
       userLocation.latitude,
       userLocation.longitude,
-      bookboxLocation[1],
-      bookboxLocation[0],
+      bookboxLatitude,
+      bookboxLongitude,
     ) / 1000; // Convert to kilometers
   }
 
@@ -73,7 +73,7 @@ class BookBoxesList extends StatelessWidget {
               itemCount: bookboxes.length,
               itemBuilder: (context, index) {
                 final bookbox = bookboxes[index];
-                final distance = _calculateDistance(userLocation, bookbox['location']);
+                final distance = _calculateDistance(userLocation, bookbox['latitude'], bookbox['longitude']);
                 final distanceStr = '${distance.toStringAsFixed(2)} km';
                 return Card(
                     color: Colors.blueGrey[50],

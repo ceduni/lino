@@ -19,7 +19,8 @@ export interface IBook {
 export interface IBookBox extends Document {
   name: string;
   image?: string;
-  location: number[];
+  longitude: number;
+  latitude: number;
   infoText?: string;
   books: IBook[];
 }
@@ -29,7 +30,7 @@ export interface ITransaction extends Document {
   username: string;
   action: 'added' | 'took';
   bookTitle: string;
-  bookboxName: string;
+  bookboxId: string;
   timestamp: Date;
 }
 

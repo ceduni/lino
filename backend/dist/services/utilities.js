@@ -9,7 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reinitDatabase = exports.newErr = exports.clearCollectionSchema = exports.userSchema = exports.threadSchema = exports.bookSchema = void 0;
+exports.clearCollectionSchema = exports.userSchema = exports.threadSchema = exports.bookSchema = void 0;
+exports.newErr = newErr;
+exports.reinitDatabase = reinitDatabase;
 exports.bookSchema = {
     type: 'object',
     properties: {
@@ -158,7 +160,6 @@ class CustomError extends Error {
 function newErr(statusCode, message) {
     return new CustomError(message, statusCode);
 }
-exports.newErr = newErr;
 function createAdminUser(server) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -221,4 +222,3 @@ function reinitDatabase(server) {
         return token;
     });
 }
-exports.reinitDatabase = reinitDatabase;

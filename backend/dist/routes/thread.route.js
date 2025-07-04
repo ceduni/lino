@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = threadRoutes;
 const thread_service_1 = __importDefault(require("../services/thread.service"));
 const thread_model_1 = __importDefault(require("../models/thread.model"));
 const utilities_1 = require("../services/utilities");
@@ -367,4 +368,3 @@ function threadRoutes(server) {
         server.delete('/threads/clear', { preValidation: [server.adminAuthenticate], schema: utilities_1.clearCollectionSchema }, clearCollection);
     });
 }
-exports.default = threadRoutes;

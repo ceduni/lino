@@ -111,14 +111,54 @@ class ProfileCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(
-              _getMemberSinceText(),
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _getMemberSinceText(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+                Transform.translate(
+                  offset: Offset(0, -30),
+                  child: Container(
+                    width: 64,
+                    height: 70,
+                    decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    ),
+                    
+                    child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                    IconButton(
+                    onPressed: () {
+                      print("todo");
+                    },
+                    icon: Icon(
+                      Icons.history,
+                      size: 30,
+                      color: Colors.grey[600],
+                    ),
+                    padding: EdgeInsets.zero,
+                    ),
+                    Text(
+                    'History',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                    ),
+                  ],
+                  ),
+                ),
+                ),
+              ],
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 0),
           ],
         ),
       ),

@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = bookRoutes;
 const book_service_1 = __importDefault(require("../services/book.service"));
 const utilities_1 = require("../services/utilities");
 function getBookInfoFromISBN(request, reply) {
@@ -370,7 +371,7 @@ const getTransactionHistorySchema = {
         properties: {
             username: { type: 'string' },
             bookTitle: { type: 'string' },
-            bookboxName: { type: 'string' },
+            bookboxId: { type: 'string' },
             limit: { type: 'number' }
         }
     },
@@ -388,7 +389,7 @@ const getTransactionHistorySchema = {
                             username: { type: 'string' },
                             action: { type: 'string' },
                             bookTitle: { type: 'string' },
-                            bookboxName: { type: 'string' },
+                            bookboxId: { type: 'string' },
                             timestamp: { type: 'string' }
                         }
                     }
@@ -415,4 +416,3 @@ function bookRoutes(server) {
         server.get('/books/transactions', { schema: getTransactionHistorySchema }, getTransactionHistory);
     });
 }
-exports.default = bookRoutes;

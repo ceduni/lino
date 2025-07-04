@@ -85,7 +85,7 @@ class MapScreen extends HookWidget {
               List<Marker> markers = bboxes
                   .map((bbox) => Marker(
                 markerId: MarkerId(bbox['id']),
-                position: bbox['location'],
+                position: LatLng(bbox['latitude'], bbox['longitude']),
                 infoWindow: InfoWindow(
                   title: bbox['name'],
                   snippet: bbox['infoText'],
@@ -123,8 +123,8 @@ class MapScreen extends HookWidget {
                     distance = Geolocator.distanceBetween(
                       userLocation.latitude,
                       userLocation.longitude,
-                      bbox['location'].latitude,
-                      bbox['location'].longitude,
+                      bbox['latitude'],
+                      bbox['longitude'],
                     );
                   }
 
