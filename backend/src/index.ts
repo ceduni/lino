@@ -14,7 +14,8 @@ const fastifySwaggerUi = require('@fastify/swagger-ui');
 const bookRoutes = require('./routes/book.route');
 const bookboxRoutes = require('./routes/bookbox.route');
 const userRoutes = require('./routes/user.route');
-const threadRoutes = require('./routes/thread.route'); 
+const threadRoutes = require('./routes/thread.route');
+const transactionRoutes = require('./routes/transaction.route');
 const fastifyWebSocket = require('@fastify/websocket');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
@@ -180,6 +181,14 @@ server.register(fastifySwagger, {
             {
                 name: 'messages',
                 description: 'Operations related to messages (e.g. add, react)'
+            },
+            {
+                name: 'transactions',
+                description: 'Operations related to transactions (e.g. create custom transaction)'
+            },
+            {
+                name: 'admin',
+                description: 'Admin-only operations'
             }
         ]
     },
@@ -195,6 +204,7 @@ server.register(bookRoutes);
 server.register(bookboxRoutes);
 server.register(userRoutes);
 server.register(threadRoutes);
+server.register(transactionRoutes);
 
 const start = async () => {
     try {
