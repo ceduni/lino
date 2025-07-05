@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'threads_section.dart';
 import 'requests_section.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
 
 class ForumScreen extends StatefulWidget {
   String? query;
