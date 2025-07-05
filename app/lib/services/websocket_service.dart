@@ -33,14 +33,10 @@ class WebSocketService {
   }
 
   void sendMessage(String message) {
-    if (channel != null) {
-      channel.sink.add(message);
+    channel.sink.add(message);
     }
-  }
 
   void disconnect() {
-    if (channel != null) {
-      channel.sink.close();
+    channel.sink.close();
     }
-  }
 }
