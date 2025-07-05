@@ -1,6 +1,5 @@
 import 'package:Lino_app/pages/floating_button/common/barcode_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 Widget buildScanner(BarcodeController barcodeController) {

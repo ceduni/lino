@@ -6,7 +6,6 @@ import 'package:Lino_app/services/book_services.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class BookBoxSelectionController extends GetxController {
   final selectedBookBox = <String, dynamic>{}.obs;

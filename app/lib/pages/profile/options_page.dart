@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:Lino_app/pages/profile/options/modify_profile_page.dart';
 import 'package:Lino_app/pages/profile/options/notification_keywords_page.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class OptionsPage extends StatefulWidget {
   @override

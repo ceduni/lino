@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
 import '../../nav_menu.dart';
 import './add_thread_form.dart';
 import '../../services/user_services.dart';
@@ -19,7 +18,6 @@ class BookDetailsPage extends StatefulWidget {
 }
 
 class _BookDetailsPageState extends State<BookDetailsPage> {
-  bool _isFavorite = false;
   bool _isLoading = true;
   bool _isUserLoggedIn = false;
   bool _isCheckingUser = true;  // New flag to check if user status is being checked
