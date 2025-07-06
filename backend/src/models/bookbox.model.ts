@@ -18,6 +18,7 @@ const bookboxSchema = new mongoose.Schema({
     image: String,
     longitude: { type: Number, required: true },
     latitude: { type: Number, required: true },
+    boroughId: { type: String, required: true },
     infoText: String,
     books: [bookSchema], // Array of nested book documents
 });

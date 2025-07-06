@@ -25,6 +25,7 @@ const bookboxService = {
             image: bookBox.image,
             longitude: bookBox.longitude,
             latitude: bookBox.latitude,
+            boroughId: bookBox.boroughId,
             infoText: bookBox.infoText,
             books: bookBox.books,
         };
@@ -224,6 +225,7 @@ const bookboxService = {
             image?: string; 
             longitude: number; 
             latitude: number; 
+            boroughId: string;
             infoText?: string; 
         } 
     }) {
@@ -233,6 +235,7 @@ const bookboxService = {
             image: request.body.image,
             longitude: request.body.longitude,
             latitude: request.body.latitude,
+            boroughId: request.body.boroughId,
             infoText: request.body.infoText,
         });
         await bookBox.save();
@@ -323,7 +326,7 @@ const bookboxService = {
         );
     },
 
-    async updateBookBox(request: AuthenticatedRequest & { body: { name?: string; image?: string; longitude?: number; latitude?: number; infoText?: string }; params: { bookboxId: string } }) {
+    async updateBookBox(request: AuthenticatedRequest & { body: { name?: string; image?: string; longitude?: number; latitude?: number; boroughId?: string; infoText?: string }; params: { bookboxId: string } }) {
         const bookBoxId = request.params.bookboxId;
         const updateData = request.body;    
         const bookBox = await BookBox.findById(bookBoxId);
@@ -344,6 +347,9 @@ const bookboxService = {
         if (updateData.latitude) {
             bookBox.latitude = updateData.latitude;
         }   
+        if (updateData.boroughId) {
+            bookBox.boroughId = updateData.boroughId;
+        }
         if (updateData.infoText) {
             bookBox.infoText = updateData.infoText;
         }
@@ -355,6 +361,7 @@ const bookboxService = {
             image: bookBox.image,
             longitude: bookBox.longitude,
             latitude: bookBox.latitude,
+            boroughId: bookBox.boroughId,
             infoText: bookBox.infoText
         };
     }
