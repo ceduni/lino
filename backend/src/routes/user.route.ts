@@ -1,5 +1,4 @@
 import {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify';
-import userService from '../services/user.service';
 import UserService from "../services/user.service";
 import User from "../models/user.model";
 import { userSchema, clearCollectionSchema } from "../services/utilities";
@@ -8,7 +7,7 @@ import { AuthenticatedRequest } from "../types/common.types";
 
 async function registerUser(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const response = await userService.registerUser(request.body as UserRegistrationData);
+        const response = await UserService.registerUser(request.body as UserRegistrationData);
         reply.code(201).send(response);
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
@@ -52,7 +51,7 @@ const registerUserSchema = {
 
 async function loginUser(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const response = await userService.loginUser(request.body as UserLoginCredentials);
+        const response = await UserService.loginUser(request.body as UserLoginCredentials);
         reply.send({ token : response.token });
     } catch (error : unknown ) {
         const statusCode = (error as any).statusCode || 500;

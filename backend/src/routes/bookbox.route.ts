@@ -204,7 +204,6 @@ async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
                 image?: string; 
                 longitude: number; 
                 latitude: number; 
-                boroughId: string;
                 infoText?: string; 
             } 
         });
@@ -225,10 +224,9 @@ const addNewBookboxSchema = {
             infoText: { type: 'string' },
             latitude: { type: 'number' },
             longitude: { type: 'number' },
-            boroughId: { type: 'string' },
             image: { type: 'string' }
         },
-        required: ['name', 'infoText', 'latitude', 'longitude', 'boroughId', 'image'],
+        required: ['name', 'infoText', 'latitude', 'longitude', 'image'],
     },
     headers: {
         type: 'object',
@@ -397,7 +395,6 @@ async function updateBookBox(request: FastifyRequest, reply: FastifyReply) {
             longitude?: number; 
             latitude?: number;
             infoText?: string;
-            boroughId?: string;
         }; params: { bookboxId: string } });
         reply.code(200).send(response);
     } catch (error : unknown) {
@@ -425,7 +422,6 @@ const updateBookBoxSchema = {
             latitude: { type: 'number' },
             longitude: { type: 'number' },
             image: { type: 'string' },
-            boroughId: { type: 'string' }
         },
     },
     headers: {

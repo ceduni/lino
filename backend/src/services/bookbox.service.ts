@@ -12,6 +12,7 @@ import {
 } from '../types/book.types';
 import { IUser } from '../types/user.types';
 import { AuthenticatedRequest } from '../types/common.types';
+import { getBoroughId } from "./borough.id.generator";
 
 const bookboxService = {
     async getBookBox(bookBoxId: string) {
@@ -225,17 +226,17 @@ const bookboxService = {
             image?: string; 
             longitude: number; 
             latitude: number; 
-            boroughId: string;
             infoText?: string; 
         } 
     }) {
+        const boroughId = await getBoroughId(request.body.latitude, request.body.longitude);
         const bookBox = new BookBox({
             name: request.body.name,
             books: [],
             image: request.body.image,
             longitude: request.body.longitude,
             latitude: request.body.latitude,
-            boroughId: request.body.boroughId,
+            boroughId: boroughId,
             infoText: request.body.infoText,
         });
         await bookBox.save();
@@ -326,7 +327,7 @@ const bookboxService = {
         );
     },
 
-    async updateBookBox(request: AuthenticatedRequest & { body: { name?: string; image?: string; longitude?: number; latitude?: number; boroughId?: string; infoText?: string }; params: { bookboxId: string } }) {
+    async updateBookBox(request: AuthenticatedRequest & { body: { name?: string; image?: string; longitude?: number; latitude?: number; infoText?: string }; params: { bookboxId: string } }) {
         const bookBoxId = request.params.bookboxId;
         const updateData = request.body;    
         const bookBox = await BookBox.findById(bookBoxId);
@@ -341,15 +342,20 @@ const bookboxService = {
         if (updateData.image) {
             bookBox.image = updateData.image;
         }
+        
         if (updateData.longitude) {
             bookBox.longitude = updateData.longitude;
         }   
         if (updateData.latitude) {
             bookBox.latitude = updateData.latitude;
         }   
-        if (updateData.boroughId) {
-            bookBox.boroughId = updateData.boroughId;
+        if (updateData.latitude || updateData.longitude) {
+            // If either latitude or longitude is updated, we need to update the boroughId
+            const boroughId = await getBoroughId(updateData.latitude || bookBox.latitude, updateData.longitude || bookBox.longitude);
+            bookBox.boroughId = boroughId;
         }
+
+
         if (updateData.infoText) {
             bookBox.infoText = updateData.infoText;
         }

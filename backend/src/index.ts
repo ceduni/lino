@@ -2,6 +2,7 @@ import {WebSocket} from "@fastify/websocket";
 import {newErr} from "./services/utilities";
 import {FastifyRequest, FastifyReply} from "fastify";
 import { WebSocketClient, FastifyRequestWithJWT } from "./types/common.types";
+import serviceRoutes from "./routes/services.route";
 
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
@@ -205,6 +206,7 @@ server.register(bookboxRoutes);
 server.register(userRoutes);
 server.register(threadRoutes);
 server.register(transactionRoutes);
+server.register(serviceRoutes);
 
 const start = async () => {
     try {
