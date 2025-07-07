@@ -12,36 +12,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.notifyUser = void 0;
+exports.notifyUser = notifyUser;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const argon2_1 = __importDefault(require("argon2"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const utilities_1 = require("./utilities");
+const index_1 = require("../index");
 dotenv_1.default.config();
 const UserService = {
     // User service to register a new user's account
     registerUser(userData) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { username, email, phone, password, getAlerted } = userData;
+            const { username, email, phone, password } = userData;
             if (username === 'guest') {
-                throw new Error('Username not allowed');
+                throw (0, utilities_1.newErr)(400, 'Username not allowed');
             }
             // Check if username already exists
+            if (!username) {
+                throw (0, utilities_1.newErr)(400, 'Username is required');
+            }
             const existingUser = yield user_model_1.default.findOne({ username });
             if (existingUser) {
-                throw new Error('Username already taken');
+                throw (0, utilities_1.newErr)(400, 'Username already taken');
             }
             // Check if email already exists
+            if (!email) {
+                throw (0, utilities_1.newErr)(400, 'Email is required');
+            }
             const existingEmail = yield user_model_1.default.findOne({ email });
             if (existingEmail) {
-                throw new Error('Email already taken');
+                throw (0, utilities_1.newErr)(400, 'Email already taken');
+            }
+            if (!password) {
+                throw (0, utilities_1.newErr)(400, 'Password is required');
             }
             const hashedPassword = yield argon2_1.default.hash(password);
             const user = new user_model_1.default({ username: username,
                 email: email,
                 phone: phone,
-                password: hashedPassword,
-                getAlerted: getAlerted
+                password: hashedPassword
             });
             yield user.save();
             return { username: user.username, password: user.password };
@@ -53,83 +63,60 @@ const UserService = {
             const identifier = credentials.identifier;
             const user = yield user_model_1.default.findOne({ $or: [{ username: identifier }, { email: identifier }] });
             if (!user) {
-                throw new Error('User not found');
+                throw (0, utilities_1.newErr)(400, 'Invalid username or email');
             }
             const validPassword = yield argon2_1.default.verify(user.password, credentials.password);
             if (!validPassword) {
-                throw new Error('Invalid password');
+                throw (0, utilities_1.newErr)(400, 'Invalid password');
             }
             // User authenticated successfully, generate tokens
-            // @ts-ignore
             const token = jsonwebtoken_1.default.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY);
             return { user: user, token: token };
         });
     },
-    // User service to add a book's ID to a user's favorites
-    addToFavorites(userId, id) {
+    getUserNotifications(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            let user = yield user_model_1.default.findById(userId);
-            if (!user) {
-                throw new Error('User not found');
-            }
-            if (user.favoriteBooks.includes(id)) {
-                return;
-            }
-            user.favoriteBooks.push(id);
-            yield user.save();
-            return user;
-        });
-    },
-    // User service to remove a book's ID from a user's favorites
-    removeFromFavorites(userId, id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let user = yield user_model_1.default.findById(userId);
-            if (!user) {
-                throw new Error('User not found');
-            }
-            const index = user.favoriteBooks.indexOf(id);
-            if (index === -1) {
-                return;
-            }
-            user.favoriteBooks.splice(index, 1);
-            yield user.save();
-            return user;
-        });
-    },
-    // User service to get the infos of the user's favorite books
-    getFavorites(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let user = yield user_model_1.default.findById(userId);
-            if (!user) {
-                throw new Error('User not found');
-            }
-            // array to store the favorite books
-            const favoriteBooks = [];
-            for (const bookId of user.favoriteBooks) {
-                // @ts-ignore
-                const book = yield Book.findById(bookId);
-                if (book) {
-                    favoriteBooks.push(book);
-                }
-            }
-            return favoriteBooks;
-        });
-    },
-    // User service to get the user's ecological impact
-    getEcologicalImpact(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
+            const userId = request.user.id;
             const user = yield user_model_1.default.findById(userId);
             if (!user) {
-                throw new Error('User not found');
+                throw (0, utilities_1.newErr)(404, 'User not found');
             }
-            return user.ecologicalImpact;
+            // Calculate the date 30 days ago
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            // Filter out notifications older than 30 days
+            const filteredNotifications = user.notifications.filter(notification => {
+                const notificationDate = new Date(notification.timestamp);
+                return notificationDate >= thirtyDaysAgo;
+            });
+            user.notifications = filteredNotifications;
+            // Save the updated user document
+            yield user.save();
+            return user.notifications;
+        });
+    },
+    readNotification(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userId = request.user.id;
+            const user = yield user_model_1.default.findById(userId);
+            if (!user) {
+                throw (0, utilities_1.newErr)(404, 'User not found');
+            }
+            const notificationId = request.body.notificationId;
+            const notification = user.notifications.id(notificationId);
+            if (!notification) {
+                throw (0, utilities_1.newErr)(404, 'Notification not found');
+            }
+            notification.read = true;
+            yield user.save();
+            return user.notifications;
         });
     },
     getUserName(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield user_model_1.default.findById(userId);
             if (!user) {
-                throw new Error('User not found');
+                throw (0, utilities_1.newErr)(404, 'User not found');
             }
             return user.username;
         });
@@ -143,30 +130,27 @@ const UserService = {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield user_model_1.default.findById(request.user.id);
             if (!user) {
-                throw new Error('User not found');
+                throw (0, utilities_1.newErr)(404, 'User not found');
             }
             if (request.body.username) {
                 const check = yield user_model_1.default.findOne({ username: request.body.username });
-                if (check) {
-                    throw new Error('Username already taken');
+                if (check && check.username !== user.username) {
+                    throw (0, utilities_1.newErr)(400, 'Username already taken');
                 }
                 user.username = request.body.username;
             }
             if (request.body.password) {
                 user.password = yield argon2_1.default.hash(request.body.password);
             }
-            if (request.body.email) {
+            if (request.body.email && request.body.email !== user.email) {
                 const check = yield user_model_1.default.findOne({ email: request.body.email });
                 if (check) {
-                    throw new Error('Email already taken');
+                    throw (0, utilities_1.newErr)(400, 'Email already taken');
                 }
                 user.email = request.body.email;
             }
             if (request.body.phone) {
                 user.phone = request.body.phone;
-            }
-            if (request.body.getAlerted) {
-                user.getAlerted = request.body.getAlerted;
             }
             if (request.body.keyWords) {
                 user.notificationKeyWords = yield this.parseKeyWords(request.body.keyWords);
@@ -177,22 +161,29 @@ const UserService = {
     },
     clearCollection() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield user_model_1.default.deleteMany({});
+            yield user_model_1.default.deleteMany({ username: { $ne: process.env.ADMIN_USERNAME } });
         });
     }
 };
-function notifyUser(userId, message) {
+function notifyUser(userId, title, message) {
     return __awaiter(this, void 0, void 0, function* () {
         let user = yield user_model_1.default.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            throw (0, utilities_1.newErr)(404, 'User not found');
         }
-        // @ts-ignore
-        const notification = { content: message };
-        user.notifications.push(notification);
-        yield user.save();
+        const notification = { title: title, content: message, timestamp: new Date(), read: false };
+        // Validate and push the notification into the user's notifications array
+        try {
+            user.notifications.push(notification);
+            yield user.save();
+        }
+        catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            throw new Error(`Failed to save notification: ${errorMessage}`);
+        }
+        // Broadcast the notification to the user if they are connected via WebSocket
+        (0, index_1.broadcastToUser)(userId, { event: 'newNotification', data: notification });
         return user;
     });
 }
-exports.notifyUser = notifyUser;
 exports.default = UserService;

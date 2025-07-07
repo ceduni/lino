@@ -2,158 +2,158 @@ import User from '../models/user.model';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { newErr } from "./utilities";
+import {broadcastToUser} from '../index';
+import { 
+    UserRegistrationData, 
+    UserLoginCredentials, 
+    IUser,
+    INotification 
+} from '../types/user.types';
+import { AuthenticatedRequest } from '../types/common.types';
 
 dotenv.config();
 
 const UserService = {
     // User service to register a new user's account
-    async registerUser(userData: any) {
-        const { username, email, phone, password, getAlerted } = userData;
+    async registerUser(userData: UserRegistrationData) {
+        const { username, email, phone, password } = userData;
         if (username === 'guest') {
-            throw new Error('Username not allowed');
+            throw newErr(400, 'Username not allowed');
         }
 
         // Check if username already exists
+        if (!username) {
+            throw newErr(400, 'Username is required');
+        }
         const existingUser = await User.findOne({ username });
         if (existingUser) {
-            throw new Error('Username already taken');
-        }
-        // Check if email already exists
-        const existingEmail = await User.findOne({ email });
-        if (existingEmail) {
-            throw new Error('Email already taken');
+            throw newErr(400, 'Username already taken');
         }
 
+        // Check if email already exists
+        if (!email) {
+            throw newErr(400, 'Email is required');
+        }
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) {
+            throw newErr(400, 'Email already taken');
+        }
+
+        if (!password) {
+            throw newErr(400, 'Password is required');
+        }
         const hashedPassword = await argon2.hash(password);
         const user = new User(
             { username : username,
                 email : email,
                 phone : phone,
-                password: hashedPassword,
-                getAlerted: getAlerted
+                password: hashedPassword
             });
         await user.save();
         return {username: user.username, password: user.password};
     },
 
     // User service to log in a user if they exist (can log with either a username or an email)
-    async loginUser(credentials: any) {
+    async loginUser(credentials: UserLoginCredentials) {
         const identifier = credentials.identifier;
         const user = await User.findOne({ $or: [{ username : identifier }, { email : identifier }]});
         if (!user) {
-            throw new Error('User not found');
+            throw newErr(400, 'Invalid username or email');
         }
         const validPassword = await argon2.verify(user.password, credentials.password);
         if (!validPassword) {
-            throw new Error('Invalid password');
+            throw newErr(400, 'Invalid password');
         }
         // User authenticated successfully, generate tokens
-        // @ts-ignore
-        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY);
+        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY as string);
 
         return { user: user, token: token };
     },
 
-
-    // User service to add a book's ID to a user's favorites
-    async addToFavorites(userId: string, id: string) {
-        let user = await User.findById(userId);
-        if (!user) {
-            throw new Error('User not found');
-        }
-        if (user.favoriteBooks.includes(id)) {
-            return;
-        }
-        user.favoriteBooks.push(id);
-        await user.save();
-        return user;
-    },
-
-
-    // User service to remove a book's ID from a user's favorites
-    async removeFromFavorites(userId: string, id: string) {
-        let user = await User.findById(userId);
-        if (!user) {
-            throw new Error('User not found');
-        }
-        const index = user.favoriteBooks.indexOf(id);
-        if (index === -1) {
-            return;
-        }
-        user.favoriteBooks.splice(index, 1);
-        await user.save();
-        return user;
-    },
-
-
-    // User service to get the infos of the user's favorite books
-    async getFavorites(userId: string) {
-        let user = await User.findById(userId);
-        if (!user) {
-            throw new Error('User not found');
-        }
-        // array to store the favorite books
-        const favoriteBooks = [];
-        for (const bookId of user.favoriteBooks) {
-            // @ts-ignore
-            const book = await Book.findById(bookId);
-            if (book) {
-                favoriteBooks.push(book);
-            }
-        }
-        return favoriteBooks;
-    },
-
-
-    // User service to get the user's ecological impact
-    async getEcologicalImpact(userId: string) {
+    async getUserNotifications(request: AuthenticatedRequest) {
+        const userId = request.user.id;
         const user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            throw newErr(404, 'User not found');
         }
-        return user.ecologicalImpact;
+
+        // Calculate the date 30 days ago
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        // Filter out notifications older than 30 days
+        const filteredNotifications = user.notifications.filter(notification => {
+            const notificationDate = new Date(notification.timestamp);
+            return notificationDate >= thirtyDaysAgo;
+        });
+        user.notifications = filteredNotifications as any;
+
+        // Save the updated user document
+        await user.save();
+        return user.notifications;
     },
+
+    async readNotification(request: AuthenticatedRequest & { body: { notificationId: string } }) {
+        const userId = request.user.id;
+        const user = await User.findById(userId);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }
+        const notificationId = request.body.notificationId;
+        const notification = user.notifications.id(notificationId);
+        if (!notification) {
+            throw newErr(404, 'Notification not found');
+        }
+        notification.read = true;
+        await user.save();
+        return user.notifications;
+    },
+
 
     async getUserName(userId: string) {
         const user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            throw newErr(404, 'User not found');
         }
         return user.username;
     },
-
-
-   async parseKeyWords(text: string) {
+    async parseKeyWords(text: string) {
         return text.split(',');
     },
 
-    async updateUser(request: any) {
+    async updateUser(request: AuthenticatedRequest & { 
+        body: { 
+            username?: string; 
+            password?: string; 
+            email?: string; 
+            phone?: string; 
+            keyWords?: string; 
+        } 
+    }) {
         const user = await User.findById(request.user.id);
         if (!user) {
-            throw new Error('User not found');
+            throw newErr(404, 'User not found');
         }
         if (request.body.username) {
             const check = await User.findOne({ username: request.body.username });
-            if (check) {
-                throw new Error('Username already taken');
+            if (check && check.username !== user.username) {
+                throw newErr(400, 'Username already taken');
             }
             user.username = request.body.username;
         }
         if (request.body.password) {
             user.password = await argon2.hash(request.body.password);
         }
-        if (request.body.email) {
+        if (request.body.email && request.body.email !== user.email) {
             const check = await User.findOne({ email: request.body.email });
             if (check) {
-                throw new Error('Email already taken');
+                throw newErr(400, 'Email already taken');
             }
             user.email = request.body.email;
         }
         if (request.body.phone) {
             user.phone = request.body.phone;
-        }
-        if (request.body.getAlerted) {
-            user.getAlerted = request.body.getAlerted;
         }
         if (request.body.keyWords) {
             user.notificationKeyWords = await this.parseKeyWords(request.body.keyWords);
@@ -163,22 +163,31 @@ const UserService = {
     },
 
     async clearCollection() {
-        await User.deleteMany({});
+        await User.deleteMany({ username: { $ne: process.env.ADMIN_USERNAME } });
     }
 };
 
-export async function notifyUser(userId: string, message: string) {
+export async function notifyUser(userId: string, title: string, message: string) {
     let user = await User.findById(userId);
     if (!user) {
-        throw new Error('User not found');
+        throw newErr(404, 'User not found');
     }
-    // @ts-ignore
-    const notification = { content: message };
-    user.notifications.push(notification);
-    await user.save();
+    const notification: INotification = { title: title, content: message, timestamp: new Date(), read: false };
+
+    // Validate and push the notification into the user's notifications array
+    try {
+        user.notifications.push(notification);
+        await user.save();
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        throw new Error(`Failed to save notification: ${errorMessage}`);
+    }
+
+    // Broadcast the notification to the user if they are connected via WebSocket
+    broadcastToUser(userId, { event: 'newNotification', data: notification });
+
     return user;
 }
-
 
 
 export default UserService;

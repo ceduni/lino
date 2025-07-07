@@ -1,6 +1,5 @@
 class Book {
   final String? isbn;
-  final String qrCodeId;
   final String title;
   final List<String> authors;
   final String? description;
@@ -9,13 +8,10 @@ class Book {
   final List<String> categories;
   final int? parutionYear;
   final int? pages;
-  final List<History> takenHistory;
-  final List<History> givenHistory;
-  final DateTime dateLastAction;
+  final DateTime dateAdded;
 
   Book({
     this.isbn,
-    required this.qrCodeId,
     required this.title,
     required this.authors,
     this.description,
@@ -24,9 +20,7 @@ class Book {
     required this.categories,
     this.parutionYear,
     this.pages,
-    required this.takenHistory,
-    required this.givenHistory,
-    required this.dateLastAction,
+    required this.dateAdded,
   });
 
   factory Book.fromJson(Map<String, dynamic> json) {
@@ -36,15 +30,8 @@ class Book {
     var categoriesList = json['categories'] as List;
     List<String> categories = categoriesList.cast<String>();
 
-    var takenHistoryList = json['takenHistory'] as List;
-    List<History> takenHistory = takenHistoryList.map((i) => History.fromJson(i)).toList();
-
-    var givenHistoryList = json['givenHistory'] as List;
-    List<History> givenHistory = givenHistoryList.map((i) => History.fromJson(i)).toList();
-
     return Book(
       isbn: json['isbn'],
-      qrCodeId: json['qrCodeId'],
       title: json['title'],
       authors: authors,
       description: json['description'],
@@ -53,23 +40,7 @@ class Book {
       categories: categories,
       parutionYear: json['parutionYear'],
       pages: json['pages'],
-      takenHistory: takenHistory,
-      givenHistory: givenHistory,
-      dateLastAction: DateTime.parse(json['dateLastAction']),
-    );
-  }
-}
-
-class History {
-  final String username;
-  final DateTime timestamp;
-
-  History({required this.username, required this.timestamp});
-
-  factory History.fromJson(Map<String, dynamic> json) {
-    return History(
-      username: json['username'],
-      timestamp: DateTime.parse(json['timestamp']),
+      dateAdded: DateTime.parse(json['dateAdded']),
     );
   }
 }

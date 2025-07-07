@@ -2,25 +2,22 @@ import mongoose from 'mongoose';
 
 const notificationSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now },
+    title: { type: String, required: true },
     content: { type: String, required: true },
     read: { type: Boolean, default: false }
 });
 
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
-    password: { type: String, required: true }, // It's gonna be hashed
+    password: { type: String, required: true }, 
     email : { type: String, required: true, unique: true },
     phone: {type: String},
-    favoriteBooks: [String], // Array of book _ids
-    trackedBooks: [String], // Array of book _ids, inaccessible for the user, only for the system
+    requestNotificationRadius: { type: Number, default: 5 }, // Default radius in km
     notificationKeyWords: [String],  // Array of key words
-    ecologicalImpact: {
-        carbonSavings: { type: Number, default: 0 }, // 27.71 kg CO2 per saved book
-        savedWater: { type: Number, default: 0 }, // 2000 liters per saved book
-        savedTrees: { type: Number, default: 0 } // 0.005 trees per saved book
-    },
+    numSavedBooks: { type: Number, default: 0 },
     notifications: {type: [notificationSchema], default: []},
-    getAlerted: { type: Boolean, default: true },
+    followedBookboxes: { type: [String], default: [] }, // Array of bookbox IDs
+    createdAt: { type: Date, default: Date.now },
 });
 
 const User = mongoose.model('User', userSchema, "users");

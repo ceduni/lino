@@ -1,26 +1,26 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../utils/constants/api_constants.dart';
 
 class UserService {
-  final String url = 'https://lino-1.onrender.com';
+  final String url = baseApiUrl;
 
 
-  Future<String> registerUser(String username, String email, String phone, String password, bool getAlerted) async {
+  Future<String> registerUser(String username, String email, String password, {String phone = ''}) async {
     // Make a POST request to the server
-    // Send the username, email, phone, password, and getAlerted to the server
+    // Send the username, email, phone, and password to the server
     // If the server returns a 201 status code, the user is registered
     // If the server returns another status code, the user is not registered
     final userData = await http.post(
-      Uri.parse('$url/users/register'),
+      Uri.parse('$url/users/register'), 
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-      },
+      }, 
       body: jsonEncode(<String, dynamic>{
         'username': username,
         'email': email,
         'phone': phone,
         'password': password,
-        'getAlerted': getAlerted,
       }),
     );
     final data = jsonDecode(userData.body);
@@ -54,49 +54,6 @@ class UserService {
     return token;
   }
 
-  Future<List<String>> addToFavorites(String token, String id) async {
-    // Make a POST request to the server
-    // Send the token and id to the server
-    // If the server returns a 200 status code, the id is added to the user's favorites
-    // If the server returns another status code, the id is not added to the user's favorites
-    final r = await http.post(
-      Uri.parse('$url/users/favorites'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(<String, String>{
-        'bookId': id,
-      }),
-    );
-    final response = jsonDecode(r.body);
-    if (r.statusCode != 200) {
-      throw Exception(response['error']);
-    }
-    final data = response['favorites'];
-    return List<String>.from(data);
-  }
-
-  Future<List<String>> removeFromFavorites(String token, String id) async {
-    // Make a DELETE request to the server
-    // Send the token and id to the server
-    // If the server returns a 200 status code, the id is removed from the user's favorites
-    // If the server returns another status code, the id is not removed from the user's favorites
-    final r = await http.delete(
-      Uri.parse('$url/users/favorites/$id'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
-      },
-    );
-    final response = jsonDecode(r.body);
-    if (r.statusCode != 200) {
-      throw Exception(response['error']);
-    }
-    final data = response['favorites'];
-    return List<String>.from(data);
-  }
-
   Future<Map<String, dynamic>> getUser(String token) async {
     // Make a GET request to the server
     // Send the token to the server
@@ -116,7 +73,7 @@ class UserService {
     return data;
   }
 
-  Future<Map<String, dynamic>> updateUser(String token, {String? username, String? password, String? email, String? phone, bool? getAlerted, String? keyWords}) async {
+  Future<Map<String, dynamic>> updateUser(String token, {String? username, String? password, String? email, String? phone, String? keyWords}) async {
     // Make a PUT request to the server
     // Send the token and the updated user information to the server
     // If the server returns a 200 status code, the user is updated
@@ -132,7 +89,6 @@ class UserService {
         'password': password,
         'email': email,
         'phone': phone,
-        'getAlerted': getAlerted,
         'keyWords': keyWords,
       }),
     );
@@ -141,5 +97,36 @@ class UserService {
       throw Exception(data['error']);
     }
     return data;
+  }
+
+  Future<Map<String, dynamic>> getUserNotifications(String token) async {
+    final response = await http.get(
+        Uri.parse('$url/users/notifications'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token',
+        });
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception(data['error']);
+    }
+    return data;
+  }
+
+  Future<void> markNotificationAsRead(String token, String id) async {
+    final response = await http.post(
+        Uri.parse('$url/users/notifications/read'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(<String, String>{
+          'notificationId': id,
+        }));
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      print(data);
+      throw Exception(data['error']);
+    }
   }
 }

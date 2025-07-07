@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const reactSchema = new mongoose.Schema({
     reactIcon : {type: String, required: true}, // The path to the icon of the reaction
     username : {type: String, required: true},
+    timestamp: { type: Date, default: Date.now }
 });
 
 const messageSchema = new mongoose.Schema({
@@ -15,6 +16,7 @@ const messageSchema = new mongoose.Schema({
 
 const threadSchema = new mongoose.Schema({
     bookTitle: { type: String, required: true },
+    image: { type: String },
     username: { type: String, required: true },
     title: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },

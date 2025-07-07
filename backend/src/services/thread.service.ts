@@ -1,29 +1,60 @@
 import Thread from "../models/thread.model";
-import {notifyUser} from "./user.service";
+import UserService, {notifyUser} from "./user.service";
 import User from "../models/user.model";
 import BookService from "./book.service";
+import {newErr} from "./utilities";
+import { 
+    ThreadCreateData, 
+    MessageCreateData, 
+    ReactionData
+} from '../types/thread.types';
+import { AuthenticatedRequest } from '../types/common.types';
 
 const ThreadService = {
-    async createThread(bookId : string, username : string, title : string) {
+    async createThread(request: AuthenticatedRequest & { body: ThreadCreateData }) {
+        const username = await UserService.getUserName(request.user.id);
+        if (!username) {
+            throw newErr(401, 'Unauthorized');
+        }
+        const { bookId, title } = request.body;
         const book = await BookService.getBook(bookId);
         if (!book) {
-            throw new Error('Book not found');
+            throw newErr(404, 'Book not found');
+        }
+        if (!title) {
+            throw newErr(400, 'Title is required');
         }
         const bookTitle = book.title;
         const thread = new Thread({
             bookTitle: bookTitle,
             username: username,
             title: title,
+            image: book.coverImage,
             messages: []
         });
         await thread.save();
         return thread;
     },
 
-    async addThreadMessage(threadId : string, username : string, content : string, respondsTo : string) {
+    async deleteThread(request: { params: { threadId: string } }) {
+        const threadId = request.params.threadId;
         const thread = await Thread.findById(threadId);
         if (!thread) {
-            throw new Error('Thread not found');
+            throw newErr(404, 'Thread not found');
+        }
+        await thread.deleteOne();
+    },
+
+    async addThreadMessage(request: AuthenticatedRequest & { body: MessageCreateData }) {
+        const username = await UserService.getUserName(request.user.id);
+        if (!username) {
+            throw newErr(401, 'Unauthorized');
+        }
+        const { content, respondsTo } = request.body;
+        const threadId = request.body.threadId;
+        const thread = await Thread.findById(threadId);
+        if (!thread) {
+            throw newErr(404, 'Thread not found');
         }
         const message = {
             username: username,
@@ -34,50 +65,51 @@ const ThreadService = {
         thread.messages.push(message);
         await thread.save();
 
-        // Notify the user that their message has been added
+        // Notify the user that someone has responded to their message
         if (respondsTo != null) {
-            // Notify the user that their message has been added
-            // @ts-ignore
             const parentMessage = thread.messages.id(respondsTo);
             if (!parentMessage) {
-                throw new Error('Parent message not found');
+                throw newErr(404, 'Parent message not found');
             }
             if (parentMessage.username !== username) {
                 const userParent = await User.findOne({ username: parentMessage.username });
                 if (!userParent) {
-                    throw new Error('User not found');
+                    throw newErr(404, 'User not found');
                 }
-                // @ts-ignore
-                await notifyUser(userParent.id, `${username} responded to your message in the thread "${thread.title}"`);
+                await notifyUser(userParent.id, `${username} in ${thread.title}`, message.content);
             }
         }
 
         // Get the _id of the newly created message
         const messageId = thread.messages[thread.messages.length - 1].id;
 
-        return { ...message, id: messageId };
+        return { messageId };
     },
 
-    async toggleMessageReaction(threadId : string, messageId : string, username : string, reactIcon : string) {
+    async toggleMessageReaction(request: AuthenticatedRequest & { body: ReactionData }) {
+        const username = await UserService.getUserName(request.user.id);
+        if (!username) {
+            throw newErr(401, 'Unauthorized');
+        }
+        const { reactIcon, messageId, threadId } = request.body;
         // Find the thread that contains the message
         const thread = await Thread.findById(threadId);
         if (!thread) {
-            throw new Error('Thread not found');
+            throw newErr(404, 'Thread not found');
         }
         // Find the message
         const message = thread.messages.id(messageId);
         if (!message) {
-            throw new Error('Message not found');
+            throw newErr(404, 'Message not found');
         }
 
         // Check if the user has already reacted to this message with the same icon
         if (message.reactions.find(r => r.username === username && r.reactIcon === reactIcon)) {
             // Remove the reaction
-            // @ts-ignore
-            message.reactions = message.reactions.filter(r => r.username !== username || r.reactIcon !== reactIcon);
+            message.reactions = message.reactions.filter(r => r.username !== username || r.reactIcon !== reactIcon) as any;
         } else {
             // Add the reaction
-            message.reactions.push({ username: username, reactIcon: reactIcon });
+            message.reactions.push({ username: username, reactIcon: reactIcon, timestamp: new Date() });
         }
 
         await thread.save();
@@ -89,25 +121,22 @@ const ThreadService = {
     },
 
 
-    async searchThreads(request: any) {
-        let query = request.query.q;
-        if (!query) {
-            query = '';
-        }
-        let threads = await Thread.find({
-            $or: [
-                {bookTitle: {$regex: query, $options: 'i'}},
-                {title: {$regex: query, $options: 'i'}},
-                {username: {$regex: query, $options: 'i'}}
-            ]
-        });
+    async searchThreads(request: { query: { q?: string; cls?: string; asc?: boolean } }) {
+        const query = request.query.q;
+        let threads = await Thread.find();
 
-        // classify : ['by recent activity', 'by number of messages']
-        let classify = request.query.cls;
-        if (!classify) {
-            classify = 'by recent activity';
+        if (query) {
+            // Filter using regex for more flexibility
+            const regex = new RegExp(query, 'i');
+            threads = threads.filter(thread =>
+                regex.test(thread.bookTitle) || regex.test(thread.title) || regex.test(thread.username)
+            );
         }
-        let asc = request.query.asc === 'true';
+
+        // classify : ['by recent activity', 'by number of messages', 'by creation date']
+        let classify = request.query.cls || 'by recent activity';
+        const asc = request.query.asc; // Boolean
+
         if (classify === 'by recent activity') {
             threads.sort((a, b) => {
                 const aDate = a.messages.length > 0 ? a.messages[a.messages.length - 1].timestamp.getTime() : 0;
@@ -118,9 +147,15 @@ const ThreadService = {
             threads.sort((a, b) => {
                 return asc ? a.messages.length - b.messages.length : b.messages.length - a.messages.length;
             });
+        } else if (classify === 'by creation date') {
+            threads.sort((a, b) => { // if asc, most recent first
+                const aDate = a.timestamp.getTime();
+                const bDate = b.timestamp.getTime();
+                return asc ? aDate - bDate : bDate - aDate;
+            });
         }
 
-        return {threads: threads};
+        return { threads: threads };
     },
 
     async clearCollection() {

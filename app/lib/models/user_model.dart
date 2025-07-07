@@ -3,64 +3,72 @@ class User {
   final String password;
   final String email;
   final String? phone;
-  final List<String> favoriteBooks;
-  final List<String> trackedBooks;
+  final double requestNotificationRadius;
   final List<String> notificationKeyWords;
-  final EcologicalImpact ecologicalImpact;
+  final int numSavedBooks;
   final List<Notification> notifications;
-  final bool getAlerted;
+  final List<String> followedBookboxes;
+  final DateTime createdAt;
 
   User({
     required this.username,
-    required this.password,
+    required this.password, 
     required this.email,
     this.phone,
-    required this.favoriteBooks,
-    required this.trackedBooks,
+    this.requestNotificationRadius = 5.0,
     required this.notificationKeyWords,
-    required this.ecologicalImpact,
+    this.numSavedBooks = 0,
     required this.notifications,
-    required this.getAlerted,
+    required this.followedBookboxes,
+    required this.createdAt,
   });
 
+  // Calculate ecological impact based on numSavedBooks
+  EcologicalImpact get ecologicalImpact {
+    return EcologicalImpact(
+      carbonSavings: numSavedBooks * 27.71,
+      savedWater: numSavedBooks * 2000.0,
+      savedTrees: numSavedBooks * 0.05,
+    );
+  }
+
   factory User.fromJson(Map<String, dynamic> json) {
-    var favoriteBooksList = json['favoriteBooks'] as List;
-    List<String> favoriteBooks = favoriteBooksList.cast<String>();
-
-    var trackedBooksList = json['trackedBooks'] as List;
-    List<String> trackedBooks = trackedBooksList.cast<String>();
-
-    var notificationKeyWordsList = json['notificationKeyWords'] as List;
+    var notificationKeyWordsList = json['notificationKeyWords'] as List? ?? [];
     List<String> notificationKeyWords = notificationKeyWordsList.cast<String>();
 
-    var notificationsList = json['notifications'] as List;
+    var notificationsList = json['notifications'] as List? ?? [];
     List<Notification> notifications = notificationsList.map((i) => Notification.fromJson(i)).toList();
+
+    var followedBookboxesList = json['followedBookboxes'] as List? ?? [];
+    List<String> followedBookboxes = followedBookboxesList.cast<String>();
 
     return User(
       username: json['username'],
       password: json['password'],
       email: json['email'],
       phone: json['phone'],
-      favoriteBooks: favoriteBooks,
-      trackedBooks: trackedBooks,
+      requestNotificationRadius: (json['requestNotificationRadius'] ?? 5.0).toDouble(),
       notificationKeyWords: notificationKeyWords,
-      ecologicalImpact: EcologicalImpact.fromJson(json['ecologicalImpact']),
+      numSavedBooks: json['numSavedBooks'] ?? 0,
       notifications: notifications,
-      getAlerted: json['getAlerted'],
+      followedBookboxes: followedBookboxes,
+      createdAt: DateTime.parse(json['createdAt']),
     );
   }
-}
+} 
 
 class Notification {
   final DateTime timestamp;
+  final String title;
   final String content;
   final bool read;
 
-  Notification({required this.timestamp, required this.content, required this.read});
+  Notification({required this.timestamp, required this.title, required this.content, required this.read});
 
   factory Notification.fromJson(Map<String, dynamic> json) {
     return Notification(
       timestamp: DateTime.parse(json['timestamp']),
+      title: json['title'],
       content: json['content'],
       read: json['read'],
     );
@@ -82,4 +90,3 @@ class EcologicalImpact {
     );
   }
 }
-

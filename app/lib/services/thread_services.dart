@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+import '../utils/constants/api_constants.dart';
 
 class ThreadService {
-  final String url = 'https://lino-1.onrender.com';
+  final String url = baseApiUrl;
 
   Future<Map<String, dynamic>> createThread(String token, String bookid, String title) async {
-      final r = await http.post(
+    final r = await http.post(
       Uri.parse('$url/threads/new'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -14,7 +14,7 @@ class ThreadService {
       },
       body: jsonEncode(<String, dynamic>{
         'bookId': bookid,
-        'title': title,
+        'title': title, 
       }),
     );
     final response = jsonDecode(r.body);
@@ -24,19 +24,39 @@ class ThreadService {
     return response;
   }
 
+  Future<void> deleteThread(String token, String threadId) async {
+    final r = await http.delete(
+      Uri.parse('$url/threads/$threadId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      });
+    if (r.statusCode != 204) {
+      throw Exception(jsonDecode(r.body)['error']);
+    }
+  }
+
   Future<Map<String, dynamic>> addMessage(String token, String threadId, String content, {String? respondsTo}) async {
-      final r = await http.post(
+    // Initialize the request body with mandatory fields
+    Map<String, dynamic> requestBody = {
+      'threadId': threadId,
+      'content': content,
+    };
+
+    // Conditionally add the respondsTo field if it is not null
+    if (respondsTo != null) {
+      requestBody['respondsTo'] = respondsTo;
+    }
+
+    final r = await http.post(
       Uri.parse('$url/threads/messages'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode(<String, dynamic>{
-        'threadId': threadId,
-        'content': content,
-        'respondsTo': respondsTo,
-      }),
+      body: jsonEncode(requestBody), // Use the modified requestBody
     );
+
     final response = jsonDecode(r.body);
     if (r.statusCode != 201) {
       throw Exception(response['error']);
@@ -44,8 +64,8 @@ class ThreadService {
     return response;
   }
 
-  Future<Map<String, dynamic>> toggleMessageReaction(String token, String threadId, String messageId, String reactIcon) async {
-      final r = await http.post(
+  Future<Map<String, dynamic>> toggleMessageReaction(String token, String threadId, String messageId, bool isGood) async {
+    final r = await http.post(
       Uri.parse('$url/threads/messages/reactions'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -54,7 +74,7 @@ class ThreadService {
       body: jsonEncode(<String, dynamic>{
         'threadId': threadId,
         'messageId': messageId,
-        'reactIcon': reactIcon,
+        'reactIcon': isGood? 'good' : 'bad',
       }),
     );
     final response = jsonDecode(r.body);
@@ -75,12 +95,12 @@ class ThreadService {
 
   Future<Map<String, dynamic>> searchThreads({String? q, String? cls, bool? asc}) async {
     var queryParams = {
-      if (q != null) 'q': q,
-      if (cls != null) 'cls': cls,
+      if (q != null && q.isNotEmpty) 'q': q,
+      if (cls != null && cls.isNotEmpty) 'cls': cls,
       if (asc != null) 'asc': asc.toString(),
     };
 
-    final r = await http.get(Uri.https('lino-1.onrender.com', '/threads/search', queryParams),
+    final r = await http.get(Uri.parse('$url/threads/search').replace(queryParameters: queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

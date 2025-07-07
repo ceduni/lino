@@ -1,0 +1,7 @@
+flutter_native_splash: 
+  color: "#FFFFFF"
+  image: assets/logos/logo_with_bird.png
+
+  ios: 
+    color: "#FFFFFF"
+    image: assets/logos/logo_with_bird.png
