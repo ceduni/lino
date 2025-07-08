@@ -3,6 +3,8 @@ import 'package:Lino_app/services/book_services.dart';
 import 'book_details_page.dart';
 import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import '../../controllers/global_state_controller.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
@@ -13,6 +15,7 @@ class NavigationPage extends StatefulWidget {
 
 class _NavigationPageState extends State<NavigationPage> {
   final bookService = BookService();
+  final GlobalStateController globalState = Get.put(GlobalStateController());
 
   List<Map<String, dynamic>> bookBoxes = [];
   bool isLoading = true;
@@ -89,7 +92,9 @@ class _NavigationPageState extends State<NavigationPage> {
 
     if (closestBookBox != null) {
       double distanceInKm = minDistance / 1000;
+      globalState.setSelectedBookBox(closestBookBox);
       return '${closestBookBox['name']} (${distanceInKm.toStringAsFixed(1)}km)';
+
     }
 
     return bookBoxes.first['name'] ?? 'Unknown';

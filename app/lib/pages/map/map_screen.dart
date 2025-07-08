@@ -8,10 +8,11 @@ import 'package:geolocator/geolocator.dart';
 
 import '../bookbox/book_box_screen.dart';
 import 'book_box_controller.dart';
+import '../../controllers/global_state_controller.dart';
 
 class MapScreen extends HookWidget {
   MapScreen({super.key});
-
+  final GlobalStateController globalState = Get.put(GlobalStateController());
   final BookBoxController bookBoxController = Get.put(BookBoxController());
 
   Future<void> _checkLocationPermission(BuildContext context) async {
@@ -38,7 +39,21 @@ class MapScreen extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Book Boxes'),
+        title: Obx(() {
+          final selectedBookBox = globalState.currentSelectedBookBox.value;
+          
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Book Boxes'),
+              if (selectedBookBox != null)
+                Text(
+                  'Selected bookbox : ${selectedBookBox['name']}',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+                ),
+            ],
+          );
+        }),
         actions: [
           Row(
             children: [
@@ -137,7 +152,7 @@ class MapScreen extends HookWidget {
                       margin:
                       EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                       decoration: BoxDecoration(
-                        color: LinoColors.secondary,
+                        color: bbox['id'] == globalState.currentSelectedBookBox.value?['id'] ? Colors.green : LinoColors.secondary,
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: ListTile(
