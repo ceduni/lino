@@ -8,11 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.clients = exports.server = void 0;
 exports.broadcastToUser = broadcastToUser;
 exports.broadcastMessage = broadcastMessage;
 const utilities_1 = require("./services/utilities");
+const services_route_1 = __importDefault(require("./routes/services.route"));
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -25,6 +29,7 @@ const bookRoutes = require('./routes/book.route');
 const bookboxRoutes = require('./routes/bookbox.route');
 const userRoutes = require('./routes/user.route');
 const threadRoutes = require('./routes/thread.route');
+const transactionRoutes = require('./routes/transaction.route');
 const fastifyWebSocket = require('@fastify/websocket');
 dotenv.config({ path: path.join(__dirname, '../.env') });
 const server = Fastify({ logger: { level: 'error' } });
@@ -180,6 +185,14 @@ server.register(fastifySwagger, {
             {
                 name: 'messages',
                 description: 'Operations related to messages (e.g. add, react)'
+            },
+            {
+                name: 'transactions',
+                description: 'Operations related to transactions (e.g. create custom transaction)'
+            },
+            {
+                name: 'admin',
+                description: 'Admin-only operations'
             }
         ]
     },
@@ -192,7 +205,9 @@ server.register(fastifySwaggerUi, {
 server.register(bookRoutes);
 server.register(bookboxRoutes);
 server.register(userRoutes);
-server.register(threadRoutes);
+// server.register(threadRoutes); // Uncomment if you want to enable thread routes
+server.register(transactionRoutes);
+server.register(services_route_1.default);
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log('Starting server initialization...');

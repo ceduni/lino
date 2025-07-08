@@ -1,7 +1,16 @@
 import {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify';
 import UserService from "../services/user.service";
 import User from "../models/user.model";
-import { userSchema, clearCollectionSchema } from "../services/utilities";
+import { 
+    registerUserSchema,
+    loginUserSchema,
+    getUserSchema,
+    getUserNotificationsSchema,
+    readNotificationSchema,
+    updateUserSchema,
+    clearCollectionSchema
+} from "../schemas/user.schemas";
+import { userSchema } from "../schemas/models.schemas";
 import { UserRegistrationData, UserLoginCredentials } from "../types/user.types";
 import { AuthenticatedRequest } from "../types/common.types";
 
@@ -14,40 +23,7 @@ async function registerUser(request : FastifyRequest, reply : FastifyReply) {
         const message = error instanceof Error ? error.message : 'Unknown error';
         reply.code(statusCode).send({ error: message });
     }
-}
-
-const registerUserSchema = {
-    description: 'Register a new user',
-    tags: ['users'],
-    body: {
-        type: 'object',
-        required: ['username', 'password', 'email'],
-        properties: {
-            username: { type: 'string' },
-            password: { type: 'string' },
-            email: { type: 'string' },
-            phone: { type: 'string' },
-            getAlerted: { type: 'boolean' },
-        }
-    },
-    response: {
-        201: {
-            description: 'User registered successfully',
-            type: 'object',
-            properties: {
-                username: { type: 'string' },
-                password: { type: 'string' }
-            }
-        },
-        400: {
-            description: 'Problem in the request : missing or invalid fields',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
+} 
 
 async function loginUser(request : FastifyRequest, reply : FastifyReply) {
     try {
@@ -59,37 +35,6 @@ async function loginUser(request : FastifyRequest, reply : FastifyReply) {
         reply.code(statusCode).send({ error: message });
     }
 }
-
-const loginUserSchema = {
-    description: 'Login a user',
-    tags: ['users'],
-    body: {
-        type: 'object',
-        required: ['identifier', 'password'],
-        properties: {
-            identifier: { type: 'string' }, // can be either username or email
-            password: { type: 'string' }
-        },
-    },
-    response: {
-        200: {
-            description: 'User logged in successfully',
-            type: 'object',
-            properties: {
-                user: userSchema,
-                token: { type: 'string' }
-            }
-        },
-        400: {
-            description: 'Invalid credentials',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    },
-};
-
 
 async function getUser(request : FastifyRequest, reply : FastifyReply) {
     try {
@@ -104,34 +49,6 @@ async function getUser(request : FastifyRequest, reply : FastifyReply) {
     }
 }
 
-const getUserSchema = {
-    description: 'Get user infos',
-    tags: ['users'],
-    headers: {
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: {type: 'string'} // JWT token
-        }
-    },
-    response: {
-        200: {
-            description: 'User infos',
-            type: 'object',
-            properties: {
-                user: userSchema
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
-
 async function getUserNotifications(request : FastifyRequest, reply : FastifyReply) {
     try {
         const notifications = await UserService.getUserNotifications(request as AuthenticatedRequest);
@@ -140,46 +57,6 @@ async function getUserNotifications(request : FastifyRequest, reply : FastifyRep
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
         reply.code(statusCode).send({ error: message });
-    }
-}
-
-const getUserNotificationsSchema = {
-    description: 'Get user notifications',
-    tags: ['users'],
-    headers: {
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: {type: 'string'} // JWT token
-        }
-    },
-    response: {
-        200: {
-            description: 'User notifications',
-            type: 'object',
-            properties: {
-                notifications: {
-                    type: 'array', items:
-                        {
-                            type: 'object',
-                            properties: {
-                                _id: { type: 'string' },
-                                title: { type: 'string' },
-                                timestamp: { type: 'string' },
-                                content: { type: 'string' },
-                                read: { type: 'boolean' }
-                            }
-                        }
-                }
-            }
-        },
-        404: {
-            description: 'User not found',
-            type: 'object',
-            properties: {
-                error: {type: 'string'}
-            }
-        }
     }
 }
 
@@ -193,54 +70,6 @@ async function readNotification(request : FastifyRequest, reply : FastifyReply) 
         reply.code(statusCode).send({ error: message });
     }
 }
-
-const readNotificationSchema = {
-    description: 'Read a user notification',
-    tags: ['users'],
-    headers: {
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: {type: 'string'} // JWT token
-        }
-    },
-    body: {
-        type: 'object',
-        required: ['notificationId'],
-        properties: {
-            notificationId: { type: 'string' }
-        }
-    },
-    response: {
-        200: {
-            description: 'Notification read',
-            type: 'object',
-            properties: {
-                notifications: {
-                    type: 'array', items:
-                        {
-                            type: 'object',
-                            properties: {
-                                _id: { type: 'string' },
-                                title: { type: 'string' },
-                                timestamp: { type: 'string' },
-                                content: { type: 'string' },
-                                read: { type: 'boolean' }
-                            }
-                        }
-                }
-            }
-        },
-        404: {
-            description: 'User or notification not found',
-            type: 'object',
-            properties: {
-                error: {type: 'string'}
-            }
-        }
-    }
-}
-
 
 async function updateUser(request : FastifyRequest, reply : FastifyReply) {
     try {
@@ -261,45 +90,6 @@ async function updateUser(request : FastifyRequest, reply : FastifyReply) {
         reply.code(statusCode).send({ error: message });
     }
 }
-
-const updateUserSchema = {
-    description: 'Update user infos',
-    tags: ['users'],
-    headers: {
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: {type: 'string'} // JWT token
-        }
-    },
-    body: {
-        type: 'object',
-        properties: {
-            username: { type: 'string' },
-            email: { type: 'string' },
-            password: { type: 'string' },
-            phone: { type: 'string' },
-            getAlerted: { type: 'boolean' },
-            keyWords: { type: 'string' }
-        }
-    },
-    response: {
-        200: {
-            description: 'Updated user infos',
-            type: 'object',
-            properties: {
-                user: userSchema
-            }
-        },
-        401: {
-            description: 'Unauthorized',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 
 async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
     try {

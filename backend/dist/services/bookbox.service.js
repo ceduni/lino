@@ -15,9 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bookbox_model_1 = __importDefault(require("../models/bookbox.model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const book_request_model_1 = __importDefault(require("../models/book.request.model"));
+const transaction_model_1 = __importDefault(require("../models/transaction.model"));
 const user_service_1 = require("./user.service");
 const utilities_1 = require("./utilities");
 const book_service_1 = __importDefault(require("./book.service"));
+const borough_id_generator_1 = require("./borough.id.generator");
 const bookboxService = {
     getBookBox(bookBoxId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -31,6 +33,7 @@ const bookboxService = {
                 image: bookBox.image,
                 longitude: bookBox.longitude,
                 latitude: bookBox.latitude,
+                boroughId: bookBox.boroughId,
                 infoText: bookBox.infoText,
                 books: bookBox.books,
             };
@@ -189,12 +192,14 @@ const bookboxService = {
     },
     addNewBookbox(request) {
         return __awaiter(this, void 0, void 0, function* () {
+            const boroughId = yield (0, borough_id_generator_1.getBoroughId)(request.body.latitude, request.body.longitude);
             const bookBox = new bookbox_model_1.default({
                 name: request.body.name,
                 books: [],
                 image: request.body.image,
                 longitude: request.body.longitude,
                 latitude: request.body.latitude,
+                boroughId: boroughId,
                 infoText: request.body.infoText,
             });
             yield bookBox.save();
@@ -248,6 +253,71 @@ const bookboxService = {
     clearCollection() {
         return __awaiter(this, void 0, void 0, function* () {
             yield bookbox_model_1.default.deleteMany({});
+        });
+    },
+    deleteBookBox(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            bookbox_model_1.default.findByIdAndDelete(request.params.bookboxId)
+                .then((bookBox) => __awaiter(this, void 0, void 0, function* () {
+                if (!bookBox) {
+                    throw (0, utilities_1.newErr)(404, 'Bookbox not found');
+                }
+                // Notify users about the deletion
+                const users = yield user_model_1.default.find();
+                for (const user of users) {
+                    if (user.followedBookboxes.includes(request.params.bookboxId)) {
+                        yield (0, user_service_1.notifyUser)(user.id, "Bookbox deleted", `The bookbox "${bookBox.name}" has been deleted.`);
+                    }
+                }
+                // Delete all transactions related to this bookbox
+                yield transaction_model_1.default.deleteMany({ bookboxId: request.params.bookboxId });
+                return { message: 'Bookbox deleted successfully' };
+            }))
+                .catch((error) => {
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                throw (0, utilities_1.newErr)(500, errorMessage);
+            });
+        });
+    },
+    updateBookBox(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const bookBoxId = request.params.bookboxId;
+            const updateData = request.body;
+            const bookBox = yield bookbox_model_1.default.findById(bookBoxId);
+            if (!bookBox) {
+                throw (0, utilities_1.newErr)(404, 'Bookbox not found');
+            }
+            // Update the bookbox fields if they are provided
+            if (updateData.name) {
+                bookBox.name = updateData.name;
+            }
+            if (updateData.image) {
+                bookBox.image = updateData.image;
+            }
+            if (updateData.longitude) {
+                bookBox.longitude = updateData.longitude;
+            }
+            if (updateData.latitude) {
+                bookBox.latitude = updateData.latitude;
+            }
+            if (updateData.latitude || updateData.longitude) {
+                // If either latitude or longitude is updated, we need to update the boroughId
+                const boroughId = yield (0, borough_id_generator_1.getBoroughId)(updateData.latitude || bookBox.latitude, updateData.longitude || bookBox.longitude);
+                bookBox.boroughId = boroughId;
+            }
+            if (updateData.infoText) {
+                bookBox.infoText = updateData.infoText;
+            }
+            yield bookBox.save();
+            return {
+                id: bookBox._id.toString(),
+                name: bookBox.name,
+                image: bookBox.image,
+                longitude: bookBox.longitude,
+                latitude: bookBox.latitude,
+                boroughId: bookBox.boroughId,
+                infoText: bookBox.infoText
+            };
         });
     }
 };

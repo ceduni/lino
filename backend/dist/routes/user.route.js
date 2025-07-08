@@ -14,9 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = userRoutes;
 const user_service_1 = __importDefault(require("../services/user.service"));
-const user_service_2 = __importDefault(require("../services/user.service"));
 const user_model_1 = __importDefault(require("../models/user.model"));
-const utilities_1 = require("../services/utilities");
+const user_schemas_1 = require("../schemas/user.schemas");
 function registerUser(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -30,38 +29,6 @@ function registerUser(request, reply) {
         }
     });
 }
-const registerUserSchema = {
-    description: 'Register a new user',
-    tags: ['users'],
-    body: {
-        type: 'object',
-        required: ['username', 'password', 'email'],
-        properties: {
-            username: { type: 'string' },
-            password: { type: 'string' },
-            email: { type: 'string' },
-            phone: { type: 'string' },
-            getAlerted: { type: 'boolean' },
-        }
-    },
-    response: {
-        201: {
-            description: 'User registered successfully',
-            type: 'object',
-            properties: {
-                username: { type: 'string' },
-                password: { type: 'string' }
-            }
-        },
-        400: {
-            description: 'Problem in the request : missing or invalid fields',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function loginUser(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -75,35 +42,6 @@ function loginUser(request, reply) {
         }
     });
 }
-const loginUserSchema = {
-    description: 'Login a user',
-    tags: ['users'],
-    body: {
-        type: 'object',
-        required: ['identifier', 'password'],
-        properties: {
-            identifier: { type: 'string' }, // can be either username or email
-            password: { type: 'string' }
-        },
-    },
-    response: {
-        200: {
-            description: 'User logged in successfully',
-            type: 'object',
-            properties: {
-                user: utilities_1.userSchema,
-                token: { type: 'string' }
-            }
-        },
-        400: {
-            description: 'Invalid credentials',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    },
-};
 function getUser(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -119,37 +57,10 @@ function getUser(request, reply) {
         }
     });
 }
-const getUserSchema = {
-    description: 'Get user infos',
-    tags: ['users'],
-    headers: {
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: { type: 'string' } // JWT token
-        }
-    },
-    response: {
-        200: {
-            description: 'User infos',
-            type: 'object',
-            properties: {
-                user: utilities_1.userSchema
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function getUserNotifications(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const notifications = yield user_service_2.default.getUserNotifications(request);
+            const notifications = yield user_service_1.default.getUserNotifications(request);
             reply.send({ notifications: notifications });
         }
         catch (error) {
@@ -159,48 +70,10 @@ function getUserNotifications(request, reply) {
         }
     });
 }
-const getUserNotificationsSchema = {
-    description: 'Get user notifications',
-    tags: ['users'],
-    headers: {
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: { type: 'string' } // JWT token
-        }
-    },
-    response: {
-        200: {
-            description: 'User notifications',
-            type: 'object',
-            properties: {
-                notifications: {
-                    type: 'array', items: {
-                        type: 'object',
-                        properties: {
-                            _id: { type: 'string' },
-                            title: { type: 'string' },
-                            timestamp: { type: 'string' },
-                            content: { type: 'string' },
-                            read: { type: 'boolean' }
-                        }
-                    }
-                }
-            }
-        },
-        404: {
-            description: 'User not found',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function readNotification(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const notifications = yield user_service_2.default.readNotification(request);
+            const notifications = yield user_service_1.default.readNotification(request);
             reply.code(200).send({ notifications: notifications });
         }
         catch (error) {
@@ -210,55 +83,10 @@ function readNotification(request, reply) {
         }
     });
 }
-const readNotificationSchema = {
-    description: 'Read a user notification',
-    tags: ['users'],
-    headers: {
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: { type: 'string' } // JWT token
-        }
-    },
-    body: {
-        type: 'object',
-        required: ['notificationId'],
-        properties: {
-            notificationId: { type: 'string' }
-        }
-    },
-    response: {
-        200: {
-            description: 'Notification read',
-            type: 'object',
-            properties: {
-                notifications: {
-                    type: 'array', items: {
-                        type: 'object',
-                        properties: {
-                            _id: { type: 'string' },
-                            title: { type: 'string' },
-                            timestamp: { type: 'string' },
-                            content: { type: 'string' },
-                            read: { type: 'boolean' }
-                        }
-                    }
-                }
-            }
-        },
-        404: {
-            description: 'User or notification not found',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function updateUser(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const user = yield user_service_2.default.updateUser(request);
+            const user = yield user_service_1.default.updateUser(request);
             reply.send({ user: user });
         }
         catch (error) {
@@ -268,48 +96,10 @@ function updateUser(request, reply) {
         }
     });
 }
-const updateUserSchema = {
-    description: 'Update user infos',
-    tags: ['users'],
-    headers: {
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: { type: 'string' } // JWT token
-        }
-    },
-    body: {
-        type: 'object',
-        properties: {
-            username: { type: 'string' },
-            email: { type: 'string' },
-            password: { type: 'string' },
-            phone: { type: 'string' },
-            getAlerted: { type: 'boolean' },
-            keyWords: { type: 'string' }
-        }
-    },
-    response: {
-        200: {
-            description: 'Updated user infos',
-            type: 'object',
-            properties: {
-                user: utilities_1.userSchema
-            }
-        },
-        401: {
-            description: 'Unauthorized',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function clearCollection(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield user_service_2.default.clearCollection();
+            yield user_service_1.default.clearCollection();
             reply.send({ message: 'Users cleared' });
         }
         catch (error) {
@@ -320,12 +110,12 @@ function clearCollection(request, reply) {
 }
 function userRoutes(server) {
     return __awaiter(this, void 0, void 0, function* () {
-        server.get('/users', { preValidation: [server.authenticate], schema: getUserSchema }, getUser);
-        server.get('/users/notifications', { preValidation: [server.authenticate], schema: getUserNotificationsSchema }, getUserNotifications);
-        server.post('/users/notifications/read', { preValidation: [server.authenticate], schema: readNotificationSchema }, readNotification);
-        server.post('/users/register', { schema: registerUserSchema }, registerUser);
-        server.post('/users/login', { schema: loginUserSchema }, loginUser);
-        server.post('/users/update', { preValidation: [server.authenticate], schema: updateUserSchema }, updateUser);
-        server.delete('/users/clear', { preValidation: [server.adminAuthenticate], schema: utilities_1.clearCollectionSchema }, clearCollection);
+        server.get('/users', { preValidation: [server.authenticate], schema: user_schemas_1.getUserSchema }, getUser);
+        server.get('/users/notifications', { preValidation: [server.authenticate], schema: user_schemas_1.getUserNotificationsSchema }, getUserNotifications);
+        server.post('/users/notifications/read', { preValidation: [server.authenticate], schema: user_schemas_1.readNotificationSchema }, readNotification);
+        server.post('/users/register', { schema: user_schemas_1.registerUserSchema }, registerUser);
+        server.post('/users/login', { schema: user_schemas_1.loginUserSchema }, loginUser);
+        server.post('/users/update', { preValidation: [server.authenticate], schema: user_schemas_1.updateUserSchema }, updateUser);
+        server.delete('/users/clear', { preValidation: [server.adminAuthenticate], schema: user_schemas_1.clearCollectionSchema }, clearCollection);
     });
 }

@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = bookBoxRoutes;
 const bookbox_service_1 = __importDefault(require("../services/bookbox.service"));
-const utilities_1 = require("../services/utilities");
+const bookbox_schemas_1 = require("../schemas/bookbox.schemas");
 function addBookToBookbox(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -28,71 +28,6 @@ function addBookToBookbox(request, reply) {
         }
     });
 }
-const addBookToBookboxSchema = {
-    description: 'Add a book to a bookbox',
-    tags: ['books', 'bookboxes'],
-    params: {
-        type: 'object',
-        properties: {
-            bookboxId: { type: 'string' }
-        },
-        required: ['bookboxId']
-    },
-    body: {
-        type: 'object',
-        properties: {
-            title: { type: 'string' },
-            authors: { type: 'array', items: { type: 'string' } },
-            isbn: { type: 'string' },
-            description: { type: 'string' },
-            coverImage: { type: 'string' },
-            publisher: { type: 'string' },
-            categories: { type: 'array', items: { type: 'string' } },
-            parutionYear: { type: "number" },
-            pages: { type: "number" }
-        },
-        required: ['title'],
-    },
-    headers: {
-        type: 'object',
-        properties: {
-            authorization: { type: 'string' },
-            bm_token: { type: 'string' }
-        },
-        required: ['bm_token']
-    },
-    response: {
-        201: {
-            description: 'Book added to bookbox',
-            type: 'object',
-            properties: {
-                bookId: { type: 'string' },
-                books: { type: 'array', items: { type: 'string' } }
-            }
-        },
-        400: {
-            description: 'Error in the request',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        404: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function getBookFromBookBox(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -106,50 +41,6 @@ function getBookFromBookBox(request, reply) {
         }
     });
 }
-const getBookFromBookBoxSchema = {
-    description: 'Get book from bookbox',
-    tags: ['books', 'bookboxes'],
-    params: {
-        type: 'object',
-        properties: {
-            bookId: { type: 'string' },
-            bookboxId: { type: 'string' }
-        },
-        required: ['bookId', 'bookboxId']
-    },
-    headers: {
-        type: 'object',
-        properties: {
-            authorization: { type: 'string' },
-            bm_token: { type: 'string' }
-        },
-        required: ['bm_token']
-    },
-    response: {
-        200: {
-            description: 'Book found',
-            type: 'object',
-            properties: {
-                book: utilities_1.bookSchema,
-                books: { type: 'array', items: { type: 'string' } }
-            }
-        },
-        404: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function getBookbox(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -162,45 +53,6 @@ function getBookbox(request, reply) {
         }
     });
 }
-const getBookboxSchema = {
-    description: 'Get bookbox',
-    tags: ['bookboxes'],
-    params: {
-        type: 'object',
-        properties: {
-            bookboxId: { type: 'string' }
-        },
-        required: ['bookboxId']
-    },
-    response: {
-        200: {
-            description: 'Bookbox found',
-            type: 'object',
-            properties: {
-                id: { type: 'string' },
-                name: { type: 'string' },
-                location: { type: 'array', items: { type: 'number' } },
-                infoText: { type: 'string' },
-                image: { type: 'string' },
-                books: { type: 'array', items: utilities_1.bookSchema }
-            }
-        },
-        404: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function addNewBookbox(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -213,56 +65,6 @@ function addNewBookbox(request, reply) {
         }
     });
 }
-const addNewBookboxSchema = {
-    description: 'Add new bookbox',
-    tags: ['bookboxes'],
-    body: {
-        type: 'object',
-        properties: {
-            name: { type: 'string' },
-            infoText: { type: 'string' },
-            latitude: { type: 'number' },
-            longitude: { type: 'number' },
-            image: { type: 'string' }
-        },
-        required: ['name', 'infoText', 'latitude', 'longitude', 'image'],
-    },
-    headers: {
-        type: 'object',
-        properties: {
-            authorization: { type: 'string' }
-        },
-        required: ['authorization']
-    },
-    response: {
-        201: {
-            description: 'Bookbox added',
-            type: 'object',
-            properties: {
-                _id: { type: 'string' },
-                name: { type: 'string' },
-                location: { type: 'array', items: { type: 'number' } },
-                image: { type: 'string' },
-                infoText: { type: 'string' },
-                books: { type: 'array', items: { type: 'string' } }
-            }
-        },
-        400: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
 function searchBookboxes(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -275,62 +77,40 @@ function searchBookboxes(request, reply) {
         }
     });
 }
-const searchBookboxesSchema = {
-    description: 'Search bookboxes',
-    tags: ['bookboxes'],
-    querystring: {
-        type: 'object',
-        properties: {
-            kw: { type: 'string' },
-            cls: { type: 'string' },
-            asc: { type: 'boolean' },
-            longitude: { type: 'number' },
-            latitude: { type: 'number' },
+function deleteBookBox(request, reply) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const response = yield bookbox_service_1.default.deleteBookBox(request);
+            reply.code(204).send(response);
         }
-    },
-    response: {
-        200: {
-            description: 'Bookboxes found',
-            type: 'object',
-            properties: {
-                bookboxes: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            id: { type: 'string' },
-                            name: { type: 'string' },
-                            location: { type: 'array', items: { type: 'number' } },
-                            infoText: { type: 'string' },
-                            image: { type: 'string' },
-                            books: { type: 'array', items: utilities_1.bookSchema }
-                        }
-                    }
-                }
-            }
-        },
-        400: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
+        catch (error) {
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
         }
-    }
-};
+    });
+}
+function updateBookBox(request, reply) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const response = yield bookbox_service_1.default.updateBookBox(request);
+            reply.code(200).send(response);
+        }
+        catch (error) {
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
+        }
+    });
+}
 function bookBoxRoutes(server) {
     return __awaiter(this, void 0, void 0, function* () {
-        server.get('/bookboxes/:bookboxId', { schema: getBookboxSchema }, getBookbox);
-        server.get('/bookboxes/search', { schema: searchBookboxesSchema }, searchBookboxes);
-        server.post('/bookboxes/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);
-        server.delete('/bookboxes/:bookboxId/books/:bookId', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: getBookFromBookBoxSchema }, getBookFromBookBox);
-        server.post('/bookboxes/:bookboxId/books/add', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
+        server.get('/bookboxes/:bookboxId', { schema: bookbox_schemas_1.getBookboxSchema }, getBookbox);
+        server.get('/bookboxes/search', { schema: bookbox_schemas_1.searchBookboxesSchema }, searchBookboxes);
+        server.post('/bookboxes/new', { preValidation: [server.adminAuthenticate], schema: bookbox_schemas_1.addNewBookboxSchema }, addNewBookbox);
+        server.delete('/bookboxes/:bookboxId/books/:bookId', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: bookbox_schemas_1.getBookFromBookBoxSchema }, getBookFromBookBox);
+        server.post('/bookboxes/:bookboxId/books/add', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: bookbox_schemas_1.addBookToBookboxSchema }, addBookToBookbox);
+        server.delete('/bookboxes/:bookboxId', { preValidation: [server.adminAuthenticate], schema: bookbox_schemas_1.deleteBookBoxSchema }, deleteBookBox);
+        server.put('/bookboxes/:bookboxId', { preValidation: [server.adminAuthenticate], schema: bookbox_schemas_1.updateBookBoxSchema }, updateBookBox);
     });
 }
