@@ -201,7 +201,7 @@ class BoroughIdGenerator {
 
 // Standalone function version
 async function getBoroughId(latitude: number, longitude: number): Promise<string> {
-    const googleApiKey = process.env.GOOGLE_BOOKS_API_KEY || 'api_key_not_set';
+    const googleApiKey = process.env.GOOGLE_API_KEY || 'api_key_not_set';
     const generator = new BoroughIdGenerator(googleApiKey);
     return await generator.getBoroughId(latitude, longitude);
 }
