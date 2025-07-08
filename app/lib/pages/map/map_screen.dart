@@ -97,18 +97,27 @@ class MapScreen extends HookWidget {
             flex: 1,
             child: Obx(() {
               final bboxes = bookBoxController.bookBoxes;
+              final selectedBookBox = globalState.currentSelectedBookBox.value;
+              
               List<Marker> markers = bboxes
-                  .map((bbox) => Marker(
-                markerId: MarkerId(bbox['id']),
-                position: LatLng(bbox['latitude'], bbox['longitude']),
-                infoWindow: InfoWindow(
-                  title: bbox['name'],
-                  snippet: bbox['infoText'],
-                ),
-                onTap: () {
-                  bookBoxController.highlightBookBox(bbox['id']);
-                },
-              ))
+                  .map((bbox) {
+                    final isSelected = selectedBookBox != null && bbox['id'] == selectedBookBox['id'];
+                    
+                    return Marker(
+                      markerId: MarkerId(bbox['id']),
+                      position: LatLng(bbox['latitude'], bbox['longitude']),
+                      infoWindow: InfoWindow(
+                        title: bbox['name'],
+                        snippet: bbox['infoText'],
+                      ),
+                      icon: isSelected 
+                          ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
+                          : BitmapDescriptor.defaultMarker,
+                      onTap: () {
+                        bookBoxController.highlightBookBox(bbox['id']);
+                      },
+                    );
+                  })
                   .toList();
 
               return GoogleMap(
