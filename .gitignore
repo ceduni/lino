@@ -10,3 +10,4 @@ app/macos/Flutter/Flutter-Release.xcconfig
 
 .vscode
 .vscode/settings.json
+app/ios/Secrets.plist
