@@ -28,6 +28,13 @@ class _NavigationPageState extends State<NavigationPage> {
     super.initState();
     _getUserLocation();
     _loadBookBoxes();
+    
+    // Listen to changes in the selected bookbox
+    globalState.currentSelectedBookBox.listen((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   Future<void> _getUserLocation() async {
@@ -52,6 +59,11 @@ class _NavigationPageState extends State<NavigationPage> {
       userLocation = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
       
+      // Initialize closest bookbox selection after the build is complete
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _setClosestBookBoxIfNone();
+      });
+      
       // pour forcer le reload
       if (mounted) {
         setState(() {});
@@ -61,16 +73,17 @@ class _NavigationPageState extends State<NavigationPage> {
     }
   }
 
-  String _getClosestSync() {
-    if (bookBoxes.isEmpty) {
-      return 'Loading bookboxes...';
+  void _setClosestBookBoxIfNone() {
+    if (bookBoxes.isEmpty || userLocation == null) {
+      return;
     }
 
-    if (userLocation == null) {
-      return 'Getting location...';
+    // Only set if no bookbox is currently selected
+    if (globalState.currentSelectedBookBox.value != null) {
+      return;
     }
 
-    // closest bb
+    // Find the closest bookbox
     Map<String, dynamic>? closestBookBox;
     double minDistance = double.infinity;
 
@@ -91,13 +104,29 @@ class _NavigationPageState extends State<NavigationPage> {
     }
 
     if (closestBookBox != null) {
-      double distanceInKm = minDistance / 1000;
       globalState.setSelectedBookBox(closestBookBox);
-      return '${closestBookBox['name']} (${distanceInKm.toStringAsFixed(1)}km)';
+      // Trigger a rebuild to update the display text
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
 
+  String _getDisplayText() {
+    if (bookBoxes.isEmpty) {
+      return 'Loading bookboxes...';
     }
 
-    return bookBoxes.first['name'] ?? 'Unknown';
+    if (userLocation == null) {
+      return 'Getting location...';
+    }
+
+    final currentSelected = globalState.currentSelectedBookBox.value;
+    if (currentSelected != null) {
+      return currentSelected['name'] ?? 'Unknown';
+    }
+
+    return 'Select a bookbox';
   }
 
   Future<void> _loadBookBoxes() async {
@@ -115,6 +144,10 @@ class _NavigationPageState extends State<NavigationPage> {
         isLoading = false;
       });
       
+      // Initialize closest bookbox selection after the build is complete
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _setClosestBookBoxIfNone();
+      });
       
       if (userLocation == null) {
         await Future.delayed(Duration(milliseconds: 500));
@@ -153,10 +186,10 @@ class _NavigationPageState extends State<NavigationPage> {
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MapScreen(),
-                ),
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MapScreen(),
+                  ),
                 );
               },
               child: Container(
@@ -164,11 +197,11 @@ class _NavigationPageState extends State<NavigationPage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-              Text(
-                _getClosestSync(),
-                style: TextStyle(fontSize: 16),
-              ),
-              Icon(Icons.arrow_drop_down),
+                    Text(
+                      _getDisplayText(),
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    Icon(Icons.arrow_drop_down),
                   ],
                 ),
               ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import '../../controllers/global_state_controller.dart';
 
 import 'book_in_bookbox_row.dart';
 
@@ -100,6 +101,19 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
                   const SizedBox(height: 15),
                   Center(
                     child: DirectionButton(bookBoxLocation: bbLocation),
+                  ),
+                  const SizedBox(height: 15),
+                  Center(
+                    child: SelectBookBoxButton(
+                      bookBoxData: {
+                        'id': widget.bookBoxId,
+                        'name': bbName,
+                        'latitude': bbLocation.latitude,
+                        'longitude': bbLocation.longitude,
+                        'infoText': bbInfoText,
+                        'image': bbImage,
+                      },
+                    ),
                   ),
                   const SizedBox(height: 15),
                   Center(
@@ -212,6 +226,61 @@ class DirectionButton extends StatelessWidget {
             Text(
               'Get Directions',
               style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SelectBookBoxButton extends StatelessWidget {
+  final Map<String, dynamic> bookBoxData;
+
+  const SelectBookBoxButton({super.key, required this.bookBoxData});
+
+  @override
+  Widget build(BuildContext context) {
+    final GlobalStateController globalState = Get.put(GlobalStateController());
+    
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(LinoSizes.borderRadiusLg),
+        color: Colors.green.shade600,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 0.5,
+            blurRadius: 3,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: TextButton(
+        onPressed: () {
+          globalState.setSelectedBookBox(bookBoxData);
+          
+          // Show a confirmation snackbar
+          Get.snackbar(
+            'BookBox Updated',
+            'Selected "${bookBoxData['name']}" as your current bookbox',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            duration: Duration(seconds: 2),
+          );
+          
+          // Close the dialog
+          Navigator.of(context).pop();
+        },
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(Icons.check_circle, color: Colors.white),
+            SizedBox(width: 8),
+            Text(
+              'Select BookBox',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ],
         ),

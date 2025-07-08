@@ -143,47 +143,52 @@ class MapScreen extends HookWidget {
                     );
                   }
 
-                  return Opacity(
-                    opacity: highlightedBookBoxId == bbox['id'] ||
-                        highlightedBookBoxId == null
-                        ? 1.0
-                        : 0.5,
-                    child: Container(
-                      margin:
-                      EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                      decoration: BoxDecoration(
-                        color: bbox['id'] == globalState.currentSelectedBookBox.value?['id'] ? Colors.green : LinoColors.secondary,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: ListTile(
-                        title: Text(
-                          bbox['name'],
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.white),
+                  return Obx(() {
+                    final selectedBookBox = globalState.currentSelectedBookBox.value;
+                    final isSelected = selectedBookBox != null && bbox['id'] == selectedBookBox['id'];
+                    
+                    return Opacity(
+                      opacity: highlightedBookBoxId == bbox['id'] ||
+                          highlightedBookBoxId == null
+                          ? 1.0
+                          : 0.5,
+                      child: Container(
+                        margin:
+                        EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.green : LinoColors.secondary,
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (distance != null)
+                        child: ListTile(
+                          title: Text(
+                            bbox['name'],
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (distance != null)
+                                Text(
+                                  '${(distance / 1000).toStringAsFixed(2)} km away',
+                                  style: TextStyle(color: Colors.white70),
+                                ),
                               Text(
-                                '${(distance / 1000).toStringAsFixed(2)} km away',
+                                'Books: ${bbox['books'].length}',
                                 style: TextStyle(color: Colors.white70),
                               ),
-                            Text(
-                              'Books: ${bbox['books'].length}',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                          ],
+                            ],
+                          ),
+                          onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) =>
+                                    BookBoxScreen(bookBoxId: bbox['id']));
+                          },
                         ),
-                        onTap: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) =>
-                                  BookBoxScreen(bookBoxId: bbox['id']));
-                        },
                       ),
-                    ),
-                  );
+                    );
+                  });
                 },
               );
             }),
