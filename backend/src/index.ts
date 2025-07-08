@@ -204,7 +204,7 @@ server.register(fastifySwaggerUi, {
 server.register(bookRoutes);
 server.register(bookboxRoutes);
 server.register(userRoutes);
-server.register(threadRoutes);
+// server.register(threadRoutes); // Uncomment if you want to enable thread routes
 server.register(transactionRoutes);
 server.register(serviceRoutes);
 

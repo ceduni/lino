@@ -66,19 +66,19 @@ const ThreadService = {
         await thread.save();
 
         // Notify the user that someone has responded to their message
-        if (respondsTo != null) {
-            const parentMessage = thread.messages.id(respondsTo);
-            if (!parentMessage) {
-                throw newErr(404, 'Parent message not found');
-            }
-            if (parentMessage.username !== username) {
-                const userParent = await User.findOne({ username: parentMessage.username });
-                if (!userParent) {
-                    throw newErr(404, 'User not found');
-                }
-                await notifyUser(userParent.id, `${username} in ${thread.title}`, message.content);
-            }
-        }
+        // if (respondsTo != null) {
+        //     const parentMessage = thread.messages.id(respondsTo);
+        //     if (!parentMessage) {
+        //         throw newErr(404, 'Parent message not found');
+        //     }
+        //     if (parentMessage.username !== username) {
+        //         const userParent = await User.findOne({ username: parentMessage.username });
+        //         if (!userParent) {
+        //             throw newErr(404, 'User not found');
+        //         }
+        //         await notifyUser(userParent.id, `${username} in ${thread.title}`, message.content);
+        //     }
+        // }
 
         // Get the _id of the newly created message
         const messageId = thread.messages[thread.messages.length - 1].id;
