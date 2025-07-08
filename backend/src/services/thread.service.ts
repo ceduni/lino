@@ -1,5 +1,5 @@
 import Thread from "../models/thread.model";
-import UserService, {notifyUser} from "./user.service";
+import UserService from "./user.service";
 import User from "../models/user.model";
 import BookService from "./book.service";
 import {newErr} from "./utilities";

@@ -40,22 +40,30 @@ export const userSchema = {
         email: { type: 'string' },
         phone: { type: 'string' },
         requestNotificationRadius: { type: 'number', default: 5 },
-        notificationKeyWords: { type: 'array', items: { type: 'string' } },
+        favouriteGenres: { type: 'array', items: { type: 'string' } },
+        boroughId: { type: 'string' },
         numSavedBooks: { type: 'number' },
-        notifications: {
-            type: 'array',
-            items: {
-                type: 'object',
-                properties: {
-                    _id: { type: 'string' },
-                    timestamp: { type: 'string', format: 'date-time' },
-                    title: { type: 'string' },
-                    content: { type: 'string' },
-                    read: { type: 'boolean' }
-                }
+        followedBookboxes: { type: 'array', items: { type: 'string' } },
+        createdAt: { type: 'string', format: 'date-time' }
+    }
+};
+
+export const notificationSchema = {
+    type: 'object',
+    properties: {
+        _id: { type: 'string' },
+        userId: { type: 'string' },
+        bookId: { type: 'string' },
+        bookTitle: { type: 'string' },
+        bookboxId: { type: 'string' },
+        reason: { 
+            type: 'array', 
+            items: { 
+                type: 'string',
+                enum: ['fav_bookbox', 'same_borough', 'fav_genre', 'book_request']
             }
         },
-        followedBookboxes: { type: 'array', items: { type: 'string' } },
+        read: { type: 'boolean' },
         createdAt: { type: 'string', format: 'date-time' }
     }
 };

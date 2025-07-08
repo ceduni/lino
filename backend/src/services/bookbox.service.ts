@@ -2,7 +2,7 @@ import BookBox from "../models/bookbox.model";
 import User from "../models/user.model";
 import Request from "../models/book.request.model";
 import Transaction from "../models/transaction.model";
-import {notifyUser} from "./user.service";
+import NotificationService from "./notification.service";
 import {newErr} from "./utilities";
 import bookService from "./book.service";
 import { 
@@ -72,11 +72,9 @@ const bookboxService = {
         await bookService.createTransaction(username, 'added', title, bookboxId);
 
         // Notify users about the new book
-        await this.notifyRelevantUsers(
+        await NotificationService.notifyRelevantUsers(
             username,
             newBook, 
-            'added to', 
-            bookBox.name, 
             bookBox._id?.toString() || ''
         );
 
@@ -121,27 +119,6 @@ const bookboxService = {
         // Create transaction record
         const username = request.user ? (await User.findById(request.user.id))?.username || 'guest' : 'guest';
         await bookService.createTransaction(username, 'took', book.title, bookboxId);
-
-        // Notify users about the book removal
-        const bookForNotification: IBook = {
-            _id: book._id?.toString(),
-            isbn: book.isbn || "Unknown ISBN",
-            title: book.title,
-            authors: book.authors || [],
-            description: book.description || "No description available",
-            coverImage: book.coverImage || "No cover image",
-            publisher: book.publisher || "Unknown Publisher",
-            categories: book.categories || [],
-            parutionYear: book.parutionYear || undefined,
-            pages: book.pages || undefined,
-            dateAdded: book.dateAdded || new Date(),
-        };
-        await this.notifyRelevantUsers(
-            username,
-            bookForNotification, 
-            'removed from', 
-            bookBox.name, 
-            bookBox._id?.toString() || '');
 
         // Increment user's saved books count
         if (request.user) {
@@ -243,88 +220,21 @@ const bookboxService = {
         return bookBox;
     },
 
-    // Function that returns 1 if the book is relevant to the user by his keywords
-    // or if he put that book title in a request, 0 otherwise
-    async getBookRelevance(book: IBook, user: IUser) {
-        const keywords = user.notificationKeyWords.map((keyword: string) => new RegExp(keyword, 'i'));
-        const properties = [book.title, ...book.authors, ...book.categories];
-
-        for (let i = 0; i < properties.length; i++) {
-            for (let j = 0; j < keywords.length; j++) {
-                if (keywords[j].test(properties[i])) {
-                    return 1;
-                }
-            }
-        }
-
-        const requests = await Request.find();
-        const regex = new RegExp(book.title, 'i');
-        const matchingRequests = requests.filter(req => regex.test(req.bookTitle));
-        
-        for (const req of matchingRequests) {
-            if (req.username === user.username) {
-                return 1; // User has requested this book
-            }
-        }
-
-        return 0;
-    },
-
-    async notifyRelevantUsers(username: string, book: IBook, action: string, bookBoxName: string, bookBoxId: string) {
-        const users = await User.find();
-        for (let i = 0; i < users.length; i++) {
-            if (users[i].username === username) {
-                continue; // Skip the user who added the book
-            }
-
-            var notify = false;
-
-            const relevance = await this.getBookRelevance(book, users[i] as any);
-            notify = relevance > 0;
-            if (users[i].followedBookboxes.includes(bookBoxId)) {
-                notify = true; // User follows this bookbox, so notify them
-            }
-
-            // Notify the user if the book is relevant to him
-            if (notify) {
-                await notifyUser(users[i].id,
-                    "Book notification",
-                    `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
-            }
-        }
-    },
 
     async clearCollection() {
         await BookBox.deleteMany({});
     },
 
     async deleteBookBox(request: AuthenticatedRequest & { params: { bookboxId: string } }) {
-        BookBox.findByIdAndDelete(request.params.bookboxId)
-            .then(async (bookBox) => {
-                if (!bookBox) {
-                    throw newErr(404, 'Bookbox not found');
-                }
+        const bookBox = await BookBox.findByIdAndDelete(request.params.bookboxId);
+        if (!bookBox) {
+            throw newErr(404, 'Bookbox not found');
+        }
 
-                // Notify users about the deletion
-                const users = await User.find();
-                for (const user of users) {
-                    if (user.followedBookboxes.includes(request.params.bookboxId)) {
-                        await notifyUser(user.id,
-                            "Bookbox deleted",
-                            `The bookbox "${bookBox.name}" has been deleted.`);
-                    }
-                }
+        // Delete all transactions related to this bookbox
+        await Transaction.deleteMany({ bookboxId: request.params.bookboxId });
 
-                // Delete all transactions related to this bookbox
-                await Transaction.deleteMany({ bookboxId: request.params.bookboxId });
-
-                return { message: 'Bookbox deleted successfully' };
-            })
-            .catch((error) => {
-                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                throw newErr(500, errorMessage);
-            }
-        );
+        return { message: 'Bookbox deleted successfully' };
     },
 
     async updateBookBox(request: AuthenticatedRequest & { body: { name?: string; image?: string; longitude?: number; latitude?: number; infoText?: string }; params: { bookboxId: string } }) {

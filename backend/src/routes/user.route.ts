@@ -8,6 +8,7 @@ import {
     getUserNotificationsSchema,
     readNotificationSchema,
     updateUserSchema,
+    updateUserLocationSchema,
     clearCollectionSchema
 } from "../schemas/user.schemas";
 import { userSchema } from "../schemas/models.schemas";
@@ -79,11 +80,28 @@ async function updateUser(request : FastifyRequest, reply : FastifyReply) {
                 password?: string; 
                 email?: string; 
                 phone?: string; 
-                getAlerted?: boolean; 
-                keyWords?: string; 
+                favouriteGenres?: string[];
+                boroughId?: string;
+                requestNotificationRadius?: number;
             } 
         });
         reply.send({ user: user });
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
+    }
+}
+
+async function updateUserLocation(request : FastifyRequest, reply : FastifyReply) {
+    try {
+        const result = await UserService.updateUserLocation(request as AuthenticatedRequest & { 
+            body: { 
+                latitude: number; 
+                longitude: number; 
+            } 
+        });
+        reply.send(result);
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -113,5 +131,6 @@ export default async function userRoutes(server: MyFastifyInstance) {
     server.post('/users/register', { schema : registerUserSchema }, registerUser);
     server.post('/users/login', { schema : loginUserSchema }, loginUser);
     server.post('/users/update', { preValidation: [server.authenticate], schema : updateUserSchema }, updateUser);
+    server.post('/users/location', { preValidation: [server.authenticate], schema : updateUserLocationSchema }, updateUserLocation);
     server.delete('/users/clear', { preValidation: [server.adminAuthenticate], schema : clearCollectionSchema }, clearCollection);
 }

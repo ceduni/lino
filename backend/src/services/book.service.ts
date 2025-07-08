@@ -4,7 +4,7 @@ import BookBox from "../models/bookbox.model";
 import User from "../models/user.model";
 import Request from "../models/book.request.model";
 import Transaction from "../models/transaction.model";
-import {notifyUser} from "./user.service";
+import NotificationService from "./notification.service";
 import {newErr} from "./utilities";
 import { 
     BookSearchQuery,
@@ -186,12 +186,16 @@ const bookService = {
             followedBookboxes: { $in: bookboxIds }
         });
 
-        // Notify all relevant users
+        // Notify all relevant users using the new notification system
         for (let i = 0; i < usersToNotify.length; i++) {
             if (usersToNotify[i].username !== user.username) {
-                await notifyUser(usersToNotify[i].id,
-                    "Book request",
-                    `The user ${user.username} wants to get the book "${request.body.title}" ! If you have it, please feel free to add it to one of our book boxes !`);
+                await NotificationService.createNotification(
+                    usersToNotify[i]._id.toString(),
+                    ['book_request'],
+                    {
+                        bookTitle: request.body.title
+                    }
+                );
             }
         }
 
@@ -273,4 +277,3 @@ const bookService = {
 };
 
 export default bookService;
- 

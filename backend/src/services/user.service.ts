@@ -3,12 +3,12 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { newErr } from "./utilities";
-import {broadcastToUser} from '../index';
+import NotificationService from './notification.service';
+import { getBoroughId } from './borough.id.generator';
 import { 
     UserRegistrationData, 
     UserLoginCredentials, 
-    IUser,
-    INotification 
+    IUser
 } from '../types/user.types';
 import { AuthenticatedRequest } from '../types/common.types';
 
@@ -72,42 +72,11 @@ const UserService = {
     },
 
     async getUserNotifications(request: AuthenticatedRequest) {
-        const userId = request.user.id;
-        const user = await User.findById(userId);
-        if (!user) {
-            throw newErr(404, 'User not found');
-        }
-
-        // Calculate the date 30 days ago
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-        // Filter out notifications older than 30 days
-        const filteredNotifications = user.notifications.filter(notification => {
-            const notificationDate = new Date(notification.timestamp);
-            return notificationDate >= thirtyDaysAgo;
-        });
-        user.notifications = filteredNotifications as any;
-
-        // Save the updated user document
-        await user.save();
-        return user.notifications;
+        return await NotificationService.getUserNotifications(request);
     },
 
     async readNotification(request: AuthenticatedRequest & { body: { notificationId: string } }) {
-        const userId = request.user.id;
-        const user = await User.findById(userId);
-        if (!user) {
-            throw newErr(404, 'User not found');
-        }
-        const notificationId = request.body.notificationId;
-        const notification = user.notifications.id(notificationId);
-        if (!notification) {
-            throw newErr(404, 'Notification not found');
-        }
-        notification.read = true;
-        await user.save();
-        return user.notifications;
+        return await NotificationService.readNotification(request);
     },
 
 
@@ -118,17 +87,15 @@ const UserService = {
         }
         return user.username;
     },
-    async parseKeyWords(text: string) {
-        return text.split(',');
-    },
-
     async updateUser(request: AuthenticatedRequest & { 
         body: { 
             username?: string; 
             password?: string; 
             email?: string; 
             phone?: string; 
-            keyWords?: string; 
+            favouriteGenres?: string[];
+            boroughId?: string;
+            requestNotificationRadius?: number;
         } 
     }) {
         const user = await User.findById(request.user.id);
@@ -155,39 +122,46 @@ const UserService = {
         if (request.body.phone) {
             user.phone = request.body.phone;
         }
-        if (request.body.keyWords) {
-            user.notificationKeyWords = await this.parseKeyWords(request.body.keyWords);
+        if (request.body.favouriteGenres) {
+            user.favouriteGenres = request.body.favouriteGenres;
+        }
+        if (request.body.boroughId) {
+            user.boroughId = request.body.boroughId;
+        }
+        if (request.body.requestNotificationRadius !== undefined) {
+            user.requestNotificationRadius = request.body.requestNotificationRadius;
         }
         await user.save();
         return user;
+    },
+
+    async updateUserLocation(request: AuthenticatedRequest & { 
+        body: { 
+            latitude: number; 
+            longitude: number; 
+        } 
+    }) {
+        const user = await User.findById(request.user.id);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }
+
+        const { latitude, longitude } = request.body;
+        if (!latitude || !longitude) {
+            throw newErr(400, 'Latitude and longitude are required');
+        }
+
+        // Get borough ID from coordinates
+        const boroughId = await getBoroughId(latitude, longitude);
+        user.boroughId = boroughId;
+        
+        await user.save();
+        return { user, boroughId };
     },
 
     async clearCollection() {
         await User.deleteMany({ username: { $ne: process.env.ADMIN_USERNAME } });
     }
 };
-
-export async function notifyUser(userId: string, title: string, message: string) {
-    let user = await User.findById(userId);
-    if (!user) {
-        throw newErr(404, 'User not found');
-    }
-    const notification: INotification = { title: title, content: message, timestamp: new Date(), read: false };
-
-    // Validate and push the notification into the user's notifications array
-    try {
-        user.notifications.push(notification);
-        await user.save();
-    } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        throw new Error(`Failed to save notification: ${errorMessage}`);
-    }
-
-    // Broadcast the notification to the user if they are connected via WebSocket
-    broadcastToUser(userId, { event: 'newNotification', data: notification });
-
-    return user;
-}
-
 
 export default UserService;

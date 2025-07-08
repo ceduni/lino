@@ -96,6 +96,19 @@ function updateUser(request, reply) {
         }
     });
 }
+function updateUserLocation(request, reply) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const result = yield user_service_1.default.updateUserLocation(request);
+            reply.send(result);
+        }
+        catch (error) {
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
+        }
+    });
+}
 function clearCollection(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -116,6 +129,7 @@ function userRoutes(server) {
         server.post('/users/register', { schema: user_schemas_1.registerUserSchema }, registerUser);
         server.post('/users/login', { schema: user_schemas_1.loginUserSchema }, loginUser);
         server.post('/users/update', { preValidation: [server.authenticate], schema: user_schemas_1.updateUserSchema }, updateUser);
+        server.post('/users/location', { preValidation: [server.authenticate], schema: user_schemas_1.updateUserLocationSchema }, updateUserLocation);
         server.delete('/users/clear', { preValidation: [server.adminAuthenticate], schema: user_schemas_1.clearCollectionSchema }, clearCollection);
     });
 }

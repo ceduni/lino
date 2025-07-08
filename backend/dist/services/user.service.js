@@ -12,13 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.notifyUser = notifyUser;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const argon2_1 = __importDefault(require("argon2"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const utilities_1 = require("./utilities");
-const index_1 = require("../index");
+const notification_service_1 = __importDefault(require("./notification.service"));
+const borough_id_generator_1 = require("./borough.id.generator");
 dotenv_1.default.config();
 const UserService = {
     // User service to register a new user's account
@@ -76,40 +76,12 @@ const UserService = {
     },
     getUserNotifications(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            const userId = request.user.id;
-            const user = yield user_model_1.default.findById(userId);
-            if (!user) {
-                throw (0, utilities_1.newErr)(404, 'User not found');
-            }
-            // Calculate the date 30 days ago
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            // Filter out notifications older than 30 days
-            const filteredNotifications = user.notifications.filter(notification => {
-                const notificationDate = new Date(notification.timestamp);
-                return notificationDate >= thirtyDaysAgo;
-            });
-            user.notifications = filteredNotifications;
-            // Save the updated user document
-            yield user.save();
-            return user.notifications;
+            return yield notification_service_1.default.getUserNotifications(request);
         });
     },
     readNotification(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            const userId = request.user.id;
-            const user = yield user_model_1.default.findById(userId);
-            if (!user) {
-                throw (0, utilities_1.newErr)(404, 'User not found');
-            }
-            const notificationId = request.body.notificationId;
-            const notification = user.notifications.id(notificationId);
-            if (!notification) {
-                throw (0, utilities_1.newErr)(404, 'Notification not found');
-            }
-            notification.read = true;
-            yield user.save();
-            return user.notifications;
+            return yield notification_service_1.default.readNotification(request);
         });
     },
     getUserName(userId) {
@@ -119,11 +91,6 @@ const UserService = {
                 throw (0, utilities_1.newErr)(404, 'User not found');
             }
             return user.username;
-        });
-    },
-    parseKeyWords(text) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return text.split(',');
         });
     },
     updateUser(request) {
@@ -152,11 +119,34 @@ const UserService = {
             if (request.body.phone) {
                 user.phone = request.body.phone;
             }
-            if (request.body.keyWords) {
-                user.notificationKeyWords = yield this.parseKeyWords(request.body.keyWords);
+            if (request.body.favouriteGenres) {
+                user.favouriteGenres = request.body.favouriteGenres;
+            }
+            if (request.body.boroughId) {
+                user.boroughId = request.body.boroughId;
+            }
+            if (request.body.requestNotificationRadius !== undefined) {
+                user.requestNotificationRadius = request.body.requestNotificationRadius;
             }
             yield user.save();
             return user;
+        });
+    },
+    updateUserLocation(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_model_1.default.findById(request.user.id);
+            if (!user) {
+                throw (0, utilities_1.newErr)(404, 'User not found');
+            }
+            const { latitude, longitude } = request.body;
+            if (!latitude || !longitude) {
+                throw (0, utilities_1.newErr)(400, 'Latitude and longitude are required');
+            }
+            // Get borough ID from coordinates
+            const boroughId = yield (0, borough_id_generator_1.getBoroughId)(latitude, longitude);
+            user.boroughId = boroughId;
+            yield user.save();
+            return { user, boroughId };
         });
     },
     clearCollection() {
@@ -165,25 +155,4 @@ const UserService = {
         });
     }
 };
-function notifyUser(userId, title, message) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let user = yield user_model_1.default.findById(userId);
-        if (!user) {
-            throw (0, utilities_1.newErr)(404, 'User not found');
-        }
-        const notification = { title: title, content: message, timestamp: new Date(), read: false };
-        // Validate and push the notification into the user's notifications array
-        try {
-            user.notifications.push(notification);
-            yield user.save();
-        }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            throw new Error(`Failed to save notification: ${errorMessage}`);
-        }
-        // Broadcast the notification to the user if they are connected via WebSocket
-        (0, index_1.broadcastToUser)(userId, { event: 'newNotification', data: notification });
-        return user;
-    });
-}
 exports.default = UserService;

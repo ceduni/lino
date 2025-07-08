@@ -1,4 +1,4 @@
-import { userSchema } from './models.schemas';
+import { userSchema, notificationSchema } from './models.schemas';
 
 export const registerUserSchema = {
     description: 'Register a new user',
@@ -107,17 +107,8 @@ export const getUserNotificationsSchema = {
             type: 'object',
             properties: {
                 notifications: {
-                    type: 'array', items:
-                        {
-                            type: 'object',
-                            properties: {
-                                _id: { type: 'string' },
-                                title: { type: 'string' },
-                                timestamp: { type: 'string' },
-                                content: { type: 'string' },
-                                read: { type: 'boolean' }
-                            }
-                        }
+                    type: 'array', 
+                    items: notificationSchema
                 }
             }
         },
@@ -154,17 +145,8 @@ export const readNotificationSchema = {
             type: 'object',
             properties: {
                 notifications: {
-                    type: 'array', items:
-                        {
-                            type: 'object',
-                            properties: {
-                                _id: { type: 'string' },
-                                title: { type: 'string' },
-                                timestamp: { type: 'string' },
-                                content: { type: 'string' },
-                                read: { type: 'boolean' }
-                            }
-                        }
+                    type: 'array', 
+                    items: notificationSchema
                 }
             }
         },
@@ -195,8 +177,9 @@ export const updateUserSchema = {
             email: { type: 'string' },
             password: { type: 'string' },
             phone: { type: 'string' },
-            getAlerted: { type: 'boolean' },
-            keyWords: { type: 'string' }
+            favouriteGenres: { type: 'array', items: { type: 'string' } },
+            boroughId: { type: 'string' },
+            requestNotificationRadius: { type: 'number', minimum: 0 }
         }
     },
     response: {
@@ -209,6 +192,50 @@ export const updateUserSchema = {
         },
         401: {
             description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+
+export const updateUserLocationSchema = {
+    description: 'Update user location and borough ID',
+    tags: ['users'],
+    headers: {
+        type: 'object',
+        required: ['authorization'],
+        properties: {
+            authorization: {type: 'string'} // JWT token
+        }
+    },
+    body: {
+        type: 'object',
+        required: ['latitude', 'longitude'],
+        properties: {
+            latitude: { type: 'number', minimum: -90, maximum: 90 },
+            longitude: { type: 'number', minimum: -180, maximum: 180 }
+        }
+    },
+    response: {
+        200: {
+            description: 'User location updated',
+            type: 'object',
+            properties: {
+                user: userSchema,
+                boroughId: { type: 'string' }
+            }
+        },
+        400: {
+            description: 'Invalid coordinates',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'User not found',
             type: 'object',
             properties: {
                 error: { type: 'string' }

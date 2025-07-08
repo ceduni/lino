@@ -18,7 +18,7 @@ const bookbox_model_1 = __importDefault(require("../models/bookbox.model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const book_request_model_1 = __importDefault(require("../models/book.request.model"));
 const transaction_model_1 = __importDefault(require("../models/transaction.model"));
-const user_service_1 = require("./user.service");
+const notification_service_1 = __importDefault(require("./notification.service"));
 const utilities_1 = require("./utilities");
 const bookService = {
     getBookInfoFromISBN(request) {
@@ -175,10 +175,12 @@ const bookService = {
             const usersToNotify = yield user_model_1.default.find({
                 followedBookboxes: { $in: bookboxIds }
             });
-            // Notify all relevant users
+            // Notify all relevant users using the new notification system
             for (let i = 0; i < usersToNotify.length; i++) {
                 if (usersToNotify[i].username !== user.username) {
-                    yield (0, user_service_1.notifyUser)(usersToNotify[i].id, "Book request", `The user ${user.username} wants to get the book "${request.body.title}" ! If you have it, please feel free to add it to one of our book boxes !`);
+                    yield notification_service_1.default.createNotification(usersToNotify[i]._id.toString(), ['book_request'], {
+                        bookTitle: request.body.title
+                    });
                 }
             }
             const newRequest = new book_request_model_1.default({

@@ -14,9 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bookbox_model_1 = __importDefault(require("../models/bookbox.model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
-const book_request_model_1 = __importDefault(require("../models/book.request.model"));
 const transaction_model_1 = __importDefault(require("../models/transaction.model"));
-const user_service_1 = require("./user.service");
+const notification_service_1 = __importDefault(require("./notification.service"));
 const utilities_1 = require("./utilities");
 const book_service_1 = __importDefault(require("./book.service"));
 const borough_id_generator_1 = require("./borough.id.generator");
@@ -74,7 +73,7 @@ const bookboxService = {
             const username = request.user ? ((_a = (yield user_model_1.default.findById(request.user.id))) === null || _a === void 0 ? void 0 : _a.username) || 'guest' : 'guest';
             yield book_service_1.default.createTransaction(username, 'added', title, bookboxId);
             // Notify users about the new book
-            yield this.notifyRelevantUsers(username, newBook, 'added to', bookBox.name, ((_b = bookBox._id) === null || _b === void 0 ? void 0 : _b.toString()) || '');
+            yield notification_service_1.default.notifyRelevantUsers(username, newBook, ((_b = bookBox._id) === null || _b === void 0 ? void 0 : _b.toString()) || '');
             // Increment user's added books count
             if (request.user) {
                 const user = yield user_model_1.default.findById(request.user.id);
@@ -92,7 +91,7 @@ const bookboxService = {
     },
     getBookFromBookBox(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c;
+            var _a;
             const bookId = request.params.bookId;
             const bookboxId = request.params.bookboxId;
             // Find the bookbox
@@ -112,21 +111,6 @@ const bookboxService = {
             // Create transaction record
             const username = request.user ? ((_a = (yield user_model_1.default.findById(request.user.id))) === null || _a === void 0 ? void 0 : _a.username) || 'guest' : 'guest';
             yield book_service_1.default.createTransaction(username, 'took', book.title, bookboxId);
-            // Notify users about the book removal
-            const bookForNotification = {
-                _id: (_b = book._id) === null || _b === void 0 ? void 0 : _b.toString(),
-                isbn: book.isbn || "Unknown ISBN",
-                title: book.title,
-                authors: book.authors || [],
-                description: book.description || "No description available",
-                coverImage: book.coverImage || "No cover image",
-                publisher: book.publisher || "Unknown Publisher",
-                categories: book.categories || [],
-                parutionYear: book.parutionYear || undefined,
-                pages: book.pages || undefined,
-                dateAdded: book.dateAdded || new Date(),
-            };
-            yield this.notifyRelevantUsers(username, bookForNotification, 'removed from', bookBox.name, ((_c = bookBox._id) === null || _c === void 0 ? void 0 : _c.toString()) || '');
             // Increment user's saved books count
             if (request.user) {
                 const user = yield user_model_1.default.findById(request.user.id);
@@ -206,50 +190,6 @@ const bookboxService = {
             return bookBox;
         });
     },
-    // Function that returns 1 if the book is relevant to the user by his keywords
-    // or if he put that book title in a request, 0 otherwise
-    getBookRelevance(book, user) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const keywords = user.notificationKeyWords.map((keyword) => new RegExp(keyword, 'i'));
-            const properties = [book.title, ...book.authors, ...book.categories];
-            for (let i = 0; i < properties.length; i++) {
-                for (let j = 0; j < keywords.length; j++) {
-                    if (keywords[j].test(properties[i])) {
-                        return 1;
-                    }
-                }
-            }
-            const requests = yield book_request_model_1.default.find();
-            const regex = new RegExp(book.title, 'i');
-            const matchingRequests = requests.filter(req => regex.test(req.bookTitle));
-            for (const req of matchingRequests) {
-                if (req.username === user.username) {
-                    return 1; // User has requested this book
-                }
-            }
-            return 0;
-        });
-    },
-    notifyRelevantUsers(username, book, action, bookBoxName, bookBoxId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const users = yield user_model_1.default.find();
-            for (let i = 0; i < users.length; i++) {
-                if (users[i].username === username) {
-                    continue; // Skip the user who added the book
-                }
-                var notify = false;
-                const relevance = yield this.getBookRelevance(book, users[i]);
-                notify = relevance > 0;
-                if (users[i].followedBookboxes.includes(bookBoxId)) {
-                    notify = true; // User follows this bookbox, so notify them
-                }
-                // Notify the user if the book is relevant to him
-                if (notify) {
-                    yield (0, user_service_1.notifyUser)(users[i].id, "Book notification", `The book "${book.title}" has been ${action} the bookbox "${bookBoxName}" !`);
-                }
-            }
-        });
-    },
     clearCollection() {
         return __awaiter(this, void 0, void 0, function* () {
             yield bookbox_model_1.default.deleteMany({});
@@ -257,26 +197,13 @@ const bookboxService = {
     },
     deleteBookBox(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            bookbox_model_1.default.findByIdAndDelete(request.params.bookboxId)
-                .then((bookBox) => __awaiter(this, void 0, void 0, function* () {
-                if (!bookBox) {
-                    throw (0, utilities_1.newErr)(404, 'Bookbox not found');
-                }
-                // Notify users about the deletion
-                const users = yield user_model_1.default.find();
-                for (const user of users) {
-                    if (user.followedBookboxes.includes(request.params.bookboxId)) {
-                        yield (0, user_service_1.notifyUser)(user.id, "Bookbox deleted", `The bookbox "${bookBox.name}" has been deleted.`);
-                    }
-                }
-                // Delete all transactions related to this bookbox
-                yield transaction_model_1.default.deleteMany({ bookboxId: request.params.bookboxId });
-                return { message: 'Bookbox deleted successfully' };
-            }))
-                .catch((error) => {
-                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                throw (0, utilities_1.newErr)(500, errorMessage);
-            });
+            const bookBox = yield bookbox_model_1.default.findByIdAndDelete(request.params.bookboxId);
+            if (!bookBox) {
+                throw (0, utilities_1.newErr)(404, 'Bookbox not found');
+            }
+            // Delete all transactions related to this bookbox
+            yield transaction_model_1.default.deleteMany({ bookboxId: request.params.bookboxId });
+            return { message: 'Bookbox deleted successfully' };
         });
     },
     updateBookBox(request) {

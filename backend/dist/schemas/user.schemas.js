@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clearCollectionSchema = exports.updateUserSchema = exports.readNotificationSchema = exports.getUserNotificationsSchema = exports.getUserSchema = exports.loginUserSchema = exports.registerUserSchema = void 0;
+exports.clearCollectionSchema = exports.updateUserLocationSchema = exports.updateUserSchema = exports.readNotificationSchema = exports.getUserNotificationsSchema = exports.getUserSchema = exports.loginUserSchema = exports.registerUserSchema = void 0;
 const models_schemas_1 = require("./models.schemas");
 exports.registerUserSchema = {
     description: 'Register a new user',
@@ -106,16 +106,8 @@ exports.getUserNotificationsSchema = {
             type: 'object',
             properties: {
                 notifications: {
-                    type: 'array', items: {
-                        type: 'object',
-                        properties: {
-                            _id: { type: 'string' },
-                            title: { type: 'string' },
-                            timestamp: { type: 'string' },
-                            content: { type: 'string' },
-                            read: { type: 'boolean' }
-                        }
-                    }
+                    type: 'array',
+                    items: models_schemas_1.notificationSchema
                 }
             }
         },
@@ -151,16 +143,8 @@ exports.readNotificationSchema = {
             type: 'object',
             properties: {
                 notifications: {
-                    type: 'array', items: {
-                        type: 'object',
-                        properties: {
-                            _id: { type: 'string' },
-                            title: { type: 'string' },
-                            timestamp: { type: 'string' },
-                            content: { type: 'string' },
-                            read: { type: 'boolean' }
-                        }
-                    }
+                    type: 'array',
+                    items: models_schemas_1.notificationSchema
                 }
             }
         },
@@ -190,8 +174,9 @@ exports.updateUserSchema = {
             email: { type: 'string' },
             password: { type: 'string' },
             phone: { type: 'string' },
-            getAlerted: { type: 'boolean' },
-            keyWords: { type: 'string' }
+            favouriteGenres: { type: 'array', items: { type: 'string' } },
+            boroughId: { type: 'string' },
+            requestNotificationRadius: { type: 'number', minimum: 0 }
         }
     },
     response: {
@@ -204,6 +189,49 @@ exports.updateUserSchema = {
         },
         401: {
             description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+exports.updateUserLocationSchema = {
+    description: 'Update user location and borough ID',
+    tags: ['users'],
+    headers: {
+        type: 'object',
+        required: ['authorization'],
+        properties: {
+            authorization: { type: 'string' } // JWT token
+        }
+    },
+    body: {
+        type: 'object',
+        required: ['latitude', 'longitude'],
+        properties: {
+            latitude: { type: 'number', minimum: -90, maximum: 90 },
+            longitude: { type: 'number', minimum: -180, maximum: 180 }
+        }
+    },
+    response: {
+        200: {
+            description: 'User location updated',
+            type: 'object',
+            properties: {
+                user: models_schemas_1.userSchema,
+                boroughId: { type: 'string' }
+            }
+        },
+        400: {
+            description: 'Invalid coordinates',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'User not found',
             type: 'object',
             properties: {
                 error: { type: 'string' }

@@ -1,7 +1,7 @@
 "use strict";
 // Model schemas that match the actual Mongoose models
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.bookRequestSchema = exports.transactionSchema = exports.threadSchema = exports.userSchema = exports.bookboxSchema = exports.bookSchema = void 0;
+exports.bookRequestSchema = exports.transactionSchema = exports.threadSchema = exports.notificationSchema = exports.userSchema = exports.bookboxSchema = exports.bookSchema = void 0;
 exports.bookSchema = {
     type: 'object',
     properties: {
@@ -40,22 +40,29 @@ exports.userSchema = {
         email: { type: 'string' },
         phone: { type: 'string' },
         requestNotificationRadius: { type: 'number', default: 5 },
-        notificationKeyWords: { type: 'array', items: { type: 'string' } },
+        favouriteGenres: { type: 'array', items: { type: 'string' } },
+        boroughId: { type: 'string' },
         numSavedBooks: { type: 'number' },
-        notifications: {
+        followedBookboxes: { type: 'array', items: { type: 'string' } },
+        createdAt: { type: 'string', format: 'date-time' }
+    }
+};
+exports.notificationSchema = {
+    type: 'object',
+    properties: {
+        _id: { type: 'string' },
+        userId: { type: 'string' },
+        bookId: { type: 'string' },
+        bookTitle: { type: 'string' },
+        bookboxId: { type: 'string' },
+        reason: {
             type: 'array',
             items: {
-                type: 'object',
-                properties: {
-                    _id: { type: 'string' },
-                    timestamp: { type: 'string', format: 'date-time' },
-                    title: { type: 'string' },
-                    content: { type: 'string' },
-                    read: { type: 'boolean' }
-                }
+                type: 'string',
+                enum: ['fav_bookbox', 'same_borough', 'fav_genre', 'book_request']
             }
         },
-        followedBookboxes: { type: 'array', items: { type: 'string' } },
+        read: { type: 'boolean' },
         createdAt: { type: 'string', format: 'date-time' }
     }
 };

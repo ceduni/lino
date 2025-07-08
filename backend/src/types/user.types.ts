@@ -1,22 +1,25 @@
 import { Document } from 'mongoose';
 
-// User related types
-export interface INotification {
-  timestamp: Date;
-  title: string;
-  content: string;
+// Notification related types (for the new separate collection)
+export interface INotification extends Document {
+  userId: string;
+  bookId?: string;
+  bookTitle?: string;
+  bookboxId?: string;
+  reason: string[];
   read: boolean;
-} 
+  createdAt: Date;
+}
 
 export interface IUser extends Document {
   username: string;
   password: string;
   email: string;
   phone?: string;
-  notificationKeyWords: string[];
+  favouriteGenres: string[];
+  boroughId?: string;
   requestNotificationRadius: number; // Default radius in km
   numSavedBooks: number;
-  notifications: INotification[];
   followedBookboxes: string[];
   createdAt: Date;
 }
