@@ -7,14 +7,42 @@ class GoogleBooksGenreScraper {
     this.genres = new Set();
     this.genreFile = 'book_genres.json';
     
-    // Popular subjects to seed the scraping
+    // Comprehensive subjects to seed the scraping
     this.seedSubjects = [
-      'fiction', 'mystery', 'romance', 'science fiction', 'fantasy',
-      'thriller', 'horror', 'biography', 'history', 'self help',
-      'business', 'cooking', 'travel', 'poetry', 'drama',
-      'adventure', 'crime', 'historical fiction', 'young adult',
-      'children', 'philosophy', 'religion', 'health', 'sports',
-      'art', 'music', 'technology', 'science', 'nature'
+      // Main fiction categories
+      'fiction', 'literary fiction', 'contemporary fiction', 'historical fiction',
+      'science fiction', 'fantasy', 'dystopian', 'urban fantasy', 'epic fantasy',
+      'mystery', 'thriller', 'suspense', 'crime', 'detective', 'cozy mystery',
+      'romance', 'contemporary romance', 'historical romance', 'paranormal romance',
+      'horror', 'psychological horror', 'supernatural', 'gothic',
+      'adventure', 'action', 'war', 'western', 'spy',
+      
+      // Age categories
+      'young adult', 'teen', 'middle grade', 'children', 'picture books',
+      'new adult', 'coming of age',
+      
+      // Non-fiction categories
+      'biography', 'autobiography', 'memoir', 'history', 'true crime',
+      'self help', 'personal development', 'psychology', 'philosophy',
+      'business', 'entrepreneurship', 'finance', 'economics', 'management',
+      'health', 'fitness', 'diet', 'nutrition', 'medicine',
+      'science', 'nature', 'environment', 'physics', 'biology', 'chemistry',
+      'technology', 'computers', 'programming', 'artificial intelligence',
+      'politics', 'social science', 'sociology', 'anthropology',
+      'religion', 'spirituality', 'christianity', 'islam', 'buddhism',
+      'education', 'parenting', 'relationships', 'family',
+      'travel', 'cooking', 'food', 'crafts', 'hobbies', 'gardening',
+      'art', 'photography', 'design', 'architecture',
+      'music', 'performing arts', 'theater', 'dance',
+      'sports', 'recreation', 'fitness', 'outdoor',
+      'poetry', 'drama', 'essays', 'humor', 'satire',
+      
+      // Specific genres that often get missed
+      'steampunk', 'cyberpunk', 'space opera', 'time travel',
+      'alternate history', 'post apocalyptic', 'magical realism',
+      'noir', 'hardboiled', 'police procedural', 'legal thriller',
+      'medical thriller', 'political thriller', 'espionage',
+      'erotica', 'lgbtq', 'multicultural', 'womens fiction'
     ];
   }
 
@@ -86,18 +114,23 @@ class GoogleBooksGenreScraper {
     
     // Clean up the genre string
     let normalized = rawGenre
-      .split('/')  // Split "Fiction / Mystery & Detective"
+      .split(/[\/\-\|]/)  // Split on /, -, or |
       .map(part => part.trim())
       .filter(part => part.length > 0)
       .map(part => {
-        // Remove common prefixes/suffixes
+        // Remove common prefixes/suffixes but be more selective
         return part
           .replace(/^(Fiction|Non-fiction|Nonfiction)\s*[-\/]?\s*/i, '')
           .replace(/\s*[-\/]\s*(Fiction|Non-fiction|Nonfiction)$/i, '')
           .replace(/\s+/g, ' ')
           .trim();
       })
-      .filter(part => part.length > 2); // Remove very short parts
+      .filter(part => part.length > 0); // Remove empty parts
+    
+    // Also add the original genre without splitting if it's not too long
+    if (rawGenre.length < 50 && !rawGenre.includes('/')) {
+      normalized.push(rawGenre.trim());
+    }
     
     normalized.forEach(genre => {
       if (this.isValidGenre(genre)) {
@@ -112,12 +145,14 @@ class GoogleBooksGenreScraper {
   isValidGenre(genre) {
     const invalidGenres = [
       'general', 'miscellaneous', 'other', 'unknown', 'various',
-      'literature', 'books', 'reading', 'library', 'collection'
+      'literature', 'books', 'reading', 'library', 'collection',
+      'text', 'study', 'reference', 'guide', 'handbook'
     ];
     
-    return genre.length > 2 && 
+    return genre.length > 1 && // Allow shorter genres like "SF"
            !invalidGenres.includes(genre.toLowerCase()) &&
-           !/^\d+$/.test(genre); // Not just numbers
+           !/^\d+$/.test(genre) && // Not just numbers
+           !/^[A-Z]{1,2}\d/.test(genre); // Not codes like "PZ7" or "B123"
   }
 
   /**
@@ -142,14 +177,26 @@ class GoogleBooksGenreScraper {
     for (const subject of this.seedSubjects) {
       console.log(`Scraping subject: ${subject}`);
       
-      const books = await this.fetchBooks(`subject:${subject}`);
+      // Try multiple query formats to get more comprehensive results
+      const queries = [
+        `subject:${subject}`,
+        `intitle:${subject}`,
+        `${subject}` // Simple search
+      ];
       
-      books.forEach(book => {
-        const bookGenres = this.extractGenresFromBook(book);
-        bookGenres.forEach(genre => this.genres.add(genre));
-      });
+      for (const query of queries) {
+        const books = await this.fetchBooks(query, 40);
+        
+        books.forEach(book => {
+          const bookGenres = this.extractGenresFromBook(book);
+          bookGenres.forEach(genre => this.genres.add(genre));
+        });
+        
+        // Small delay between queries
+        await this.delay(50);
+      }
       
-      // Be nice to the API - add a small delay
+      // Be nice to the API - add a small delay between subjects
       await this.delay(100);
     }
     
@@ -209,11 +256,16 @@ class GoogleBooksGenreScraper {
    */
   async loadGenresFromFile() {
     try {
-      // This would need to be adapted based on your environment
-      // For browser: fetch the file or use FileReader
-      // For Node.js: use fs.readFileSync
-      const response = await fetch(this.genreFile);
-      const data = await response.json();
+      let data;
+      if (typeof window !== 'undefined') {
+        // Browser environment
+        const response = await fetch(this.genreFile);
+        data = await response.json();
+      } else {
+        // Node.js environment
+        const fileContent = fs.readFileSync(this.genreFile, 'utf8');
+        data = JSON.parse(fileContent);
+      }
       
       if (data.genres) {
         data.genres.forEach(genre => this.genres.add(genre));
@@ -258,27 +310,43 @@ class GoogleBooksGenreScraper {
     
     // Load existing genres
     await this.loadGenresFromFile();
+    console.log(`Starting with ${this.genres.size} existing genres`);
     
     // Scrape from seed subjects
     await this.scrapeGenresFromSeeds();
+    
+    // Add some essential genres that might be missed
+    const essentialGenres = [
+      'Fiction', 'Science Fiction', 'Fantasy', 'Mystery', 'Romance',
+      'Thriller', 'Horror', 'Biography', 'History', 'Non-fiction',
+      'Young Adult', 'Children', 'Poetry', 'Drama', 'Adventure',
+      'Crime', 'Suspense', 'Contemporary Fiction', 'Historical Fiction',
+      'Literary Fiction', 'Self Help', 'Business', 'Health', 'Travel',
+      'Cooking', 'Art', 'Music', 'Sports', 'Technology', 'Science'
+    ];
+    
+    essentialGenres.forEach(genre => this.genres.add(genre));
     
     // Save to file
     await this.saveGenresToFile();
     
     console.log('Genre scraping complete!');
     console.log(`Total genres collected: ${this.genres.size}`);
+    console.log('Sample genres:', Array.from(this.genres).slice(0, 20));
     
     return this.getAllGenres();
   }
 }
 
-// Initialize scraper 
-const scraper = new GoogleBooksGenreScraper(process.env.GOOGLE_API_KEY); 
+// Usage examples:
+
+// Initialize scraper (with optional API key for higher rate limits)
+const scraper = new GoogleBooksGenreScraper(process.env.GOOGLE_API_KEY);
 
 // Run full scrape
 scraper.runFullScrape();
 
-// Extract genres from a specific book ISBN
+// Or extract genres from a specific book ISBN
 // scraper.extractGenresFromISBN('9780123456789');
 
 // Search existing genres
