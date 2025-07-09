@@ -18,7 +18,7 @@ const bookService = {
 
     async getBookInfoFromISBN(request: { params: { isbn: string } }) {
         const isbn = request.params.isbn;
-        const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${process.env.GOOGLE_BOOKS_API_KEY}`);
+        const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${process.env.GOOGLE_API_KEY}`);
         if (response.data.totalItems === 0) {
             throw newErr(404, 'Book not found');
         }
