@@ -5,12 +5,14 @@ class BookBox {
   final double longitude;
   final double latitude;
   final String? infoText;
+  final String boroughId;
   final List<Book> books;
 
   BookBox({
     required this.name,
     required this.longitude,
     required this.latitude,
+    required this.boroughId,
     this.infoText,
     required this.books,
   });
@@ -23,6 +25,7 @@ class BookBox {
       name: json['name'],
       longitude: (json['longitude'] as num).toDouble(),
       latitude: (json['latitude'] as num).toDouble(),
+      boroughId: json['boroughId'],
       infoText: json['infoText'],
       books: books,
     );

@@ -8,9 +8,9 @@ import 'package:Lino_app/pages/forum/thread_message_screen.dart';
 import '../../services/user_services.dart';
 
 class ThreadsSection extends StatefulWidget {
-  String? query;
+  final String? query;
 
-  ThreadsSection({super.key, this.query});
+  const ThreadsSection({super.key, this.query});
 
   @override
   ThreadsSectionState createState() => ThreadsSectionState();
@@ -67,7 +67,6 @@ class ThreadsSectionState extends State<ThreadsSection> {
       appBar: AppBar(
         title: ElevatedButton(
           onPressed: () {
-            widget.query = null;
             fetchThreadTiles(cls: 'by recent activity', asc: false);
           },
           child: const Text(

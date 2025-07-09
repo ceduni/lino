@@ -2,7 +2,7 @@ import {WebSocket} from "@fastify/websocket";
 import {newErr} from "./services/utilities";
 import {FastifyRequest, FastifyReply} from "fastify";
 import { WebSocketClient, FastifyRequestWithJWT } from "./types/common.types";
-import serviceRoutes from "./routes/services.route";
+
 
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
@@ -16,7 +16,9 @@ const bookRoutes = require('./routes/book.route');
 const bookboxRoutes = require('./routes/bookbox.route');
 const userRoutes = require('./routes/user.route');
 const threadRoutes = require('./routes/thread.route');
+const serviceRoutes = require('./routes/services.route');
 const transactionRoutes = require('./routes/transaction.route');
+const requestRoutes = require('./routes/request.route');
 const fastifyWebSocket = require('@fastify/websocket');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
@@ -203,6 +205,7 @@ server.register(fastifySwaggerUi, {
 // Register routes
 server.register(bookRoutes);
 server.register(bookboxRoutes);
+server.register(requestRoutes);
 server.register(userRoutes);
 // server.register(threadRoutes); // Uncomment if you want to enable thread routes
 server.register(transactionRoutes);

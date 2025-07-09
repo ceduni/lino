@@ -65,3 +65,46 @@ export const createCustomTransactionSchema = {
         }
     }
 };
+
+export const getTransactionHistorySchema = {
+    description: 'Get transaction history',
+    tags: ['books', 'transactions'],
+    querystring: {
+        type: 'object',
+        properties: {
+            username: { type: 'string' },
+            bookTitle: { type: 'string' },
+            bookboxId: { type: 'string' },
+            limit: { type: 'number' }
+        }
+    },
+    response: {
+        200: {
+            description: 'Transaction history found',
+            type: 'object',
+            properties: {
+                transactions: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            _id: { type: 'string' },
+                            username: { type: 'string' },
+                            action: { type: 'string' },
+                            bookTitle: { type: 'string' },
+                            bookboxId: { type: 'string' },
+                            timestamp: { type: 'string' }
+                        }
+                    }
+                }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};

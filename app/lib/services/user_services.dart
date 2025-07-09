@@ -99,7 +99,7 @@ class UserService {
     return data;
   }
 
-  Future<Map<String, dynamic>> getUserNotifications(String token) async {
+  Future<List<dynamic>> getUserNotifications(String token) async {
     final response = await http.get(
         Uri.parse('$url/users/notifications'),
         headers: <String, String>{
@@ -110,7 +110,7 @@ class UserService {
     if (response.statusCode != 200) {
       throw Exception(data['error']);
     }
-    return data;
+    return data['notifications'] as List<dynamic>;
   }
 
   Future<void> markNotificationAsRead(String token, String id) async {

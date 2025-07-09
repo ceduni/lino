@@ -1,18 +1,12 @@
 import axios from 'axios';
 import mongoose from 'mongoose';
 import BookBox from "../models/bookbox.model";
-import User from "../models/user.model";
-import Request from "../models/book.request.model";
-import Transaction from "../models/transaction.model";
-import NotificationService from "./notification.service";
 import {newErr} from "./utilities";
 import { 
     BookSearchQuery,
     IBook,
     ITransaction
 } from '../types/book.types';
-import { IUser } from '../types/user.types';
-import { AuthenticatedRequest } from '../types/common.types';
 
 const bookService = {
 
@@ -155,125 +149,6 @@ const bookService = {
         return results.length > 0 ? results[0] : null;
     },
  
-    async requestBookToUsers(request: AuthenticatedRequest & { 
-        body: { title: string; customMessage?: string }; 
-        query: { latitude?: number; longitude?: number } 
-    }) {
-        const user = await User.findById(request.user.id);
-        if (!user) {
-            throw newErr(404, 'User not found');
-        }
-
-        const { latitude, longitude } = request.query;
-        if (!latitude || !longitude) {
-            throw newErr(400, 'User location (latitude and longitude) is required');
-        }
-
-        // Get all bookboxes and filter by distance using Haversine formula
-        const allBookboxes = await BookBox.find();
-        const nearbyBookboxes = allBookboxes.filter(bookbox => {
-            if (!bookbox.longitude || !bookbox.latitude) {
-                return false;
-            }
-            
-            const distance = this.calculateDistance(latitude, longitude, bookbox.latitude, bookbox.longitude);
-            return distance <= user.requestNotificationRadius;
-        });
-
-        // Get all unique users who follow any of these nearby bookboxes
-        const bookboxIds = nearbyBookboxes.map(bookbox => bookbox._id.toString());
-        const usersToNotify = await User.find({
-            followedBookboxes: { $in: bookboxIds }
-        });
-
-        // Notify all relevant users using the new notification system
-        for (let i = 0; i < usersToNotify.length; i++) {
-            if (usersToNotify[i].username !== user.username) {
-                await NotificationService.createNotification(
-                    usersToNotify[i]._id.toString(),
-                    ['book_request'],
-                    {
-                        bookTitle: request.body.title
-                    }
-                );
-            }
-        }
-
-        const newRequest = new Request({
-            username: user.username,
-            bookTitle: request.body.title,
-            customMessage: request.body.customMessage,
-        });
-        await newRequest.save();
-        return newRequest;
-    },
-
-    async deleteBookRequest(request: { params: { id: string } }) {
-        const requestId = request.params.id;
-        const requestToDelete = await Request.findById(requestId);
-        if (!requestToDelete) {
-            throw newErr(404, 'Request not found');
-        }
-        await requestToDelete.deleteOne();
-    },
-
-
-    async getBookRequests(request: { query: { username?: string } }) {
-        let username = request.query.username;
-        if (!username) {
-            return Request.find();
-        } else {
-            return Request.find({username: username});
-        }
-    },
-
-    // Get transaction history
-    async getTransactionHistory(request: { query: { username?: string; bookTitle?: string; bookboxId?: string; limit?: number } }) {
-        const { username, bookTitle, bookboxId, limit } = request.query;
-        
-        let filter: any = {};
-        if (username) filter.username = username;
-        if (bookTitle) filter.bookTitle = new RegExp(bookTitle, 'i');
-        if (bookboxId) filter.bookboxId = bookboxId;
-
-        let query = Transaction.find(filter).sort({ timestamp: -1 });
-        if (limit) {
-            query = query.limit(parseInt(limit.toString()));
-        }
-
-        return await query.exec();
-    },
-
-    // Create a transaction record
-    async createTransaction(username: string, action: 'added' | 'took', bookTitle: string, bookboxId: string) {
-        const transaction = new Transaction({
-            username,
-            action,
-            bookTitle,
-            bookboxId
-        });
-        await transaction.save();
-        return transaction;
-    },
-
-    // Calculate distance between two points using Haversine formula
-    calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-        const R = 6371; // Radius of the Earth in kilometers
-        const dLat = this.deg2rad(lat2 - lat1);
-        const dLon = this.deg2rad(lon2 - lon1);
-        const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distance = R * c; // Distance in kilometers
-        return distance;
-    },
-
-    // Convert degrees to radians
-    deg2rad(deg: number): number {
-        return deg * (Math.PI/180);
-    }
 };
 
 export default bookService;

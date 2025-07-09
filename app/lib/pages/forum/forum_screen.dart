@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'threads_section.dart'; // Commented out - threads functionality removed
 import 'requests_section.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
 
 class ForumScreen extends StatefulWidget {
-  String? query;
+  final String? query;
 
-  ForumScreen({super.key, this.query});
+  const ForumScreen({super.key, this.query});
 
   @override
   ForumScreenState createState() => ForumScreenState();

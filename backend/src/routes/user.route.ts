@@ -133,4 +133,14 @@ export default async function userRoutes(server: MyFastifyInstance) {
     server.post('/users/update', { preValidation: [server.authenticate], schema : updateUserSchema }, updateUser);
     server.post('/users/location', { preValidation: [server.authenticate], schema : updateUserLocationSchema }, updateUserLocation);
     server.delete('/users/clear', { preValidation: [server.adminAuthenticate], schema : clearCollectionSchema }, clearCollection);
+    server.delete('/users/notifications/clear', { preValidation: [server.adminAuthenticate] }, async (request: FastifyRequest, reply: FastifyReply) => {
+        try {
+            await UserService.clearNotifications();
+            reply.send({ message: 'Notifications cleared' });
+        } catch (error: unknown) {
+            const statusCode = (error as any).statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
+        }
+    });
 }

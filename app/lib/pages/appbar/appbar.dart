@@ -77,7 +77,7 @@ class _LinoAppBarState extends State<LinoAppBar> {
     try {
       final userService = UserService();
       final notifications = await userService.getUserNotifications(token);
-      final count = notifications['notifications'].where((n) => !n['read']).length;
+      final count = notifications.where((n) => !n['read']).length;
       print('Unread count from service: $count'); // Debug statement
       return count;
     } catch (e) {

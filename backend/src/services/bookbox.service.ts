@@ -1,10 +1,8 @@
 import BookBox from "../models/bookbox.model";
 import User from "../models/user.model";
-import Request from "../models/book.request.model";
 import Transaction from "../models/transaction.model";
 import NotificationService from "./notification.service";
 import {newErr} from "./utilities";
-import bookService from "./book.service";
 import { 
     BookAddData,
     IBook,
@@ -13,6 +11,7 @@ import {
 import { IUser } from '../types/user.types';
 import { AuthenticatedRequest } from '../types/common.types';
 import { getBoroughId } from "./borough.id.generator";
+import TransactionService from "./transaction.service";
 
 const bookboxService = {
     async getBookBox(bookBoxId: string) {
@@ -69,7 +68,7 @@ const bookboxService = {
 
         // Create transaction record
         const username = request.user ? (await User.findById(request.user.id))?.username || 'guest' : 'guest';
-        await bookService.createTransaction(username, 'added', title, bookboxId);
+        await TransactionService.createTransaction(username, 'added', title, bookboxId);
 
         // Notify users about the new book
         await NotificationService.notifyRelevantUsers(
@@ -118,7 +117,7 @@ const bookboxService = {
 
         // Create transaction record
         const username = request.user ? (await User.findById(request.user.id))?.username || 'guest' : 'guest';
-        await bookService.createTransaction(username, 'took', book.title, bookboxId);
+        await TransactionService.createTransaction(username, 'took', book.title, bookboxId);
 
         // Increment user's saved books count
         if (request.user) {

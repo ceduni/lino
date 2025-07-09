@@ -3,15 +3,10 @@ import BookService from "../services/book.service";
 import { 
     getBookInfoFromISBNSchema,
     searchBooksSchema,
-    sendBookRequestSchema,
-    deleteBookRequestSchema,
-    getBookSchema,
-    getBookRequestsSchema,
-    getTransactionHistorySchema
+    getBookSchema
 } from "../schemas/book.schemas";
 import { bookSchema } from "../schemas/models.schemas";
 import { BookSearchQuery } from "../types/book.types";
-import { AuthenticatedRequest } from "../types/common.types";
 
 
 interface Params extends RouteGenericInterface { 
@@ -43,30 +38,6 @@ async function searchBooks(request: FastifyRequest, reply: FastifyReply) {
 }
 
 
-async function sendBookRequest(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const response = await BookService.requestBookToUsers(request as AuthenticatedRequest & { 
-            body: { title: string; customMessage?: string }; 
-            query: { latitude?: number; longitude?: number } 
-        });
-        reply.code(201).send(response);
-    } catch (error : unknown) {
-        const statusCode = (error as any).statusCode || 500;
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        reply.code(statusCode).send({error: message});
-    }
-}
-
-async function deleteBookRequest(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        await BookService.deleteBookRequest(request as { params: { id: string } });
-        reply.code(204).send({message: 'Book request deleted'});
-    } catch (error : unknown) {
-        const statusCode = (error as any).statusCode || 500;
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        reply.code(statusCode).send({error: message});
-    }
-}
 
 interface GetUniqueBookParams extends RouteGenericInterface {
     Params: {
@@ -83,25 +54,6 @@ async function getBook(request: FastifyRequest<GetUniqueBookParams>, reply: Fast
     }
 }
 
-async function getBookRequests(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const response = await BookService.getBookRequests(request as { query: { username?: string } });
-        reply.code(200).send(response);
-    } catch (error : unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        reply.code(500).send({error: message});
-    }
-}
-
-async function getTransactionHistory(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const transactions = await BookService.getTransactionHistory(request as { query: { username?: string; bookTitle?: string; bookboxId?: string; limit?: number } });
-        reply.send({transactions});
-    } catch (error : unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        reply.code(500).send({error: message});
-    }
-}
 
 interface MyFastifyInstance extends FastifyInstance {
     optionalAuthenticate: (request: FastifyRequest) => void;
@@ -113,8 +65,4 @@ export default async function bookRoutes(server: MyFastifyInstance) {
     server.get('/books/:id', { schema : getBookSchema }, getBook);
     server.get('/books/info-from-isbn/:isbn', { preValidation: [server.optionalAuthenticate], schema: getBookInfoFromISBNSchema }, getBookInfoFromISBN);
     server.get('/books/search', { schema: searchBooksSchema }, searchBooks);
-    server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);
-    server.delete('/books/request/:id', { preValidation: [server.authenticate], schema: deleteBookRequestSchema }, deleteBookRequest);
-    server.get('/books/requests', { schema: getBookRequestsSchema }, getBookRequests);
-    server.get('/books/transactions', { schema: getTransactionHistorySchema }, getTransactionHistory);
 }

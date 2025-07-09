@@ -65,7 +65,7 @@ const NotificationService = {
     // Mark a notification as read
     async readNotification(request: AuthenticatedRequest & { body: { notificationId: string } }) {
         const userId = request.user.id;
-        const notificationId = request.body.notificationId;
+        const notificationId = request.body.notificationId; 
 
         const notification = await Notification.findOne({
             _id: notificationId,
@@ -123,13 +123,20 @@ const NotificationService = {
 
             // Create notification if at least one reason exists
             if (reasons.length > 0) {
+                const notificationOptions: any = {
+                    bookTitle: book.title || '',
+                    bookboxId: bookboxId
+                };
+                
+                // Only include bookId if it exists and is not empty
+                if (book._id && book._id.toString()) {
+                    notificationOptions.bookId = book._id.toString();
+                }
+                
                 await this.createNotification(
                     user._id.toString(),
                     reasons,
-                    {
-                        bookId: book._id?.toString() || '',
-                        bookboxId: bookboxId
-                    }
+                    notificationOptions
                 );
             }
         }

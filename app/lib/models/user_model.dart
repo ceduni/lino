@@ -4,9 +4,8 @@ class User {
   final String email;
   final String? phone;
   final double requestNotificationRadius;
-  final List<String> notificationKeyWords;
+  final List<String> favouriteGenres;
   final int numSavedBooks;
-  final List<Notification> notifications;
   final List<String> followedBookboxes;
   final DateTime createdAt;
 
@@ -16,9 +15,8 @@ class User {
     required this.email,
     this.phone,
     this.requestNotificationRadius = 5.0,
-    required this.notificationKeyWords,
+    required this.favouriteGenres,
     this.numSavedBooks = 0,
-    required this.notifications,
     required this.followedBookboxes,
     required this.createdAt,
   });
@@ -33,11 +31,8 @@ class User {
   }
 
   factory User.fromJson(Map<String, dynamic> json) {
-    var notificationKeyWordsList = json['notificationKeyWords'] as List? ?? [];
-    List<String> notificationKeyWords = notificationKeyWordsList.cast<String>();
-
-    var notificationsList = json['notifications'] as List? ?? [];
-    List<Notification> notifications = notificationsList.map((i) => Notification.fromJson(i)).toList();
+    var favouriteGenresList = json['favouriteGenres'] as List? ?? [];
+    List<String> favouriteGenres = favouriteGenresList.cast<String>();
 
     var followedBookboxesList = json['followedBookboxes'] as List? ?? [];
     List<String> followedBookboxes = followedBookboxesList.cast<String>();
@@ -48,9 +43,8 @@ class User {
       email: json['email'],
       phone: json['phone'],
       requestNotificationRadius: (json['requestNotificationRadius'] ?? 5.0).toDouble(),
-      notificationKeyWords: notificationKeyWords,
+      favouriteGenres: favouriteGenres,
       numSavedBooks: json['numSavedBooks'] ?? 0,
-      notifications: notifications,
       followedBookboxes: followedBookboxes,
       createdAt: DateTime.parse(json['createdAt']),
     );
@@ -58,19 +52,33 @@ class User {
 } 
 
 class Notification {
-  final DateTime timestamp;
-  final String title;
-  final String content;
-  final bool read;
+  final String userId;
+  final String? bookId;
+  final String? bookTitle;
+  final String? bookboxId;
+  final List<String> reason;
+  final bool isRead;
+  final DateTime createdAt;
 
-  Notification({required this.timestamp, required this.title, required this.content, required this.read});
+  Notification({
+    required this.userId,
+    this.bookId,
+    this.bookTitle,
+    this.bookboxId,
+    required this.reason,
+    this.isRead = false,
+    required this.createdAt,
+  });
 
-  factory Notification.fromJson(Map<String, dynamic> json) {
+  factory Notification.fromJson(Map<String, dynamic> json) { 
     return Notification(
-      timestamp: DateTime.parse(json['timestamp']),
-      title: json['title'],
-      content: json['content'],
-      read: json['read'],
+      userId: json['userId'],
+      bookId: json['bookId'],
+      bookTitle: json['bookTitle'],
+      bookboxId: json['bookboxId'],
+      reason: List<String>.from(json['reason'] ?? []),
+      isRead: json['isRead'] ?? false,
+      createdAt: DateTime.parse(json['createdAt']),
     );
   }
 }

@@ -161,6 +161,11 @@ const UserService = {
 
     async clearCollection() {
         await User.deleteMany({ username: { $ne: process.env.ADMIN_USERNAME } });
+    },
+
+    async clearNotifications() {
+        await NotificationService.clearCollection();
+        return { message: 'Notifications cleared' };
     }
 };
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/user_services.dart';
+import 'package:Lino_app/services/book_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/utils/constants/colors.dart';
@@ -24,7 +25,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     _token = prefs.getString('token')!;
     final userService = UserService();
     final response = await userService.getUserNotifications(_token);
-    return response['notifications'];
+    return response;
   }
 
   Future<void> _markAsRead(String id) async {
@@ -48,31 +49,90 @@ class _NotificationsPageState extends State<NotificationsPage> {
     });
   }
 
+  String _getNotificationTitle(dynamic notification) {
+    final List<String> reasons = List<String>.from(notification['reason'] ?? []);
+    
+    if (reasons.contains('book_request')) {
+      return 'Book Request';
+    } else {
+      return 'New Book Available';
+    }
+  }
+
+  String _getNotificationPreview(dynamic notification) {
+    final List<String> reasons = List<String>.from(notification['reason'] ?? []);
+    final String bookTitle = notification['bookTitle'] ?? '';
+    
+    if (reasons.contains('book_request')) {
+      return 'Someone is looking for "$bookTitle"';
+    } else {
+      return '"$bookTitle" is now available';
+    }
+  }
+
+  Future<String> _getBookboxName(String? bookboxId) async {
+    if (bookboxId == null || bookboxId.isEmpty) {
+      return 'a book box';
+    }
+    
+    try {
+      final bookService = BookService();
+      final bookboxData = await bookService.getBookBox(bookboxId);
+      return bookboxData['name'] ?? 'a book box';
+    } catch (e) {
+      return 'a book box';
+    }
+  }
+
   void _showNotificationDetails(BuildContext context, dynamic notification) {
+    final List<String> reasons = List<String>.from(notification['reason'] ?? []);
+    
+    String title;
+    
+    if (reasons.contains('book_request')) {
+      title = 'Book Request';
+    } else {
+      title = 'New Book Available';
+    }
+    
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(notification['title']),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                notification['content'],
-                style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-              SizedBox(height: 10.0),
-              Text(
-                timeago.format(DateTime.parse(notification['timestamp'])),
-                style: TextStyle(
-                  fontSize: 10.0,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
+          title: Text(title),
+          content: FutureBuilder<String>(
+            future: _buildNotificationContent(notification),
+            builder: (context, snapshot) {
+              String content;
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                content = 'Loading...';
+              } else if (snapshot.hasError) {
+                content = _buildNotificationContentSync(notification);
+              } else {
+                content = snapshot.data ?? _buildNotificationContentSync(notification);
+              }
+              
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    content,
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  SizedBox(height: 10.0),
+                  Text(
+                    timeago.format(DateTime.parse(notification['createdAt'])),
+                    style: TextStyle(
+                      fontSize: 10.0,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
           actions: [
             TextButton(
@@ -90,6 +150,72 @@ class _NotificationsPageState extends State<NotificationsPage> {
         _markAsRead(notification['_id']);
       }
     });
+  }
+
+  Future<String> _buildNotificationContent(dynamic notification) async {
+    final List<String> reasons = List<String>.from(notification['reason'] ?? []);
+    final String bookTitle = notification['bookTitle'] ?? '';
+    final String? bookboxId = notification['bookboxId'];
+    
+    if (reasons.contains('book_request')) {
+      return 'Someone is looking for "$bookTitle". If you have this book, please consider adding it to the nearest book box to help out!';
+    } else {
+      final String bookboxName = await _getBookboxName(bookboxId);
+      List<String> reasonMessages = [];
+      
+      if (reasons.contains('fav_bookbox')) {
+        reasonMessages.add('it was added to "$bookboxName", a book box you follow');
+      }
+      if (reasons.contains('same_borough')) {
+        reasonMessages.add('it was added to "$bookboxName", a book box near you');
+      }
+      if (reasons.contains('fav_genre')) {
+        reasonMessages.add('it matches one of your favorite genres');
+      }
+      
+      String reasonText;
+      if (reasonMessages.length == 1) {
+        reasonText = reasonMessages[0];
+      } else if (reasonMessages.length == 2) {
+        reasonText = '${reasonMessages[0]} and ${reasonMessages[1]}';
+      } else {
+        reasonText = '${reasonMessages.sublist(0, reasonMessages.length - 1).join(', ')}, and ${reasonMessages.last}';
+      }
+      
+      return 'Good news! "$bookTitle" is now available because $reasonText.';
+    }
+  }
+
+  String _buildNotificationContentSync(dynamic notification) {
+    final List<String> reasons = List<String>.from(notification['reason'] ?? []);
+    final String bookTitle = notification['bookTitle'] ?? '';
+    
+    if (reasons.contains('book_request')) {
+      return 'Someone is looking for "$bookTitle". If you have this book, please consider adding it to the nearest book box to help out!';
+    } else {
+      List<String> reasonMessages = [];
+      
+      if (reasons.contains('fav_bookbox')) {
+        reasonMessages.add('it was added to a book box you follow');
+      }
+      if (reasons.contains('same_borough')) {
+        reasonMessages.add('it was added to a book box near you');
+      }
+      if (reasons.contains('fav_genre')) {
+        reasonMessages.add('it matches one of your favorite genres');
+      }
+      
+      String reasonText;
+      if (reasonMessages.length == 1) {
+        reasonText = reasonMessages[0];
+      } else if (reasonMessages.length == 2) {
+        reasonText = '${reasonMessages[0]} and ${reasonMessages[1]}';
+      } else {
+        reasonText = '${reasonMessages.sublist(0, reasonMessages.length - 1).join(', ')}, and ${reasonMessages.last}';
+      }
+      
+      return 'Good news! "$bookTitle" is now available because $reasonText.';
+    }
   }
 
   @override
@@ -139,7 +265,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          notification['title'],
+                          _getNotificationTitle(notification),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -149,7 +275,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         ),
                         SizedBox(height: 4.0),
                         Text(
-                          notification['content'],
+                          _getNotificationPreview(notification),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -160,7 +286,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         ),
                         SizedBox(height: 4.0),
                         Text(
-                          timeago.format(DateTime.parse(notification['timestamp'])),
+                          timeago.format(DateTime.parse(notification['createdAt'])),
                           style: TextStyle(
                             fontSize: 10.0,
                             color: Colors.black,
