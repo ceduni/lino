@@ -225,16 +225,16 @@ class _NavigationPageState extends State<NavigationPage> {
                   width: double.infinity,
                   height: 32,
                   margin: const EdgeInsets.only(bottom: 0),
-                  color: Color.fromRGBO(125, 201, 236, 1),
+                  color: (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? Color.fromRGBO(0, 136, 0, 1) : Color.fromRGBO(125, 201, 236, 1)),
                   padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 16.0),
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Bookbox ${bb['name']}',
+                    'Bookbox ${bb['name']}' + (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? ' (Selected)' : ''),
                     textAlign: TextAlign.left,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(3, 51, 86, 1),
+                      color: (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? const Color.fromARGB(255, 255, 255, 255) : const Color.fromRGBO(3, 51, 86, 1)),
                     ),
                   ),
                 ),
