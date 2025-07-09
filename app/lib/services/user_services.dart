@@ -73,7 +73,7 @@ class UserService {
     return data;
   }
 
-  Future<Map<String, dynamic>> updateUser(String token, {String? username, String? password, String? email, String? phone, String? keyWords}) async {
+  Future<Map<String, dynamic>> updateUser(String token, {String? username, String? password, String? email, String? phone, List<String>? favouriteGenres, String? keyWords, double? requestNotificationRadius}) async {
     // Make a PUT request to the server
     // Send the token and the updated user information to the server
     // If the server returns a 200 status code, the user is updated
@@ -89,7 +89,9 @@ class UserService {
         'password': password,
         'email': email,
         'phone': phone,
+        'favouriteGenres': favouriteGenres,
         'keyWords': keyWords,
+        'requestNotificationRadius': requestNotificationRadius,
       }),
     );
     final data = jsonDecode(response.body);

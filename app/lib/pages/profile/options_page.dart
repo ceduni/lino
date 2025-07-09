@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:Lino_app/pages/profile/options/modify_profile_page.dart';
-import 'package:Lino_app/pages/profile/options/notification_keywords_page.dart';
+import 'package:Lino_app/pages/profile/options/favourite_genres_page.dart';
+import 'package:Lino_app/pages/profile/options/notification_radius_page.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 
 class OptionsPage extends StatefulWidget {
@@ -65,9 +66,9 @@ class _OptionsPageState extends State<OptionsPage> {
                 borderRadius: BorderRadius.circular(8.0),
               ),
               child: ListTile(
-                leading: Icon(Icons.notifications, color: Colors.black),
+                leading: Icon(Icons.favorite, color: Colors.black),
                 title: Text(
-                  'Setup Notification Keywords',
+                  'Setup Favourite Genres',
                   style: TextStyle(
                       fontWeight: FontWeight.normal, color: Colors.black),
                 ),
@@ -78,7 +79,32 @@ class _OptionsPageState extends State<OptionsPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            NotificationKeywordsPage()),
+                            FavouriteGenresPage()),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                color: LinoColors.primary,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: ListTile(
+                leading: Icon(Icons.location_on, color: Colors.black),
+                title: Text(
+                  'Request Notification Radius',
+                  style: TextStyle(
+                      fontWeight: FontWeight.normal, color: Colors.black),
+                ),
+                trailing:
+                Icon(Icons.chevron_right, color: Colors.black),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            NotificationRadiusPage()),
                   );
                 },
               ),

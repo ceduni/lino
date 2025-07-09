@@ -110,7 +110,6 @@ class ProfilePage extends HookWidget {
     }
 
     final username = userData.data!['user']['username'];
-    print(userData.data!);
 
     return Scaffold(
       appBar: AppBar(

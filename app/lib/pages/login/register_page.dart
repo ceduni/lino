@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'keyword_input_page.dart';
+import 'favourite_genres_input_page.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -224,7 +224,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     Future.delayed(Duration(seconds: 1), () {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => KeywordInputPage(token: widget.token, prefs: widget.prefs)),
+        MaterialPageRoute(builder: (context) => FavouriteGenresInputPage(token: widget.token, prefs: widget.prefs)),
             (route) => false, // Remove all previous routes
       );
     });

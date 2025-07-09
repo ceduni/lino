@@ -33,6 +33,7 @@ const requestService = {
 
         // Get all unique users who follow any of these nearby bookboxes
         const bookboxIds = nearbyBookboxes.map(bookbox => bookbox._id.toString());
+        console.log(`bookboxIds: ${bookboxIds}`);
         const usersToNotify = await User.find({
             followedBookboxes: { $in: bookboxIds }
         }); 
