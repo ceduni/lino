@@ -66,6 +66,10 @@ jobs:
           echo "tag=$(date +%Y.%m.%d)-$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_OUTPUT
         fi
         
+    - name: Set build date
+      id: build_date
+      run: echo "date=$(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_OUTPUT
+        
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
@@ -81,7 +85,7 @@ jobs:
         body: |
           **Commit Message:** ${{ steps.commit.outputs.message }}
           **Version:** ${{ steps.version.outputs.tag }}
-          **Build Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Build Date:** ${{ steps.build_date.outputs.date }}
           
           ## Changes
           Built from commit: ${{ github.sha }}
