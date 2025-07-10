@@ -35,7 +35,15 @@ jobs:
     - name: Get dependencies
       working-directory: ./app
       run: flutter pub get
-      
+  
+    - name: Create local.properties
+      working-directory: ./app/android
+      run: |
+        echo "sdk.dir=$ANDROID_HOME" > local.properties
+        echo "flutter.sdk=$FLUTTER_ROOT" >> local.properties
+        echo "googleMapsApiKey=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> local.properties
+        echo "imgbbApiKey=${{ secrets.IMGBB_API_KEY }}" >> local.properties
+
     # - name: Run tests (optional)
     #   working-directory: ./app
     #   run: flutter test
