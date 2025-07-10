@@ -83,15 +83,15 @@ class _NotificationRadiusSetupPageState extends State<NotificationRadiusSetupPag
                   children: [
                     Icon(
                       Icons.location_on,
-                      size: 60,
+                      size: 50,
                       color: Colors.white,
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 12),
                     Text(
                       'Set Your Request Radius',
                       style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 8),
                     Text(
                       'How far are you willing to travel to pick up books you request?',
                       style: TextStyle(color: Colors.white70, fontSize: 16),
@@ -108,7 +108,7 @@ class _NotificationRadiusSetupPageState extends State<NotificationRadiusSetupPag
                   children: [
                     // Current radius display
                     Container(
-                      padding: EdgeInsets.all(20),
+                      padding: EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(15),
@@ -120,11 +120,11 @@ class _NotificationRadiusSetupPageState extends State<NotificationRadiusSetupPag
                             '${_radius.toInt()} km',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 48,
+                              fontSize: 42,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          SizedBox(height: 6),
                           Text(
                             _getRadiusDescription(_radius),
                             style: TextStyle(
@@ -137,14 +137,14 @@ class _NotificationRadiusSetupPageState extends State<NotificationRadiusSetupPag
                       ),
                     ),
                     
-                    SizedBox(height: 30),
+                    SizedBox(height: 20),
                     
                     // Slider
                     Text(
                       'Adjust your radius:',
                       style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 12),
                     
                     SliderTheme(
                       data: SliderTheme.of(context).copyWith(
@@ -169,23 +169,23 @@ class _NotificationRadiusSetupPageState extends State<NotificationRadiusSetupPag
                       ),
                     ),
                     
-                    SizedBox(height: 30),
+                    SizedBox(height: 20),
                     
                     // Info box
                     Container(
-                      padding: EdgeInsets.all(16),
+                      padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.info_outline, color: Colors.white70, size: 20),
-                          SizedBox(width: 12),
+                          Icon(Icons.info_outline, color: Colors.white70, size: 18),
+                          SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               'When you request a book, users following bookboxes within this radius will be notified.',
-                              style: TextStyle(color: Colors.white70, fontSize: 14),
+                              style: TextStyle(color: Colors.white70, fontSize: 13),
                             ),
                           ),
                         ],

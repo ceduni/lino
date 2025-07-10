@@ -47,7 +47,7 @@ class _FavouriteGenresPageState extends State<FavouriteGenresPage> {
             .where((genre) => genre.toLowerCase().contains(query))
             .where((genre) => !_selectedGenres.contains(genre))
             .toList();
-        _showSuggestions = _filteredGenres.isNotEmpty;
+        _showSuggestions = _filteredGenres.isNotEmpty; 
       }
     });
   }
@@ -143,10 +143,41 @@ class _FavouriteGenresPageState extends State<FavouriteGenresPage> {
     Navigator.pop(context);
   }
 
+  Widget _buildHighlightedText(String text, String query) {
+    if (query.isEmpty) {
+      return Text(text);
+    }
+
+    final lowerText = text.toLowerCase();
+    final lowerQuery = query.toLowerCase();
+    final index = lowerText.indexOf(lowerQuery);
+
+    if (index == -1) {
+      return Text(text);
+    }
+
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(color: Colors.black),
+        children: [
+          if (index > 0)
+            TextSpan(text: text.substring(0, index)),
+          TextSpan(
+            text: text.substring(index, index + query.length),
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+          if (index + query.length < text.length)
+            TextSpan(text: text.substring(index + query.length)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF4277B8),
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text('Setup Favourite Genres'),
         backgroundColor: Color(0xFF4277B8),
@@ -214,6 +245,7 @@ class _FavouriteGenresPageState extends State<FavouriteGenresPage> {
                         if (_showSuggestions)
                           Container(
                             margin: EdgeInsets.only(top: 8),
+                            height: 200, // Fixed height for scrolling
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(8),
@@ -225,14 +257,17 @@ class _FavouriteGenresPageState extends State<FavouriteGenresPage> {
                                 ),
                               ],
                             ),
-                            child: Column(
-                              children: _filteredGenres.map((genre) {
+                            child: ListView.builder(
+                              itemCount: _filteredGenres.length,
+                              itemBuilder: (context, index) {
+                                final genre = _filteredGenres[index];
+                                final query = _genreController.text.toLowerCase();
                                 return ListTile(
-                                  title: Text(genre),
+                                  title: _buildHighlightedText(genre, query),
                                   onTap: () => _addGenre(genre),
                                   dense: true,
                                 );
-                              }).toList(),
+                              },
                             ),
                           ),
                       ],
