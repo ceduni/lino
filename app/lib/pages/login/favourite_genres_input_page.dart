@@ -65,7 +65,6 @@ class _FavouriteGenresInputPageState extends State<FavouriteGenresInputPage> {
         _filteredGenres = _availableGenres
             .where((genre) => genre.toLowerCase().contains(query))
             .where((genre) => !_selectedGenres.contains(genre))
-            .take(5)
             .toList();
         _showSuggestions = _filteredGenres.isNotEmpty;
       }

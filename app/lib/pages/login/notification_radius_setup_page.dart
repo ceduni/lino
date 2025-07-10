@@ -17,8 +17,6 @@ class _NotificationRadiusSetupPageState extends State<NotificationRadiusSetupPag
   double _radius = 5.0; // Default radius in kilometers
   bool _isLoading = false;
 
-  // Predefined radius options
-  final List<double> _radiusOptions = [1.0, 2.0, 5.0, 10.0];
 
   Future<void> _continue() async {
     setState(() {
@@ -169,45 +167,6 @@ class _NotificationRadiusSetupPageState extends State<NotificationRadiusSetupPag
                           });
                         },
                       ),
-                    ),
-                    
-                    SizedBox(height: 20),
-                    
-                    // Quick selection buttons
-                    Text(
-                      'Quick select:',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    SizedBox(height: 12),
-                    
-                    Wrap(
-                      spacing: 8.0,
-                      runSpacing: 8.0,
-                      children: _radiusOptions.map((option) {
-                        final isSelected = _radius == option;
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _radius = option;
-                            });
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: isSelected ? Colors.white : Colors.transparent,
-                              border: Border.all(color: Colors.white, width: 1.5),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              '${option.toInt()} km',
-                              style: TextStyle(
-                                color: isSelected ? Color(0xFF4277B8) : Colors.white,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
                     ),
                     
                     SizedBox(height: 30),

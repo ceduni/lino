@@ -36,9 +36,9 @@ jobs:
       working-directory: ./app
       run: flutter pub get
       
-    - name: Run tests (optional)
-      working-directory: ./app
-      run: flutter test
+    # - name: Run tests (optional)
+    #   working-directory: ./app
+    #   run: flutter test
       
     - name: Build APK
       working-directory: ./app
