@@ -1,0 +1,92 @@
+name: Flutter Build APK
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'app/**'  # Only trigger when files in app/ directory change
+  workflow_dispatch:  # Allow manual trigger
+    inputs:
+      version_tag:
+        description: 'Version tag (e.g., 1.2.3456)'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '11'
+        
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.32.5' 
+        channel: 'stable'
+        
+    - name: Get dependencies
+      working-directory: ./app
+      run: flutter pub get
+      
+    - name: Run tests (optional)
+      working-directory: ./app
+      run: flutter test
+      
+    - name: Build APK
+      working-directory: ./app
+      run: flutter build apk --release
+      
+    - name: Get commit message
+      id: commit
+      run: echo "message=$(git log --format=%B -n 1 ${{ github.sha }} | head -n 1)" >> $GITHUB_OUTPUT
+      
+    - name: Set version tag
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "tag=${{ github.event.inputs.version_tag }}" >> $GITHUB_OUTPUT
+        else
+          # Generate automatic version based on timestamp or commit short hash
+          echo "tag=$(date +%Y.%m.%d)-$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: apk-${{ steps.version.outputs.tag }}
+        path: app/build/app/outputs/flutter-apk/app-release.apk
+        
+    - name: Create Release (if manual trigger)
+      if: github.event_name == 'workflow_dispatch'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.version.outputs.tag }}
+        release_name: Release ${{ steps.version.outputs.tag }}
+        body: |
+          **Commit:** ${{ steps.commit.outputs.message }}
+          **Version:** ${{ steps.version.outputs.tag }}
+          
+          APK built from commit: ${{ github.sha }}
+        draft: false
+        prerelease: false
+        
+    - name: Upload Release Asset
+      if: github.event_name == 'workflow_dispatch'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: app/build/app/outputs/flutter-apk/app-release.apk
+        asset_name: app-${{ steps.version.outputs.tag }}.apk
+        asset_content_type: application/vnd.android.package-archive
