@@ -117,10 +117,10 @@ class BookBoxSelectionDialog extends StatelessWidget {
             ),
           if (bookBoxController.isAutoSelected.value)
             const SizedBox(height: 8.0),
-          Text(
-            'Selected Bookbox: ${bookBoxController.selectedBookBox['name']}',
-            style: TextStyle(fontWeight: FontWeight.w500),
-          ),
+          //Text(
+            //'Selected Bookbox: ${bookBoxController.selectedBookBox['name']}',
+            //style: TextStyle(fontWeight: FontWeight.w500),
+          //),
           const SizedBox(height: 8.0),
           Text('Number of books: ${bookBoxController.selectedBookBox['books'].length}'),
           if (bookBoxController.selectedBookBox['distance'] != null)

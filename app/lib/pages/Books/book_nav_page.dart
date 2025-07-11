@@ -26,10 +26,10 @@ class _NavigationPageState extends State<NavigationPage> {
   @override
   void initState() {
     super.initState();
-    _getUserLocation();
+    // _getUserLocation();
     _loadBookBoxes();
     
-    // Listen to changes in the selected bookbox
+    
     globalState.currentSelectedBookBox.listen((_) {
       if (mounted) {
         setState(() {});
@@ -60,9 +60,9 @@ class _NavigationPageState extends State<NavigationPage> {
           desiredAccuracy: LocationAccuracy.high);
       
       // Initialize closest bookbox selection after the build is complete
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _setClosestBookBoxIfNone();
-      });
+      //WidgetsBinding.instance.addPostFrameCallback((_) {
+        //_setClosestBookBoxIfNone();
+      //});
       
       // pour forcer le reload
       if (mounted) {
@@ -144,10 +144,10 @@ class _NavigationPageState extends State<NavigationPage> {
         isLoading = false;
       });
       
-      // Initialize closest bookbox selection after the build is complete
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _setClosestBookBoxIfNone();
-      });
+      // 
+      //WidgetsBinding.instance.addPostFrameCallback((_) {
+        // _setClosestBookBoxIfNone();
+      //});
       
       if (userLocation == null) {
         await Future.delayed(Duration(milliseconds: 500));
@@ -180,6 +180,7 @@ class _NavigationPageState extends State<NavigationPage> {
             onPressed: _toggleViewMode,
           ),
         ],
+        /* 
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(50.0),
           child: Center(
@@ -207,7 +208,7 @@ class _NavigationPageState extends State<NavigationPage> {
               ),
             ),
           ),
-        ),
+        ),*/
         
       ),
       body: isLoading
@@ -225,16 +226,16 @@ class _NavigationPageState extends State<NavigationPage> {
                   width: double.infinity,
                   height: 32,
                   margin: const EdgeInsets.only(bottom: 0),
-                  color: (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? Color.fromRGBO(0, 136, 0, 1) : Color.fromRGBO(125, 201, 236, 1)),
+                  color: Color.fromRGBO(125, 201, 236, 1), // (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? Color.fromRGBO(0, 136, 0, 1) : Color.fromRGBO(125, 201, 236, 1)),
                   padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 16.0),
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Bookbox ${bb['name']}' + (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? ' (Selected)' : ''),
+                    'Bookbox ${bb['name']}', //+ (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? ' (Selected)' : ''),
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? const Color.fromARGB(255, 255, 255, 255) : const Color.fromRGBO(3, 51, 86, 1)),
+                      color: const Color.fromRGBO(3, 51, 86, 1), // (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? const Color.fromARGB(255, 255, 255, 255) : const Color.fromRGBO(3, 51, 86, 1)),
                     ),
                   ),
                 ),

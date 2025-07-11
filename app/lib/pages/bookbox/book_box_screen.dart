@@ -256,6 +256,7 @@ class SelectBookBoxButton extends StatelessWidget {
           ),
         ],
       ),
+      /*
       child: TextButton(
         onPressed: () {
           globalState.setSelectedBookBox(bookBoxData);
@@ -284,7 +285,7 @@ class SelectBookBoxButton extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      ),*/
     );
   }
 }

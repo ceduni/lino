@@ -46,11 +46,11 @@ class MapScreen extends HookWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Book Boxes'),
-              if (selectedBookBox != null)
-                Text(
-                  'Selected bookbox : ${selectedBookBox['name']}',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
-                ),
+              //if (selectedBookBox != null)
+                //Text(
+                  //'Selected bookbox : ${selectedBookBox['name']}',
+                  //style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+                //),
             ],
           );
         }),
@@ -101,7 +101,7 @@ class MapScreen extends HookWidget {
               
               List<Marker> markers = bboxes
                   .map((bbox) {
-                    final isSelected = selectedBookBox != null && bbox['id'] == selectedBookBox['id'];
+                    // final isSelected = selectedBookBox != null && bbox['id'] == selectedBookBox['id'];
                     
                     return Marker(
                       markerId: MarkerId(bbox['id']),
@@ -110,9 +110,9 @@ class MapScreen extends HookWidget {
                         title: bbox['name'],
                         snippet: bbox['infoText'],
                       ),
-                      icon: isSelected 
-                          ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
-                          : BitmapDescriptor.defaultMarker,
+                      // icon: isSelected 
+                          //? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
+                      icon : BitmapDescriptor.defaultMarker,
                       onTap: () {
                         bookBoxController.highlightBookBox(bbox['id']);
                       },
@@ -154,7 +154,7 @@ class MapScreen extends HookWidget {
 
                   return Obx(() {
                     final selectedBookBox = globalState.currentSelectedBookBox.value;
-                    final isSelected = selectedBookBox != null && bbox['id'] == selectedBookBox['id'];
+                    // final isSelected = selectedBookBox != null && bbox['id'] == selectedBookBox['id'];
                     
                     return Opacity(
                       opacity: highlightedBookBoxId == bbox['id'] ||
@@ -165,7 +165,7 @@ class MapScreen extends HookWidget {
                         margin:
                         EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                         decoration: BoxDecoration(
-                          color: isSelected ? Colors.green : LinoColors.secondary,
+                          color: LinoColors.secondary,// isSelected ? Colors.green : LinoColors.secondary,
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: ListTile(
