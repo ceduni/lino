@@ -8,6 +8,7 @@ import 'package:Lino_app/pages/forum/forum_screen.dart';
 import 'package:Lino_app/pages/appbar/observable_appbar.dart';
 import 'package:Lino_app/pages/search_bar/results_screen.dart';
 import 'package:Lino_app/pages/search_bar/search_bar.dart' as sb;
+import 'package:Lino_app/pages/profile/profile_page.dart';
 
 class BookNavPage extends StatelessWidget {
   const BookNavPage({super.key});
@@ -71,16 +72,24 @@ class BookNavPage extends StatelessWidget {
       labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       destinations: const [
         NavigationDestination(
-          icon: Icon(Icons.book),
-          label: 'Books',
+          icon: Icon(Icons.home),
+          label: 'Home',
         ),
         NavigationDestination(
+          icon: Icon(Icons.search),
+          label: 'Search',
+        ),
+        /*NavigationDestination(
           icon: Icon(Icons.map),
           label: 'Map',
-        ),
+        ),*/
         NavigationDestination(
           icon: Icon(Icons.chat),
           label: 'Requests',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.person),
+          label: 'Profile',
         ),
       ],
     );
@@ -100,8 +109,10 @@ class NavigationController extends GetxController {
     forumQuery = '';
     screens = [
       NavigationPage(),
-      MapScreen(),
+      NavigationPage(),
+      //MapScreen(),
       ForumScreen(key: forumScreenKey, query: forumQuery),
+      ProfilePage()
     ];
   }
 

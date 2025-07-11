@@ -100,42 +100,44 @@ class _LinoAppBarState extends State<LinoAppBar> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      if (!isLoggedIn) {
-                        Navigator.of(context).pushReplacementNamed('/login');
-                      } else {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ProfilePage(),
-                          ),
-                        );
-                      }
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isLoggedIn ? Icons.person : Icons.login,
-                          color: isLoggedIn ? Colors.white : Colors.red,
-                        ),
-                        SizedBox(height: 2), // Minimal space between icon and text
-                        Text(
-                          isLoggedIn ? 'Profile' : 'Log In',
-                          style: isLoggedIn ? TextStyle(color: Colors.white) : TextStyle(color: Colors.red),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 8.0),
+                //   child: GestureDetector(
+                //     onTap: () {
+                //       if (!isLoggedIn) {
+                //         Navigator.of(context).pushReplacementNamed('/login');
+                //       } else {
+                //         Navigator.of(context).push(
+                //           MaterialPageRoute(
+                //             builder: (context) => ProfilePage(),
+                //           ),
+                //         );
+                //       }
+                //     },
+                //     child: Column(
+                //       mainAxisSize: MainAxisSize.min,
+                //       
+                //       children: [
+                //         Icon(
+                //           isLoggedIn ? Icons.person : Icons.login,
+                //           color: isLoggedIn ? Colors.white : Colors.red,
+                //         ),
+                //         SizedBox(height: 2), // Minimal space between icon and text
+                //         Text(
+                //           isLoggedIn ? 'Profile' : 'Log In',
+                //           style: isLoggedIn ? TextStyle(color: Colors.white) : TextStyle(color: Colors.red),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6.0),
                     child: LinoSearchBar(sourcePage: widget.sourcePage),
                   ),
                 ),
+                
                 if (isLoggedIn)
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
