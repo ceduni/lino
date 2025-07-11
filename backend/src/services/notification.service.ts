@@ -104,9 +104,12 @@ const NotificationService = {
                 reasons.push('fav_bookbox');
             }
 
-            // Check if user is in the same borough
-            if (user.boroughId && user.boroughId === bookBox.boroughId) {
-                reasons.push('same_borough');
+            // Check if the borough matches one of the user's favourite locations
+            for (const location of user.favouriteLocations) {
+                if (location.boroughId === bookBox.boroughId) {
+                    reasons.push('same_borough');
+                    break; // Exit early since we only need to find one match
+                }
             }
 
             // Check if book categories match user's favourite genres

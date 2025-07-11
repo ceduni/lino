@@ -7,7 +7,15 @@ const userSchema = new mongoose.Schema({
     phone: { type: String },
     requestNotificationRadius: { type: Number, default: 5 }, // Default radius in km
     favouriteGenres: { type: [String], default: [] }, // Array of favourite book genres
-    boroughId: { type: String }, // Borough ID for location-based notifications
+    favouriteLocations: {
+        type: [
+            {
+                latitude: { type: Number, required: true },
+                longitude: { type: Number, required: true },
+                boroughId: { type: String, required: true } // ID of the borough
+            }
+        ]
+    },
     numSavedBooks: { type: Number, default: 0 },
     followedBookboxes: { type: [String], default: [] }, // Array of bookbox IDs
     createdAt: { type: Date, default: Date.now },

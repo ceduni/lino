@@ -1,5 +1,7 @@
 // Model schemas that match the actual Mongoose models
 
+import { de } from "@faker-js/faker";
+
 export const bookSchema = {
     type: 'object', 
     properties: {
@@ -41,7 +43,19 @@ export const userSchema = {
         phone: { type: 'string' },
         requestNotificationRadius: { type: 'number', default: 5 },
         favouriteGenres: { type: 'array', items: { type: 'string' } },
-        boroughId: { type: 'string' },
+        favouriteLocations: { 
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    latitude: { type: 'number' },
+                    longitude: { type: 'number' },
+                    boroughId: { type: 'string' } // ID of the borough
+                },
+                required: ['latitude', 'longitude', 'boroughId']
+            },
+            default: []
+        },
         numSavedBooks: { type: 'number' },
         followedBookboxes: { type: 'array', items: { type: 'string' } },
         createdAt: { type: 'string', format: 'date-time' }

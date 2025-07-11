@@ -125,9 +125,6 @@ const UserService = {
         if (request.body.favouriteGenres) {
             user.favouriteGenres = request.body.favouriteGenres;
         }
-        if (request.body.boroughId) {
-            user.boroughId = request.body.boroughId;
-        }
         if (request.body.requestNotificationRadius !== undefined) {
             user.requestNotificationRadius = request.body.requestNotificationRadius;
         }
@@ -135,7 +132,7 @@ const UserService = {
         return user;
     },
 
-    async updateUserLocation(request: AuthenticatedRequest & { 
+    async addUserFavLocation(request: AuthenticatedRequest & { 
         body: { 
             latitude: number; 
             longitude: number; 
@@ -153,10 +150,41 @@ const UserService = {
 
         // Get borough ID from coordinates
         const boroughId = await getBoroughId(latitude, longitude);
-        user.boroughId = boroughId;
+        user.favouriteLocations.push({
+            latitude: latitude,
+            longitude: longitude,
+            boroughId: boroughId
+        });
         
         await user.save();
         return { user, boroughId };
+    },
+
+    async deleteUserFavLocation(request: AuthenticatedRequest & { 
+        body: { 
+            latitude: number; 
+            longitude: number; 
+        } 
+    }) {
+        const user = await User.findById(request.user.id);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }   
+        const { latitude, longitude } = request.body;
+        if (!latitude || !longitude) {
+            throw newErr(400, 'Latitude and longitude are required');
+        }   
+        // Find the index of the location to remove
+        const index = user.favouriteLocations.findIndex(location => 
+            location.latitude === latitude &&
+            location.longitude === longitude
+        );
+        if (index === -1) {
+            throw newErr(404, 'Location not found in favourites');
+        }
+        // Remove the location from the array
+        user.favouriteLocations.splice(index, 1);   
+        await user.save();
     },
 
     async clearCollection() {

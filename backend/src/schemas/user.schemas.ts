@@ -1,3 +1,4 @@
+import { fa } from '@faker-js/faker';
 import { userSchema, notificationSchema } from './models.schemas';
 
 export const registerUserSchema = {
@@ -178,7 +179,6 @@ export const updateUserSchema = {
             password: { type: 'string' },
             phone: { type: 'string' },
             favouriteGenres: { type: 'array', items: { type: 'string' } },
-            boroughId: { type: 'string' },
             requestNotificationRadius: { type: 'number', minimum: 0 }
         }
     },
@@ -200,8 +200,8 @@ export const updateUserSchema = {
     }
 };
 
-export const updateUserLocationSchema = {
-    description: 'Update user location and borough ID',
+export const addUserFavLocationSchema = {
+    description: 'Add user favourite location',
     tags: ['users'],
     headers: {
         type: 'object',
@@ -220,11 +220,11 @@ export const updateUserLocationSchema = {
     },
     response: {
         200: {
-            description: 'User location updated',
+            description: 'Location added to user\'s favourite locations',
             type: 'object',
             properties: {
                 user: userSchema,
-                boroughId: { type: 'string' }
+                boroughId: { type: 'string' } // ID of the borough where the location is
             }
         },
         400: {
@@ -236,6 +236,42 @@ export const updateUserLocationSchema = {
         },
         404: {
             description: 'User not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+
+export const deleteUserFavLocationSchema = {
+    description: 'Delete user favourite location',
+    tags: ['users'],
+    headers: {
+        type: 'object',
+        required: ['authorization'],
+        properties: {
+            authorization: {type: 'string'} // JWT token
+        }
+    },
+    body: {
+        type: 'object',
+        required: ['latitude', 'longitude'],
+        properties: {
+            latitude: { type: 'number', minimum: -90, maximum: 90 },
+            longitude: { type: 'number', minimum: -180, maximum: 180 }
+        }
+    },
+    response: {
+        200: {
+            description: 'Location removed from user\'s favourite locations',
+            type: 'object',
+            properties: {
+                message: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'User or location not found',
             type: 'object',
             properties: {
                 error: { type: 'string' }

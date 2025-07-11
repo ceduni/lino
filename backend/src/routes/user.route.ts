@@ -8,8 +8,9 @@ import {
     getUserNotificationsSchema,
     readNotificationSchema,
     updateUserSchema,
-    updateUserLocationSchema,
-    clearCollectionSchema
+    addUserFavLocationSchema,
+    clearCollectionSchema,
+    deleteUserFavLocationSchema
 } from "../schemas/user.schemas";
 import { userSchema } from "../schemas/models.schemas";
 import { UserRegistrationData, UserLoginCredentials } from "../types/user.types";
@@ -93,15 +94,31 @@ async function updateUser(request : FastifyRequest, reply : FastifyReply) {
     }
 }
 
-async function updateUserLocation(request : FastifyRequest, reply : FastifyReply) {
+async function addUserFavLocation(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const result = await UserService.updateUserLocation(request as AuthenticatedRequest & { 
+        const result = await UserService.addUserFavLocation(request as AuthenticatedRequest & { 
             body: { 
                 latitude: number; 
                 longitude: number; 
             } 
         });
         reply.send(result);
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
+    }
+}
+
+async function deleteUserFavLocation(request : FastifyRequest, reply : FastifyReply) {
+    try {
+        await UserService.deleteUserFavLocation(request as AuthenticatedRequest & { 
+            body: { 
+                latitude: number; 
+                longitude: number; 
+            } 
+        });
+        reply.send({ message: 'Location removed from favourites' });
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -131,7 +148,8 @@ export default async function userRoutes(server: MyFastifyInstance) {
     server.post('/users/register', { schema : registerUserSchema }, registerUser);
     server.post('/users/login', { schema : loginUserSchema }, loginUser);
     server.post('/users/update', { preValidation: [server.authenticate], schema : updateUserSchema }, updateUser);
-    server.post('/users/location', { preValidation: [server.authenticate], schema : updateUserLocationSchema }, updateUserLocation);
+    server.post('/users/location', { preValidation: [server.authenticate], schema : addUserFavLocationSchema }, addUserFavLocation);
+    server.delete('/users/location', { preValidation: [server.authenticate], schema : deleteUserFavLocationSchema }, deleteUserFavLocation);
     server.delete('/users/clear', { preValidation: [server.adminAuthenticate], schema : clearCollectionSchema }, clearCollection);
     server.delete('/users/notifications/clear', { preValidation: [server.adminAuthenticate] }, async (request: FastifyRequest, reply: FastifyReply) => {
         try {
