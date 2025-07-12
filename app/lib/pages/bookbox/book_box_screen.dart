@@ -1,3 +1,4 @@
+import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/services/bookbox_state_service.dart';
 import 'package:Lino_app/utils/constants/sizes.dart';
@@ -20,7 +21,7 @@ class BookBoxScreen extends StatefulWidget {
 
 class _BookBoxScreenState extends State<BookBoxScreen> {
   final BookBoxStateService _stateService = Get.find<BookBoxStateService>();
-  Future<Map<String, dynamic>>? _bookBoxDataFuture;
+  Future<BookBox>? _bookBoxDataFuture;
 
   @override
   void initState() {
@@ -41,22 +42,25 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
     });
   }
 
-  Future<Map<String, dynamic>> _getBookBoxData(String bookBoxId) async {
+  Future<BookBox> _getBookBoxData(String bookBoxId) async {
     var bb = await BookService().getBookBox(bookBoxId);
-    return {
-      'name': bb['name'],
-      'image': bb['image'],
-      'infoText': bb['infoText'],
-      'location': LatLng(bb['latitude'].toDouble(), bb['longitude'].toDouble()),
-      'books': bb['books']
-    };
+    return BookBox(
+      id: bb.id,
+      name: bb.name,
+      image: bb.image,
+      infoText: bb.infoText,
+      longitude: bb.longitude,
+      latitude: bb.latitude,
+      boroughId: bb.boroughId,
+      books: bb.books
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: FutureBuilder<Map<String, dynamic>>(
+      child: FutureBuilder<BookBox>(
         future: _bookBoxDataFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -72,12 +76,12 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
     );
   }
 
-  Widget buildContent(BuildContext context, Map<String, dynamic> data) {
-    final bbName = data['name'];
-    final bbImage = data['image'];
-    final bbInfoText = data['infoText'];
-    final bbLocation = data['location'];
-    final bbBooks = data['books'];
+  Widget buildContent(BuildContext context, BookBox data) {
+    final bbName = data.name;
+    final bbImage = data.image;
+    final bbInfoText = data.infoText;
+    final bbLocation = LatLng(data.latitude, data.longitude);
+    final bbBooks = data.books;
     return SingleChildScrollView(
       child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,7 +122,7 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
                   const SizedBox(height: 15),
                   Center(
                     child: BookInBookBoxRow(
-                      books: (bbBooks as List<dynamic>).map((item) => item as Map<String, dynamic>).toList(),
+                      books: bbBooks,
                       bbid: widget.bookBoxId,
                     ),
                   ),
@@ -133,17 +137,17 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
 
 class BookBoxTitleContainer extends StatelessWidget {
   final String bbName;
-  final String bbInfoText;
-  final String bbImageLink;
+  final String? bbInfoText;
+  final String? bbImageLink;
   final LatLng bbLocation;
 
-  const BookBoxTitleContainer({super.key, required this.bbName, required this.bbInfoText, required this.bbImageLink, required this.bbLocation});
+  const BookBoxTitleContainer({super.key, required this.bbName, this.bbInfoText, this.bbImageLink, required this.bbLocation});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(250, 250, 240, 1).withOpacity(0.9),
+        color: const Color.fromRGBO(250, 250, 240, 1).withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(10),
       ),
       padding: const EdgeInsets.all(16.0),
@@ -155,7 +159,7 @@ class BookBoxTitleContainer extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             image: DecorationImage(
-              image: Image.network(bbImageLink).image,
+              image: Image.network(bbImageLink ?? '').image,
               fit: BoxFit.cover,
             ),
           ),
@@ -249,7 +253,7 @@ class SelectBookBoxButton extends StatelessWidget {
         color: Colors.green.shade600,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             spreadRadius: 0.5,
             blurRadius: 3,
             offset: const Offset(0, 3),

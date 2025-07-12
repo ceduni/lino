@@ -62,7 +62,7 @@ export const searchBooksSchema = {
                 books: {
                     type: 'array',
                     items: {
-                        type: 'object',
+                        type: 'object', 
                         properties: {
                             _id: { type: 'string' },
                             isbn: { type: 'string' },
@@ -74,7 +74,7 @@ export const searchBooksSchema = {
                             categories: { type: 'array', items: { type: 'string' } },
                             parutionYear: { type: 'number' },
                             pages: { type: 'number' },
-                            dateLastAction: { type: 'string' },
+                            dateAdded: { type: 'string' },
                             bookboxId: { type: 'string' },
                             bookboxName: { type: 'string' }
                         }

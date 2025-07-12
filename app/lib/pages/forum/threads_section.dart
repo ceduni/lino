@@ -36,7 +36,7 @@ class ThreadsSectionState extends State<ThreadsSection> {
     if (token != null) {
       final user = await UserService().getUser(token);
       setState(() {
-        currentUsername = user['user']['username'];
+        currentUsername = user.username;
       });
     }
   }
@@ -85,15 +85,12 @@ class ThreadsSectionState extends State<ThreadsSection> {
                       case 'with most recent activity':
                         selectedOrder = 'by recent activity';
                         ascending = false;
-                        break;
                       case 'created most recently':
                         selectedOrder = 'by creation date';
                         ascending = false;
-                        break;
                       case 'with the most number of messages':
                         selectedOrder = 'by number of messages';
                         ascending = false;
-                        break;
                     }
                   });
                   fetchThreadTiles(q: widget.query, cls: selectedOrder, asc: ascending);
@@ -127,16 +124,15 @@ class ThreadsSectionState extends State<ThreadsSection> {
 
   Future<List<Card>> getThreadTiles(BuildContext context, {String? q, String? cls, bool? asc}) async {
     final ts = ThreadService();
-    final r = await ts.searchThreads(q: q, cls: cls, asc: asc);
-    final threads = r['threads'] as List<dynamic>;
+    final threads = await ts.searchThreads(q: q, cls: cls, asc: asc);
 
     return threads.map((thread) {
-      final DateTime timestamp = DateTime.parse(thread['timestamp']);
+      final DateTime timestamp = DateTime.parse(thread.timestamp.toIso8601String());
       final String timeAgo = timeago.format(timestamp);
 
-      final threadTitle = thread['title'];
-      final bookTitle = thread['bookTitle'];
-      final isOwner = thread['username'] == currentUsername;
+      final threadTitle = thread.title;
+      final bookTitle = thread.bookTitle;
+      final isOwner = thread.username == currentUsername;
 
       if (isOwner) {
         return Card(
@@ -144,10 +140,10 @@ class ThreadsSectionState extends State<ThreadsSection> {
           color: LinoColors.accent,
           child: GestureDetector(
             onLongPress: () {
-              _showDeleteDialog(context, thread['_id'], threadTitle);
+              _showDeleteDialog(context, thread.id, threadTitle);
             },
             child: Dismissible(
-              key: Key(thread['_id']),
+              key: Key(thread.id),
               direction: DismissDirection.endToStart,
               background: Container(
                 alignment: Alignment.centerRight,
@@ -159,24 +155,24 @@ class ThreadsSectionState extends State<ThreadsSection> {
                 child: Icon(Icons.delete, color: Colors.white),
               ),
               confirmDismiss: (direction) async {
-                return await _showDeleteDialog(context, thread['_id'], threadTitle);
+                return await _showDeleteDialog(context, thread.id, threadTitle);
               },
               child: ListTile(
-                leading: _buildBookCover(thread['image'], bookTitle),
+                leading: _buildBookCover(thread.image, bookTitle),
                 title: Text('$bookTitle : $threadTitle'),
                 subtitle: Text('Thread created $timeAgo'),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.person),
-                    Text(thread['username']),
+                    Text(thread.username),
                   ],
                 ),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ThreadMessagesScreen(threadId: thread['_id'], title: threadTitle),
+                      builder: (context) => ThreadMessagesScreen(threadId: thread.id, title: threadTitle),
                     ),
                   );
                 },
@@ -189,21 +185,21 @@ class ThreadsSectionState extends State<ThreadsSection> {
           margin: EdgeInsets.symmetric(vertical: 10),
           color: LinoColors.secondary,
           child: ListTile(
-            leading: _buildBookCover(thread['image'], bookTitle),
+            leading: _buildBookCover(thread.image, bookTitle),
             title: Text('$bookTitle : $threadTitle'),
             subtitle: Text('Thread created $timeAgo'),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.person),
-                Text(thread['username']),
+                Text(thread.username),
               ],
             ),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ThreadMessagesScreen(threadId: thread['_id'], title: threadTitle),
+                  builder: (context) => ThreadMessagesScreen(threadId: thread.id, title: threadTitle),
                 ),
               );
             },

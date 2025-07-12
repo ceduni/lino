@@ -22,12 +22,11 @@ class SearchController extends GetxController {
     if (query.isEmpty) {
       results.clear();
     } else {
-      var bookDict = await BookService().searchBooks(kw: query);
-      var bookResults = bookDict['books'];
+      var bookResults = await BookService().searchBooks(kw: query);
       results.clear();
-      bookResults.forEach((book) {
-        results.add(book['title']);
-      });
+      for (var book in bookResults) {
+        results.add(book.title);
+      }
     }
   }
 

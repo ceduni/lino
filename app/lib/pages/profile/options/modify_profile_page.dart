@@ -31,10 +31,10 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
     final user = await userService.getUser(_token);
 
     setState(() {
-      _usernameController = TextEditingController(text: user['user']['username'] ?? '');
+      _usernameController = TextEditingController(text: user.username);
       _passwordController = TextEditingController(text: '');
-      _emailController = TextEditingController(text: user['user']['email'] ?? '');
-      _phoneController = TextEditingController(text: user['user']['phone'] ?? '');
+      _emailController = TextEditingController(text: user.email);
+      _phoneController = TextEditingController(text: user.phone ?? '');
       _isLoading = false;
     });
   }

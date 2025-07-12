@@ -104,17 +104,17 @@ class MapScreen extends HookWidget {
                     // final isSelected = selectedBookBox != null && bbox['id'] == selectedBookBox['id'];
                     
                     return Marker(
-                      markerId: MarkerId(bbox['id']),
-                      position: LatLng(bbox['latitude'], bbox['longitude']),
+                      markerId: MarkerId(bbox.id),
+                      position: LatLng(bbox.latitude, bbox.longitude),
                       infoWindow: InfoWindow(
-                        title: bbox['name'],
-                        snippet: bbox['infoText'],
+                        title: bbox.name,
+                        snippet: bbox.infoText ?? '',
                       ),
                       // icon: isSelected 
                           //? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
                       icon : BitmapDescriptor.defaultMarker,
                       onTap: () {
-                        bookBoxController.highlightBookBox(bbox['id']);
+                        bookBoxController.highlightBookBox(bbox.id);
                       },
                     );
                   })
@@ -147,8 +147,8 @@ class MapScreen extends HookWidget {
                     distance = Geolocator.distanceBetween(
                       userLocation.latitude,
                       userLocation.longitude,
-                      bbox['latitude'],
-                      bbox['longitude'],
+                      bbox.latitude,
+                      bbox.longitude,
                     );
                   }
 
@@ -157,7 +157,7 @@ class MapScreen extends HookWidget {
                     // final isSelected = selectedBookBox != null && bbox['id'] == selectedBookBox['id'];
                     
                     return Opacity(
-                      opacity: highlightedBookBoxId == bbox['id'] ||
+                      opacity: highlightedBookBoxId == bbox.id ||
                           highlightedBookBoxId == null
                           ? 1.0
                           : 0.5,
@@ -170,7 +170,7 @@ class MapScreen extends HookWidget {
                         ),
                         child: ListTile(
                           title: Text(
-                            bbox['name'],
+                            bbox.name,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, color: Colors.white),
                           ),
@@ -183,7 +183,7 @@ class MapScreen extends HookWidget {
                                   style: TextStyle(color: Colors.white70),
                                 ),
                               Text(
-                                'Books: ${bbox['books'].length}',
+                                'Books: ${bbox.books.length}',
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ],
@@ -192,7 +192,7 @@ class MapScreen extends HookWidget {
                             showDialog(
                                 context: context,
                                 builder: (context) =>
-                                    BookBoxScreen(bookBoxId: bbox['id']));
+                                    BookBoxScreen(bookBoxId: bbox.id));
                           },
                         ),
                       ),

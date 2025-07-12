@@ -1,7 +1,3 @@
-// Model schemas that match the actual Mongoose models
-
-import { de } from "@faker-js/faker";
-
 export const bookSchema = {
     type: 'object', 
     properties: {
@@ -15,7 +11,9 @@ export const bookSchema = {
         categories: {type: 'array', items: {type: 'string'}},
         parutionYear: {type: 'number'},
         pages: {type: 'number'},
-        dateAdded: {type: 'string', format: 'date-time'}
+        dateAdded: {type: 'string', format: 'date-time'},
+        bookboxId: {type: 'string'},
+        bookboxName: {type: 'string'}
     }
 };
 
@@ -38,10 +36,8 @@ export const userSchema = {
     properties: {
         _id: { type: 'string' },
         username: { type: 'string' },
-        password: { type: 'string' },
         email: { type: 'string' },
         phone: { type: 'string' },
-        requestNotificationRadius: { type: 'number', default: 5 },
         favouriteGenres: { type: 'array', items: { type: 'string' } },
         favouriteLocations: { 
             type: 'array',

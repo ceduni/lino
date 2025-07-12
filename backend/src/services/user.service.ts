@@ -94,8 +94,6 @@ const UserService = {
             email?: string; 
             phone?: string; 
             favouriteGenres?: string[];
-            boroughId?: string;
-            requestNotificationRadius?: number;
         } 
     }) {
         const user = await User.findById(request.user.id);
@@ -125,9 +123,6 @@ const UserService = {
         if (request.body.favouriteGenres) {
             user.favouriteGenres = request.body.favouriteGenres;
         }
-        if (request.body.requestNotificationRadius !== undefined) {
-            user.requestNotificationRadius = request.body.requestNotificationRadius;
-        }
         await user.save();
         return user;
     },
@@ -135,7 +130,8 @@ const UserService = {
     async addUserFavLocation(request: AuthenticatedRequest & { 
         body: { 
             latitude: number; 
-            longitude: number; 
+            longitude: number;
+            name: string; // Name of the location
         } 
     }) {
         const user = await User.findById(request.user.id);
@@ -143,9 +139,9 @@ const UserService = {
             throw newErr(404, 'User not found');
         }
 
-        const { latitude, longitude } = request.body;
-        if (!latitude || !longitude) {
-            throw newErr(400, 'Latitude and longitude are required');
+        const { latitude, longitude, name } = request.body;
+        if (!latitude || !longitude || !name) {
+            throw newErr(400, 'Latitude, longitude and name are required');
         }
 
         // Get borough ID from coordinates
@@ -162,23 +158,19 @@ const UserService = {
 
     async deleteUserFavLocation(request: AuthenticatedRequest & { 
         body: { 
-            latitude: number; 
-            longitude: number; 
+            name: string;
         } 
     }) {
         const user = await User.findById(request.user.id);
         if (!user) {
             throw newErr(404, 'User not found');
         }   
-        const { latitude, longitude } = request.body;
-        if (!latitude || !longitude) {
-            throw newErr(400, 'Latitude and longitude are required');
-        }   
+        const { name } = request.body;
+        if (!name) {
+            throw newErr(400, 'Name is required');
+        }
         // Find the index of the location to remove
-        const index = user.favouriteLocations.findIndex(location => 
-            location.latitude === latitude &&
-            location.longitude === longitude
-        );
+        const index = user.favouriteLocations.findIndex(location => location.name === name);
         if (index === -1) {
             throw newErr(404, 'Location not found in favourites');
         }

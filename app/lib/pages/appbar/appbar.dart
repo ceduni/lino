@@ -1,4 +1,3 @@
-import 'package:Lino_app/pages/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/user_services.dart';
@@ -39,21 +38,18 @@ class _LinoAppBarState extends State<LinoAppBar> {
     try {
       final userService = UserService();
       final user = await userService.getUser(token);
-      if (user['user'] != null) {
-        // Initialize WebSocket connection here
-        webSocketService.connect(
-          webSocketUrl,
-          userId: user['user']['_id'],
-          onEvent: (event, data) async {
-            if (event == 'newNotification') {
-              await _fetchAndUpdateUnreadCount();
-            }
-          },
-        );
+      // Initialize WebSocket connection here
+      webSocketService.connect(
+        webSocketUrl,
+        userId: user.id,
+        onEvent: (event, data) async {
+          if (event == 'newNotification') {
+            await _fetchAndUpdateUnreadCount();
+          }
+        },
+      );
 
-        return true;
-      }
-      return false;
+      return true;
     } catch (e) {
       print('Error: $e'); // Debug statement
       return false;
@@ -77,7 +73,7 @@ class _LinoAppBarState extends State<LinoAppBar> {
     try {
       final userService = UserService();
       final notifications = await userService.getUserNotifications(token);
-      final count = notifications.where((n) => !n['read']).length;
+      final count = notifications.where((n) => !n.isRead).length;
       print('Unread count from service: $count'); // Debug statement
       return count;
     } catch (e) {

@@ -20,8 +20,7 @@ export const registerUserSchema = {
             description: 'User registered successfully',
             type: 'object',
             properties: {
-                username: { type: 'string' },
-                password: { type: 'string' }
+                username: { type: 'string' }
             }
         },
         400: {
@@ -179,7 +178,6 @@ export const updateUserSchema = {
             password: { type: 'string' },
             phone: { type: 'string' },
             favouriteGenres: { type: 'array', items: { type: 'string' } },
-            requestNotificationRadius: { type: 'number', minimum: 0 }
         }
     },
     response: {
@@ -215,7 +213,8 @@ export const addUserFavLocationSchema = {
         required: ['latitude', 'longitude'],
         properties: {
             latitude: { type: 'number', minimum: -90, maximum: 90 },
-            longitude: { type: 'number', minimum: -180, maximum: 180 }
+            longitude: { type: 'number', minimum: -180, maximum: 180 },
+            name: { type: 'string' } // Name of the location
         }
     },
     response: {
@@ -256,10 +255,9 @@ export const deleteUserFavLocationSchema = {
     },
     body: {
         type: 'object',
-        required: ['latitude', 'longitude'],
+        required: ['name'],
         properties: {
-            latitude: { type: 'number', minimum: -90, maximum: 90 },
-            longitude: { type: 'number', minimum: -180, maximum: 180 }
+            name: { type: 'string' }, // Name of the location to be removed
         }
     },
     response: {

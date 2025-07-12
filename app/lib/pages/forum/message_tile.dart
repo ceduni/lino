@@ -1,11 +1,12 @@
+import 'package:Lino_app/models/thread_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class MessageTile extends StatefulWidget {
-  final Map<String, dynamic> message;
-  final List<dynamic> allMessages;
+  final Message message;
+  final List<Message> allMessages;
   final void Function(String, bool) onReact;
-  final void Function(String, Map<String, dynamic>) onReply;
+  final void Function(String, Message) onReply;
   final Color backgroundColor;
   final String? currentUsername;
 
@@ -26,19 +27,28 @@ class _MessageTileState extends State<MessageTile> {
   bool _isHovered = false;
 
   int countReactions(String reactionType) {
-    return widget.message['reactions'].where((reaction) => reaction['reactIcon'] == reactionType).length;
+    return widget.message.reactions.where((reaction) => reaction.reactIcon == reactionType).length;
   }
 
   bool userHasReacted(String reactionType) {
     if (widget.currentUsername == null) return false;
-    return widget.message['reactions'].any((reaction) => reaction['reactIcon'] == reactionType && reaction['username'] == widget.currentUsername);
+    return widget.message.reactions.any((reaction) => reaction.reactIcon == reactionType && reaction.username == widget.currentUsername);
   }
 
   @override
   Widget build(BuildContext context) {
-    final String respondsToId = widget.message['respondsTo'];
-    final respondingToMessage = widget.allMessages.firstWhere((msg) => msg['_id'] == respondsToId, orElse: () => null);
-    final DateTime timestamp = DateTime.parse(widget.message['timestamp']);
+    final String? respondsToId = widget.message.respondsTo;
+    Message? respondingToMessage;
+    
+    if (respondsToId != null) {
+      try {
+        respondingToMessage = widget.allMessages.firstWhere((msg) => msg.id == respondsToId);
+      } catch (e) {
+        respondingToMessage = null;
+      }
+    }
+    
+    final DateTime timestamp = DateTime.parse(widget.message.timestamp.toIso8601String());
     final String formattedDate = DateFormat('MM/dd/yyyy hh:mm a').format(timestamp);
 
     return GestureDetector(
@@ -63,7 +73,7 @@ class _MessageTileState extends State<MessageTile> {
                     decoration: BoxDecoration(
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           spreadRadius: 1,
                           blurRadius: 1,
                           offset: Offset(0, 1),
@@ -78,12 +88,12 @@ class _MessageTileState extends State<MessageTile> {
                       TextSpan(
                         children: [
                           TextSpan(
-                            text: '${respondingToMessage['username']}: ',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.55)),
+                            text: '${respondingToMessage.username}: ',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black.withValues(alpha: 0.55)),
                           ),
                           TextSpan(
-                            text: respondingToMessage['content'],
-                            style: TextStyle(fontWeight: FontWeight.normal, color: Colors.black.withOpacity(0.55)),
+                            text: respondingToMessage.content,
+                            style: TextStyle(fontWeight: FontWeight.normal, color: Colors.black.withValues(alpha: 0.55)),
                           ),
                         ],
                       ),
@@ -99,7 +109,7 @@ class _MessageTileState extends State<MessageTile> {
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         spreadRadius: 1,
                         blurRadius: 1,
                         offset: Offset(0, 1),
@@ -118,7 +128,7 @@ class _MessageTileState extends State<MessageTile> {
                         children: [
                           Expanded(
                             child: Text(
-                              widget.message['username'],
+                              widget.message.username,
                               style: TextStyle(fontWeight: FontWeight.bold),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
@@ -132,7 +142,7 @@ class _MessageTileState extends State<MessageTile> {
                         ],
                       ),
                       SizedBox(height: 4.0),
-                      Text(widget.message['content']),
+                      Text(widget.message.content),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -146,7 +156,7 @@ class _MessageTileState extends State<MessageTile> {
                                 BoxShadow(color: Colors.black, blurRadius: 1),
                               ],
                             ),
-                            onPressed: () => widget.onReact(widget.message['_id'], true),
+                            onPressed: () => widget.onReact(widget.message.id, true),
                           ),
                           Text('${countReactions('good')}'),
                           SizedBox(width: 8),
@@ -160,7 +170,7 @@ class _MessageTileState extends State<MessageTile> {
                                 BoxShadow(color: Colors.black, blurRadius: 1),
                               ],
                             ),
-                            onPressed: () => widget.onReact(widget.message['_id'], false),
+                            onPressed: () => widget.onReact(widget.message.id, false),
                           ),
                           Text('${countReactions('bad')}'),
                         ],
@@ -182,7 +192,7 @@ class _MessageTileState extends State<MessageTile> {
                       BoxShadow(color: Colors.black, blurRadius: 1),
                     ]),
                     onPressed: () {
-                      widget.onReply(widget.message['_id'], widget.message);
+                      widget.onReply(widget.message.id, widget.message);
                     },
                   ),
                 ),

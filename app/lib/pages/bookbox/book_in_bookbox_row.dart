@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
+import 'package:Lino_app/models/book_model.dart';
 import 'package:flutter/material.dart';
 
 import '../Books/book_details_page.dart';
 
 class BookInBookBoxRow extends StatelessWidget {
-  final List<Map<String, dynamic>> books;
+  final List<Book> books;
   final String bbid;
 
   const BookInBookBoxRow({super.key, required this.books, required this.bbid});
@@ -17,7 +17,7 @@ class BookInBookBoxRow extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(
-            12), // Replace with your border radius constant
+            12), 
         color: const Color.fromARGB(255, 242, 226, 196),
       ),
       child: Column(
@@ -40,9 +40,9 @@ class BookInBookBoxRow extends StatelessWidget {
     );
   }
 
-  Widget _buildBookItem(BuildContext context, Map<String, dynamic> book) {
-    String title = book['title'] ?? 'Unknown Title';
-    List<dynamic> authors = book['authors'] ?? [];
+  Widget _buildBookItem(BuildContext context, Book book) {
+    String title = book.title;
+    List<dynamic> authors = book.authors;
     String authorsString = authors.isNotEmpty ? authors.join(', ') : 'Unknown Author';
     String bookName = '$title by $authorsString';
 
@@ -65,17 +65,17 @@ class BookInBookBoxRow extends StatelessWidget {
     );
   }
 
-  void _navigateToBookDetails(BuildContext context, Map<String, dynamic> book) {
+  void _navigateToBookDetails(BuildContext context, Book book) {
     showDialog(
       context: context,
       builder: (context) => BookDetailsPage(book: book, bbid: bbid),
     );
   }
 
-  Widget _buildBookCover(Map<String, dynamic> book) {
-    String? coverImage = book['coverImage'];
-    String title = book['title'] ?? 'Unknown Title';
-    
+  Widget _buildBookCover(Book book) {
+    String? coverImage = book.coverImage;
+    String title = book.title;
+
     return SizedBox(
       width: 100, // Define the width
       height: 150, // Define the height

@@ -53,9 +53,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
       for (String bookboxId in uniqueBookboxIds) {
         try {
           final bookboxData = await bookService.getBookBox(bookboxId);
-          if (bookboxData['name'] != null) {
-            bookboxNames[bookboxId] = bookboxData['name'];
-          }
+          bookboxNames[bookboxId] = bookboxData.name;
         } catch (e) {
           print('Error fetching bookbox $bookboxId: $e');
           // Continue with other bookboxes even if one fails
@@ -190,7 +188,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
     return ListTile(
       contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
       leading: CircleAvatar(
-        backgroundColor: actionColor.withOpacity(0.1),
+        backgroundColor: actionColor.withValues(alpha: 0.1),
         child: Icon(
           actionIcon,
           color: actionColor,
@@ -216,7 +214,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
       trailing: Container(
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: actionColor.withOpacity(0.1),
+          color: actionColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(

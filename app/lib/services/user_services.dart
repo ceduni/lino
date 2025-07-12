@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:Lino_app/models/notification_model.dart';
+import 'package:Lino_app/models/user_model.dart';
 import 'package:http/http.dart' as http;
 import '../utils/constants/api_constants.dart';
 
@@ -54,7 +56,7 @@ class UserService {
     return token;
   }
 
-  Future<Map<String, dynamic>> getUser(String token) async {
+  Future<User> getUser(String token) async {
     // Make a GET request to the server
     // Send the token to the server
     // If the server returns a 200 status code, the user is returned
@@ -70,10 +72,10 @@ class UserService {
     if (response.statusCode != 200) {
       throw Exception(data['error']);
     }
-    return data;
+    return User.fromJson(data['user']);
   }
 
-  Future<Map<String, dynamic>> updateUser(String token, {String? username, String? password, String? email, String? phone, List<String>? favouriteGenres, String? keyWords, double? requestNotificationRadius}) async {
+  Future<void> updateUser(String token, {String? username, String? password, String? email, String? phone, List<String>? favouriteGenres}) async {
     // Make a PUT request to the server
     // Send the token and the updated user information to the server
     // If the server returns a 200 status code, the user is updated
@@ -87,21 +89,18 @@ class UserService {
       body: jsonEncode(<String, dynamic>{
         'username': username,
         'password': password,
-        'email': email,
+        'email': email, 
         'phone': phone,
         'favouriteGenres': favouriteGenres,
-        'keyWords': keyWords,
-        'requestNotificationRadius': requestNotificationRadius,
       }),
     );
     final data = jsonDecode(response.body);
     if (response.statusCode != 200) {
       throw Exception(data['error']);
     }
-    return data;
   }
 
-  Future<List<dynamic>> getUserNotifications(String token) async {
+  Future<List<Notification>> getUserNotifications(String token) async {
     final response = await http.get(
         Uri.parse('$url/users/notifications'),
         headers: <String, String>{
@@ -112,7 +111,12 @@ class UserService {
     if (response.statusCode != 200) {
       throw Exception(data['error']);
     }
-    return data['notifications'] as List<dynamic>;
+
+    List<Notification> notifications = [];
+    for (var notification in data['notifications']) {
+      notifications.add(Notification.fromJson(notification));
+    }
+    return notifications;
   }
 
   Future<void> markNotificationAsRead(String token, String id) async {

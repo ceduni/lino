@@ -1,3 +1,4 @@
+import 'package:Lino_app/models/thread_model.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/thread_services.dart';
 import 'package:Lino_app/services/user_services.dart';
@@ -18,12 +19,12 @@ class ThreadMessagesScreen extends StatefulWidget {
 }
 
 class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
-  List<dynamic> messages = [];
+  List<Message> messages = [];
   bool isLoading = true;
   bool isUserAuthenticated = false;
   String token = '';
   String? respondsTo;
-  Map<String, dynamic>? respondingToMessage;
+  Message? respondingToMessage;
   TextEditingController _controller = TextEditingController();
   ScrollController _scrollController = ScrollController();
   String? currentUsername;
@@ -46,7 +47,7 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
     final ts = ThreadService();
     final response = await ts.getThread(widget.threadId);
     setState(() {
-      messages = response['messages'];
+      messages = response.messages;
       isLoading = false;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -65,11 +66,11 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
         setState(() {
           isUserAuthenticated = true;
           token = storedToken;
-          currentUsername = response['user']['username'];
+          currentUsername = response.username;
         });
         webSocketService.connect(
           webSocketUrl,
-          userId: response['user']['_id'],
+          userId: response.id,
           onEvent: (event, data) {
             print('Received event: $event');
             print('Data: $data');
@@ -132,13 +133,13 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
                   final message = messages[index];
-                  final messageUsername = message['username'];
+                  final messageUsername = message.username;
                   final isCurrentUser = messageUsername == currentUsername;
                   return MessageTile(
                     message: message,
                     allMessages: messages,
                     onReact: handleReaction,
-                    onReply: (String messageId, Map<String, dynamic> message) {
+                    onReply: (String messageId, Message message) {
                       setState(() {
                         respondsTo = messageId;
                         respondingToMessage = message;
@@ -197,7 +198,7 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
 }
 
 class RespondingToMessagePreview extends StatelessWidget {
-  final Map<String, dynamic> respondingToMessage;
+  final Message respondingToMessage;
   final VoidCallback onClose;
 
   const RespondingToMessagePreview({required this.respondingToMessage, required this.onClose});
@@ -216,11 +217,11 @@ class RespondingToMessagePreview extends StatelessWidget {
               TextSpan(
                 children: [
                   TextSpan(
-                    text: '${respondingToMessage['username']}: ',
+                    text: '${respondingToMessage.username}: ',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   TextSpan(
-                    text: respondingToMessage['content'],
+                    text: respondingToMessage.content,
                   ),
                 ],
               ),

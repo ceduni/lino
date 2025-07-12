@@ -82,8 +82,6 @@ async function updateUser(request : FastifyRequest, reply : FastifyReply) {
                 email?: string; 
                 phone?: string; 
                 favouriteGenres?: string[];
-                boroughId?: string;
-                requestNotificationRadius?: number;
             } 
         });
         reply.send({ user: user });
@@ -100,6 +98,7 @@ async function addUserFavLocation(request : FastifyRequest, reply : FastifyReply
             body: { 
                 latitude: number; 
                 longitude: number; 
+                name: string;
             } 
         });
         reply.send(result);
@@ -114,8 +113,7 @@ async function deleteUserFavLocation(request : FastifyRequest, reply : FastifyRe
     try {
         await UserService.deleteUserFavLocation(request as AuthenticatedRequest & { 
             body: { 
-                latitude: number; 
-                longitude: number; 
+                name: string;
             } 
         });
         reply.send({ message: 'Location removed from favourites' });

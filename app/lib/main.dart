@@ -48,7 +48,7 @@ Future<String?> fetchUserId(SharedPreferences prefs) async {
   if (token != null) {
     try {
       var user = await UserService().getUser(token);
-      return user['user']['_id'];
+      return user.id;
     } catch (e) {
       print('Error fetching user ID: $e');
       return null;

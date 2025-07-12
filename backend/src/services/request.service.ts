@@ -20,19 +20,22 @@ const requestService = {
             throw newErr(400, 'User location (latitude and longitude) is required');
         }
 
-        // Get all bookboxes and filter by distance using Haversine formula
+        const userBoroughIds = user.favouriteLocations.map(location => location.boroughId);
+        if (userBoroughIds.length === 0) {
+            throw newErr(400, 'User has no favourite locations to notify');
+        }
+
+        // Get all bookboxes and filter 
         const allBookboxes = await BookBox.find();
-        const nearbyBookboxes = allBookboxes.filter(bookbox => {
-            if (!bookbox.longitude || !bookbox.latitude) {
+        const favBookboxes = allBookboxes.filter(bookbox => {
+            // Get book boxes whose boroughId is in user's favourite locations
+            if (!userBoroughIds.includes(bookbox.boroughId)) {
                 return false;
             }
-            
-            const distance = this.calculateDistance(latitude, longitude, bookbox.latitude, bookbox.longitude);
-            return distance <= user.requestNotificationRadius;
         });
 
         // Get all unique users who follow any of these nearby bookboxes
-        const bookboxIds = nearbyBookboxes.map(bookbox => bookbox._id.toString());
+        const bookboxIds = favBookboxes.map(bookbox => bookbox._id.toString());
         console.log(`bookboxIds: ${bookboxIds}`);
         const usersToNotify = await User.find({
             followedBookboxes: { $in: bookboxIds }
@@ -78,25 +81,6 @@ const requestService = {
             return Request.find({username: username});
         }
     },
-
-    // Calculate distance between two points using Haversine formula
-    calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-        const R = 6371; // Radius of the Earth in kilometers
-        const dLat = this.deg2rad(lat2 - lat1);
-        const dLon = this.deg2rad(lon2 - lon1);
-        const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distance = R * c; // Distance in kilometers
-        return distance;
-    },
-
-    // Convert degrees to radians
-    deg2rad(deg: number): number {
-        return deg * (Math.PI/180);
-    }
 };
 
 export default requestService;

@@ -222,7 +222,7 @@ export const searchBookboxesSchema = {
     },
     response: {
         200: {
-            description: 'Bookboxes found',
+            description: 'Bookboxes found', 
             type: 'object',
             properties: {
                 bookboxes: {

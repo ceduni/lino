@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'notification_radius_setup_page.dart';
 
 class FavouriteGenresInputPage extends StatefulWidget {
   final String token;
@@ -138,22 +137,18 @@ class _FavouriteGenresInputPageState extends State<FavouriteGenresInputPage> {
       var userService = UserService();
       await userService.updateUser(widget.token, favouriteGenres: _selectedGenres);
       showToast('Favourite genres saved successfully!');
-      Navigator.pushReplacement(
+      Navigator.pushReplacementNamed(
         context,
-        MaterialPageRoute(
-          builder: (context) => NotificationRadiusSetupPage(token: widget.token, prefs: widget.prefs),
-        ),
+        '/home'
       );
     } catch (e) {
       showToast('Error saving favourite genres: $e');
     }
   }
   void _skip() {
-    Navigator.pushReplacement(
+    Navigator.pushReplacementNamed(
       context,
-      MaterialPageRoute(
-        builder: (context) => NotificationRadiusSetupPage(token: widget.token, prefs: widget.prefs),
-      ),
+      '/home'
     );
   }
 

@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'package:Lino_app/models/thread_model.dart';
 import 'package:http/http.dart' as http;
 import '../utils/constants/api_constants.dart';
 
 class ThreadService {
   final String url = baseApiUrl;
 
-  Future<Map<String, dynamic>> createThread(String token, String bookid, String title) async {
+  Future<void> createThread(String token, String bookid, String title) async {
     final r = await http.post(
       Uri.parse('$url/threads/new'),
       headers: <String, String>{
@@ -21,7 +22,6 @@ class ThreadService {
     if (r.statusCode != 201) {
       throw Exception(response['error']);
     }
-    return response;
   }
 
   Future<void> deleteThread(String token, String threadId) async {
@@ -36,7 +36,7 @@ class ThreadService {
     }
   }
 
-  Future<Map<String, dynamic>> addMessage(String token, String threadId, String content, {String? respondsTo}) async {
+  Future<void> addMessage(String token, String threadId, String content, {String? respondsTo}) async {
     // Initialize the request body with mandatory fields
     Map<String, dynamic> requestBody = {
       'threadId': threadId,
@@ -61,10 +61,9 @@ class ThreadService {
     if (r.statusCode != 201) {
       throw Exception(response['error']);
     }
-    return response;
   }
 
-  Future<Map<String, dynamic>> toggleMessageReaction(String token, String threadId, String messageId, bool isGood) async {
+  Future<void> toggleMessageReaction(String token, String threadId, String messageId, bool isGood) async {
     final r = await http.post(
       Uri.parse('$url/threads/messages/reactions'),
       headers: <String, String>{
@@ -81,19 +80,18 @@ class ThreadService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    return response;
   }
 
-  Future<Map<String, dynamic>> getThread(String threadId) async {
+  Future<Thread> getThread(String threadId) async {
     final r = await http.get(Uri.parse('$url/threads/$threadId'));
     final response = jsonDecode(r.body);
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    return response;
+    return Thread.fromJson(response);
   }
 
-  Future<Map<String, dynamic>> searchThreads({String? q, String? cls, bool? asc}) async {
+  Future<List<Thread>> searchThreads({String? q, String? cls, bool? asc}) async {
     var queryParams = {
       if (q != null && q.isNotEmpty) 'q': q,
       if (cls != null && cls.isNotEmpty) 'cls': cls,
@@ -109,6 +107,10 @@ class ThreadService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    return response;
+    List<Thread> threads = [];
+    for (var thread in response['threads']) {
+      threads.add(Thread.fromJson(thread));
+    }
+    return threads;
   }
 }

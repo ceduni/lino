@@ -9,7 +9,7 @@ class TransactionServices {
 
   Future<Map<String, dynamic>> getTransactions({
     String? username,
-    String? bookTitle,
+    String? bookTitle, 
     String? bookboxId,
     int? limit,
   }) async {

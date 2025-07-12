@@ -122,9 +122,9 @@ class BookBoxSelectionController extends GetxController {
     try {
       final bookBox = await BookService().getBookBox(id);
       selectedBookBox.value = {
-        'id': bookBox['id'],
-        'name': bookBox['name'],
-        'books': bookBox['books']
+        'id': bookBox.id,
+        'name': bookBox.name,
+        'books': bookBox.books
       };
       isBookBoxFound.value = true;
     } catch (e) {

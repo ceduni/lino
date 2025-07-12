@@ -5,13 +5,13 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true }, 
     email : { type: String, required: true, unique: true },
     phone: { type: String },
-    requestNotificationRadius: { type: Number, default: 5 }, // Default radius in km
     favouriteGenres: { type: [String], default: [] }, // Array of favourite book genres
     favouriteLocations: {
         type: [
             {
                 latitude: { type: Number, required: true },
                 longitude: { type: Number, required: true },
+                name: { type: String, required: true }, // Name of the location
                 boroughId: { type: String, required: true } // ID of the borough
             }
         ]

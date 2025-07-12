@@ -1,3 +1,5 @@
+import 'package:Lino_app/models/book_model.dart';
+import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'book_details_page.dart';
@@ -17,7 +19,7 @@ class _NavigationPageState extends State<NavigationPage> {
   final bookService = BookService();
   final GlobalStateController globalState = Get.put(GlobalStateController());
 
-  List<Map<String, dynamic>> bookBoxes = [];
+  List<BookBox> bookBoxes = [];
   bool isLoading = true;
   String? error;
   bool isGridMode = false; // Track if we are in grid mode
@@ -84,24 +86,22 @@ class _NavigationPageState extends State<NavigationPage> {
     }
 
     // Find the closest bookbox
-    Map<String, dynamic>? closestBookBox;
+    BookBox? closestBookBox;
     double minDistance = double.infinity;
 
     for (var bookBox in bookBoxes) {
-      if (bookBox['latitude'] != null && bookBox['longitude'] != null) {
-        double distance = Geolocator.distanceBetween(
-          userLocation!.latitude,
-          userLocation!.longitude,
-          bookBox['latitude'].toDouble(),
-          bookBox['longitude'].toDouble(),
-        );
+      double distance = Geolocator.distanceBetween(
+        userLocation!.latitude,
+        userLocation!.longitude,
+        bookBox.latitude,
+        bookBox.longitude,
+      );
 
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestBookBox = bookBox;
-        }
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestBookBox = bookBox;
       }
-    }
+        }
 
     if (closestBookBox != null) {
       globalState.setSelectedBookBox(closestBookBox);
@@ -123,7 +123,7 @@ class _NavigationPageState extends State<NavigationPage> {
 
     final currentSelected = globalState.currentSelectedBookBox.value;
     if (currentSelected != null) {
-      return currentSelected['name'] ?? 'Unknown';
+      return currentSelected.name;
     }
 
     return 'Select a bookbox';
@@ -138,9 +138,7 @@ class _NavigationPageState extends State<NavigationPage> {
     try {
       final data = await bookService.searchBookboxes();
       setState(() {
-        bookBoxes = List<Map<String, dynamic>>.from(
-          data['bookboxes'].map((bookbox) => bookbox),
-        );
+        bookBoxes = data;
         isLoading = false;
       });
       
@@ -230,7 +228,7 @@ class _NavigationPageState extends State<NavigationPage> {
                   padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 16.0),
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Bookbox ${bb['name']}', //+ (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? ' (Selected)' : ''),
+                    'Bookbox ${bb.name}', //+ (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? ' (Selected)' : ''),
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       fontSize: 18,
@@ -243,8 +241,8 @@ class _NavigationPageState extends State<NavigationPage> {
                   color: Color.fromRGBO(250, 250, 240, 1),
                   margin: const EdgeInsets.only(bottom: 10),
                   child: isGridMode
-                      ? _buildGridBooks(bb['books']) // Grid view mode
-                      : _buildHorizontalBooks(bb['books']), // Horizontal scroll mode
+                      ? _buildGridBooks(bb.books) // Grid view mode
+                      : _buildHorizontalBooks(bb.books), // Horizontal scroll mode
                 ),
               ],
             ],
@@ -255,7 +253,7 @@ class _NavigationPageState extends State<NavigationPage> {
   }
 
   // Horizontal book list (default)
-  Widget _buildHorizontalBooks(List books) {
+  Widget _buildHorizontalBooks(List<Book> books) {
     return Container(
       height: 150,
       child: ListView.builder(
@@ -269,20 +267,20 @@ class _NavigationPageState extends State<NavigationPage> {
                 context: context,
                 builder: (context) => BookDetailsPage(
                   book: book,
-                  bbid: "null",
+                  bbid: 'null',
                 ),
               );
             },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: book['coverImage'] != null
+              child: book.coverImage != null
                   ? Image.network(
-                      book['coverImage']!,
+                      book.coverImage!,
                       errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                        return _errorImage(book['title']);
+                        return _errorImage(book.title);
                       },
                     )
-                  : _errorImage(book['title']),
+                  : _errorImage(book.title),
             ),
           );
         },
@@ -291,7 +289,7 @@ class _NavigationPageState extends State<NavigationPage> {
   }
 
   // Grid book list
-  Widget _buildGridBooks(List books) {
+  Widget _buildGridBooks(List<Book> books) {
     double bookWidth = 100; // Fixed width for the book covers
 
     return GridView.builder(
@@ -316,14 +314,14 @@ class _NavigationPageState extends State<NavigationPage> {
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: book['coverImage'] != null
+            child: book.coverImage != null
                 ? Image.network(
-                    book['coverImage']!,
+                    book.coverImage!,
                     errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                      return _errorImage(book['title']);
+                      return _errorImage(book.title);
                     },
                   )
-                : _errorImage(book['title']),
+                : _errorImage(book.title),
           ),
         );
       },

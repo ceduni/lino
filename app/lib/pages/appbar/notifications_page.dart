@@ -78,7 +78,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     try {
       final bookService = BookService();
       final bookboxData = await bookService.getBookBox(bookboxId);
-      return bookboxData['name'] ?? 'a book box';
+      return bookboxData.name;
     } catch (e) {
       return 'a book box';
     }

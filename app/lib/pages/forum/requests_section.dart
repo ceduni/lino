@@ -1,3 +1,4 @@
+import 'package:Lino_app/models/request_model.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -13,7 +14,7 @@ class RequestsSection extends StatefulWidget {
 }
 
 class RequestsSectionState extends State<RequestsSection> {
-  List<Map<String, dynamic>> requests = [];
+  List<Request> requests = [];
   bool isLoading = true;
   String? currentUsername;
   bool showAllRequests = true;
@@ -31,7 +32,7 @@ class RequestsSectionState extends State<RequestsSection> {
     if (token != null) {
       final user = await UserService().getUser(token);
       setState(() {
-        currentUsername = user['user']['username'];
+        currentUsername = user.username;
       });
     }
   }
@@ -43,11 +44,11 @@ class RequestsSectionState extends State<RequestsSection> {
 
     try {
       var bs = BookService();
-      final List<dynamic> requestList = allRequests
+      final List<Request> requestList = allRequests
           ? await bs.getBookRequests()
           : await bs.getBookRequests(username: currentUsername);
       setState(() {
-        requests = requestList.cast<Map<String, dynamic>>();
+        requests = requestList;
         isLoading = false;
       });
     } catch (e) {
@@ -127,18 +128,18 @@ class RequestsSectionState extends State<RequestsSection> {
               itemCount: requests.length,
               itemBuilder: (context, index) {
                 final request = requests[index];
-                final isOwner = request['username'] == currentUsername;
+                final isOwner = request.username == currentUsername;
 
                 return GestureDetector(
                   onLongPress: isOwner
                       ? () {
-                    _showDeleteDialog(context, request['_id'],
-                        request['bookTitle']);
+                    _showDeleteDialog(context, request.id,
+                        request.bookTitle);
                   }
                       : null,
                   child: isOwner
                       ? Dismissible(
-                    key: Key(request['_id']),
+                    key: Key(request.id),
                     direction: DismissDirection.endToStart,
                     background: Container(
                       margin: EdgeInsets.symmetric(
@@ -154,7 +155,7 @@ class RequestsSectionState extends State<RequestsSection> {
                     confirmDismiss: (direction) async {
                       if (isOwner) {
                         return await _showDeleteDialog(context,
-                            request['_id'], request['bookTitle']);
+                            request.id, request.bookTitle);
                       }
                       return false;
                     },
@@ -170,7 +171,7 @@ class RequestsSectionState extends State<RequestsSection> {
     );
   }
 
-  Widget _buildRequestCard(Map<String, dynamic> request, bool isOwner) {
+  Widget _buildRequestCard(Request request, bool isOwner) {
     return Card(
       color: isOwner ? LinoColors.accent : LinoColors.secondary,
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Add margin between cards
@@ -178,10 +179,10 @@ class RequestsSectionState extends State<RequestsSection> {
         borderRadius: BorderRadius.circular(8.0), // Match the border radius
       ),
       child: ListTile(
-        title: Text(request['bookTitle'],
+        title: Text(request.bookTitle,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        subtitle: request['customMessage'] != null
-            ? Text(request['customMessage'])
+        subtitle: request.customMessage != null && request.customMessage!.isNotEmpty
+            ? Text(request.customMessage!)
             : null,
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -27,7 +28,7 @@ class MapController extends GetxController {
 }
 
 class BookBoxController extends GetxController {
-  var bookBoxes = <Map<String, dynamic>>[].obs;
+  var bookBoxes = <BookBox>[].obs;
   var userLocation = Rxn<Position>();
   var highlightedBookBoxId = RxnString();
   var sortBy = 'by location'.obs;
@@ -52,16 +53,7 @@ class BookBoxController extends GetxController {
       latitude: sortBy.value == 'by location' ? latitude : null,
     );
 
-    bookBoxes.value = bbs['bookboxes'].map<Map<String, dynamic>>((bb) {
-      return {
-        'id': bb['id'],
-        'name': bb['name'],
-        'infoText': bb['infoText'],
-        'latitude': bb['latitude'].toDouble(),
-        'longitude': bb['longitude'].toDouble(),
-        'books': bb['books']
-      };
-    }).toList();
+    bookBoxes.value = bbs;
   }
 
   Future<void> getUserLocation() async {
@@ -89,7 +81,7 @@ class BookBoxController extends GetxController {
 
   void highlightBookBox(String bookBoxId) {
     highlightedBookBoxId.value = bookBoxId;
-    final index = bookBoxes.indexWhere((bb) => bb['id'] == bookBoxId);
+    final index = bookBoxes.indexWhere((bb) => bb.id == bookBoxId);
     if (index != -1) {
       final highlightedBookBox = bookBoxes.removeAt(index);
       bookBoxes.insert(0, highlightedBookBox);

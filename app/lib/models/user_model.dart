@@ -1,23 +1,23 @@
 class User {
+  final String id;
   final String username;
-  final String password;
   final String email;
   final String? phone;
-  final double requestNotificationRadius;
   final List<String> favouriteGenres;
   final int numSavedBooks;
   final List<String> followedBookboxes;
+  final List<FavouriteLocation> favouriteLocations;
   final DateTime createdAt;
 
   User({
+    required this.id,
     required this.username,
-    required this.password, 
     required this.email,
     this.phone,
-    this.requestNotificationRadius = 5.0,
     required this.favouriteGenres,
     this.numSavedBooks = 0,
     required this.followedBookboxes,
+    required this.favouriteLocations,
     required this.createdAt,
   });
 
@@ -30,6 +30,7 @@ class User {
     );
   }
 
+
   factory User.fromJson(Map<String, dynamic> json) {
     var favouriteGenresList = json['favouriteGenres'] as List? ?? [];
     List<String> favouriteGenres = favouriteGenresList.cast<String>();
@@ -37,48 +38,44 @@ class User {
     var followedBookboxesList = json['followedBookboxes'] as List? ?? [];
     List<String> followedBookboxes = followedBookboxesList.cast<String>();
 
+    var favouriteLocationsList = json['favouriteLocations'] as List? ?? [];
+    List<FavouriteLocation> favouriteLocations = favouriteLocationsList
+        .map((location) => FavouriteLocation.fromJson(location))
+        .toList();
+
     return User(
+      id: json['_id'],
       username: json['username'],
-      password: json['password'],
       email: json['email'],
       phone: json['phone'],
-      requestNotificationRadius: (json['requestNotificationRadius'] ?? 5.0).toDouble(),
       favouriteGenres: favouriteGenres,
       numSavedBooks: json['numSavedBooks'] ?? 0,
       followedBookboxes: followedBookboxes,
+      favouriteLocations: favouriteLocations,
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
 } 
 
-class Notification {
-  final String userId;
-  final String? bookId;
-  final String? bookTitle;
-  final String? bookboxId;
-  final List<String> reason;
-  final bool isRead;
-  final DateTime createdAt;
+class FavouriteLocation {
+  final double latitude;
+  final double longitude;
+  final String name; // Name of the location
+  final String boroughId;
 
-  Notification({
-    required this.userId,
-    this.bookId,
-    this.bookTitle,
-    this.bookboxId,
-    required this.reason,
-    this.isRead = false,
-    required this.createdAt,
+  FavouriteLocation({
+    required this.latitude,
+    required this.longitude,
+    required this.name,
+    required this.boroughId,
   });
 
-  factory Notification.fromJson(Map<String, dynamic> json) { 
-    return Notification(
-      userId: json['userId'],
-      bookId: json['bookId'],
-      bookTitle: json['bookTitle'],
-      bookboxId: json['bookboxId'],
-      reason: List<String>.from(json['reason'] ?? []),
-      isRead: json['isRead'] ?? false,
-      createdAt: DateTime.parse(json['createdAt']),
+  factory FavouriteLocation.fromJson(Map<String, dynamic> json) {
+    return FavouriteLocation(
+      latitude: json['latitude'].toDouble(),
+      longitude: json['longitude'].toDouble(),
+      name: json['name'],
+      boroughId: json['boroughId'],
     );
   }
 }

@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'package:Lino_app/models/book_model.dart';
+import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/models/request_model.dart';
 import 'package:http/http.dart' as http;
 import '../utils/constants/api_constants.dart';
 
@@ -31,7 +34,7 @@ class BookService {
     return response;
   }
 
-  Future<Map<String, dynamic>> addBookToBB(String bookboxId,
+  Future<void> addBookToBB(String bookboxId,
       {String? token,
       String? isbn,
       String? title,
@@ -72,10 +75,9 @@ class BookService {
     if (r.statusCode != 201) {
       throw Exception(response['error']);
     }
-    return response;
   }
 
-  Future<Map<String, dynamic>> getBookFromBB(String bookId, String bookboxId,
+  Future<void> getBookFromBB(String bookId, String bookboxId,
       {String? token}) async {
     final headers = {
       if (token != null) 'Authorization': 'Bearer $token',
@@ -93,7 +95,6 @@ class BookService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    return response;
   }
 
   Future<Map<String, dynamic>> getBookInfo(String isbn) async {
@@ -114,7 +115,7 @@ class BookService {
     return response;
   }
 
-  Future<Map<String, dynamic>> getBookBox(String bookBoxId) async {
+  Future<BookBox> getBookBox(String bookBoxId) async {
     final r = await http.get(
       Uri.parse('$url/bookboxes/$bookBoxId'),
       headers: <String, String>{
@@ -125,10 +126,10 @@ class BookService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    return response;
+    return BookBox.fromJson(response);
   }
 
-  Future<Map<String, dynamic>> getBook(String bookId) async {
+  Future<ExtendedBook> getBook(String bookId) async {
     // Make a GET request to the server
     // Send the bookId to the server
     // If the server returns a 200 status code, the book is found
@@ -143,10 +144,10 @@ class BookService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    return response;
+    return ExtendedBook.fromJson(response);
   }
 
-  Future<Map<String, dynamic>> searchBooks(
+  Future<List<ExtendedBook>> searchBooks(
       {String? kw, String? cls, bool? asc}) async {
     // Make a GET request to the server
     // Send the parameters to the server
@@ -172,10 +173,14 @@ class BookService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    return response;
+    List<ExtendedBook> books = [];
+    for (var bookJson in response['books']) {
+      books.add(ExtendedBook.fromJson(bookJson));
+    }
+    return books;
   }
 
-  Future<Map<String, dynamic>> searchBookboxes(
+  Future<List<BookBox>> searchBookboxes(
       {String? kw,
       bool? asc,
       String? cls,
@@ -207,7 +212,11 @@ class BookService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    return response;
+    List<BookBox> bookboxes = [];
+    for (var bookBoxJson in response['bookboxes']) {
+      bookboxes.add(BookBox.fromJson(bookBoxJson));
+    }
+    return bookboxes;
   }
 
   Future<void> requestBookToUsers(String token, String title,
@@ -243,7 +252,7 @@ class BookService {
     }
   }
 
-  Future<List<dynamic>> getBookRequests({String? username}) async {
+  Future<List<Request>> getBookRequests({String? username}) async {
     var queryParams = {
       if (username != null) 'username': username,
     };
@@ -257,6 +266,10 @@ class BookService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    return response;
+    List<Request> requests = [];
+    for (var reqJson in response['requests']) {
+      requests.add(Request.fromJson(reqJson));
+    }
+    return requests;
   }
 }

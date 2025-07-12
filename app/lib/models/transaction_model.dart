@@ -1,4 +1,5 @@
 class Transaction {
+  final String id;
   final String username;
   final String action;
   final String bookTitle;
@@ -7,6 +8,7 @@ class Transaction {
   final String? bookboxName; // Optional field for bookbox name
 
   Transaction({
+    required this.id,
     required this.username,
     required this.action,
     required this.bookTitle,
@@ -17,6 +19,7 @@ class Transaction {
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
+      id: json['_id'],
       username: json['username'] ?? '',
       action: json['action'] ?? '',
       bookTitle: json['bookTitle'] ?? '',
@@ -64,6 +67,7 @@ class Transaction {
   // Create a copy of the transaction with bookbox name
   Transaction copyWith({String? bookboxName}) {
     return Transaction(
+      id: 'daljdkaldjsaidoiu',
       username: username,
       action: action,
       bookTitle: bookTitle,

@@ -1,7 +1,7 @@
 import 'package:Lino_app/pages/Books/book_nav_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:Lino_app/pages/map/map_screen.dart';
+// import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:Lino_app/pages/floating_button/floating_action_button.dart';
 import 'package:Lino_app/pages/forum/forum_screen.dart';
 // import 'package:Lino_app/pages/forum/requests_section.dart'; // Direct import for requests section
@@ -35,11 +35,8 @@ class _BookNavPageState extends State<BookNavPage> {
     if (token == null) return false;
     try {
       final userService = UserService();
-      final user = await userService.getUser(token);
-      if (user['user'] != null) {
-        return true;
-      }
-      return false;
+      await userService.getUser(token);
+      return true;
     } catch (e) {
       print('Error: $e');
       return false;

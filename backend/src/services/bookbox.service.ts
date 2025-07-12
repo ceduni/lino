@@ -6,9 +6,7 @@ import {newErr} from "./utilities";
 import { 
     BookAddData,
     IBook,
-    IBookBox 
 } from '../types/book.types';
-import { IUser } from '../types/user.types';
 import { AuthenticatedRequest } from '../types/common.types';
 import { getBoroughId } from "./borough.id.generator";
 import TransactionService from "./transaction.service";
@@ -24,7 +22,7 @@ const bookboxService = {
             name: bookBox.name,
             image: bookBox.image,
             longitude: bookBox.longitude,
-            latitude: bookBox.latitude,
+            latitude: bookBox.latitude, 
             boroughId: bookBox.boroughId,
             infoText: bookBox.infoText,
             books: bookBox.books,

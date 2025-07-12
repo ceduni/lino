@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:Lino_app/models/book_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -23,7 +24,7 @@ class _AddThreadFormState extends State<AddThreadForm> {
   final _titleController = TextEditingController();
   bool _isLoading = false;
   Timer? _debounce;
-  List<dynamic> books = [];
+  List<ExtendedBook> books = [];
   String? selectedBookId;
 
   @override
@@ -54,7 +55,7 @@ class _AddThreadFormState extends State<AddThreadForm> {
       var bs = BookService();
       var response = await bs.searchBooks(kw: query);
       setState(() {
-        books = response['books'];
+        books = response;
       });
     } catch (e) {
       print('Error searching books: $e');
@@ -124,11 +125,11 @@ class _AddThreadFormState extends State<AddThreadForm> {
                   itemCount: books.length,
                   itemBuilder: (context, index) {
                     final book = books[index];
-                    final isSelected = book['_id'] == selectedBookId;
+                    final isSelected = book.id == selectedBookId;
                     return GestureDetector(
                       onTap: () {
                         setState(() {
-                          selectedBookId = book['_id'];
+                          selectedBookId = book.id;
                         });
                       },
                       child: Container(
@@ -146,16 +147,15 @@ class _AddThreadFormState extends State<AddThreadForm> {
                             width: isSelected ? 120 : 100,
                             height: isSelected ? 120 : 100,
                             color: Colors.grey.shade200,
-                            child: book['coverImage'] != null
-                                ? Image.network(
-                              book['coverImage'],
+                            child: Image.network(
+                              book.coverImage ?? '',
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return Container(
                                   color: Colors.grey,
                                   child: Center(
                                     child: Text(
-                                      book['title'],
+                                      book.title,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Colors.white,
@@ -165,19 +165,6 @@ class _AddThreadFormState extends State<AddThreadForm> {
                                   ),
                                 );
                               },
-                            )
-                                : Container(
-                              color: Colors.grey,
-                              child: Center(
-                                child: Text(
-                                  book['title'],
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
                             ),
                           ),
                         ),

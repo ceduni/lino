@@ -73,17 +73,11 @@ class _FavouriteGenresPageState extends State<FavouriteGenresPage> {
 
       final userService = UserService();
       final user = await userService.getUser(_token!);
-      final favouriteGenres = user['user']?['favouriteGenres'];
+      final favouriteGenres = user.favouriteGenres;
       
       setState(() {
-        if (favouriteGenres != null) {
-          if (favouriteGenres is List) {
-            for (var item in favouriteGenres) {
-              if (item != null) {
-                _selectedGenres.add(item.toString());
-              }
-            }
-          }
+        for (var item in favouriteGenres) {
+          _selectedGenres.add(item);
         }
         _isLoading = false;
       });
