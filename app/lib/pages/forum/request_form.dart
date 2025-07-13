@@ -1,9 +1,8 @@
+import 'package:Lino_app/services/book_request_services.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
-
-import '../../services/book_services.dart';
 
 class RequestForm extends StatefulWidget {
   final VoidCallback onRequestCreated;
@@ -66,9 +65,8 @@ class _RequestFormState extends State<RequestForm> {
           return; // Exit if location is not available
         }
 
-        var bs = BookService();
         final token = await SharedPreferences.getInstance().then((prefs) => prefs.getString('token'));
-        await bs.requestBookToUsers(
+        await BookRequestService().requestBookToUsers(
           token!,
           _titleController.text,
           cm: _messageController.text,

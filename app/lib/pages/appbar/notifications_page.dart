@@ -1,6 +1,7 @@
+import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/user_services.dart';
-import 'package:Lino_app/services/book_services.dart';
+import 'package:Lino_app/models/notification_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/utils/constants/colors.dart';
@@ -11,7 +12,7 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  late Future<List<dynamic>> _notificationsFuture;
+  late Future<List<Notif>> _notificationsFuture;
   late String _token;
 
   @override
@@ -20,28 +21,24 @@ class _NotificationsPageState extends State<NotificationsPage> {
     _notificationsFuture = _fetchNotifications();
   }
 
-  Future<List<dynamic>> _fetchNotifications() async {
+  Future<List<Notif>> _fetchNotifications() async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token')!;
-    final userService = UserService();
-    final response = await userService.getUserNotifications(_token);
-    return response;
+    return await UserService().getUserNotifications(_token);
   }
 
   Future<void> _markAsRead(String id) async {
-    final userService = UserService();
-    await userService.markNotificationAsRead(_token, id);
+    await UserService().markNotificationAsRead(_token, id);
     setState(() {
       _notificationsFuture = _fetchNotifications();
     });
   }
 
   Future<void> _markAllAsRead() async {
-    final userService = UserService();
     final notifications = await _notificationsFuture;
     for (var notification in notifications) {
-      if (!notification['read']) {
-        await userService.markNotificationAsRead(_token, notification['_id']);
+      if (!notification.isRead) {
+        await UserService().markNotificationAsRead(_token, notification.id);
       }
     }
     setState(() {
@@ -49,9 +46,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
     });
   }
 
-  String _getNotificationTitle(dynamic notification) {
-    final List<String> reasons = List<String>.from(notification['reason'] ?? []);
-    
+  String _getNotificationTitle(Notif notification) {
+    final List<String> reasons = notification.reason;
+    if (reasons.isEmpty) {
+      return 'Notification';
+    }
     if (reasons.contains('book_request')) {
       return 'Book Request';
     } else {
@@ -59,10 +58,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
     }
   }
 
-  String _getNotificationPreview(dynamic notification) {
-    final List<String> reasons = List<String>.from(notification['reason'] ?? []);
-    final String bookTitle = notification['bookTitle'] ?? '';
-    
+  String _getNotificationPreview(Notif notification) {
+    final List<String> reasons = notification.reason;
+    final String bookTitle = notification.bookTitle;
+    if (reasons.isEmpty) {
+      return 'No specific reason provided for this notification.';
+    }
     if (reasons.contains('book_request')) {
       return 'Someone is looking for "$bookTitle"';
     } else {
@@ -76,17 +77,16 @@ class _NotificationsPageState extends State<NotificationsPage> {
     }
     
     try {
-      final bookService = BookService();
-      final bookboxData = await bookService.getBookBox(bookboxId);
+      final bookboxData = await BookboxService().getBookBox(bookboxId);
       return bookboxData.name;
     } catch (e) {
       return 'a book box';
     }
   }
 
-  void _showNotificationDetails(BuildContext context, dynamic notification) {
-    final List<String> reasons = List<String>.from(notification['reason'] ?? []);
-    
+  void _showNotificationDetails(BuildContext context, Notif notification) {
+    final List<String> reasons = notification.reason;
+
     String title;
     
     if (reasons.contains('book_request')) {
@@ -124,7 +124,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   ),
                   SizedBox(height: 10.0),
                   Text(
-                    timeago.format(DateTime.parse(notification['createdAt'])),
+                    timeago.format(DateTime.parse(notification.createdAt.toIso8601String())),
                     style: TextStyle(
                       fontSize: 10.0,
                       color: Colors.grey,
@@ -146,16 +146,16 @@ class _NotificationsPageState extends State<NotificationsPage> {
       },
     ).then((_) {
       // Mark the notification as read after closing the dialog
-      if (!notification['read']) {
-        _markAsRead(notification['_id']);
+      if (!notification.isRead) {
+        _markAsRead(notification.id);
       }
     });
   }
 
-  Future<String> _buildNotificationContent(dynamic notification) async {
-    final List<String> reasons = List<String>.from(notification['reason'] ?? []);
-    final String bookTitle = notification['bookTitle'] ?? '';
-    final String? bookboxId = notification['bookboxId'];
+  Future<String> _buildNotificationContent(Notif notification) async {
+    final List<String> reasons = notification.reason;
+    final String bookTitle = notification.bookTitle;
+    final String? bookboxId = notification.bookboxId;
     
     if (reasons.contains('book_request')) {
       return 'Someone is looking for "$bookTitle". If you have this book, please consider adding it to the nearest book box to help out!';
@@ -172,6 +172,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
       if (reasons.contains('fav_genre')) {
         reasonMessages.add('it matches one of your favorite genres');
       }
+      if (reasons.contains('solved_book_request')) {
+        reasonMessages.add('it matches a book request you made');
+      }
       
       String reasonText;
       if (reasonMessages.length == 1) {
@@ -186,10 +189,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
     }
   }
 
-  String _buildNotificationContentSync(dynamic notification) {
-    final List<String> reasons = List<String>.from(notification['reason'] ?? []);
-    final String bookTitle = notification['bookTitle'] ?? '';
-    
+  String _buildNotificationContentSync(Notif notification) {
+    final List<String> reasons = notification.reason;
+    final String bookTitle = notification.bookTitle;
+
     if (reasons.contains('book_request')) {
       return 'Someone is looking for "$bookTitle". If you have this book, please consider adding it to the nearest book box to help out!';
     } else {
@@ -239,7 +242,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
           ),
         ],
       ),
-      body: FutureBuilder<List<dynamic>>(
+      body: FutureBuilder<List<Notif>>(
         future: _notificationsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -258,7 +261,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                     padding: EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
-                      color: notification['read'] ? LinoColors.primary : LinoColors.accent,
+                      color: notification.isRead ? LinoColors.primary : LinoColors.accent,
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     child: Column(
@@ -269,7 +272,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontWeight: notification['read'] ? FontWeight.normal : FontWeight.bold,
+                            fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
@@ -281,12 +284,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           style: TextStyle(
                             fontStyle: FontStyle.italic,
                             color: Colors.black,
-                            fontSize: notification['read'] ? 12.0 : 14.0,
+                            fontSize: notification.isRead ? 12.0 : 14.0,
                           ),
                         ),
                         SizedBox(height: 4.0),
                         Text(
-                          timeago.format(DateTime.parse(notification['createdAt'])),
+                          timeago.format(notification.createdAt),
                           style: TextStyle(
                             fontSize: 10.0,
                             color: Colors.black,

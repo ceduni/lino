@@ -1,9 +1,9 @@
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:flutter/material.dart';
-import 'package:Lino_app/services/book_services.dart';
 import 'book_details_page.dart';
-import 'package:Lino_app/pages/map/map_screen.dart';
+// import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import '../../controllers/global_state_controller.dart';
@@ -16,7 +16,6 @@ class NavigationPage extends StatefulWidget {
 }
 
 class _NavigationPageState extends State<NavigationPage> {
-  final bookService = BookService();
   final GlobalStateController globalState = Get.put(GlobalStateController());
 
   List<BookBox> bookBoxes = [];
@@ -39,95 +38,95 @@ class _NavigationPageState extends State<NavigationPage> {
     });
   }
 
-  Future<void> _getUserLocation() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        return;
-      }
+  // Future<void> _getUserLocation() async {
+  //   try {
+  //     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //     if (!serviceEnabled) {
+  //       return;
+  //     }
 
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return;
-        }
-      }
+  //     var permission = await Geolocator.checkPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       permission = await Geolocator.requestPermission();
+  //       if (permission == LocationPermission.denied) {
+  //         return;
+  //       }
+  //     }
 
-      if (permission == LocationPermission.deniedForever) {
-        return;
-      }
+  //     if (permission == LocationPermission.deniedForever) {
+  //       return;
+  //     }
 
-      userLocation = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+  //     userLocation = await Geolocator.getCurrentPosition(
+  //         desiredAccuracy: LocationAccuracy.high);
       
-      // Initialize closest bookbox selection after the build is complete
-      //WidgetsBinding.instance.addPostFrameCallback((_) {
-        //_setClosestBookBoxIfNone();
-      //});
+  //     // Initialize closest bookbox selection after the build is complete
+  //     //WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       //_setClosestBookBoxIfNone();
+  //     //});
       
-      // pour forcer le reload
-      if (mounted) {
-        setState(() {});
-      }
-    } catch (e) {
-      print('Error getting user location: $e');
-    }
-  }
+  //     // pour forcer le reload
+  //     if (mounted) {
+  //       setState(() {});
+  //     }
+  //   } catch (e) {
+  //     print('Error getting user location: $e');
+  //   }
+  // }
 
-  void _setClosestBookBoxIfNone() {
-    if (bookBoxes.isEmpty || userLocation == null) {
-      return;
-    }
+  // void _setClosestBookBoxIfNone() {
+  //   if (bookBoxes.isEmpty || userLocation == null) {
+  //     return;
+  //   }
 
-    // Only set if no bookbox is currently selected
-    if (globalState.currentSelectedBookBox.value != null) {
-      return;
-    }
+  //   // Only set if no bookbox is currently selected
+  //   if (globalState.currentSelectedBookBox.value != null) {
+  //     return;
+  //   }
 
-    // Find the closest bookbox
-    BookBox? closestBookBox;
-    double minDistance = double.infinity;
+  //   // Find the closest bookbox
+  //   BookBox? closestBookBox;
+  //   double minDistance = double.infinity;
 
-    for (var bookBox in bookBoxes) {
-      double distance = Geolocator.distanceBetween(
-        userLocation!.latitude,
-        userLocation!.longitude,
-        bookBox.latitude,
-        bookBox.longitude,
-      );
+  //   for (var bookBox in bookBoxes) {
+  //     double distance = Geolocator.distanceBetween(
+  //       userLocation!.latitude,
+  //       userLocation!.longitude,
+  //       bookBox.latitude,
+  //       bookBox.longitude,
+  //     );
 
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestBookBox = bookBox;
-      }
-        }
+  //     if (distance < minDistance) {
+  //       minDistance = distance;
+  //       closestBookBox = bookBox;
+  //     }
+  //       }
 
-    if (closestBookBox != null) {
-      globalState.setSelectedBookBox(closestBookBox);
-      // Trigger a rebuild to update the display text
-      if (mounted) {
-        setState(() {});
-      }
-    }
-  }
+  //   if (closestBookBox != null) {
+  //     globalState.setSelectedBookBox(closestBookBox);
+  //     // Trigger a rebuild to update the display text
+  //     if (mounted) {
+  //       setState(() {});
+  //     }
+  //   }
+  // }
 
-  String _getDisplayText() {
-    if (bookBoxes.isEmpty) {
-      return 'Loading bookboxes...';
-    }
+  // String _getDisplayText() {
+  //   if (bookBoxes.isEmpty) {
+  //     return 'Loading bookboxes...';
+  //   }
 
-    if (userLocation == null) {
-      return 'Getting location...';
-    }
+  //   if (userLocation == null) {
+  //     return 'Getting location...';
+  //   }
 
-    final currentSelected = globalState.currentSelectedBookBox.value;
-    if (currentSelected != null) {
-      return currentSelected.name;
-    }
+  //   final currentSelected = globalState.currentSelectedBookBox.value;
+  //   if (currentSelected != null) {
+  //     return currentSelected.name;
+  //   }
 
-    return 'Select a bookbox';
-  }
+  //   return 'Select a bookbox';
+  // }
 
   Future<void> _loadBookBoxes() async {
     setState(() {
@@ -136,7 +135,7 @@ class _NavigationPageState extends State<NavigationPage> {
     });
 
     try {
-      final data = await bookService.searchBookboxes();
+      final data = await BookboxService().searchBookboxes();
       setState(() {
         bookBoxes = data;
         isLoading = false;

@@ -1,8 +1,8 @@
 import 'package:Lino_app/models/request_model.dart';
+import 'package:Lino_app/services/book_request_services.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import '../../services/book_services.dart';
 import '../../services/user_services.dart';
 import '../../utils/constants/colors.dart';
 
@@ -43,10 +43,10 @@ class RequestsSectionState extends State<RequestsSection> {
     });
 
     try {
-      var bs = BookService();
+      var brs = BookRequestService();
       final List<Request> requestList = allRequests
-          ? await bs.getBookRequests()
-          : await bs.getBookRequests(username: currentUsername);
+          ? await brs.getBookRequests()
+          : await brs.getBookRequests(username: currentUsername);
       setState(() {
         requests = requestList;
         isLoading = false;
@@ -214,7 +214,7 @@ class RequestsSectionState extends State<RequestsSection> {
       final token = prefs.getString('token');
       if (token != null) {
         try {
-          await BookService().deleteBookRequest(token, requestId);
+          await BookRequestService().deleteBookRequest(token, requestId);
           fetchRequests(showAllRequests); // Re-fetch requests
           showToast('Request deleted successfully!');
         } catch (e) {

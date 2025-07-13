@@ -134,7 +134,7 @@ async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
     }
 }
 
-
+ 
 interface MyFastifyInstance extends FastifyInstance {
     authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
     adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;

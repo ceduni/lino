@@ -5,7 +5,7 @@ import NotificationService from "./notification.service";
 import {newErr} from "./utilities";
 import { AuthenticatedRequest } from '../types/common.types';
 
-const requestService = {
+const RequestService = {
     async requestBookToUsers(request: AuthenticatedRequest & { 
         body: { title: string; customMessage?: string }; 
         query: { latitude?: number; longitude?: number } 
@@ -48,9 +48,7 @@ const requestService = {
                 await NotificationService.createNotification(
                     usersToNotify[i]._id.toString(),
                     ['book_request'],
-                    {
-                        bookTitle: request.body.title
-                    }
+                    request.body.title
                 );
             }
         }
@@ -83,4 +81,4 @@ const requestService = {
     },
 };
 
-export default requestService;
+export default RequestService;

@@ -13,7 +13,7 @@ class ThreadService {
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode(<String, dynamic>{
+      body: jsonEncode(<String, String>{
         'bookId': bookid,
         'title': title, 
       }),
@@ -38,7 +38,7 @@ class ThreadService {
 
   Future<void> addMessage(String token, String threadId, String content, {String? respondsTo}) async {
     // Initialize the request body with mandatory fields
-    Map<String, dynamic> requestBody = {
+    Map<String, String> requestBody = {
       'threadId': threadId,
       'content': content,
     };
@@ -70,7 +70,7 @@ class ThreadService {
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode(<String, dynamic>{
+      body: jsonEncode(<String, String>{
         'threadId': threadId,
         'messageId': messageId,
         'reactIcon': isGood? 'good' : 'bad',

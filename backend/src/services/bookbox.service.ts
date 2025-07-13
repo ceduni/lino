@@ -72,7 +72,7 @@ const bookboxService = {
         await NotificationService.notifyRelevantUsers(
             username,
             newBook, 
-            bookBox._id?.toString() || ''
+            bookBox._id.toString()
         );
 
         // Increment user's added books count

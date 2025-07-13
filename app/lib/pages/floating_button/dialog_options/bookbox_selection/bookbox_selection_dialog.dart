@@ -117,15 +117,15 @@ class BookBoxSelectionDialog extends StatelessWidget {
             ),
           if (bookBoxController.isAutoSelected.value)
             const SizedBox(height: 8.0),
-          //Text(
-            //'Selected Bookbox: ${bookBoxController.selectedBookBox['name']}',
-            //style: TextStyle(fontWeight: FontWeight.w500),
-          //),
+          Text(
+            'Selected Bookbox: ${bookBoxController.selectedBookBox.value?.name ?? 'Unknown'}',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
           const SizedBox(height: 8.0),
-          Text('Number of books: ${bookBoxController.selectedBookBox['books'].length}'),
-          if (bookBoxController.selectedBookBox['distance'] != null)
+          Text('Number of books: ${bookBoxController.selectedBookBox.value?.books.length ?? 0}'),
+          if (bookBoxController.selectedBookBox.value?.distance != null)
             Text(
-              'Distance: ${(bookBoxController.selectedBookBox['distance'] as double).toStringAsFixed(1)}m',
+              'Distance: ${bookBoxController.selectedBookBox.value!.distance!.toStringAsFixed(1)}m',
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
           if (bookBoxController.isAutoSelected.value) ...[
@@ -134,7 +134,7 @@ class BookBoxSelectionDialog extends StatelessWidget {
               onPressed: () {
                 bookBoxController.isBookBoxFound.value = false;
                 bookBoxController.isAutoSelected.value = false;
-                bookBoxController.selectedBookBox.clear();
+                bookBoxController.selectedBookBox.value = null;
               },
               child: Text('Choose Different Bookbox'),
               style: TextButton.styleFrom(
@@ -164,7 +164,7 @@ class BookBoxSelectionDialog extends StatelessWidget {
           child: DropdownButton<String>(
             isExpanded: true,
             hint: const Text('Select a bookbox'),
-            value: bookBoxController.selectedBookBox['id'],
+            value: bookBoxController.selectedBookBox.value?.id,
             items: bookBoxController.bookBoxes.map((bookBox) {
               final bool knownLocation =
                   bookBoxController.userLocation.value != null;
@@ -172,18 +172,18 @@ class BookBoxSelectionDialog extends StatelessWidget {
                   ? Geolocator.distanceBetween(
                 bookBoxController.userLocation.value!.latitude,
                 bookBoxController.userLocation.value!.longitude,
-                bookBox['latitude'],
-                bookBox['longitude'],
+                bookBox.latitude,
+                bookBox.longitude,
               )
                   : null;
               return DropdownMenuItem<String>(
-                value: bookBox['id'],
+                value: bookBox.id,
                 child: Container(
                   decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(8.0)),
                   child: ListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: Text(bookBox['name']),
+                    title: Text(bookBox.name),
                     trailing: knownLocation
                         ? Text(
                       '${(distance! / 1000).toStringAsFixed(2)} km',
@@ -218,18 +218,18 @@ class BookBoxSelectionDialog extends StatelessWidget {
         itemCount: bookBoxController.nearbyBookBoxes.length,
         itemBuilder: (context, index) {
           final bookBox = bookBoxController.nearbyBookBoxes[index];
-          final distance = bookBox['distance'] as double? ?? 0.0;
+          final distance = bookBox.distance ?? 0.0;
           
           return Card(
             margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
             child: ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
               title: Text(
-                bookBox['name'],
+                bookBox.name,
                 style: TextStyle(fontWeight: FontWeight.w500),
               ),
               subtitle: Text(
-                '${bookBox['books'].length} books',
+                '${bookBox.books.length} books',
                 style: TextStyle(fontSize: 12),
               ),
               trailing: Column(
@@ -248,7 +248,7 @@ class BookBoxSelectionDialog extends StatelessWidget {
                 ],
               ),
               onTap: () {
-                bookBoxController.setSelectedBookBox(bookBox['id']);
+                bookBoxController.setSelectedBookBox(bookBox.id);
               },
             ),
           );

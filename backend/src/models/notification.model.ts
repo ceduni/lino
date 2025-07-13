@@ -3,17 +3,17 @@ import mongoose from 'mongoose';
 const notificationSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     bookId: { type: mongoose.Schema.Types.ObjectId }, // Optional for book requests
-    bookTitle: { type: String }, // Optional for book requests
+    bookTitle: { type: String, required: true },
     bookboxId: { type: mongoose.Schema.Types.ObjectId, ref: 'BookBox' }, // Optional for book requests
     reason: { 
         type: [String], 
         required: true,
         validate: {
             validator: function(reasons: string[]) {
-                const validReasons = ['fav_bookbox', 'same_borough', 'fav_genre', 'book_request'];
+                const validReasons = ['fav_bookbox', 'same_borough', 'fav_genre', 'solved_book_request', 'book_request'];
                 return reasons.length > 0 && reasons.every(reason => validReasons.includes(reason));
             },
-            message: 'Reason must contain at least one of: fav_bookbox, same_borough, fav_genre, book_request'
+            message: 'Reason must contain at least one of: fav_bookbox, same_borough, fav_genre, solved_book_request, book_request'
         }
     },
     read: { type: Boolean, default: false },

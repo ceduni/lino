@@ -41,7 +41,7 @@ interface GetBookBoxParams extends RouteGenericInterface {
         bookboxId: string
     }
 }
-
+ 
 async function getBookbox(request: FastifyRequest<GetBookBoxParams>, reply: FastifyReply) {
     try {
         const response = await BookboxService.getBookBox(request.params.bookboxId);

@@ -31,7 +31,7 @@ async function deleteBookRequest(request: FastifyRequest, reply: FastifyReply) {
         reply.code(statusCode).send({error: message});
     }
 }
-
+ 
 async function getBookRequests(request: FastifyRequest, reply: FastifyReply) {
     try {
         const response = await RequestService.getBookRequests(request as { query: { username?: string } });

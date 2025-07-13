@@ -40,7 +40,7 @@ class MapScreen extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         title: Obx(() {
-          final selectedBookBox = globalState.currentSelectedBookBox.value;
+          // final selectedBookBox = globalState.currentSelectedBookBox.value;
           
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,7 +97,7 @@ class MapScreen extends HookWidget {
             flex: 1,
             child: Obx(() {
               final bboxes = bookBoxController.bookBoxes;
-              final selectedBookBox = globalState.currentSelectedBookBox.value;
+              // final selectedBookBox = globalState.currentSelectedBookBox.value;
               
               List<Marker> markers = bboxes
                   .map((bbox) {
@@ -153,7 +153,7 @@ class MapScreen extends HookWidget {
                   }
 
                   return Obx(() {
-                    final selectedBookBox = globalState.currentSelectedBookBox.value;
+                    // final selectedBookBox = globalState.currentSelectedBookBox.value;
                     // final isSelected = selectedBookBox != null && bbox['id'] == selectedBookBox['id'];
                     
                     return Opacity(

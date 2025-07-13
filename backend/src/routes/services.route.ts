@@ -9,7 +9,7 @@ async function getBoroughIdRoute(request: FastifyRequest, reply: FastifyReply): 
         reply.status(400).send({ error: 'Invalid latitude or longitude' });
         return;
     }
- 
+  
     try {
         const boroughId = await getBoroughId(latitude, longitude);
         reply.send({ boroughId });

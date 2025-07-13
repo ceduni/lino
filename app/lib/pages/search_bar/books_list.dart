@@ -1,6 +1,7 @@
 // books_list.dart
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/book_services.dart';
 
@@ -34,7 +35,7 @@ class BooksList extends StatelessWidget {
             final bbid = book.bookboxId;
 
             return FutureBuilder<BookBox>(
-              future: (bbid.isNotEmpty) ? BookService().getBookBox(bbid) : null,
+              future: (bbid.isNotEmpty) ? BookboxService().getBookBox(bbid) : null,
               builder: (context, bbSnapshot) {
                 String bookboxStatus = 'Currently not in a bookbox';
                 if (bbSnapshot.connectionState == ConnectionState.waiting) {

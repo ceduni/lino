@@ -1,3 +1,4 @@
+import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/pages/floating_button/common/build_banner.dart';
 import 'package:Lino_app/pages/floating_button/common/build_divider.dart';
 import 'package:Lino_app/pages/floating_button/common/build_scanner.dart';
@@ -8,7 +9,7 @@ import 'package:get/get.dart';
 
 class BookRemovalDialog extends StatelessWidget {
   final String bookBoxId;
-  final List<dynamic> books;
+  final List<Book> books;
 
   const BookRemovalDialog({
     super.key,
@@ -103,8 +104,8 @@ class BookRemovalDialog extends StatelessWidget {
                 child: Column(
                   children: [
                     Text('Book Found:', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('Title: ${matchingBook['title']}'),
-                    Text('Authors: ${matchingBook['authors']?.join(', ') ?? 'Unknown'}'),
+                    Text('Title: ${matchingBook.title}'),
+                    Text('Authors: ${matchingBook.authors.join(', ')}'),
                   ],
                 ),
               );
@@ -148,12 +149,12 @@ class BookRemovalDialog extends StatelessWidget {
     }
     
     // Create a list of unique books with more lenient filtering
-    final uniqueBooks = <String, Map<String, dynamic>>{};
+    final uniqueBooks = <String, Book>{};
     for (int i = 0; i < books.length; i++) {
       final book = books[i];
       // Use index as fallback ID if book doesn't have a proper ID
-      final bookId = book['id']?.toString() ?? book['_id']?.toString() ?? 'book_$i';
-      
+      final bookId = book.id;
+
       if (bookId.isNotEmpty) {
         uniqueBooks[bookId] = book;
       }
@@ -198,13 +199,13 @@ class BookRemovalDialog extends StatelessWidget {
   }
 
   Widget _buildSelectableBookItem(
-    Map<String, dynamic> book, 
+    Book book, 
     String bookId, 
     bool isSelected, 
     BookRemovalController controller
   ) {
-    String title = book['title'] ?? 'Unknown Title';
-    List<dynamic> authors = book['authors'] ?? [];
+    String title = book.title;
+    List<String> authors = book.authors;
     String authorsString = authors.isNotEmpty ? authors.join(', ') : 'Unknown Author';
 
     return GestureDetector(
@@ -273,10 +274,10 @@ class BookRemovalDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildSelectableBookCover(Map<String, dynamic> book, bool isSelected) {
-    String? coverImage = book['coverImage'];
-    String title = book['title'] ?? 'Unknown Title';
-    
+  Widget _buildSelectableBookCover(Book book, bool isSelected) {
+    String? coverImage = book.coverImage;
+    String title = book.title;
+
     return Container(
       width: 120,
       height: 160,

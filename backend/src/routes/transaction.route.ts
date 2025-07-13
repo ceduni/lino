@@ -31,7 +31,7 @@ async function getTransactionHistory(request: FastifyRequest, reply: FastifyRepl
         const message = error instanceof Error ? error.message : 'Unknown error';
         reply.code(500).send({error: message});
     }
-}
+} 
 
 
 interface MyFastifyInstance extends FastifyInstance {

@@ -36,7 +36,7 @@ async function searchBooks(request: FastifyRequest, reply: FastifyReply) {
         reply.code(statusCode).send({error: message});
     }
 }
-
+ 
 
 
 interface GetUniqueBookParams extends RouteGenericInterface {

@@ -100,7 +100,7 @@ class UserService {
     }
   }
 
-  Future<List<Notification>> getUserNotifications(String token) async {
+  Future<List<Notif>> getUserNotifications(String token) async {
     final response = await http.get(
         Uri.parse('$url/users/notifications'),
         headers: <String, String>{
@@ -112,9 +112,9 @@ class UserService {
       throw Exception(data['error']);
     }
 
-    List<Notification> notifications = [];
+    List<Notif> notifications = [];
     for (var notification in data['notifications']) {
-      notifications.add(Notification.fromJson(notification));
+      notifications.add(Notif.fromJson(notification));
     }
     return notifications;
   }
@@ -132,6 +132,42 @@ class UserService {
     final data = jsonDecode(response.body);
     if (response.statusCode != 200) {
       print(data);
+      throw Exception(data['error']);
+    }
+  }
+
+  Future<void> addUserFavLocation(String token, double latitude, double longitude, String name) async {
+    final response = await http.post(
+      Uri.parse('$url/users/location'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'latitude': latitude,
+        'longitude': longitude,
+        'name': name,
+      }),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception(data['error']);
+    }
+  }
+
+  Future<void> deleteUserFavLocation(String token, String name) async {
+    final response = await http.delete(
+      Uri.parse('$url/users/location'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'name': name,
+      }),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
       throw Exception(data['error']);
     }
   }

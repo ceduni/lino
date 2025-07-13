@@ -1,7 +1,7 @@
+import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:flutter/material.dart';
 import '../../models/transaction_model.dart';
 import '../../services/transaction_services.dart';
-import '../../services/book_services.dart';
 
 class RecentTransactionsCard extends StatefulWidget {
   final String username;
@@ -34,10 +34,10 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
       });
 
       final transactionService = TransactionServices();
-      final bookService = BookService();
+      final bookboxService = BookboxService();
       
       // Fetch transactions
-      final fetchedTransactions = await transactionService.getUserTransactionsList(
+      final fetchedTransactions = await transactionService.getUserTransactions(
         widget.username,
         limit: 10, // Show 10 most recent transactions
       );
@@ -52,7 +52,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
       final Map<String, String> bookboxNames = {};
       for (String bookboxId in uniqueBookboxIds) {
         try {
-          final bookboxData = await bookService.getBookBox(bookboxId);
+          final bookboxData = await bookboxService.getBookBox(bookboxId);
           bookboxNames[bookboxId] = bookboxData.name;
         } catch (e) {
           print('Error fetching bookbox $bookboxId: $e');

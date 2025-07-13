@@ -42,7 +42,7 @@ class BookInBookBoxRow extends StatelessWidget {
 
   Widget _buildBookItem(BuildContext context, Book book) {
     String title = book.title;
-    List<dynamic> authors = book.authors;
+    List<String> authors = book.authors;
     String authorsString = authors.isNotEmpty ? authors.join(', ') : 'Unknown Author';
     String bookName = '$title by $authorsString';
 

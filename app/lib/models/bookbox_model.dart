@@ -37,3 +37,19 @@ class BookBox {
     );
   }
 }
+
+class BookBoxWithDistance extends BookBox {
+  final double? distance; // Distance from the user's location
+
+  BookBoxWithDistance({
+    required super.id,
+    required super.name,
+    super.image,
+    required super.longitude,
+    required super.latitude,
+    required super.boroughId,
+    super.infoText,
+    required super.books,
+    this.distance,
+  });
+}

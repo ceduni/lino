@@ -1,7 +1,7 @@
 import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:Lino_app/services/book_services.dart';
 import '../bookbox/book_box_screen.dart'; 
 
 class BookBoxesList extends StatelessWidget {
@@ -45,7 +45,7 @@ class BookBoxesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<BookBox>>(
-      future: BookService().searchBookboxes(kw: query),
+      future: BookboxService().searchBookboxes(kw: query),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());

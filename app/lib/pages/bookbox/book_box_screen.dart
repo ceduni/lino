@@ -1,12 +1,12 @@
 import 'package:Lino_app/models/bookbox_model.dart';
-import 'package:Lino_app/services/book_services.dart';
+import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/services/bookbox_state_service.dart';
 import 'package:Lino_app/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import '../../controllers/global_state_controller.dart';
+// import '../../controllers/global_state_controller.dart';
 
 import 'book_in_bookbox_row.dart';
 
@@ -43,17 +43,7 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
   }
 
   Future<BookBox> _getBookBoxData(String bookBoxId) async {
-    var bb = await BookService().getBookBox(bookBoxId);
-    return BookBox(
-      id: bb.id,
-      name: bb.name,
-      image: bb.image,
-      infoText: bb.infoText,
-      longitude: bb.longitude,
-      latitude: bb.latitude,
-      boroughId: bb.boroughId,
-      books: bb.books
-    );
+    return await BookboxService().getBookBox(bookBoxId);
   }
 
   @override
@@ -76,12 +66,7 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
     );
   }
 
-  Widget buildContent(BuildContext context, BookBox data) {
-    final bbName = data.name;
-    final bbImage = data.image;
-    final bbInfoText = data.infoText;
-    final bbLocation = LatLng(data.latitude, data.longitude);
-    final bbBooks = data.books;
+  Widget buildContent(BuildContext context, BookBox bb) {
     return SingleChildScrollView(
       child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,33 +81,26 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
                   const SizedBox(height: 15),
                   Center(
                     child: BookBoxTitleContainer(
-                      bbName: bbName,
-                      bbInfoText: bbInfoText,
-                      bbImageLink: bbImage,
-                      bbLocation: bbLocation,
+                      bbName: bb.name,
+                      bbInfoText: bb.infoText,
+                      bbImageLink: bb.image,
+                      bbLocation: LatLng(bb.latitude, bb.longitude),
                     ),
                   ),
                   const SizedBox(height: 15),
                   Center(
-                    child: DirectionButton(bookBoxLocation: bbLocation),
+                    child: DirectionButton(bookBoxLocation: LatLng(bb.latitude, bb.longitude)),
                   ),
                   const SizedBox(height: 15),
                   Center(
                     child: SelectBookBoxButton(
-                      bookBoxData: {
-                        'id': widget.bookBoxId,
-                        'name': bbName,
-                        'latitude': bbLocation.latitude,
-                        'longitude': bbLocation.longitude,
-                        'infoText': bbInfoText,
-                        'image': bbImage,
-                      },
+                      bookBoxData: bb,
                     ),
                   ),
                   const SizedBox(height: 15),
                   Center(
                     child: BookInBookBoxRow(
-                      books: bbBooks,
+                      books: bb.books,
                       bbid: widget.bookBoxId,
                     ),
                   ),
@@ -239,13 +217,13 @@ class DirectionButton extends StatelessWidget {
 }
 
 class SelectBookBoxButton extends StatelessWidget {
-  final Map<String, dynamic> bookBoxData;
+  final BookBox bookBoxData;
 
   const SelectBookBoxButton({super.key, required this.bookBoxData});
 
   @override
   Widget build(BuildContext context) {
-    final GlobalStateController globalState = Get.put(GlobalStateController());
+    // final GlobalStateController globalState = Get.put(GlobalStateController());
     
     return Container(
       decoration: BoxDecoration(
