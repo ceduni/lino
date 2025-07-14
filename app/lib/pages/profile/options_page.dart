@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:Lino_app/pages/profile/options/modify_profile_page.dart';
 import 'package:Lino_app/pages/profile/options/favourite_genres_page.dart';
+import 'package:Lino_app/pages/map/favourite_locations_page.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 
 class OptionsPage extends StatefulWidget {
@@ -79,6 +80,30 @@ class _OptionsPageState extends State<OptionsPage> {
                     MaterialPageRoute(
                         builder: (context) =>
                             FavouriteGenresPage()),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                color: LinoColors.primary,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: ListTile(
+                leading: Icon(Icons.location_on, color: Colors.black),
+                title: Text(
+                  'Favourite Locations',
+                  style: TextStyle(
+                      fontWeight: FontWeight.normal, color: Colors.black),
+                ),
+                trailing:
+                Icon(Icons.chevron_right, color: Colors.black),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FavouriteLocationsPage()),
                   );
                 },
               ),

@@ -210,7 +210,7 @@ export const addUserFavLocationSchema = {
     },
     body: {
         type: 'object',
-        required: ['latitude', 'longitude'],
+        required: ['latitude', 'longitude', 'name'],
         properties: {
             latitude: { type: 'number', minimum: -90, maximum: 90 },
             longitude: { type: 'number', minimum: -180, maximum: 180 },
@@ -222,7 +222,9 @@ export const addUserFavLocationSchema = {
             description: 'Location added to user\'s favourite locations',
             type: 'object',
             properties: {
-                user: userSchema,
+                longitude: { type: 'number' },
+                latitude: { type: 'number' },
+                name: { type: 'string' }, // Name of the location
                 boroughId: { type: 'string' } // ID of the borough where the location is
             }
         },

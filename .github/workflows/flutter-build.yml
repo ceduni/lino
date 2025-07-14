@@ -43,6 +43,12 @@ jobs:
         echo "flutter.sdk=$FLUTTER_ROOT" >> local.properties
         echo "googleMapsApiKey=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> local.properties
         echo "imgbbApiKey=${{ secrets.IMGBB_API_KEY }}" >> local.properties
+      
+    - name: Create .env file
+      working-directory: ./app
+      run: |
+        echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" > .env
+        echo "IMGBB_API_KEY=${{ secrets.IMGBB_API_KEY }}" >> .env
 
     # - name: Run tests (optional)
     #   working-directory: ./app

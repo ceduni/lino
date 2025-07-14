@@ -94,6 +94,7 @@ gradlew
 gradlew.bat
 settings.gradle
 gradle.properties
+.env
 
 # Web specific
 web/.dart_tool/

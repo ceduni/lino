@@ -12,6 +12,15 @@ if (localPropertiesFile.exists()) {
     }
 }
 
+// Load .env file for API keys
+def envProperties = new Properties()
+def envFile = rootProject.file('.env')
+if (envFile.exists()) {
+    envFile.withReader('UTF-8') { reader ->
+        envProperties.load(reader)
+    }
+}
+
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
     flutterVersionCode = '1'
@@ -53,8 +62,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        resValue "string", "google_maps_api_key", localProperties['googleMapsApiKey']
-        buildConfigField "String", "IMGBB_API_KEY", "\"${localProperties['imgbbApiKey'] ?: 'YOUR_IMGBB_API_KEY_HERE'}\""
+        resValue "string", "google_maps_api_key", envProperties['GOOGLE_MAPS_API_KEY'] ?: localProperties['googleMapsApiKey'] ?: 'YOUR_API_KEY_HERE'
     }
 
     buildTypes {

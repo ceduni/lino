@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'favourite_locations_input_page.dart';
 
 class FavouriteGenresInputPage extends StatefulWidget {
   final String token;
@@ -85,7 +86,7 @@ class _FavouriteGenresInputPageState extends State<FavouriteGenresInputPage> {
         _isLoading = false;
       });
     }
-  }
+  } 
 
   void _toggleGenre(String genre) {
     setState(() {
@@ -137,9 +138,14 @@ class _FavouriteGenresInputPageState extends State<FavouriteGenresInputPage> {
       var userService = UserService();
       await userService.updateUser(widget.token, favouriteGenres: _selectedGenres);
       showToast('Favourite genres saved successfully!');
-      Navigator.pushReplacementNamed(
+      Navigator.pushReplacement(
         context,
-        '/home'
+        MaterialPageRoute(
+          builder: (context) => FavouriteLocationsInputPage(
+            token: widget.token,
+            prefs: widget.prefs,
+          ),
+        ),
       );
     } catch (e) {
       showToast('Error saving favourite genres: $e');

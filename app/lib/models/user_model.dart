@@ -72,10 +72,10 @@ class FavouriteLocation {
 
   factory FavouriteLocation.fromJson(Map<String, dynamic> json) {
     return FavouriteLocation(
-      latitude: json['latitude'].toDouble(),
-      longitude: json['longitude'].toDouble(),
-      name: json['name'],
-      boroughId: json['boroughId'],
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      name: json['name'] as String? ?? 'Unknown Location',
+      boroughId: json['boroughId'] as String? ?? '',
     );
   }
 }

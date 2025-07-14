@@ -44,11 +44,13 @@ export const userSchema = {
             items: {
                 type: 'object',
                 properties: {
+                    _id: { type: 'string' },
                     latitude: { type: 'number' },
                     longitude: { type: 'number' },
+                    name: { type: 'string' }, // Name of the location
                     boroughId: { type: 'string' } // ID of the borough
                 },
-                required: ['latitude', 'longitude', 'boroughId']
+                required: ['latitude', 'longitude', 'name', 'boroughId']
             },
             default: []
         },

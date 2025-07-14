@@ -149,11 +149,17 @@ const UserService = {
         user.favouriteLocations.push({
             latitude: latitude,
             longitude: longitude,
+            name: name,
             boroughId: boroughId
         });
         
         await user.save();
-        return { user, boroughId };
+        return { 
+            latitude: latitude, 
+            longitude: longitude, 
+            boroughId: boroughId, 
+            name: name 
+        };
     },
 
     async deleteUserFavLocation(request: AuthenticatedRequest & { 
