@@ -5,7 +5,6 @@ import { newErr } from './utilities';
 import { broadcastToUser } from '../index';
 import { AuthenticatedRequest } from '../types/common.types';
 import { IBook } from '../types/book.types';
-import requestService from './request.service';
 import RequestService from './request.service';
 
 const NotificationService = {
@@ -99,46 +98,43 @@ const NotificationService = {
                 continue; // Skip the user who added the book
             }
 
-            // Store requests for later
-            const requests = await RequestService.getBookRequests({ query: { username: user.username } });
 
             const reasons: string[] = [];
 
             // Check if user follows this bookbox
             if (user.followedBookboxes.includes(bookboxId)) {
                 reasons.push('fav_bookbox');
-                // Check if the book matches the user's request
-                if (requests.some(req => req.bookTitle.toLowerCase() === book.title.toLowerCase())) {
-                    reasons.push('requested_book');
-                }
             }
 
             // Check if the borough matches one of the user's favourite locations
             for (const location of user.favouriteLocations) {
                 if (location.boroughId === bookBox.boroughId) {
                     reasons.push('same_borough');
-                    // Check if the book matches the user's request
-                    if (requests.some(req => req.bookTitle.toLowerCase() === book.title.toLowerCase())) {
-                        reasons.push('requested_book');
-                    }
                     break; // Exit early since we only need to find one match
                 }
             }
 
-            // Check if book categories match user's favourite genres
-            if (user.favouriteGenres && user.favouriteGenres.length > 0 && book.categories) {
-                const hasMatchingGenre = book.categories.some(category => 
-                    user.favouriteGenres.some(genre => 
-                        genre.toLowerCase() === category.toLowerCase()
-                    )
-                );
-                if (hasMatchingGenre) {
-                    reasons.push('fav_genre');
-                }
-            }
-
-            // Create notification if at least one reason exists
+            // Create notification if there's at least a reason related to the book box
             if (reasons.length > 0) {
+                 // Check if book categories match user's favourite genres
+                if (user.favouriteGenres && user.favouriteGenres.length > 0 && book.categories) {
+                    const hasMatchingGenre = book.categories.some(category => 
+                        user.favouriteGenres.some(genre => 
+                            genre.toLowerCase() === category.toLowerCase()
+                        )
+                    );
+                    if (hasMatchingGenre) {
+                        reasons.push('fav_genre');
+                    }
+                }
+
+                const requests = await RequestService.getBookRequests({ query: { username: user.username } });
+
+                // Check if the book matches the user's request
+                if (requests.some(req => req.bookTitle.toLowerCase() === book.title.toLowerCase())) {
+                    reasons.push('requested_book');
+                }
+                
                 const notificationOptions: any = {
                     bookboxId: bookboxId
                 };
