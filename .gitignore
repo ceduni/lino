@@ -1,6 +1,7 @@
 /backend/.env
 /.idea
 /backend/node_modules
+app/.env
 
 # Flutter app environment variables - NEVER commit these!
 app/.env
