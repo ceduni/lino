@@ -2,12 +2,15 @@
 /.idea
 /backend/node_modules
 app/.env
+<<<<<<< HEAD
 
 # Flutter app environment variables - NEVER commit these!
 app/.env
 app/.env.local
 app/.env.production
 app/.env.staging
+=======
+>>>>>>> 90f4afb2 (Remove .env . come on.)
 
 app/ios/Podfile
 app/ios/Flutter/Debug.xcconfig
