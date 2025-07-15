@@ -199,6 +199,9 @@ class BookBoxSelectionDialog extends StatelessWidget {
             }).toList(),
             onChanged: (String? value) {
               bookBoxController.setSelectedBookBox(value!);
+              isAddBook
+                  ? bookBoxController.submitBookBox()
+                  : bookBoxController.submitBookBox2();
             },
           ),
         );
@@ -249,6 +252,9 @@ class BookBoxSelectionDialog extends StatelessWidget {
               ),
               onTap: () {
                 bookBoxController.setSelectedBookBox(bookBox.id);
+                isAddBook
+                    ? bookBoxController.submitBookBox()
+                    : bookBoxController.submitBookBox2();
               },
             ),
           );
