@@ -150,7 +150,7 @@ class HomePage extends HookWidget {
           // Profile card section
           Padding(
             padding: EdgeInsets.all(16.0),
-            child: ProfileCard(username: userData.data!.username, carbonSavings: userData.data!.ecologicalImpact.carbonSavings, savedWater: userData.data!.ecologicalImpact.savedWater, savedTrees: userData.data!.ecologicalImpact.savedTrees, numSavedBooks: userData.data!.numSavedBooks, createdAt: userData.data!.createdAt),
+            child: ProfileCard(username: userData.data!.username, savedTrees: userData.data!.ecologicalImpact.savedTrees, numSavedBooks: userData.data!.numSavedBooks, createdAt: userData.data!.createdAt),
           ),
           // Map section
           Expanded(
