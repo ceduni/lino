@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
+import '../profile/user_dashboard_widget.dart';
 import '../../models/user_model.dart';
 import '../../services/user_services.dart';
 import '../profile/user_dashboard_widget.dart';
@@ -33,106 +34,6 @@ class HomePage extends HookWidget {
     }
   }
 
-  Widget buildProfileCard(User user) {
-    int numSavedBooks = user.numSavedBooks;
-    double savedTrees = numSavedBooks * 0.05;
-    DateTime createdAt = DateTime.parse(user.createdAt.toIso8601String());
-    
-    int daysSince = DateTime.now().difference(createdAt).inDays;
-    String memberSince = daysSince == 0 ? 'today' : '$daysSince days ago';
-
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Row(
-        children: [
-          // Profile avatar
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.orange,
-            child: Icon(
-              Icons.person,
-              size: 30,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(width: 16),
-          // User info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  user.username,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Member since $memberSince',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Stats
-          Column(
-            children: [
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        '$numSavedBooks',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Books Saved',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 20),
-                  Column(
-                    children: [
-                      Text(
-                        savedTrees.toStringAsFixed(2),
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Trees Saved',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget buildMapSection() {
     return Obx(() {
@@ -228,6 +129,9 @@ class HomePage extends HookWidget {
     }
 
     final userData = useFuture(useMemoized(() => getUserData(token.value!), [token.value]));
+    //print('boop ${userData.data?.ecologicalImpact.carbonSavings}');
+    
+    
 
     if (userData.connectionState != ConnectionState.done) {
       return Scaffold(
@@ -247,7 +151,7 @@ class HomePage extends HookWidget {
           // Profile card section
           Padding(
             padding: EdgeInsets.all(16.0),
-            child: buildProfileCard(userData.data!),
+            child: ProfileCard(username: userData.data!.username, carbonSavings: userData.data!.ecologicalImpact.carbonSavings, savedWater: userData.data!.ecologicalImpact.savedWater, savedTrees: userData.data!.ecologicalImpact.savedTrees, numSavedBooks: userData.data!.numSavedBooks, createdAt: userData.data!.createdAt),
           ),
           // Map section
           Expanded(
