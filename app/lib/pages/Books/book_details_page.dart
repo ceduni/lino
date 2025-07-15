@@ -19,9 +19,9 @@ class BookDetailsPage extends StatefulWidget {
 }
 
 class _BookDetailsPageState extends State<BookDetailsPage> {
-  bool _isLoading = true;
+  bool _isLoading = false;
   // bool _isUserLoggedIn = false;
-  bool _isCheckingUser = true;  // New flag to check if user status is being checked
+  bool _isCheckingUser = false;  // New flag to check if user status is being checked
 
   @override
   void initState() {
