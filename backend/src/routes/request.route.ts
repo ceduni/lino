@@ -11,7 +11,6 @@ async function sendBookRequest(request: FastifyRequest, reply: FastifyReply) {
     try {
         const response = await RequestService.requestBookToUsers(request as AuthenticatedRequest & { 
             body: { title: string; customMessage?: string }; 
-            query: { latitude?: number; longitude?: number } 
         });
         reply.code(201).send(response);
     } catch (error : unknown) {

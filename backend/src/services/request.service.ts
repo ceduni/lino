@@ -8,16 +8,10 @@ import { AuthenticatedRequest } from '../types/common.types';
 const RequestService = {
     async requestBookToUsers(request: AuthenticatedRequest & { 
         body: { title: string; customMessage?: string }; 
-        query: { latitude?: number; longitude?: number } 
     }) {
         const user = await User.findById(request.user.id);
         if (!user) {
             throw newErr(404, 'User not found');
-        }
-
-        const { latitude, longitude } = request.query;
-        if (!latitude || !longitude) {
-            throw newErr(400, 'User location (latitude and longitude) is required');
         }
 
         const userBoroughIds = user.favouriteLocations.map(location => location.boroughId);

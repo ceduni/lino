@@ -8,13 +8,9 @@ class BookRequestService {
   final String url = baseApiUrl;
   
   Future<void> requestBookToUsers(String token, String title,
-      {String? cm, num? latitude, num? longitude}) async {
-    var queryParams = <String, String>{
-      if (latitude != null) 'latitude': latitude.toString(),
-      if (longitude != null) 'longitude': longitude.toString(),
-    };
+      {String? cm}) async {
     final r = await http.post(
-      Uri.parse('$url/books/request').replace(queryParameters: queryParams),
+      Uri.parse('$url/books/request'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
