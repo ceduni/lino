@@ -76,15 +76,23 @@ jobs:
       if: github.event.inputs.include_patch_notes == 'true'
       run: |
         if [ -f "PATCH_NOTES.md" ]; then
-          {
-            echo 'content<<PATCH_NOTES_EOF'
-            cat PATCH_NOTES.md
-            echo 'PATCH_NOTES_EOF'
-            echo 'exists=true'
-          } >> $GITHUB_OUTPUT
+          # Encode content to base64 to avoid multiline issues
+          CONTENT=$(base64 -w 0 PATCH_NOTES.md)
+          echo "content_base64=$CONTENT" >> $GITHUB_OUTPUT
+          echo "exists=true" >> $GITHUB_OUTPUT
         else
-          echo 'exists=false' >> $GITHUB_OUTPUT
+          echo "exists=false" >> $GITHUB_OUTPUT
         fi
+    
+    - name: Decode patch notes
+      id: decoded_notes
+      if: github.event.inputs.include_patch_notes == 'true' && steps.patch_notes.outputs.exists == 'true'
+      run: |
+        DECODED_CONTENT=$(echo "${{ steps.patch_notes.outputs.content_base64 }}" | base64 -d)
+        # Use a different approach for multiline content
+        echo "content<<NOTES_END" >> $GITHUB_OUTPUT
+        echo "$DECODED_CONTENT" >> $GITHUB_OUTPUT
+        echo "NOTES_END" >> $GITHUB_OUTPUT
         
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
@@ -102,7 +110,7 @@ jobs:
           **Build Date:** ${{ steps.build_date.outputs.date }}
           **Commit:** ${{ github.sha }}
           
-          ${{ steps.patch_notes.outputs.exists == 'true' && steps.patch_notes.outputs.content || '## Changes\nBuilt from latest commit.' }}
+          ${{ steps.patch_notes.outputs.exists == 'true' && steps.decoded_notes.outputs.content || '## Changes\nBuilt from latest commit.' }}
         files: |
           app/build/app/outputs/flutter-apk/app-release.apk
         draft: false
