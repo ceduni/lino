@@ -76,12 +76,14 @@ jobs:
       if: github.event.inputs.include_patch_notes == 'true'
       run: |
         if [ -f "PATCH_NOTES.md" ]; then
-          echo "content<<EOF" >> $GITHUB_OUTPUT
-          cat PATCH_NOTES.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          echo "exists=true" >> $GITHUB_OUTPUT
+          {
+            echo 'content<<PATCH_NOTES_EOF'
+            cat PATCH_NOTES.md
+            echo 'PATCH_NOTES_EOF'
+            echo 'exists=true'
+          } >> $GITHUB_OUTPUT
         else
-          echo "exists=false" >> $GITHUB_OUTPUT
+          echo 'exists=false' >> $GITHUB_OUTPUT
         fi
         
     - name: Upload APK artifact
