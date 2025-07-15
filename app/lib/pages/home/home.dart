@@ -4,12 +4,10 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:geolocator/geolocator.dart';
 import '../../models/user_model.dart';
 import '../../services/user_services.dart';
-import '../profile/user_dashboard_widget.dart';
+import 'package:Lino_app/pages/profile/user_dashboard/profile_card.dart';
 import '../map/book_box_controller.dart';
-import '../bookbox/book_box_screen.dart';
 
 class HomePage extends HookWidget {
   final BookBoxController bookBoxController = Get.put(BookBoxController());
@@ -38,99 +36,11 @@ class HomePage extends HookWidget {
     double savedTrees = numSavedBooks * 0.05;
     DateTime createdAt = DateTime.parse(user.createdAt.toIso8601String());
     
-    int daysSince = DateTime.now().difference(createdAt).inDays;
-    String memberSince = daysSince == 0 ? 'today' : '$daysSince days ago';
-
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Row(
-        children: [
-          // Profile avatar
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.orange,
-            child: Icon(
-              Icons.person,
-              size: 30,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(width: 16),
-          // User info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  user.username,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Member since $memberSince',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Stats
-          Column(
-            children: [
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        '$numSavedBooks',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Books Saved',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 20),
-                  Column(
-                    children: [
-                      Text(
-                        savedTrees.toStringAsFixed(2),
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Trees Saved',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
+    return ProfileCard(
+      username: user.username, 
+    savedTrees: savedTrees, 
+    numSavedBooks: numSavedBooks, 
+    createdAt: createdAt
     );
   }
 
