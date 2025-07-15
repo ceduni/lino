@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../../utils/constants/colors.dart';
+import 'package:Lino_app/pages/profile/user_dashboard/profile_card.dart';
 import 'recent_transactions_widget.dart';
-import 'options/modify_profile_page.dart';
 
 class UserDashboard extends StatefulWidget {
   final String username;
@@ -34,11 +32,10 @@ class _UserDashboardState extends State<UserDashboard> {
         children: [
           ProfileCard(
             username: widget.username,
-            carbonSavings: widget.carbonSavings,
-            savedWater: widget.savedWater,
             savedTrees: widget.savedTrees,
             numSavedBooks: widget.numSavedBooks,
             createdAt: widget.createdAt,
+            includeModifyButton: true,
           ),
           EcologicalImpactCard(
             carbonSavings: widget.carbonSavings,
@@ -55,145 +52,6 @@ class _UserDashboardState extends State<UserDashboard> {
   }
 }
 
-class ProfileCard extends StatelessWidget {
-  final String username;
-  final double carbonSavings;
-  final double savedWater;
-  final double savedTrees;
-  final int numSavedBooks;
-  final DateTime createdAt;
-
-  const ProfileCard({
-    super.key,
-    required this.username,
-    required this.carbonSavings,
-    required this.savedWater,
-    required this.savedTrees,
-    required this.numSavedBooks,
-    required this.createdAt,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: LinoColors.primary,
-      elevation: 4,
-      margin: EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: Image.network('https://imgs.search.brave.com/M3mi-is8_3t7e0PSznN7CZl9wCDVz6B_7hiUc3zgp3o/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG40/Lmljb25maW5kZXIu/Y29tL2RhdGEvaWNv/bnMvc3BvdHMvNTEy/L2ZhY2Utd29tYW4t/MTI4LnBuZw').image,
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(child: _buildStatColumn('$numSavedBooks', 'Books Saved')),
-                          Expanded(child: _buildStatColumn('${savedTrees.toStringAsFixed(2)}', 'Trees Saved')),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Text(
-              username,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              _getMemberSinceText(),
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-            SizedBox(height: 12),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ModifyProfilePage(),
-                  ),
-                );
-              },
-              child: Text(
-                'Update profile',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.blue,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-            SizedBox(height: 0),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _getMemberSinceText() {
-    final now = DateTime.now();
-    final difference = now.difference(createdAt);
-    
-    if (difference.inDays >= 365) {
-      final years = (difference.inDays / 365).floor();
-      return 'Member since ${years} year${years > 1 ? 's' : ''} ago';
-    } else if (difference.inDays >= 30) {
-      final months = (difference.inDays / 30).floor();
-      return 'Member since ${months} month${months > 1 ? 's' : ''} ago';
-    } else if (difference.inDays >= 1) {
-      return 'Member since ${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
-    } else if (difference.inHours >= 1) {
-      return 'Member since ${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
-    } else if (difference.inMinutes >= 1) {
-      return 'Member since ${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
-    } else {
-      return 'Member since just now';
-    }
-  }
-
-  Column _buildStatColumn(String count, String label) {
-    return Column(
-      children: [
-        Text(
-          count,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(height: 4),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.clip,
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey,
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 class EcologicalImpactCard extends StatelessWidget {
   final double carbonSavings;

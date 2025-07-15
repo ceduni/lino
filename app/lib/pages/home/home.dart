@@ -8,9 +8,8 @@ import 'package:geolocator/geolocator.dart';
 import '../profile/user_dashboard_widget.dart';
 import '../../models/user_model.dart';
 import '../../services/user_services.dart';
-import '../profile/user_dashboard_widget.dart';
+import 'package:Lino_app/pages/profile/user_dashboard/profile_card.dart';
 import '../map/book_box_controller.dart';
-import '../bookbox/book_box_screen.dart';
 
 class HomePage extends HookWidget {
   final BookBoxController bookBoxController = Get.put(BookBoxController());

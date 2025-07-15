@@ -2,7 +2,6 @@ import 'package:Lino_app/pages/login/login_page.dart';
 import 'package:Lino_app/pages/map/favourite_locations_page.dart';
 import 'package:Lino_app/services/bookbox_state_service.dart';
 import 'package:Lino_app/services/user_services.dart';
-import 'package:Lino_app/splash_screen.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -37,9 +36,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: AppRoutes.splash,
+      initialRoute: AppRoutes.home,
       getPages: [
-        GetPage(name: AppRoutes.splash, page: () => SplashScreen()),
         GetPage(name: AppRoutes.login, page: () => LoginPage(prefs: prefs)),
         GetPage(name: AppRoutes.home, page: () => BookNavPage()),
         GetPage(name: AppRoutes.favouriteLocations, page: () => FavouriteLocationsPage()),
