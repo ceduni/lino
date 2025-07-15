@@ -34,6 +34,11 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
   static const LatLng _defaultLocation = LatLng(45.5017, -73.5673); // Montreal
   LatLng _currentLocation = _defaultLocation;
   
+  // Resizable divider state
+  double _mapFlex = 2.0;
+  double _listFlex = 1.0;
+  bool _isDragging = false;
+  
   @override
   void initState() {
     super.initState();
@@ -308,7 +313,7 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
                 
                 // Map
                 Expanded(
-                  flex: 2,
+                  flex: _mapFlex.round(),
                   child: Stack(
                     children: [
                       GoogleMap(
@@ -335,9 +340,69 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
                   ),
                 ),
                 
+                // Resizable divider
+                GestureDetector(
+                  onPanStart: (details) {
+                    setState(() {
+                      _isDragging = true;
+                    });
+                  },
+                  onPanUpdate: (details) {
+                    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+                    final screenHeight = renderBox.size.height;
+                    final appBarHeight = AppBar().preferredSize.height;
+                    final searchBarHeight = 80.0; // Approximate height of search bar
+                    final dividerHeight = 20.0;
+                    final availableHeight = screenHeight - appBarHeight - searchBarHeight - dividerHeight - MediaQuery.of(context).padding.top;
+                    
+                    // Calculate drag position relative to the available content area
+                    final dragPosition = details.globalPosition.dy - appBarHeight - searchBarHeight - MediaQuery.of(context).padding.top;
+                    
+                    // Allow very small minimum sizes (5% each) to enable near-complete hiding
+                    final minMapHeight = availableHeight * 0.05;
+                    final minListHeight = availableHeight * 0.05;
+                    
+                    // Clamp the drag position to ensure minimums
+                    final clampedDragPosition = dragPosition.clamp(minMapHeight, availableHeight - minListHeight);
+                    
+                    final mapHeight = clampedDragPosition;
+                    final listHeight = availableHeight - clampedDragPosition;
+                    
+                    setState(() {
+                      // Use direct proportional flex values for smoother resizing
+                      _mapFlex = (mapHeight / availableHeight * 10).clamp(0.5, 9.5);
+                      _listFlex = (listHeight / availableHeight * 10).clamp(0.5, 9.5);
+                    });
+                  },
+                  onPanEnd: (details) {
+                    setState(() {
+                      _isDragging = false;
+                    });
+                  },
+                  child: Container(
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: _isDragging ? LinoColors.secondary.withOpacity(0.3) : Colors.grey[200],
+                      border: Border.symmetric(
+                        horizontal: BorderSide(color: Colors.grey[300]!, width: 1),
+                      ),
+                    ),
+                    child: Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: _isDragging ? LinoColors.secondary : Colors.grey[400],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                
                 // Favourite locations list
                 Expanded(
-                  flex: 1,
+                  flex: _listFlex.round(),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[50],
@@ -471,6 +536,8 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
               Text('• Tap anywhere on the map to add a location'),
               SizedBox(height: 8),
               Text('• Tap on markers to remove locations'),
+              SizedBox(height: 8),
+              Text('• Drag the divider between map and list to resize'),
               SizedBox(height: 8),
               Text('• Maximum 10 favourite locations allowed'),
               SizedBox(height: 8),

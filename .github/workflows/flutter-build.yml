@@ -1,16 +1,17 @@
 name: Flutter Build APK
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'app/**'  # Only trigger when files in app/ directory change
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:  # Only allow manual trigger
     inputs:
       version_tag:
         description: 'Version tag (e.g., 1.2.3456)'
         required: true
         type: string
+      include_patch_notes:
+        description: 'Include PATCH_NOTES.md file in release description'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -64,17 +65,24 @@ jobs:
       
     - name: Set version tag
       id: version
-      run: |
-        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-          echo "tag=${{ github.event.inputs.version_tag }}" >> $GITHUB_OUTPUT
-        else
-          # Generate automatic version based on timestamp or commit short hash
-          echo "tag=$(date +%Y.%m.%d)-$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_OUTPUT
-        fi
+      run: echo "tag=${{ github.event.inputs.version_tag }}" >> $GITHUB_OUTPUT
         
     - name: Set build date
       id: build_date
       run: echo "date=$(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_OUTPUT
+      
+    - name: Read patch notes
+      id: patch_notes
+      if: github.event.inputs.include_patch_notes == 'true'
+      run: |
+        if [ -f "PATCH_NOTES.md" ]; then
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          cat PATCH_NOTES.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
         
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
@@ -82,19 +90,17 @@ jobs:
         name: apk-${{ steps.version.outputs.tag }}
         path: app/build/app/outputs/flutter-apk/app-release.apk
         
-    - name: Create Release (if manual trigger)
-      if: github.event_name == 'workflow_dispatch'
+    - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: v${{ steps.version.outputs.tag }}
         name: Release ${{ steps.version.outputs.tag }}
         body: |
-          **Commit Message:** ${{ steps.commit.outputs.message }}
           **Version:** ${{ steps.version.outputs.tag }}
           **Build Date:** ${{ steps.build_date.outputs.date }}
+          **Commit:** ${{ github.sha }}
           
-          ## Changes
-          Built from commit: ${{ github.sha }}
+          ${{ steps.patch_notes.outputs.exists == 'true' && steps.patch_notes.outputs.content || '## Changes\nBuilt from latest commit.' }}
         files: |
           app/build/app/outputs/flutter-apk/app-release.apk
         draft: false
