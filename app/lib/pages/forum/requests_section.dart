@@ -47,11 +47,14 @@ class RequestsSectionState extends State<RequestsSection> {
       final List<Request> requestList = allRequests
           ? await brs.getBookRequests()
           : await brs.getBookRequests(username: currentUsername);
+      
+      
       setState(() {
         requests = requestList;
         isLoading = false;
       });
     } catch (e) {
+      showToast('Error loading requests: ${e.toString()}');
       setState(() {
         isLoading = false;
       });
@@ -123,7 +126,35 @@ class RequestsSectionState extends State<RequestsSection> {
           children: [
             isLoading
                 ? Center(child: CircularProgressIndicator())
-                : ListView.builder(
+                : requests.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.book_outlined, size: 64, color: LinoColors.accent),
+                            SizedBox(height: 16),
+                            Text(
+                              showAllRequests ? 'No book requests found' : 'You have no requests',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: LinoColors.accent,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              showAllRequests 
+                                  ? 'Be the first to request a book!'
+                                  : 'Start requesting books you\'d like to read',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: LinoColors.accent.withOpacity(0.7),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
               padding: const EdgeInsets.all(8.0),
               itemCount: requests.length,
               itemBuilder: (context, index) {

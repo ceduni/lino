@@ -44,18 +44,24 @@ class BookRequestService {
     var queryParams = {
       if (username != null) 'username': username,
     };
+    
+    final uri = Uri.parse('$url/books/requests').replace(queryParameters: queryParams);
+    
     final r = await http.get(
-      Uri.parse('$url/books/requests').replace(queryParameters: queryParams),
+      uri,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
-    final response = jsonDecode(r.body);
+    
     if (r.statusCode != 200) {
+      final response = jsonDecode(r.body);
       throw Exception(response['error']);
     }
+    
+    final requestsJson = jsonDecode(r.body) as List;
     List<Request> requests = [];
-    for (var reqJson in response['requests']) {
+    for (var reqJson in requestsJson) {
       requests.add(Request.fromJson(reqJson));
     }
     return requests;
