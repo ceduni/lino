@@ -1,4 +1,5 @@
 import 'package:Lino_app/pages/floating_button/dialog_options/bookbox_selection/bookbox_selection_dialog.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
@@ -42,30 +43,21 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
   @override
   Widget build(BuildContext context) {
     if (widget.selectedIndex == 2) {
-      // Requests page is active
-      return SpeedDial(
-        icon: Icons.add,
-        backgroundColor:
-            isUserAuthenticated ? Colors.blue.shade100 : Colors.grey,
-        children: isUserAuthenticated
-            ? [
-                // SpeedDialChild( // Commented out - threads functionality removed
-                //   backgroundColor: Colors.blue.shade300,
-                //   labelBackgroundColor: Colors.blue.shade300,
-                //   child: Icon(Icons.add),
-                //   label: 'Add Thread',
-                //   onTap: () => _addThread(context, widget.onThreadCreated),
-                // ),
-                SpeedDialChild(
-                  backgroundColor: Colors.blue.shade300,
-                  labelBackgroundColor: Colors.blue.shade300,
-                  child: Icon(Icons.add),
-                  label: 'Add Request',
-                  onTap: () =>
-                      _showRequestForm(context, widget.onRequestCreated),
-                ),
-              ]
-            : [],
+      // Requests page is active - Direct "Create Request" button
+      return Container(
+        margin: EdgeInsets.all(16.0), // Same margin as default floating button
+        child: FloatingActionButton.extended(
+          onPressed: isUserAuthenticated 
+              ? () => _showRequestForm(context, widget.onRequestCreated)
+              : null,
+          backgroundColor: isUserAuthenticated ? LinoColors.secondary : Colors.grey,
+          elevation: 2.0,
+          icon: Icon(Icons.add, color: Colors.white),
+          label: Text(
+            'Create Request',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
+        ),
       );
     }
 

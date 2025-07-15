@@ -30,8 +30,8 @@ import GoogleMaps
       let lines = content.components(separatedBy: .newlines)
       
       for line in lines {
-        if line.hasPrefix("GOOGLE_MAPS_API_KEY=") {
-          let apiKey = String(line.dropFirst("GOOGLE_MAPS_API_KEY=".count))
+        if line.hasPrefix("GOOGLE_API_KEY=") {
+          let apiKey = String(line.dropFirst("GOOGLE_API_KEY=".count))
           return apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
         }
       }

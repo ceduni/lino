@@ -297,7 +297,7 @@ class _FavouriteLocationsInputPageState extends State<FavouriteLocationsInputPag
                           ),
                           child: GooglePlaceAutoCompleteTextField(
                             textEditingController: _searchController,
-                            googleAPIKey: dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '',
+                            googleAPIKey: dotenv.env['GOOGLE_API_KEY'] ?? '',
                             inputDecoration: InputDecoration(
                               hintText: 'Search for places...',
                               prefixIcon: const Icon(Icons.search, color: Color(0xFF4277B8)),
