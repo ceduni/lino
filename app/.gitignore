@@ -12,6 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 .env
+uplodad-keystore.jks
 
 # IntelliJ related
 *.iml
