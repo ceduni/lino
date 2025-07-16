@@ -10,7 +10,7 @@ class ForumScreen extends StatefulWidget {
 
   @override
   ForumScreenState createState() => ForumScreenState();
-} 
+}  
 
 class ForumScreenState extends State<ForumScreen> {
   // final GlobalKey<ThreadsSectionState> threadsSectionKey = GlobalKey<ThreadsSectionState>(); // Commented out - threads functionality removed

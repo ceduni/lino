@@ -277,6 +277,30 @@ const bookboxService = {
             boroughId: bookBox.boroughId,
             infoText: bookBox.infoText
         };
+    },
+
+    async followBookBox(request: AuthenticatedRequest & { params: { bookboxId: string } }) {
+        const bookboxId = request.params.bookboxId;
+        const user = await User.findById(request.user.id);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }
+        if (!user.followedBookboxes.includes(bookboxId)) {
+            user.followedBookboxes.push(bookboxId);
+            await user.save();
+        }
+        return { message: 'Bookbox followed successfully' };
+    },
+
+    async unfollowBookBox(request: AuthenticatedRequest & { params: { bookboxId: string } }) {
+        const bookboxId = request.params.bookboxId;
+        const user = await User.findById(request.user.id);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }
+        user.followedBookboxes = user.followedBookboxes.filter(id => id !== bookboxId);
+        await user.save();
+        return { message: 'Bookbox unfollowed successfully' };
     }
 };
 

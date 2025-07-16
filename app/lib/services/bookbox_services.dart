@@ -58,4 +58,28 @@ class BookboxService {
     }
     return bookboxes;
   }
+
+  Future<void> followBookBox(String token, String bookBoxId) async {
+    final r = await http.post(
+      Uri.parse('$url/bookboxes/follow/$bookBoxId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (r.statusCode != 200) {
+      throw Exception(jsonDecode(r.body)['error']);
+    }
+  }
+
+  Future<void> unfollowBookBox(String token, String bookBoxId) async {
+    final r = await http.delete(
+      Uri.parse('$url/bookboxes/unfollow/$bookBoxId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (r.statusCode != 200) {
+      throw Exception(jsonDecode(r.body)['error']);
+    }
+  } 
 }

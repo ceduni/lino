@@ -7,10 +7,10 @@ import {
     addNewBookboxSchema,
     searchBookboxesSchema,
     deleteBookBoxSchema,
-    updateBookBoxSchema
+    updateBookBoxSchema,
+    followBookBoxSchema,
+    unfollowBookBoxSchema
 } from "../schemas/bookbox.schemas";
-import { clearCollectionSchema } from "../schemas/user.schemas";
-import { bookSchema } from "../schemas/models.schemas";
 import { BookAddData } from "../types/book.types";
 import { AuthenticatedRequest } from "../types/common.types";
 
@@ -116,6 +116,28 @@ async function updateBookBox(request: FastifyRequest, reply: FastifyReply) {
     }
 }
 
+async function followBookBox(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const response = await BookboxService.followBookBox(request as AuthenticatedRequest & { params: { bookboxId: string } });
+        reply.code(200).send(response);
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({error: message});
+    }
+}
+
+async function unfollowBookBox(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const response = await BookboxService.unfollowBookBox(request as AuthenticatedRequest & { params: { bookboxId: string } });
+        reply.code(200).send(response);
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({error: message});
+    }
+}
+
 interface MyFastifyInstance extends FastifyInstance {
     optionalAuthenticate: (request: FastifyRequest) => void;
     authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
@@ -126,6 +148,8 @@ interface MyFastifyInstance extends FastifyInstance {
 export default async function bookBoxRoutes(server: MyFastifyInstance) {
     server.get('/bookboxes/:bookboxId', { schema: getBookboxSchema }, getBookbox);
     server.get('/bookboxes/search', { schema: searchBookboxesSchema }, searchBookboxes);
+    server.post('/bookboxes/follow/:bookboxId', { preValidation: [server.authenticate], schema: followBookBoxSchema }, followBookBox);
+    server.delete('/bookboxes/unfollow/:bookboxId', { preValidation: [server.authenticate], schema: unfollowBookBoxSchema }, unfollowBookBox);
     server.post('/bookboxes/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);
     server.delete('/bookboxes/:bookboxId/books/:bookId', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: getBookFromBookBoxSchema }, getBookFromBookBox);
     server.post('/bookboxes/:bookboxId/books/add', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);

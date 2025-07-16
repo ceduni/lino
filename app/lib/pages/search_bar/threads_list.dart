@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/services/thread_services.dart';
 
-import '../forum/thread_message_screen.dart';
+import '../forum/threads/thread_message_screen.dart';
 
 class ThreadsList extends StatelessWidget {
   final String query;

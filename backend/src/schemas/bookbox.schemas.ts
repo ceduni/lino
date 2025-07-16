@@ -345,12 +345,118 @@ export const updateBookBoxSchema = {
                 error: { type: 'string' }
             }
         },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
         404: {
             description: 'Bookbox not found',
             type: 'object',
             properties: {
                 error: { type: 'string' }
             }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+
+
+export const followBookBoxSchema = {
+    description: 'Follow a bookbox',
+    tags: ['bookboxes'],
+    params: {  
+        type: 'object',
+        properties: {
+            bookboxId: { type: 'string' }
+        },
+        required: ['bookboxId']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' }
+        },
+        required: ['authorization']
+    },
+    response: {
+        200: {
+            description: 'Bookbox followed',
+            type: 'object',
+            properties: {
+                message: { type: 'string' }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Bookbox not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }   
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+
+export const unfollowBookBoxSchema = {
+    description: 'Unfollow a bookbox',
+    tags: ['bookboxes'],
+    params: {
+        type: 'object',
+        properties: {
+            bookboxId: { type: 'string' }
+        },
+        required: ['bookboxId']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' }
+        },
+        required: ['authorization']
+    },
+    response: {
+        200: {
+            description: 'Bookbox unfollowed',
+            type: 'object',
+            properties: {
+                message: { type: 'string' }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Bookbox not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }   
         },
         500: {
             description: 'Internal server error',

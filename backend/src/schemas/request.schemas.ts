@@ -9,14 +9,6 @@ export const sendBookRequestSchema = {
         },
         required: ['title']
     },
-    querystring: {
-        type: 'object',
-        properties: {
-            latitude: { type: 'number' },
-            longitude: { type: 'number' }
-        },
-        required: ['latitude', 'longitude']
-    },
     headers: {
         type: 'object',
         properties: {
