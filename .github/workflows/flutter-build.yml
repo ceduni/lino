@@ -54,6 +54,19 @@ jobs:
     # - name: Run tests (optional)
     #   working-directory: ./app
     #   run: flutter test
+
+    - name: Create keystore
+      working-directory: ./app
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > upload-keystore.jks
+        
+    - name: Create key.properties
+      working-directory: ./app/android
+      run: |
+        echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > key.properties
+        echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> key.properties
+        echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> key.properties
+        echo "storeFile=../upload-keystore.jks" >> key.properties
       
     - name: Build APK
       working-directory: ./app
