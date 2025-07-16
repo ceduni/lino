@@ -4,11 +4,9 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:geolocator/geolocator.dart';
-import '../profile/user_dashboard_widget.dart';
 import '../../models/user_model.dart';
 import '../../services/user_services.dart';
-import 'package:Lino_app/pages/profile/user_dashboard/profile_card.dart';
+import '../../widgets/home_profile_summary.dart';
 import '../map/book_box_controller.dart';
 
 class HomePage extends HookWidget {
@@ -147,10 +145,16 @@ class HomePage extends HookWidget {
     return Scaffold(
       body: Column(
         children: [
-          // Profile card section
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: ProfileCard(username: userData.data!.username, savedTrees: userData.data!.ecologicalImpact.savedTrees, numSavedBooks: userData.data!.numSavedBooks, createdAt: userData.data!.createdAt),
+          // Profile summary section
+          HomeProfileSummary(
+            username: userData.data!.username,
+            numSavedBooks: userData.data!.numSavedBooks,
+            savedTrees: userData.data!.ecologicalImpact.savedTrees,
+            carbonSavings: userData.data!.ecologicalImpact.carbonSavings,
+            onTap: () {
+              // Navigate to profile page when tapped
+              Navigator.pushNamed(context, '/profile');
+            },
           ),
           // Map section
           Expanded(
