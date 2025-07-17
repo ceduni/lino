@@ -38,7 +38,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "com.example.test_app"
+    namespace "ca.umontreal.ceduni.lino"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -83,9 +83,9 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            minifyEnabled true           // Enable R8 code shrinking and obfuscation
-            shrinkResources true         // Enable resource shrinking
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled false          // Disable R8 to prevent deep link issues
+            shrinkResources false        // Disable resource shrinking
+            // proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
             signingConfig signingConfigs.debug

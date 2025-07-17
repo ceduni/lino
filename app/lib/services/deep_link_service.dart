@@ -1,60 +1,130 @@
 import 'package:app_links/app_links.dart';
 import 'package:get/get.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 class DeepLinkService {
   static final _appLinks = AppLinks();
   static bool _initialized = false;
+  static StreamSubscription<Uri>? _linkSubscription;
   
-  static void initialize() {
+  static Future<void> initialize() async {
     if (_initialized) return;
     _initialized = true;
     
-    // Handle app launch from link
-    _appLinks.getInitialLink().then((uri) {
-      if (uri != null) {
-        _handleDeepLink(uri);
+    try {
+      // Handle app launch from link
+      final initialUri = await _appLinks.getInitialLink();
+      if (initialUri != null) {
+        // Delay initial link handling to ensure app is fully initialized
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _handleDeepLink(initialUri);
+        });
       }
-    });
-    
-    // Handle app already running
-    _appLinks.uriLinkStream.listen((uri) {
-      _handleDeepLink(uri);
-    });
+      
+      // Handle app already running
+      _linkSubscription = _appLinks.uriLinkStream.listen(
+        (uri) {
+          _handleDeepLink(uri);
+        },
+        onError: (error) {
+          if (kDebugMode) {
+            print('Deep link error: $error');
+          }
+        },
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Failed to initialize deep links: $e');
+      }
+    }
+  }
+  
+  static void dispose() {
+    _linkSubscription?.cancel();
+    _linkSubscription = null;
+    _initialized = false;
   }
   
   static void _handleDeepLink(Uri uri) {
-    print('Deep link received: $uri');
+    if (kDebugMode) {
+      print('Deep link received: $uri');
+    }
     
-    // Parse the URL
-    final segments = uri.pathSegments;
-    
-    if (segments.isNotEmpty && segments[0] == 'bookbox') {
-      if (segments.length >= 2) {
-        final bookboxId = segments[1];
-        _navigateToBookbox(bookboxId);
+    try {
+      // Parse the URL
+      final segments = uri.pathSegments;
+      
+      if (segments.isNotEmpty && segments[0] == 'bookbox') {
+        if (segments.length >= 2) {
+          final bookboxId = segments[1];
+          _navigateToBookbox(bookboxId);
+        } else {
+          _navigateToHome();
+        }
+      } else {
+        // Default to home page
+        _navigateToHome();
       }
-    } else {
-      // Default to home page
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error handling deep link: $e');
+      }
       _navigateToHome();
     }
   }
   
   static void _navigateToBookbox(String bookboxId) {
-    print('Navigating to bookbox: $bookboxId');
+    if (kDebugMode) {
+      print('Navigating to bookbox: $bookboxId');
+    }
     
-    // Navigate to home first, then to bookbox
-    Get.offAllNamed(AppRoutes.home);
-    
-    // Then navigate to bookbox with ID
-    // Use a delay to ensure home page is loaded first
-    Future.delayed(Duration(milliseconds: 100), () {
-      Get.toNamed(AppRoutes.bookbox, arguments: {'bookboxId': bookboxId, 'canInteract': true});
-    });
+    try {
+      // Ensure we're on the main thread and GetX is ready
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (Get.context != null) {
+          // Navigate to home first, then to bookbox
+          Get.offAllNamed(AppRoutes.home);
+          
+          // Wait for navigation to complete before navigating to bookbox
+          Future.delayed(const Duration(milliseconds: 300), () {
+            if (Get.context != null) {
+              Get.toNamed(
+                AppRoutes.bookbox, 
+                arguments: {
+                  'bookboxId': bookboxId, 
+                  'canInteract': true
+                }
+              );
+            }
+          });
+        }
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error navigating to bookbox: $e');
+      }
+      _navigateToHome();
+    }
   }
-  
+   
   static void _navigateToHome() {
-    print('Navigating to home');
-    Get.offAllNamed(AppRoutes.home);
+    if (kDebugMode) {
+      print('Navigating to home');
+    }
+    
+    try {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (Get.context != null) {
+          Get.offAllNamed(AppRoutes.home);
+        }
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error navigating to home: $e');
+      }
+    }
   }
 }

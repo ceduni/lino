@@ -14,42 +14,64 @@ import 'nav_menu.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Load environment variables
-  await dotenv.load(fileName: '.env');
+  // Load environment variables with error handling
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    print('Warning: Could not load .env file: $e');
+    // Continue without .env file - app should still work
+  }
   
   // Initialize GetX services
   Get.put(BookBoxStateService());
   
   final prefs = await SharedPreferences.getInstance();
-  String? userId = await fetchUserId(prefs);
+  String? userId;
+  try {
+    userId = await fetchUserId(prefs);
+  } catch (e) {
+    print('Error fetching user ID during startup: $e');
+    userId = null;
+  }
   runApp(MyApp(prefs: prefs, userId: userId));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final SharedPreferences prefs;
   final String? userId;
 
   const MyApp({required this.prefs, this.userId, super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void dispose() {
+    DeepLinkService.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Initialize deep link handling
-    DeepLinkService.initialize();
-    
-    return GetMaterialApp(
+    return GetMaterialApp( 
       title: 'Lino',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       initialRoute: AppRoutes.home,
       getPages: [
-        GetPage(name: AppRoutes.login, page: () => LoginPage(prefs: prefs)),
+        GetPage(name: AppRoutes.login, page: () => LoginPage(prefs: widget.prefs)),
         GetPage(name: AppRoutes.home, page: () => BookNavPage()),
         GetPage(name: AppRoutes.favouriteLocations, page: () => FavouriteLocationsPage()),
         GetPage(name: AppRoutes.bookbox, page: () => BookBoxScreen()),
-        // Note: FavouriteLocationsInputPage now uses direct navigation instead of named routes
         // Add more routes here as needed
       ],
+      onReady: () {
+        // Initialize deep link handling after GetX is ready
+        DeepLinkService.initialize();
+      },
     );
   }
 }
