@@ -1,74 +1,23 @@
+import 'package:Lino_app/models/user_model.dart';
 import 'package:flutter/material.dart';
-import 'package:Lino_app/pages/profile/user_dashboard/profile_card.dart';
-import 'recent_transactions_widget.dart';
-
-class UserDashboard extends StatefulWidget {
-  final String username;
-  final double carbonSavings;
-  final double savedWater;
-  final double savedTrees;
-  final int numSavedBooks;
-  final DateTime createdAt;
-
-  const UserDashboard({
-    super.key,
-    required this.username,
-    required this.carbonSavings,
-    required this.savedWater,
-    required this.savedTrees,
-    required this.numSavedBooks,
-    required this.createdAt,
-  });
-
-  @override
-  _UserDashboardState createState() => _UserDashboardState();
-}
-
-class _UserDashboardState extends State<UserDashboard> {
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          ProfileCard(
-            username: widget.username,
-            savedTrees: widget.savedTrees,
-            numSavedBooks: widget.numSavedBooks,
-            createdAt: widget.createdAt,
-            includeModifyButton: true,
-          ),
-          EcologicalImpactCard(
-            carbonSavings: widget.carbonSavings,
-            savedWater: widget.savedWater,
-            savedTrees: widget.savedTrees,
-            numSavedBooks: widget.numSavedBooks,
-          ),
-          RecentTransactionsCard(
-            username: widget.username,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 
 class EcologicalImpactCard extends StatelessWidget {
-  final double carbonSavings;
-  final double savedWater;
-  final double savedTrees;
-  final int numSavedBooks;
+  final User user;
 
   const EcologicalImpactCard({
     super.key,
-    required this.carbonSavings,
-    required this.savedWater,
-    required this.savedTrees,
-    required this.numSavedBooks,
+    required this.user,
   });
 
   @override
   Widget build(BuildContext context) {
+    int numSavedBooks = user.numSavedBooks;
+
+    // Calculate ecological impact based on numSavedBooks
+    double carbonSavings = numSavedBooks * 27.71;
+    double savedWater = numSavedBooks * 2000.0;
+    double savedTrees = numSavedBooks * 0.05;
+
     return Card(
       elevation: 4,
       margin: EdgeInsets.all(16),
@@ -107,7 +56,7 @@ class EcologicalImpactCard extends StatelessWidget {
                 Expanded(
                   child: _buildImpactItem(
                     icon: Icons.park,
-                    value: '${savedTrees.toStringAsFixed(2)}',
+                    value: savedTrees.toStringAsFixed(2),
                     label: 'Trees Saved',
                     color: Colors.brown,
                   ),

@@ -1,4 +1,5 @@
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/get.dart';
@@ -6,7 +7,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../bookbox/book_box_screen.dart';
 import 'book_box_controller.dart';
 import '../../controllers/global_state_controller.dart';
 
@@ -189,10 +189,13 @@ class MapScreen extends HookWidget {
                             ],
                           ),
                           onTap: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) =>
-                                    BookBoxScreen(bookBoxId: bbox.id));
+                            Get.toNamed(
+                              AppRoutes.bookbox,
+                              arguments: {
+                                'bookboxId': bbox.id,
+                                'canInteract': false,
+                              },
+                            );
                           },
                         ),
                       ),

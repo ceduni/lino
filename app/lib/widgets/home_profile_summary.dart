@@ -27,8 +27,8 @@ class HomeProfileSummary extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              const Color.fromARGB(255, 13, 102, 255).withOpacity(0.8),
-              const Color.fromARGB(255, 0, 187, 255),
+              LinoColors.secondary.withValues(alpha: 0.8),
+              LinoColors.accent.withValues(alpha: 0.8),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -36,7 +36,7 @@ class HomeProfileSummary extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: Offset(0, 2),
             ),
@@ -47,7 +47,7 @@ class HomeProfileSummary extends StatelessWidget {
             // Profile avatar
             CircleAvatar(
               radius: 30,
-              backgroundColor: Colors.white.withOpacity(0.2),
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
               child: Text(
                 username.isNotEmpty ? username[0].toUpperCase() : 'U',
                 style: TextStyle(
@@ -69,7 +69,7 @@ class HomeProfileSummary extends StatelessWidget {
                     'Welcome back,',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                   Text(
@@ -119,7 +119,7 @@ class HomeProfileSummary extends StatelessWidget {
       children: [
         Icon(
           icon,
-          color: Colors.white.withOpacity(0.8),
+          color: Colors.white.withValues(alpha: 0.8),
           size: 16,
         ),
         SizedBox(width: 4),
@@ -127,7 +127,7 @@ class HomeProfileSummary extends StatelessWidget {
           '$value $label',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha: 0.9),
             fontWeight: FontWeight.w500,
           ),
         ),

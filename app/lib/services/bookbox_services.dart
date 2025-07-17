@@ -81,5 +81,40 @@ class BookboxService {
     if (r.statusCode != 200) {
       throw Exception(jsonDecode(r.body)['error']);
     }
-  } 
+  }
+
+  Future<List<BookBox>> getFollowedBookboxes(String token, List<String> bookboxIds) async {
+    if (bookboxIds.isEmpty) {
+      return [];
+    }
+    
+    List<BookBox> followedBookboxes = [];
+    
+    // Fetch each bookbox individually
+    for (String bookboxId in bookboxIds) {
+      try {
+        final bookbox = await getBookBox(bookboxId);
+        followedBookboxes.add(bookbox);
+      } catch (e) {
+        // Skip bookboxes that can't be fetched (might be deleted)
+        print('Error fetching bookbox $bookboxId: $e');
+      }
+    }
+    
+    return followedBookboxes;
+  }
+
+  Future<bool> isBookboxFollowed(String token, String bookBoxId) async {
+    final r = await http.get(
+      Uri.parse('$url/bookboxes/is-followed/$bookBoxId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (r.statusCode != 200) {
+      return false; // If there's an error, assume not followed
+    }
+    final response = jsonDecode(r.body);
+    return response['isFollowed'] ?? false;
+  }
 }

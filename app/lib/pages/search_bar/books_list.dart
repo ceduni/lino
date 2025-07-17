@@ -5,7 +5,7 @@ import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/services/book_services.dart';
 
-import '../Books/book_details_page.dart';
+import '../books/book_details_page.dart';
 
 class BooksList extends StatelessWidget {
   final String query;

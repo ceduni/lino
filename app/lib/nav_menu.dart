@@ -1,4 +1,4 @@
-import 'package:Lino_app/pages/Books/book_nav_page.dart';
+import 'package:Lino_app/pages/books/book_nav_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // import 'package:Lino_app/pages/map/map_screen.dart';

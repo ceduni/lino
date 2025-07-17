@@ -1,25 +1,26 @@
+import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/pages/profile/options/modify_profile_page.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class ProfileCard extends StatelessWidget {
-  final String username;
-  final double savedTrees;
-  final int numSavedBooks;
-  final DateTime createdAt;
+  final User user;
   final bool includeModifyButton;
 
   const ProfileCard({
     super.key,
-    required this.username,
-    required this.savedTrees,
-    required this.numSavedBooks,
-    required this.createdAt,
+    required this.user,
     this.includeModifyButton = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    int numSavedBooks = user.numSavedBooks;
+    double savedTrees = numSavedBooks * 0.05;
+
+    // Parse createdAt date
+    DateTime createdAt = DateTime.parse(user.createdAt.toIso8601String());
+
     return Card(
       color: LinoColors.primary,
       elevation: includeModifyButton ? 4 : 0,
@@ -55,14 +56,14 @@ class ProfileCard extends StatelessWidget {
             ),
             SizedBox(height: 16),
             Text(
-              username,
+              user.username,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              _getMemberSinceText(),
+              _getMemberSinceText(createdAt),
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
@@ -93,7 +94,7 @@ class ProfileCard extends StatelessWidget {
     );
   }
 
-  String _getMemberSinceText() {
+  String _getMemberSinceText(DateTime createdAt) {
     final now = DateTime.now();
     final difference = now.difference(createdAt);
     

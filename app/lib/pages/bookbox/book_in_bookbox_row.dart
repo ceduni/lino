@@ -1,7 +1,7 @@
 import 'package:Lino_app/models/book_model.dart';
 import 'package:flutter/material.dart';
 
-import '../Books/book_details_page.dart';
+import '../books/book_details_page.dart';
 
 class BookInBookBoxRow extends StatelessWidget {
   final List<Book> books;
@@ -41,7 +41,7 @@ class BookInBookBoxRow extends StatelessWidget {
   }
 
   Widget _buildBookItem(BuildContext context, Book book) {
-    String title = book.title;
+    String title = book.title; 
     List<String> authors = book.authors;
     String authorsString = authors.isNotEmpty ? authors.join(', ') : 'Unknown Author';
     String bookName = '$title by $authorsString';

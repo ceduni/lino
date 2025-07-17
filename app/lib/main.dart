@@ -1,6 +1,8 @@
+import 'package:Lino_app/pages/bookbox/book_box_screen.dart';
 import 'package:Lino_app/pages/login/login_page.dart';
 import 'package:Lino_app/pages/map/favourite_locations_page.dart';
 import 'package:Lino_app/services/bookbox_state_service.dart';
+import 'package:Lino_app/services/deep_link_service.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize deep link handling
+    DeepLinkService.initialize();
+    
     return GetMaterialApp(
       title: 'Lino',
       theme: ThemeData(
@@ -41,6 +46,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: AppRoutes.login, page: () => LoginPage(prefs: prefs)),
         GetPage(name: AppRoutes.home, page: () => BookNavPage()),
         GetPage(name: AppRoutes.favouriteLocations, page: () => FavouriteLocationsPage()),
+        GetPage(name: AppRoutes.bookbox, page: () => BookBoxScreen()),
         // Note: FavouriteLocationsInputPage now uses direct navigation instead of named routes
         // Add more routes here as needed
       ],

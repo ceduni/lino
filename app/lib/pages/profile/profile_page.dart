@@ -1,5 +1,5 @@
 import 'package:Lino_app/models/user_model.dart';
-import 'package:Lino_app/pages/profile/user_dashboard_widget.dart';
+import 'package:Lino_app/widgets/user_dashboard/user_dashboard_widget.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'options_page.dart';
   
 class ProfilePage extends HookWidget {
-  ProfilePage({Key? key}) : super(key: key);
+  const ProfilePage({super.key});
 
   Future<String?> initializePrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -21,23 +21,8 @@ class ProfilePage extends HookWidget {
 
 
   Widget buildContent(BuildContext context, User user) {
-    int numSavedBooks = user.numSavedBooks;
-
-    // Calculate ecological impact based on numSavedBooks
-    double carbonSavings = numSavedBooks * 27.71;
-    double savedWater = numSavedBooks * 2000.0;
-    double savedTrees = numSavedBooks * 0.05;
-
-    // Parse createdAt date
-    DateTime createdAt = DateTime.parse(user.createdAt.toIso8601String());
-
     return UserDashboard(
-      username: user.username,
-      carbonSavings: carbonSavings,
-      savedWater: savedWater,
-      savedTrees: savedTrees,
-      numSavedBooks: numSavedBooks,
-      createdAt: createdAt,
+      user: user,
     );
   }
 

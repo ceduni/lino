@@ -382,7 +382,7 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
                   child: Container(
                     height: 20,
                     decoration: BoxDecoration(
-                      color: _isDragging ? LinoColors.secondary.withOpacity(0.3) : Colors.grey[200],
+                      color: _isDragging ? LinoColors.secondary.withValues(alpha: 0.3) : Colors.grey[200],
                       border: Border.symmetric(
                         horizontal: BorderSide(color: Colors.grey[300]!, width: 1),
                       ),

@@ -161,19 +161,19 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
       keyboardType: hintText == 'Phone' ? TextInputType.phone : TextInputType.text,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
+        hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.3)),
         filled: true,
         fillColor: LinoColors.secondary,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.0),
           borderSide: BorderSide.none,
         ),
-        prefixIcon: Icon(icon, color: Colors.black.withOpacity(0.5)),
+        prefixIcon: Icon(icon, color: Colors.black.withValues(alpha: 0.5)),
         suffixIcon: hintText == 'Password'
             ? IconButton(
           icon: Icon(
             _obscureText ? Icons.visibility_off : Icons.visibility,
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
           ),
           onPressed: _togglePasswordVisibility,
         )

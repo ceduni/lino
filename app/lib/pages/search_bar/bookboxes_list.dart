@@ -1,8 +1,9 @@
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
+import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import '../bookbox/book_box_screen.dart'; 
+import 'package:get/get.dart';
 
 class BookBoxesList extends StatelessWidget {
   final String query;
@@ -99,11 +100,12 @@ class BookBoxesList extends StatelessWidget {
                       ),
                       trailing: Text(distanceStr),
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BookBoxScreen(bookBoxId: bookbox.id),
-                          ),
+                        Get.toNamed(
+                          AppRoutes.bookbox,
+                          arguments: {
+                            'bookboxId': bookbox.id,
+                            'canInteract': false,
+                          },
                         );
                       },
                     )

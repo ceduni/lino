@@ -1,14 +1,15 @@
+import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:flutter/material.dart';
 import '../../models/transaction_model.dart';
 import '../../services/transaction_services.dart';
 
 class RecentTransactionsCard extends StatefulWidget {
-  final String username;
+  final User user;
 
   const RecentTransactionsCard({
     super.key,
-    required this.username,
+    required this.user,
   });
 
   @override
@@ -38,7 +39,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
       
       // Fetch transactions
       final fetchedTransactions = await transactionService.getUserTransactions(
-        widget.username,
+        widget.user.username,
         limit: 10, // Show 10 most recent transactions
       );
 

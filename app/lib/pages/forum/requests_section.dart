@@ -148,7 +148,7 @@ class RequestsSectionState extends State<RequestsSection> {
                                   : 'Start requesting books you\'d like to read',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: LinoColors.accent.withOpacity(0.7),
+                                color: LinoColors.accent.withValues(alpha: 0.7),
                               ),
                             ),
                           ],

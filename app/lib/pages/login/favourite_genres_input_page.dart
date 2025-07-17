@@ -303,7 +303,7 @@ class _FavouriteGenresInputPageState extends State<FavouriteGenresInputPage> {
                                       decoration: InputDecoration(
                                         contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                                         hintText: 'Search or enter custom genre',
-                                        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
+                                        hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.3)),
                                         filled: true,
                                         fillColor: Color(0xFFE0F7FA),
                                         border: OutlineInputBorder(
