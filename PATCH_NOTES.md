@@ -1,5 +1,5 @@
 # Release Notes
 
-## Small improvements
+## Huge improvement
 
-- Set up proper release signing config for Android
+- Add deep linking to open book box page directly from URL
