@@ -18,6 +18,54 @@ Lino est un projet visant à **bonifier l'initiative des boîtes à livres et en
 
 ## Fonctionnalités📱
 
+### Utilisateur non-connecté:
+
+- [x] Créer un compte
+- [x] Récupérer et filtrer la liste des boîtes à livres
+- [ ] Chercher les boîtes à livres par livre
+- [ ] Chercher les boîtes à proximité d'une adresse (rayon)
+- [x] Chercher les boîtes à livre par arrondissement
+- [x] Voir le contenu des boîtes à livre
+- [x] Déposer un livre dans une boîte à livre
+- [x] Récupérer un livre dans une boîte à livre
+
+### Utilisateur connecté
+
+- [x] Émettre une requête de livres
+- [x] Annuler une requête de livres
+- [ ] Marquer une requête comme résolu
+- [ ] Voir historique de requête 
+- [x] Recevoir une notification d'ajout de livres
+- [x] Recevoir une notification de requête
+- [ ] Signaler un problème associé à une boîte à livres
+- [x] Voir et modifier mon profil et mes préférences de livre (genre)
+- [x] Se désabonner d'une boite à livre
+- [x] S'abonner à une boite à livre
+- [ ] Modifier mes préférences de notification
+- [x] Supprimer mon compte
+
+### Type de notifications
+
+#### Ajout d'un livre
+
+1. Ajout dans une bookbox suivi par l'utilisateur
+2. Ajout dans une bookbox a proximité d'un endroit favori
+3. Ajout dans une bookbox favori
+
+#### Nouvelle requête
+
+1. Envoie à tout utilisateur qui suit les boites à livre à proximité des endroits favoris de l'utilisateur
+2. Envoie à tout utilisateur qui a le même endroit favori que l'utilisateur
+
+### Administrateur
+
+- [ ] Créer un compte admin
+- [x] Enregistrer une boîte à livre
+- [ ] Désactiver une boîte à livre
+- [x] Générer un code QR
+- [x] Supprimer une boîte à livre
+- [x] Voir les statistiques d'utilisation d'une boîte à livre
+
 
 ## 🌐 Infrastructure
 
