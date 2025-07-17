@@ -23,7 +23,7 @@ Lino est un projet visant à **bonifier l'initiative des boîtes à livres et en
 - [x] Créer un compte
 - [x] Récupérer et filtrer la liste des boîtes à livres
 - [ ] Chercher les boîtes à livres par livre
-- [ ] Chercher les boîtes à proximité d'une adresse (rayon)
+- [x] Chercher les boîtes à proximité d'une adresse (rayon)
 - [x] Chercher les boîtes à livre par arrondissement
 - [x] Voir le contenu des boîtes à livre
 - [x] Déposer un livre dans une boîte à livre
@@ -33,7 +33,7 @@ Lino est un projet visant à **bonifier l'initiative des boîtes à livres et en
 
 - [x] Émettre une requête de livres
 - [x] Annuler une requête de livres
-- [ ] Marquer une requête comme résolu
+- [x] Marquer une requête comme résolu
 - [ ] Voir historique de requête 
 - [x] Recevoir une notification d'ajout de livres
 - [x] Recevoir une notification de requête
@@ -59,9 +59,9 @@ Lino est un projet visant à **bonifier l'initiative des boîtes à livres et en
 
 ### Administrateur
 
-- [ ] Créer un compte admin
+- [x] Créer un compte admin
 - [x] Enregistrer une boîte à livre
-- [ ] Désactiver une boîte à livre
+- [x] Désactiver une boîte à livre
 - [x] Générer un code QR
 - [x] Supprimer une boîte à livre
 - [x] Voir les statistiques d'utilisation d'une boîte à livre
