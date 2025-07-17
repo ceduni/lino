@@ -89,6 +89,18 @@ async function unfollowBookBox(request: FastifyRequest, reply: FastifyReply) {
     }
 }
 
+async function findNearestBookboxes(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const { longitude, latitude, maxDistance } = request.query as { longitude: number; latitude: number; maxDistance?: number };
+        const bookboxes = await BookboxService.findNearestBookboxes(longitude, latitude, maxDistance);
+        reply.send({ bookboxes });
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({error: message});
+    }
+}
+
 interface MyFastifyInstance extends FastifyInstance {
     optionalAuthenticate: (request: FastifyRequest) => void;
     authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
@@ -100,6 +112,8 @@ export default async function bookBoxRoutes(server: MyFastifyInstance) {
     // Public routes
     server.get('/bookboxes/:bookboxId', { schema: getBookboxSchema }, getBookbox);
     server.get('/bookboxes/search', { schema: searchBookboxesSchema }, searchBookboxes);
+    server.get('/bookboxes/nearest', { schema: searchBookboxesSchema }, findNearestBookboxes);
+
     
     // User routes (authenticated)
     server.post('/bookboxes/follow/:bookboxId', { preValidation: [server.authenticate], schema: followBookBoxSchema }, followBookBox);

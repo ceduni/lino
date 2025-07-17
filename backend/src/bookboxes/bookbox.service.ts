@@ -213,7 +213,7 @@ const bookboxService = {
         return { message: 'Bookbox unfollowed successfully' };
     },
 
-    async findNearestBookboxes(longitude: number, latitude: number, maxDistance: number = 5000) {
+    async findNearestBookboxes(longitude: number, latitude: number, maxDistance: number = 5) {
         if (!longitude || !latitude) {
             throw newErr(400, 'Longitude and latitude are required');
         }
