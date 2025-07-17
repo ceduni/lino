@@ -1,10 +1,11 @@
-import User from '../models/user.model';
+import User from './user.model';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { newErr } from "./utilities";
-import NotificationService from './notification.service';
-import { getBoroughId } from './borough.id.generator';
+import { newErr } from "../services/utilities";
+import NotificationService from '../notifications/notification.service';
+import { getBoroughId } from '../services/borough.id.generator';
+import AdminService from '../admins/admin.service';
 import { 
     UserRegistrationData, 
     UserLoginCredentials, 
@@ -17,7 +18,7 @@ dotenv.config();
 const UserService = {
     // User service to register a new user's account
     async registerUser(userData: UserRegistrationData) {
-        const { username, email, phone, password } = userData;
+        const { username, email, phone, password, adminVerificationKey } = userData;
         if (username === 'guest') {
             throw newErr(400, 'Username not allowed');
         }
@@ -51,6 +52,29 @@ const UserService = {
                 password: hashedPassword
             });
         await user.save();
+
+        // Check if admin verification key is provided and valid
+        if (adminVerificationKey) {
+            const secretAdminKey = process.env.ADMIN_VERIFICATION_KEY;
+            if (!secretAdminKey) {
+                throw newErr(500, 'Admin verification not configured');
+            }
+            
+            if (adminVerificationKey === secretAdminKey) {
+                // Add user to admin list
+                try {
+                    await AdminService.addAdmin(username);
+                } catch (error) {
+                    // If admin already exists, that's fine - just continue
+                    if ((error as any).statusCode !== 400) {
+                        throw error;
+                    }
+                }
+            } else {
+                throw newErr(400, 'Invalid admin verification key');
+            }
+        }
+
         return {username: user.username, password: user.password};
     },
 
@@ -132,6 +156,7 @@ const UserService = {
             latitude: number; 
             longitude: number;
             name: string; // Name of the location
+            tag?: string; // Optional tag for the location
         } 
     }) {
         const user = await User.findById(request.user.id);
@@ -150,7 +175,8 @@ const UserService = {
             latitude: latitude,
             longitude: longitude,
             name: name,
-            boroughId: boroughId
+            boroughId: boroughId,
+            tag: request.body.tag // Optional tag for the location
         });
         
         await user.save();
@@ -158,7 +184,8 @@ const UserService = {
             latitude: latitude, 
             longitude: longitude, 
             boroughId: boroughId, 
-            name: name 
+            name: name,
+            tag: request.body.tag // Return the tag if provided
         };
     },
 

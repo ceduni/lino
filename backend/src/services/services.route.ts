@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { getBoroughId } from "../services/borough.id.generator";
-import { boroughIdRouteSchema } from "../schemas/services.schemas";
+import { boroughIdRouteSchema } from "./services.schemas";
 
 async function getBoroughIdRoute(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { latitude, longitude } = request.query as { latitude: number; longitude: number };

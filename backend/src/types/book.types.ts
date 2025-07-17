@@ -40,6 +40,7 @@ export interface IRequest extends Document {
   bookTitle: string;
   timestamp: Date;
   customMessage?: string;
+  isSolved: boolean;
 }
 
 // Book service method types

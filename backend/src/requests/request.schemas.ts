@@ -26,6 +26,7 @@ export const sendBookRequestSchema = {
                 bookTitle: { type: 'string' },
                 timestamp: { type: 'string' },
                 customMessage: { type: 'string' },
+                isSolved: { type: 'boolean' }
             }
         },
         400: {
@@ -115,6 +116,7 @@ export const getBookRequestsSchema = {
                     bookTitle: {type: 'string'},
                     timestamp: {type: 'string'},
                     customMessage: {type: 'string'},
+                    isSolved: {type: 'boolean'}
                 }
             },
         },
@@ -127,3 +129,53 @@ export const getBookRequestsSchema = {
         }
     }
 };
+
+export const toggleSolvedStatusSchema = {
+    description: 'Toggle the solved status of a book request',
+    tags: ['books', 'users'],
+    params: {
+        type: 'object',
+        properties: {
+            id: { type: 'string' }
+        },
+        required: ['id']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' }
+        },
+        required: ['authorization']
+    },
+    response: {
+        200: {
+            description: 'Book request solved status toggled',
+            type: 'object',
+            properties: {
+                message: { type: 'string' },
+                isSolved: { type: 'boolean' }
+            }
+        },
+        404: {
+            description: 'Error message',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};  

@@ -1,15 +1,15 @@
-import BookBox from "../models/bookbox.model";
-import User from "../models/user.model";
-import Transaction from "../models/transaction.model";
-import NotificationService from "./notification.service";
-import {newErr} from "./utilities";
+import BookBox from "./bookbox.model";
+import User from "../users/user.model";
+import Transaction from "../transactions/transaction.model";
+import NotificationService from "../notifications/notification.service";
+import {newErr} from "../services/utilities";
 import { 
     BookAddData,
     IBook,
 } from '../types/book.types';
 import { AuthenticatedRequest } from '../types/common.types';
-import { getBoroughId } from "./borough.id.generator";
-import TransactionService from "./transaction.service";
+import { getBoroughId } from "../services/borough.id.generator";
+import TransactionService from "../transactions/transaction.service";
 
 const bookboxService = {
     async getBookBox(bookBoxId: string) {
@@ -17,16 +17,7 @@ const bookboxService = {
         if (!bookBox) {
             throw new Error('Bookbox not found');
         }
-        return {
-            id: bookBox.id,
-            name: bookBox.name,
-            image: bookBox.image,
-            longitude: bookBox.longitude,
-            latitude: bookBox.latitude, 
-            boroughId: bookBox.boroughId,
-            infoText: bookBox.infoText,
-            books: bookBox.books,
-        };
+        return bookBox;
     },
 
     // Add a book to a bookbox as a nested document
@@ -170,8 +161,8 @@ const bookboxService = {
             bookBoxes.sort((a, b) => {
                 if (a.longitude && a.latitude && b.longitude && b.latitude) {
                     // calculate the distance between the user's location and the bookbox's location
-                    const aDist = Math.sqrt((a.longitude - userLongitude) ** 2 + (a.latitude - userLatitude) ** 2);
-                    const bDist = Math.sqrt((b.longitude - userLongitude) ** 2 + (b.latitude - userLatitude) ** 2);
+                    const aDist = this.calculateDistance(userLatitude, userLongitude, a.latitude, a.longitude);
+                    const bDist = this.calculateDistance(userLatitude, userLongitude, b.latitude, b.longitude);
                     // sort in ascending or descending order of distance
                     return asc ? aDist - bDist : bDist - aDist;
                 }
@@ -194,89 +185,8 @@ const bookboxService = {
         return finalBookBoxes;
     },
 
-    async addNewBookbox(request: { 
-        body: { 
-            name: string; 
-            image?: string; 
-            longitude: number; 
-            latitude: number; 
-            infoText?: string; 
-        } 
-    }) {
-        const boroughId = await getBoroughId(request.body.latitude, request.body.longitude);
-        const bookBox = new BookBox({
-            name: request.body.name,
-            books: [],
-            image: request.body.image,
-            longitude: request.body.longitude,
-            latitude: request.body.latitude,
-            boroughId: boroughId,
-            infoText: request.body.infoText,
-        });
-        await bookBox.save();
-        return bookBox;
-    },
-
-
     async clearCollection() {
         await BookBox.deleteMany({});
-    },
-
-    async deleteBookBox(request: AuthenticatedRequest & { params: { bookboxId: string } }) {
-        const bookBox = await BookBox.findByIdAndDelete(request.params.bookboxId);
-        if (!bookBox) {
-            throw newErr(404, 'Bookbox not found');
-        }
-
-        // Delete all transactions related to this bookbox
-        await Transaction.deleteMany({ bookboxId: request.params.bookboxId });
-
-        return { message: 'Bookbox deleted successfully' };
-    },
-
-    async updateBookBox(request: AuthenticatedRequest & { body: { name?: string; image?: string; longitude?: number; latitude?: number; infoText?: string }; params: { bookboxId: string } }) {
-        const bookBoxId = request.params.bookboxId;
-        const updateData = request.body;    
-        const bookBox = await BookBox.findById(bookBoxId);
-        if (!bookBox) {
-            throw newErr(404, 'Bookbox not found');
-        }   
-
-        // Update the bookbox fields if they are provided
-        if (updateData.name) {
-            bookBox.name = updateData.name;
-        }
-        if (updateData.image) {
-            bookBox.image = updateData.image;
-        }
-        
-        if (updateData.longitude) {
-            bookBox.longitude = updateData.longitude;
-        }   
-        if (updateData.latitude) {
-            bookBox.latitude = updateData.latitude;
-        }   
-        if (updateData.latitude || updateData.longitude) {
-            // If either latitude or longitude is updated, we need to update the boroughId
-            const boroughId = await getBoroughId(updateData.latitude || bookBox.latitude, updateData.longitude || bookBox.longitude);
-            bookBox.boroughId = boroughId;
-        }
-
-
-        if (updateData.infoText) {
-            bookBox.infoText = updateData.infoText;
-        }
-        await bookBox.save();
-    
-        return {
-            id: bookBox._id.toString(),
-            name: bookBox.name,
-            image: bookBox.image,
-            longitude: bookBox.longitude,
-            latitude: bookBox.latitude,
-            boroughId: bookBox.boroughId,
-            infoText: bookBox.infoText
-        };
     },
 
     async followBookBox(request: AuthenticatedRequest & { params: { bookboxId: string } }) {
@@ -301,6 +211,35 @@ const bookboxService = {
         user.followedBookboxes = user.followedBookboxes.filter(id => id !== bookboxId);
         await user.save();
         return { message: 'Bookbox unfollowed successfully' };
+    },
+
+    async findNearestBookboxes(longitude: number, latitude: number, maxDistance: number = 5000) {
+        if (!longitude || !latitude) {
+            throw newErr(400, 'Longitude and latitude are required');
+        }
+
+        const bookboxes = await BookBox.find();
+
+        const nearbyBookboxes = bookboxes.filter(bookbox => {
+            const distance = this.calculateDistance(latitude, longitude, bookbox.latitude, bookbox.longitude);
+            return distance <= maxDistance;
+        });
+
+        return nearbyBookboxes;
+    },
+
+    calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+        const R = 6371; // Earth's radius in km
+        
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
     }
 };
 

@@ -1,4 +1,4 @@
-import { bookSchema } from './models.schemas';
+import { bookboxSchema, bookSchema } from '../models.schemas';
 
 export const addBookToBookboxSchema = {
     description: 'Add a book to a bookbox',
@@ -124,17 +124,7 @@ export const getBookboxSchema = {
     response: {
         200: {
             description: 'Bookbox found',
-            type: 'object',
-            properties: {
-                id: { type: 'string' },
-                name: { type: 'string' },
-                latitude: { type: 'number' },
-                longitude: { type: 'number' },
-                boroughId: { type: 'string' },
-                infoText: { type: 'string' },
-                image: { type: 'string' },
-                books: { type: 'array', items: bookSchema }
-            }
+            ...bookboxSchema
         },
         404: {
             description: 'Error message',
@@ -150,59 +140,6 @@ export const getBookboxSchema = {
                 error: {type: 'string'}
             }
 
-        }
-    }
-};
-
-export const addNewBookboxSchema = {
-    description: 'Add new bookbox',
-    tags: ['bookboxes'],
-    body: {
-        type: 'object',
-        properties: {
-            name: { type: 'string' },
-            infoText: { type: 'string' },
-            latitude: { type: 'number' },
-            longitude: { type: 'number' },
-            image: { type: 'string' }
-        },
-        required: ['name', 'infoText', 'latitude', 'longitude', 'image'],
-    },
-    headers: {
-        type: 'object',
-        properties: {
-            authorization: { type: 'string' }
-        },
-        required: ['authorization']
-    },
-    response: {
-        201: {
-            description: 'Bookbox added',
-            type: 'object',
-            properties: {
-                _id: { type: 'string' },
-                name: { type: 'string' },
-                latitude: { type: 'number' },
-                longitude: { type: 'number' },
-                image: { type: 'string' },
-                boroughId: { type: 'string' },
-                infoText: { type: 'string' },
-                books: { type: 'array', items: { type: 'string' } }
-            }
-        },
-        400: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: {type: 'string'}
-            }
         }
     }
 };
@@ -228,17 +165,7 @@ export const searchBookboxesSchema = {
                 bookboxes: {
                     type: 'array',
                     items: {
-                        type: 'object',
-                        properties: {
-                            id: { type: 'string' },
-                            name: { type: 'string' },
-                            infoText: { type: 'string' },
-                            image: { type: 'string' },
-                            books: { type: 'array', items: bookSchema },
-                            latitude: { type: 'number' },
-                            longitude: { type: 'number' },
-                            boroughId: { type: 'string' }
-                        }
+                        ...bookboxSchema
                     }
                 }
             }
@@ -255,115 +182,6 @@ export const searchBookboxesSchema = {
             type: 'object',
             properties: {
                 error: {type: 'string'}
-            }
-        }
-    }
-};
-
-export const deleteBookBoxSchema = {
-    description: 'Delete a bookbox',
-    tags: ['bookboxes'],
-    params: {
-        type: 'object',
-        properties: {
-            bookboxId: { type: 'string' }
-        },
-        required: ['bookboxId']
-    },
-    headers: {
-        type: 'object',
-        properties: {
-            authorization: { type: 'string' },
-        },
-    },
-    response: {
-        204: {
-            description: 'Bookbox deleted'
-        },
-        404: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: {type: 'string'}
-            }
-        }
-    }
-};
-
-export const updateBookBoxSchema = {
-    description: 'Update a bookbox',
-    tags: ['bookboxes'],
-    params: {
-        type: 'object',
-        properties: {
-            bookboxId: { type: 'string' }
-        },
-        required: ['bookboxId']
-    },
-    body: {
-        type: 'object',
-        properties: {
-            name: { type: 'string' },   
-            infoText: { type: 'string' },
-            latitude: { type: 'number' },
-            longitude: { type: 'number' },
-            image: { type: 'string' },
-        },
-    },
-    headers: {
-        type: 'object',
-        properties: {
-            authorization: { type: 'string' },
-        },
-        required: ['authorization']
-    },
-    response: {
-        200: {
-            description: 'Bookbox updated',
-            type: 'object',
-            properties: {
-                _id: { type: 'string' },
-                name: { type: 'string' },
-                latitude: { type: 'number' },
-                longitude: { type: 'number' },
-                image: { type: 'string' },
-                boroughId: { type: 'string' },
-                infoText: { type: 'string' },
-            }
-        },
-        400: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        401: {
-            description: 'Unauthorized',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        404: {
-            description: 'Bookbox not found',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
             }
         }
     }
@@ -467,3 +285,40 @@ export const unfollowBookBoxSchema = {
         }
     }
 };
+
+export const findNearestBookboxesSchema = {
+    description: 'Find nearest bookboxes',
+    tags: ['bookboxes'],
+    querystring: {
+        type: 'object',
+        properties: {
+            longitude: { type: 'number' },
+            latitude: { type: 'number' },
+            maxDistance: { type: 'number', default: 5000 }
+        },
+        required: ['longitude', 'latitude']
+    },
+    response: {
+        200: {
+            description: 'Nearest bookboxes found',
+            type: 'array',
+            items: {
+                ...bookboxSchema
+            }
+        },
+        400: {
+            description: 'Error message',
+            type: 'object',
+            properties: {   
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};  

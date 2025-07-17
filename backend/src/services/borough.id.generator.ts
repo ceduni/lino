@@ -1,10 +1,3 @@
-/**
- * Ultimate Borough ID Generator (TypeScript)
- * Takes latitude/longitude and returns a normalized 4-component borough ID
- * Format: sublocality_locality_admin-level-1_country
- */
-
-
 interface AddressComponent {
     long_name: string;
     short_name: string;

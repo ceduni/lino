@@ -1,11 +1,11 @@
 import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} from "fastify";
-import BookService from "../services/book.service";
+import BookService from "./book.service";
 import { 
     getBookInfoFromISBNSchema,
     searchBooksSchema,
     getBookSchema
-} from "../schemas/book.schemas";
-import { bookSchema } from "../schemas/models.schemas";
+} from "./book.schemas";
+import { bookSchema } from "../models.schemas";
 import { BookSearchQuery } from "../types/book.types";
 
 

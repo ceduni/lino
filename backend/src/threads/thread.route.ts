@@ -1,6 +1,6 @@
 import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} from 'fastify';
-import ThreadService from '../services/thread.service';
-import Thread from "../models/thread.model";
+import ThreadService from './thread.service';
+import Thread from "./thread.model";
 import {
     createThreadSchema,
     deleteThreadSchema,
@@ -8,9 +8,9 @@ import {
     toggleReactionSchema,
     searchThreadsSchema,
     getThreadSchema
-} from "../schemas/thread.schemas";
-import { clearCollectionSchema } from "../schemas/user.schemas";
-import { threadSchema } from "../schemas/models.schemas";
+} from "./thread.schemas";
+import { clearCollectionSchema } from "../users/user.schemas";
+import { threadSchema } from "../models.schemas";
 import {broadcastMessage} from "../index";
 import { ThreadCreateData, MessageCreateData, ReactionData } from "../types/thread.types";
 import { AuthenticatedRequest } from "../types/common.types";

@@ -1,11 +1,11 @@
-import Notification from '../models/notification.model';
-import User from '../models/user.model';
-import BookBox from '../models/bookbox.model';
-import { newErr } from './utilities';
+import Notification from './notification.model';
+import User from '../users/user.model';
+import BookBox from '../bookboxes/bookbox.model';
+import { newErr } from '../services/utilities';
 import { broadcastToUser } from '../index';
 import { AuthenticatedRequest } from '../types/common.types';
 import { IBook } from '../types/book.types';
-import RequestService from './request.service';
+import RequestService from '../requests/request.service';
 
 const NotificationService = {
     // Create a new notification

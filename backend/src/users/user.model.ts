@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
                 latitude: { type: Number, required: true },
                 longitude: { type: Number, required: true },
                 name: { type: String, required: true }, // Name of the location
+                tag: { type: String }, // Optional tag for the location
                 boroughId: { type: String, required: true } // ID of the borough
             }
         ]

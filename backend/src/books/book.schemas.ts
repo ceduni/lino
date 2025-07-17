@@ -1,4 +1,4 @@
-import { bookSchema } from './models.schemas';
+import { bookSchema } from '../models.schemas';
 
 export const getBookInfoFromISBNSchema = {
     description: 'Get book info from ISBN',

@@ -1,4 +1,4 @@
-import { threadSchema } from './models.schemas';
+import { threadSchema } from '../models.schemas';
 
 export const createThreadSchema = {
     description: 'Create a new thread',

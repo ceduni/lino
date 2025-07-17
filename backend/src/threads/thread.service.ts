@@ -1,8 +1,8 @@
-import Thread from "../models/thread.model";
-import UserService from "./user.service";
-import User from "../models/user.model";
-import BookService from "./book.service";
-import {newErr} from "./utilities";
+import Thread from "./thread.model";
+import UserService from "../users/user.service";
+import User from "../users/user.model";
+import BookService from "../books/book.service";
+import {newErr} from "../services/utilities";
 import { 
     ThreadCreateData, 
     MessageCreateData, 

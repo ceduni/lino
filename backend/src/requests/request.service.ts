@@ -1,8 +1,8 @@
-import User from "../models/user.model";
-import BookBox from "../models/bookbox.model";
-import Request from "../models/book.request.model";
-import NotificationService from "./notification.service";
-import {newErr} from "./utilities";
+import User from "../users/user.model";
+import BookBox from "../bookboxes/bookbox.model";
+import Request from "./book.request.model";
+import NotificationService from "../notifications/notification.service";
+import {newErr} from "../services/utilities";
 import { AuthenticatedRequest } from '../types/common.types';
 
 const RequestService = {
@@ -15,25 +15,26 @@ const RequestService = {
         }
 
         const userBoroughIds = user.favouriteLocations.map(location => location.boroughId);
-        if (userBoroughIds.length === 0) {
-            throw newErr(400, 'User has no favourite locations to notify');
+        const userFollowedBookboxes = user.followedBookboxes;
+
+        if (userBoroughIds.length === 0 && userFollowedBookboxes.length === 0) {
+            throw newErr(400, 'User has no favourite locations or followed bookboxes to notify');
         }
 
-        // Get all bookboxes and filter 
-        const allBookboxes = await BookBox.find();
-        const favBookboxes = allBookboxes.filter(bookbox => {
-            // Get book boxes whose boroughId is in user's favourite locations
-            if (!userBoroughIds.includes(bookbox.boroughId)) {
-                return false;
-            }
-        });
-
-        // Get all unique users who follow any of these nearby bookboxes
-        const bookboxIds = favBookboxes.map(bookbox => bookbox._id.toString());
-        console.log(`bookboxIds: ${bookboxIds}`);
+        // Find users who share favourite locations (by boroughId) or followed bookboxes
         const usersToNotify = await User.find({
-            followedBookboxes: { $in: bookboxIds }
-        }); 
+            $or: [
+                // Users who have favourite locations with matching boroughIds
+                ...(userBoroughIds.length > 0 ? [{
+                    'favouriteLocations.boroughId': { $in: userBoroughIds }
+                }] : []),
+                // Users who follow at least one of the same bookboxes
+                ...(userFollowedBookboxes.length > 0 ? [{
+                    followedBookboxes: { $in: userFollowedBookboxes }
+                }] : [])
+            ]
+        });
+        
         console.log(`Found ${usersToNotify.length} users to notify about the book request.`);
 
         // Notify all relevant users using the new notification system
@@ -72,6 +73,20 @@ const RequestService = {
         } else {
             return Request.find({username: username});
         }
+    },
+
+    async toggleSolvedStatus(request: { params: { id: string } }) {
+        const requestId = request.params.id;
+        const bookRequest = await Request.findById(requestId);
+        if (!bookRequest) {
+            throw newErr(404, 'Request not found');
+        }
+        bookRequest.isSolved = !bookRequest.isSolved;
+        await bookRequest.save();
+        return {
+            message: `Request ${bookRequest.isSolved ? 'solved' : 'unsolved'} successfully`,
+            isSolved: bookRequest.isSolved
+        };
     },
 };
 

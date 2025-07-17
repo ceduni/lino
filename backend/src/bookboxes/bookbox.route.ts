@@ -1,16 +1,13 @@
 import {FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface} from "fastify";
-import BookboxService from "../services/bookbox.service";
+import BookboxService from "./bookbox.service";
 import {
     addBookToBookboxSchema,
     getBookFromBookBoxSchema,
     getBookboxSchema,
-    addNewBookboxSchema,
     searchBookboxesSchema,
-    deleteBookBoxSchema,
-    updateBookBoxSchema,
     followBookBoxSchema,
     unfollowBookBoxSchema
-} from "../schemas/bookbox.schemas";
+} from "./bookbox.schemas";
 import { BookAddData } from "../types/book.types";
 import { AuthenticatedRequest } from "../types/common.types";
 
@@ -52,24 +49,6 @@ async function getBookbox(request: FastifyRequest<GetBookBoxParams>, reply: Fast
     }
 }
 
-async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const response = await BookboxService.addNewBookbox(request as { 
-            body: { 
-                name: string; 
-                image?: string; 
-                longitude: number; 
-                latitude: number; 
-                infoText?: string; 
-            } 
-        });
-        reply.code(201).send(response);
-    } catch (error : unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        reply.code(400).send({error: message});
-    }
-}
-
 async function searchBookboxes(request: FastifyRequest, reply: FastifyReply) {
     try {
         const bookboxes = await BookboxService.searchBookboxes(request as { 
@@ -85,34 +64,6 @@ async function searchBookboxes(request: FastifyRequest, reply: FastifyReply) {
     } catch (error : unknown) {
         const message = error instanceof Error ? error.message : 'Unknown error';
         reply.code(400).send({error: message});
-    }
-}
-
-async function deleteBookBox(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const response = await BookboxService.deleteBookBox(request as AuthenticatedRequest & { params: { bookboxId: string } });
-        reply.code(204).send(response);
-    } catch (error : unknown) {
-        const statusCode = (error as any).statusCode || 500;
-        const message = error instanceof Error ? error.message : 'Unknown error';  
-        reply.code(statusCode).send({error: message});
-    }
-}
-
-async function updateBookBox(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const response = await BookboxService.updateBookBox(request as AuthenticatedRequest & { body: { 
-            name?: string;
-            image?: string;
-            longitude?: number; 
-            latitude?: number;
-            infoText?: string;
-        }; params: { bookboxId: string } });
-        reply.code(200).send(response);
-    } catch (error : unknown) {
-        const statusCode = (error as any).statusCode || 500;
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        reply.code(statusCode).send({error: message});
     }
 }
 
@@ -146,13 +97,15 @@ interface MyFastifyInstance extends FastifyInstance {
 }
 
 export default async function bookBoxRoutes(server: MyFastifyInstance) {
+    // Public routes
     server.get('/bookboxes/:bookboxId', { schema: getBookboxSchema }, getBookbox);
     server.get('/bookboxes/search', { schema: searchBookboxesSchema }, searchBookboxes);
+    
+    // User routes (authenticated)
     server.post('/bookboxes/follow/:bookboxId', { preValidation: [server.authenticate], schema: followBookBoxSchema }, followBookBox);
     server.delete('/bookboxes/unfollow/:bookboxId', { preValidation: [server.authenticate], schema: unfollowBookBoxSchema }, unfollowBookBox);
-    server.post('/bookboxes/new', { preValidation: [server.adminAuthenticate], schema: addNewBookboxSchema }, addNewBookbox);
+    
+    // Book manipulation routes (special token required)
     server.delete('/bookboxes/:bookboxId/books/:bookId', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: getBookFromBookBoxSchema }, getBookFromBookBox);
     server.post('/bookboxes/:bookboxId/books/add', { preValidation: [server.bookManipAuth, server.optionalAuthenticate], schema: addBookToBookboxSchema }, addBookToBookbox);
-    server.delete('/bookboxes/:bookboxId', { preValidation: [server.adminAuthenticate], schema: deleteBookBoxSchema }, deleteBookBox);
-    server.put('/bookboxes/:bookboxId', { preValidation: [server.adminAuthenticate], schema: updateBookBoxSchema }, updateBookBox);
 }

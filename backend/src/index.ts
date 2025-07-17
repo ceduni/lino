@@ -12,14 +12,16 @@ const fastifyJwt = require('@fastify/jwt');
 const fastifyCors = require('@fastify/cors');
 const fastifySwagger = require('@fastify/swagger');
 const fastifySwaggerUi = require('@fastify/swagger-ui');
-const bookRoutes = require('./routes/book.route');
-const bookboxRoutes = require('./routes/bookbox.route');
-const userRoutes = require('./routes/user.route');
-const threadRoutes = require('./routes/thread.route');
-const serviceRoutes = require('./routes/services.route');
-const transactionRoutes = require('./routes/transaction.route');
-const requestRoutes = require('./routes/request.route');
+const bookRoutes = require('./books/book.route');
+const bookboxRoutes = require('./bookboxes/bookbox.route');
+const userRoutes = require('./users/user.route');
+const threadRoutes = require('./threads/thread.route');
+const serviceRoutes = require('./services/services.route');
+const transactionRoutes = require('./transactions/transaction.route');
+const requestRoutes = require('./requests/request.route');
+const adminRoutes = require('./admins/admin.route');
 const fastifyWebSocket = require('@fastify/websocket');
+const AdminService = require('./admins/admin.service');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
@@ -113,7 +115,6 @@ server.decorate('bookManipAuth', async (request: FastifyRequest, reply: FastifyR
             return reply.status(401).send({ error: 'Unauthorized' });
         }
 
-        console.log('Valid book manipulation token');
     } catch (error) {
         return reply.status(401).send({ error: 'Unauthorized' });
     }
@@ -140,14 +141,36 @@ server.decorate('adminAuthenticate', async (request: FastifyRequest, reply: Fast
         }
         const token = authHeader.split(' ')[1];
         const user = await server.jwt.verify(token) as { username: string };
-        if (user.username !== process.env.ADMIN_USERNAME) {
-            console.log('Non-user tried to access admin route: ', user.username);
+        
+        const isAdmin = await AdminService.isAdmin(user.username);
+        
+        if (!isAdmin) {
+            console.log('Non-admin user tried to access admin route: ', user.username);
             reply.status(401).send({ error: 'Unauthorized' });
         }
     } catch (error) {
         reply.status(401).send({ error: 'Unauthorized' });
     }
 });
+
+server.decorate('superAdminAuthenticate', async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        const authHeader = request.headers.authorization;
+        if (!authHeader) {
+            return reply.status(401).send({ error: 'Unauthorized' });
+        }
+        const token = authHeader.split(' ')[1];
+        const user = await server.jwt.verify(token) as { username: string };
+        
+        if (user.username !== process.env.ADMIN_USERNAME) {
+            console.log('Non-super-admin user tried to access super admin route: ', user.username);
+            reply.status(401).send({ error: 'Unauthorized' });
+        }
+    } catch (error) {
+        reply.status(401).send({ error: 'Unauthorized' });
+    }
+});
+
 
 server.register(fastifySwagger, {
     swagger: {
@@ -210,6 +233,7 @@ server.register(userRoutes);
 // server.register(threadRoutes); // Uncomment if you want to enable thread routes
 server.register(transactionRoutes);
 server.register(serviceRoutes);
+server.register(adminRoutes);
 
 const start = async () => {
     try {

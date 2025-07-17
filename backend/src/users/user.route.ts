@@ -1,6 +1,6 @@
 import {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify';
-import UserService from "../services/user.service";
-import User from "../models/user.model";
+import UserService from "./user.service";
+import User from "./user.model";
 import { 
     registerUserSchema,
     loginUserSchema,
@@ -11,8 +11,8 @@ import {
     addUserFavLocationSchema,
     clearCollectionSchema,
     deleteUserFavLocationSchema
-} from "../schemas/user.schemas";
-import { userSchema } from "../schemas/models.schemas";
+} from "./user.schemas";
+import { userSchema } from "../models.schemas";
 import { UserRegistrationData, UserLoginCredentials } from "../types/user.types";
 import { AuthenticatedRequest } from "../types/common.types";
 
@@ -99,6 +99,7 @@ async function addUserFavLocation(request : FastifyRequest, reply : FastifyReply
                 latitude: number; 
                 longitude: number; 
                 name: string;
+                tag?: string; // Optional tag for the location
             } 
         });
         reply.send(result);

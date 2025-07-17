@@ -1,10 +1,11 @@
 import {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
-import RequestService from "../services/request.service";
+import RequestService from "./request.service";
 import { 
     sendBookRequestSchema,
     deleteBookRequestSchema,
-    getBookRequestsSchema
-} from "../schemas/request.schemas";
+    getBookRequestsSchema,
+    toggleSolvedStatusSchema
+} from "./request.schemas";
 import { AuthenticatedRequest } from "../types/common.types";
 
 async function sendBookRequest(request: FastifyRequest, reply: FastifyReply) {
@@ -41,6 +42,17 @@ async function getBookRequests(request: FastifyRequest, reply: FastifyReply) {
     }
 }
 
+async function toggleSolvedStatus(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const response = await RequestService.toggleSolvedStatus(request as { params: { id: string } });
+        reply.code(200).send(response);
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({error: message});
+    }
+}
+
 interface MyFastifyInstance extends FastifyInstance {
     authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
 }
@@ -49,4 +61,5 @@ export default async function requestRoutes(server: MyFastifyInstance) {
     server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);
     server.delete('/books/request/:id', { preValidation: [server.authenticate], schema: deleteBookRequestSchema }, deleteBookRequest);
     server.get('/books/requests', { schema: getBookRequestsSchema }, getBookRequests);
+    server.patch('/books/request/:id/solve', { preValidation: [server.authenticate], schema: toggleSolvedStatusSchema }, toggleSolvedStatus);
 }

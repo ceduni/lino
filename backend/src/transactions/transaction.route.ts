@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import TransactionService from "../services/transaction.service";
-import { createCustomTransactionSchema, getTransactionHistorySchema } from "../schemas/transaction.schemas";
+import TransactionService from "./transaction.service";
+import { createCustomTransactionSchema, getTransactionHistorySchema } from "./transaction.schemas";
 
 interface CreateCustomTransactionBody {
     username: string;

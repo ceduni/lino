@@ -15,12 +15,14 @@ const bookSchema = new mongoose.Schema({
 
 const bookboxSchema = new mongoose.Schema({
     name: { type: String, required: true },
+    owner: { type: String, required: true },
     image: String,
     longitude: { type: Number, required: true },
     latitude: { type: Number, required: true },
     boroughId: { type: String, required: true },
     infoText: String,
     books: [bookSchema], // Array of nested book documents
+    isActive: { type: Boolean, default: true },
 });
 
 // Add indexes for efficient searching on nested books

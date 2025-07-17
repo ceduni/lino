@@ -1,7 +1,7 @@
 import axios from 'axios';
 import mongoose from 'mongoose';
-import BookBox from "../models/bookbox.model";
-import {newErr} from "./utilities";
+import BookBox from "../bookboxes/bookbox.model";
+import {newErr} from "../services/utilities";
 import { 
     BookSearchQuery,
     IBook,

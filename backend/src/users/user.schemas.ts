@@ -1,5 +1,5 @@
 import { fa } from '@faker-js/faker';
-import { userSchema, notificationSchema } from './models.schemas';
+import { userSchema, notificationSchema } from '../models.schemas';
 
 export const registerUserSchema = {
     description: 'Register a new user',
@@ -12,7 +12,7 @@ export const registerUserSchema = {
             password: { type: 'string' },
             email: { type: 'string' },
             phone: { type: 'string' },
-            getAlerted: { type: 'boolean' },
+            adminVerificationKey: { type: 'string', description: 'Admin verification key for admin users' },
         }
     },
     response: {
@@ -225,7 +225,8 @@ export const addUserFavLocationSchema = {
                 longitude: { type: 'number' },
                 latitude: { type: 'number' },
                 name: { type: 'string' }, // Name of the location
-                boroughId: { type: 'string' } // ID of the borough where the location is
+                boroughId: { type: 'string' }, // ID of the borough where the location is
+                tag: { type: 'string' } // Optional tag for the location
             }
         },
         400: {

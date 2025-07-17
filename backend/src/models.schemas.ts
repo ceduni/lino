@@ -22,11 +22,13 @@ export const bookboxSchema = {
     properties: {
         _id: {type: 'string'},
         name: {type: 'string'},
+        owner: {type: 'string'},
         image: {type: 'string'},
         longitude: {type: 'number'},
         latitude: {type: 'number'},
         boroughId: {type: 'string'},
         infoText: {type: 'string'},
+        isActive: {type: 'boolean'},
         books: {type: 'array', items: bookSchema}
     }
 };
@@ -48,6 +50,7 @@ export const userSchema = {
                     latitude: { type: 'number' },
                     longitude: { type: 'number' },
                     name: { type: 'string' }, // Name of the location
+                    tag: { type: 'string' }, // Optional tag for the location
                     boroughId: { type: 'string' } // ID of the borough
                 },
                 required: ['latitude', 'longitude', 'name', 'boroughId']
@@ -136,6 +139,7 @@ export const bookRequestSchema = {
         username: { type: 'string' },
         bookTitle: { type: 'string' },
         timestamp: { type: 'string', format: 'date-time' },
-        customMessage: { type: 'string' }
+        customMessage: { type: 'string' },
+        isSolved: { type: 'boolean' }
     }
 };
