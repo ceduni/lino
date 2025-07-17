@@ -34,7 +34,7 @@ Lino est un projet visant à **bonifier l'initiative des boîtes à livres et en
 - [x] Émettre une requête de livres
 - [x] Annuler une requête de livres
 - [x] Marquer une requête comme résolu
-- [ ] Voir historique de requête 
+- [x] Voir historique de requête 
 - [x] Recevoir une notification d'ajout de livres
 - [x] Recevoir une notification de requête
 - [ ] Signaler un problème associé à une boîte à livres
