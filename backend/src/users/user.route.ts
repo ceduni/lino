@@ -12,7 +12,6 @@ import {
     clearCollectionSchema,
     deleteUserFavLocationSchema
 } from "./user.schemas";
-import { userSchema } from "../models.schemas";
 import { UserRegistrationData, UserLoginCredentials } from "../types/user.types";
 import { AuthenticatedRequest } from "../types/common.types";
 

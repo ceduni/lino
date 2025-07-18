@@ -18,7 +18,7 @@ dotenv.config();
 const UserService = {
     // User service to register a new user's account
     async registerUser(userData: UserRegistrationData) {
-        const { username, email, phone, password, adminVerificationKey } = userData;
+        const { username, email, phone, password } = userData;
         if (username === 'guest') {
             throw newErr(400, 'Username not allowed');
         }
@@ -53,29 +53,9 @@ const UserService = {
             });
         await user.save();
 
-        // Check if admin verification key is provided and valid
-        if (adminVerificationKey) {
-            const secretAdminKey = process.env.ADMIN_VERIFICATION_KEY;
-            if (!secretAdminKey) {
-                throw newErr(500, 'Admin verification not configured');
-            }
-            
-            if (adminVerificationKey === secretAdminKey) {
-                // Add user to admin list
-                try {
-                    await AdminService.addAdmin(username);
-                } catch (error) {
-                    // If admin already exists, that's fine - just continue
-                    if ((error as any).statusCode !== 400) {
-                        throw error;
-                    }
-                }
-            } else {
-                throw newErr(400, 'Invalid admin verification key');
-            }
-        }
+        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY as string);
 
-        return {username: user.username, password: user.password};
+        return {username: user.username, email: user.email, token: token };
     },
 
     // User service to log in a user if they exist (can log with either a username or an email)

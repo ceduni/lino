@@ -12,7 +12,6 @@ export const registerUserSchema = {
             password: { type: 'string' },
             email: { type: 'string' },
             phone: { type: 'string' },
-            adminVerificationKey: { type: 'string', description: 'Admin verification key for admin users' },
         }
     },
     response: {
@@ -20,7 +19,9 @@ export const registerUserSchema = {
             description: 'User registered successfully',
             type: 'object',
             properties: {
-                username: { type: 'string' }
+                username: { type: 'string' },
+                email: { type: 'string' },
+                token: { type: 'string' }
             }
         },
         400: {

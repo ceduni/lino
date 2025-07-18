@@ -13,7 +13,7 @@ class UserService {
     // Send the username, email, phone, and password to the server
     // If the server returns a 201 status code, the user is registered
     // If the server returns another status code, the user is not registered
-    final userData = await http.post(
+    final r = await http.post(
       Uri.parse('$url/users/register'), 
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -25,11 +25,11 @@ class UserService {
         'password': password,
       }),
     );
-    final data = jsonDecode(userData.body);
-    if (userData.statusCode != 201) {
-      throw Exception(data['error']);
+    final response = jsonDecode(r.body);
+    if (r.statusCode != 201) {
+      throw Exception(response['error']);
     }
-    final token = await loginUser(username, password);
+    final token = response['token'];
     return token;
   }
 
@@ -131,7 +131,6 @@ class UserService {
         }));
     final data = jsonDecode(response.body);
     if (response.statusCode != 200) {
-      print(data);
       throw Exception(data['error']);
     }
   }

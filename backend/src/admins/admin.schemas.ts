@@ -64,56 +64,6 @@ export const addAdminSchema = {
     }
 };
 
-export const trySetAdminSchema = {
-    description: 'Try to set a user as admin',
-    tags: ['admin'],
-    headers: {  
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: { type: 'string' }
-        }
-    },
-    body: {
-        type: 'object',
-        required: ['adminKey'],
-        properties: {
-            adminKey: { type: 'string' }
-        }
-    },
-    response: {
-        200: {
-            description: 'Admin status set successfully',
-            type: 'object',
-            properties: {
-                message: { type: 'string' },
-                admin: {
-                    type: 'object',
-                    properties: {
-                        _id: { type: 'string' },
-                        username: { type: 'string' },
-                        isAdmin: { type: 'boolean' }
-                    }
-                }
-            }
-        },
-        400: {
-            description: 'Invalid admin key',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
-
 export const removeAdminSchema = {
     description: 'Remove an admin user',
     tags: ['admin'],

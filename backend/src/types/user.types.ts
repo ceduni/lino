@@ -30,7 +30,6 @@ export interface UserRegistrationData {
   email: string;
   phone?: string;
   password: string;
-  adminVerificationKey?: string;
 }
 
 export interface UserLoginCredentials {
