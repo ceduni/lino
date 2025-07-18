@@ -26,7 +26,7 @@ class BookBox {
     List<Book> books = booksList.map((bookJson) => Book.fromJson(bookJson)).toList();
 
     return BookBox( 
-      id: json['id'],
+      id: json['_id'],
       name: json['name'],
       image: json['image'],
       longitude: (json['longitude'] as num).toDouble(),
