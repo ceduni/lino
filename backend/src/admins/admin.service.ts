@@ -180,6 +180,34 @@ const AdminService = {
         }
     },
 
+    async activateBookBox(request: any) {
+        try {
+            const bookBox = await BookBox.findById(request.params.bookboxId);
+            if (!bookBox) {
+                throw newErr(404, 'Bookbox not found');
+            }
+            // Check ownership (super admin or owner)
+            if (request.user.username !== process.env.ADMIN_USERNAME && bookBox.owner !== request.user.username) {
+                throw newErr(401, 'Unauthorized: You can only manage your own bookboxes');
+            }   
+            bookBox.isActive = true;
+            await bookBox.save();
+            return {
+                message: 'Bookbox activated successfully',
+                bookbox: {
+                    _id: bookBox._id.toString(),
+                    name: bookBox.name,
+                    isActive: bookBox.isActive
+                }
+            };
+        } catch (error) {
+            if ((error as any).statusCode) {
+                throw error;
+            }
+            throw newErr(500, 'Failed to activate bookbox');
+        }
+    },
+
     async deactivateBookBox(request: any) {
         try {
             const bookBox = await BookBox.findById(request.params.bookboxId);

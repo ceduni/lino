@@ -11,7 +11,8 @@ import {
     updateBookBoxSchema,
     deleteBookBoxSchema,
     deactivateBookBoxSchema,
-    transferBookBoxOwnershipSchema
+    transferBookBoxOwnershipSchema,
+    activateBookBoxSchema
 } from './admin.schemas';
 
 async function getAllAdmins(request: FastifyRequest, reply: FastifyReply) {
@@ -134,6 +135,19 @@ async function deleteBookBox(request: FastifyRequest, reply: FastifyReply) {
     }
 }
 
+async function activateBookBox(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const response = await AdminService.activateBookBox(request as AuthenticatedRequest & { 
+            params: { bookboxId: string } 
+        });
+        reply.code(200).send(response);
+    } catch (error: unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
+    }
+}
+
 async function deactivateBookBox(request: FastifyRequest, reply: FastifyReply) {
     try {
         const response = await AdminService.deactivateBookBox(request as AuthenticatedRequest & { 
@@ -220,12 +234,19 @@ export default async function adminRoutes(server: MyFastifyInstance) {
         schema: deleteBookBoxSchema
     }, deleteBookBox);
 
+    // Activate bookbox (admin only - ownership checked in service)
+    server.patch('/admin/bookboxes/:bookboxId/activate', { 
+        preValidation: [server.adminAuthenticate],
+        schema: activateBookBoxSchema
+    }, activateBookBox);
+
+
     // Deactivate bookbox (admin only - ownership checked in service)
     server.patch('/admin/bookboxes/:bookboxId/deactivate', { 
         preValidation: [server.adminAuthenticate],
         schema: deactivateBookBoxSchema
     }, deactivateBookBox);
-
+    
     // Transfer bookbox ownership (admin only - ownership checked in service)
     server.patch('/admin/bookboxes/:bookboxId/transfer', { 
         preValidation: [server.adminAuthenticate],

@@ -283,6 +283,56 @@ export const deleteBookBoxSchema = {
     }
 };
 
+export const activateBookBoxSchema = {
+    description: 'Activate a bookbox',
+    tags: ['admin', 'bookboxes'],
+    params: {
+        type: 'object',
+        properties: {
+            bookboxId: { type: 'string' }
+        },
+        required: ['bookboxId']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' },
+        },
+        required: ['authorization']
+    },
+    response: {
+        200: {
+            description: 'Bookbox activated',
+            type: 'object',
+            properties: {
+                message: { type: 'string' },
+                bookbox: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string' },
+                        name: { type: 'string' },
+                        isActive: { type: 'boolean' }
+                    }
+                }
+            }
+        },
+        401: {  
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Bookbox not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }    
+};
+
 export const deactivateBookBoxSchema = {
     description: 'Deactivate a bookbox',
     tags: ['admin', 'bookboxes'],
