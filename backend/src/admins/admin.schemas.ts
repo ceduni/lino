@@ -1,3 +1,5 @@
+import { bookboxSchema } from "../models.schemas";
+
 export const getAllAdminsSchema = {
     description: 'Get all admin users',
     tags: ['admin'],
@@ -132,6 +134,47 @@ export const clearAdminsSchema = {
                 message: { type: 'string' }
             }
         }
+    }
+};
+
+export const searchMyBookboxesSchema = {
+    description: 'Search for bookboxes owned by the admin',
+    tags: ['admin', 'bookboxes'],
+    headers: {
+        type: 'object',
+        required: ['authorization'],
+        properties: {
+            authorization: { type: 'string' }
+        }
+    },
+    querystring: {
+        type: 'object',
+        properties: {
+            q: { type: 'string' },
+            cls: { type: 'string' }, // classification type
+            asc: { type: 'boolean' }, //
+        },
+    },
+    response: {
+        200: {
+            description: 'List of bookboxes',
+            type: 'object',
+            properties: {
+                bookboxes: {
+                    type: 'array',
+                    items: {
+                        ...bookboxSchema
+                    }
+                }
+            }
+        },
+        400: {
+            description: 'Invalid query parameters',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
     }
 };
 

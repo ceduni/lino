@@ -13,6 +13,7 @@ import {
     deactivateBookBoxSchema,
     transferBookBoxOwnershipSchema,
     activateBookBoxSchema,
+    searchMyBookboxesSchema,
 } from './admin.schemas';
 
 async function getAllAdmins(request: FastifyRequest, reply: FastifyReply) {
@@ -75,6 +76,17 @@ async function clearAdmins(request: FastifyRequest, reply: FastifyReply) {
     try {
         const result = await AdminService.clearAdmins();
         reply.send(result);
+    } catch (error: unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
+    }
+}
+
+async function searchMyBookboxes(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const bookboxes = await AdminService.searchMyBookboxes(request);
+        reply.send({ bookboxes });
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -215,7 +227,13 @@ export default async function adminRoutes(server: MyFastifyInstance) {
     }, clearAdmins);
 
     // Bookbox Management Routes
-    
+
+    // Search my bookboxes (authenticated users only)
+    server.get('/admin/bookboxes/search', { 
+        preValidation: [server.adminAuthenticate],
+        schema: searchMyBookboxesSchema
+    }, searchMyBookboxes);
+
     // Create new bookbox (admin only)
     server.post('/admin/bookboxes', { 
         preValidation: [server.adminAuthenticate],

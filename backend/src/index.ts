@@ -21,7 +21,7 @@ const transactionRoutes = require('./transactions/transaction.route');
 const requestRoutes = require('./requests/request.route');
 const adminRoutes = require('./admins/admin.route');
 const fastifyWebSocket = require('@fastify/websocket');
-const AdminService = require('./admins/admin.service');
+import AdminService from './admins/admin.service';
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
@@ -133,7 +133,7 @@ server.decorate('optionalAuthenticate', async (request: FastifyRequestWithJWT) =
     }
 });
 
-server.decorate('adminAuthenticate', async (request: FastifyRequest, reply: FastifyReply) => {
+server.decorate('adminAuthenticate', async (request: FastifyRequestWithJWT, reply: FastifyReply) => {
     try {
         const authHeader = request.headers.authorization;
         if (!authHeader) {
@@ -141,19 +141,21 @@ server.decorate('adminAuthenticate', async (request: FastifyRequest, reply: Fast
         }
         const token = authHeader.split(' ')[1];
         const user = await server.jwt.verify(token) as { username: string };
-        
+
         const isAdmin = await AdminService.isAdmin(user.username);
-        
+
         if (!isAdmin) {
             console.log('Non-admin user tried to access admin route: ', user.username);
             reply.status(401).send({ error: 'Unauthorized' });
         }
+        
+        request.user = user; // Attach user info to request
     } catch (error) {
         reply.status(401).send({ error: 'Unauthorized' });
     }
 });
 
-server.decorate('superAdminAuthenticate', async (request: FastifyRequest, reply: FastifyReply) => {
+server.decorate('superAdminAuthenticate', async (request: FastifyRequestWithJWT, reply: FastifyReply) => {
     try {
         const authHeader = request.headers.authorization;
         if (!authHeader) {
@@ -166,6 +168,8 @@ server.decorate('superAdminAuthenticate', async (request: FastifyRequest, reply:
             console.log('Non-super-admin user tried to access super admin route: ', user.username);
             reply.status(401).send({ error: 'Unauthorized' });
         }
+
+        request.user = user; // Attach user info to request
     } catch (error) {
         reply.status(401).send({ error: 'Unauthorized' });
     }
