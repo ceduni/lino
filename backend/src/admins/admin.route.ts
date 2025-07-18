@@ -12,7 +12,8 @@ import {
     deleteBookBoxSchema,
     deactivateBookBoxSchema,
     transferBookBoxOwnershipSchema,
-    activateBookBoxSchema
+    activateBookBoxSchema,
+    trySetAdminSchema
 } from './admin.schemas';
 
 async function getAllAdmins(request: FastifyRequest, reply: FastifyReply) {
@@ -35,6 +36,22 @@ async function addAdmin(request: FastifyRequest, reply: FastifyReply) {
         
         const admin = await AdminService.addAdmin(username);
         reply.code(201).send({ message: 'Admin added successfully', admin });
+    } catch (error: unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
+    }
+}
+
+async function trySetAdmin(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const { adminKey } = request.body as { adminKey: string };
+        if (!adminKey) {
+            return reply.code(400).send({ error: 'Admin key is required' });
+        }
+
+        const result = await AdminService.trySetAdmin(adminKey);
+        reply.send(result);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -195,6 +212,12 @@ export default async function adminRoutes(server: MyFastifyInstance) {
         preValidation: [server.superAdminAuthenticate],
         schema: addAdminSchema
     }, addAdmin);
+
+    // Try to set admin (super admin only)
+    server.post('/admin/set', { 
+        preValidation: [server.authenticate],
+        schema: trySetAdminSchema
+    }, trySetAdmin);
 
     // Remove admin (super admin only)
     server.delete('/admin/remove', { 

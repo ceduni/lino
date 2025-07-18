@@ -31,6 +31,26 @@ const AdminService = {
         }
     },
 
+    async trySetAdmin(request: any) {
+        try {
+            const username = request.user.username;
+
+            // Check if the provided key matches the admin key
+            const { adminKey } = request.body;
+            if (adminKey !== process.env.ADMIN_VERIFICATION_KEY) {
+                throw newErr(403, 'Invalid admin key');
+            }
+
+            const admin = await this.addAdmin(username);
+            return { message: 'Admin added successfully', admin };
+        } catch (error) {
+            if ((error as any).statusCode) {
+                throw error;
+            }
+            throw newErr(500, 'Failed to set admin');
+        }
+    },
+
     // Check if a user is an admin
     async isAdmin(username: string): Promise<boolean> {
         try {
