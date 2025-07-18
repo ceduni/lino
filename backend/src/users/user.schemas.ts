@@ -49,7 +49,8 @@ export const loginUserSchema = {
             description: 'User logged in successfully',
             type: 'object',
             properties: {
-                user: userSchema,
+                username: { type: 'string' },
+                email: { type: 'string' },
                 token: { type: 'string' }
             }
         },

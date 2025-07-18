@@ -30,7 +30,7 @@ async function registerUser(request : FastifyRequest, reply : FastifyReply) {
 async function loginUser(request : FastifyRequest, reply : FastifyReply) {
     try {
         const response = await UserService.loginUser(request.body as UserLoginCredentials);
-        reply.send({ token : response.token });
+        reply.send({ username: response.user.username, email: response.user.email, token: response.token });
     } catch (error : unknown ) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
