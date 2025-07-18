@@ -18,6 +18,7 @@ export const getAllAdminsSchema = {
                     items: {
                         type: 'object',
                         properties: {
+                            _id: { type: 'string' },
                             username: { type: 'string' },
                             createdAt: { type: 'string' }
                         }

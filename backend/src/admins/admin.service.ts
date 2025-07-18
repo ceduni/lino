@@ -60,7 +60,7 @@ const AdminService = {
     // Get all admins
     async getAllAdmins() {
         try {
-            const admins = await Admin.find({}, 'username createdAt');
+            const admins = await Admin.find();
             return admins;
         } catch (error) {
             throw newErr(500, 'Failed to retrieve admins');

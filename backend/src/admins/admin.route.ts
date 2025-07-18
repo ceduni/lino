@@ -184,9 +184,9 @@ interface MyFastifyInstance extends FastifyInstance {
 export default async function adminRoutes(server: MyFastifyInstance) {
     // Admin Management Routes
     
-    // Get all admins (super admin only)
+    // Get all admins (admin only)
     server.get('/admin/list', { 
-        preValidation: [server.superAdminAuthenticate],
+        preValidation: [server.adminAuthenticate],
         schema: getAllAdminsSchema
     }, getAllAdmins);
 
