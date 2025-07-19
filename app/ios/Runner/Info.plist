@@ -14,18 +14,6 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
-	<key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>lino</string>
-            </array>
-        </dict>
-    </array>
-
 	<key>CFBundleName</key>
 	<string>LinoApp</string>
 	<key>CFBundlePackageType</key>
@@ -34,6 +22,17 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>lino</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -42,10 +41,10 @@
 	<string>We need to use NFC to read bookbox tags.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app requires camera access to scan barcodes.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app requires location access to show your current location on the map.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app requires location access to find nearby book boxes and show your location on the map.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app requires location access to show your current location on the map.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

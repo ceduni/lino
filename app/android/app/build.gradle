@@ -14,7 +14,7 @@ if (localPropertiesFile.exists()) {
 
 // Load .env file for API keys
 def envProperties = new Properties()
-def envFile = rootProject.file('.env')
+def envFile = rootProject.file('../.env')
 if (envFile.exists()) {
     envFile.withReader('UTF-8') { reader ->
         envProperties.load(reader)
