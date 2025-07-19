@@ -518,7 +518,7 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
                 Text(
                   'Books in this BookBox',
                   style: const TextStyle(
-                    fontSize: 22,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Kanit',
                     color: Color.fromRGBO(101, 67, 33, 1),

@@ -55,15 +55,12 @@ class DeepLinkService {
     
     try {
       // Parse the URL
+      final host = uri.host;
       final segments = uri.pathSegments;
       
-      if (segments.isNotEmpty && segments[0] == 'bookbox') {
-        if (segments.length >= 2) {
-          final bookboxId = segments[1];
-          _navigateToBookbox(bookboxId);
-        } else {
-          _navigateToHome();
-        }
+      if (host == 'bookbox' && segments.isNotEmpty) {
+        final bookboxId = segments[0];
+        _navigateToBookbox(bookboxId);
       } else {
         // Default to home page
         _navigateToHome();
