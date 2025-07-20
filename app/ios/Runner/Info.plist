@@ -24,14 +24,14 @@
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
 	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>lino</string>
-			</array>
-		</dict>
+    	<dict>
+        	<key>CFBundleURLName</key>
+        	<string>ca.umontreal.ceduni.lino</string>
+        	<key>CFBundleURLSchemes</key>
+        	<array>
+            	<string>lino</string>
+        	</array>
+    	</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
@@ -68,6 +68,10 @@
 	<array>
 		<string>NDEF</string>
 		<string>TAG</string>
+	</array>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+    	<string>applinks:ceduni-lino.netlify.app</string>
 	</array>
 </dict>
 </plist>
