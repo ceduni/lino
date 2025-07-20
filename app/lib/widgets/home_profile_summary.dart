@@ -88,13 +88,13 @@ class HomeProfileSummary extends StatelessWidget {
                       _buildQuickStat(
                         icon: Icons.book,
                         value: numSavedBooks.toString(),
-                        label: 'books',
+                        label: 'books saved',
                       ),
-                      SizedBox(width: 16),
-                      _buildQuickStat(
+                      SizedBox(width: 10),
+                      _buildDescription(
                         icon: Icons.eco,
-                        value: _formatImpact(),
-                        label: _getImpactLabel(),
+                        label: getMatchingDescription(savedTrees),
+                        
                       ),
                     ],
                   ),
@@ -106,6 +106,54 @@ class HomeProfileSummary extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  static const descriptionList = [
+    "Tree Hugger in Training",
+    "Carbon Crusader", 
+    "Eco Warrior",
+    "Planet Protector",
+    "Environmental Champion"
+  ];
+
+  String getMatchingDescription(double savedTrees) {
+    if (this.numSavedBooks >= 100) {
+      return descriptionList[4];
+    } else if (this.numSavedBooks >= 50) {
+      return descriptionList[3];
+    } else if (this.numSavedBooks >= 20) {
+      return descriptionList[2];
+    } else if (this.numSavedBooks >= 10) {
+      return descriptionList[1];
+    } else {
+      return descriptionList[0];
+    }
+  }
+  
+  
+  Widget _buildDescription({
+    required IconData icon,
+    required String label,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          icon,
+          color: Colors.white.withValues(alpha: 0.8),
+          size: 16,
+        ),
+        SizedBox(width: 4),
+        Text(
+          '$label',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.white.withValues(alpha: 0.9),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 
@@ -140,7 +188,7 @@ class HomeProfileSummary extends StatelessWidget {
     if (savedTrees >= 1.0) {
       return savedTrees.toStringAsFixed(1);
     } else if (carbonSavings >= 100) {
-      return '${(carbonSavings / 1000).toStringAsFixed(1)}kg';
+      return '${(carbonSavings / 1000).toStringAsFixed(1)}';
     } else {
       return carbonSavings.toStringAsFixed(0);
     }

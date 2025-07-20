@@ -153,7 +153,7 @@ class HomePage extends HookWidget {
             carbonSavings: userData.data!.ecologicalImpact.carbonSavings,
             onTap: () {
               // Navigate to profile page when tapped
-              Navigator.pushNamed(context, '/profile');
+              print('birdo soundo');
             },
           ),
           // Map section

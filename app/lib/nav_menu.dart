@@ -55,7 +55,10 @@ class _BookNavPageState extends State<BookNavPage> {
             sourcePage: controller.selectedIndex),
       ),
       floatingActionButton: Obx(() {
-        if (controller.selectedIndex.value == 2) {
+        if (controller.selectedIndex.value == 0) {
+          // pr cacher
+          return SizedBox.shrink();
+        } else if (controller.selectedIndex.value == 2) {
           // Requests page is active
           return LinoFloatingButton(
             selectedIndex: controller.selectedIndex.value,
