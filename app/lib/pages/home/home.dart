@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:audioplayers/audioplayers.dart';
 import '../../models/user_model.dart';
 import '../../services/user_services.dart';
 import '../../widgets/home_profile_summary.dart';
@@ -65,6 +66,8 @@ class HomePage extends HookWidget {
   Widget build(BuildContext context) {
     final initialized = useState(false);
     final token = useState<String?>(null);
+    final clicks = useState(0);
+    final audioPlayer = useMemoized(() => AudioPlayer(), []);
 
     useEffect(() {
       initializePrefs().then((value) {
@@ -74,6 +77,20 @@ class HomePage extends HookWidget {
       _checkLocationPermission(context);
       return null;
     }, []);
+
+    Future<void> addClick() async {
+      clicks.value++;
+      print('Click count: ${clicks.value}');
+      if (clicks.value >= 5) {
+        try {
+          await audioPlayer.play(AssetSource('sounds/beep.mp3'));
+          clicks.value = 0; // Reset counter after playing sound
+          print('hmmmmmmmmmmmmmmm');
+        } catch (e) {
+          print('Error playing sound: $e');
+        }
+      }
+    }
 
     if (!initialized.value) {
       return Scaffold(
@@ -152,8 +169,7 @@ class HomePage extends HookWidget {
             savedTrees: userData.data!.ecologicalImpact.savedTrees,
             carbonSavings: userData.data!.ecologicalImpact.carbonSavings,
             onTap: () {
-              // Navigate to profile page when tapped
-              print('birdo soundo');
+              addClick();
             },
           ),
           // Map section
