@@ -132,7 +132,7 @@ const NotificationService = {
 
                 // Check if the book matches the user's request
                 if (requests.some(req => req.bookTitle.toLowerCase() === book.title.toLowerCase())) {
-                    reasons.push('requested_book');
+                    reasons.push('solved_book_request');
                 }
                 
                 const notificationOptions: any = {

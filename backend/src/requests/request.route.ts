@@ -6,7 +6,7 @@ import {
     getBookRequestsSchema,
     toggleSolvedStatusSchema
 } from "./request.schemas";
-import { AuthenticatedRequest } from "../types/common.types";
+import { AuthenticatedRequest, MyFastifyInstance } from "../types/common.types";
 
 async function sendBookRequest(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -53,9 +53,6 @@ async function toggleSolvedStatus(request: FastifyRequest, reply: FastifyReply) 
     }
 }
 
-interface MyFastifyInstance extends FastifyInstance {
-    authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-}
 
 export default async function requestRoutes(server: MyFastifyInstance) {
     server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);

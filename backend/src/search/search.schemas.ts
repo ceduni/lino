@@ -1,3 +1,4 @@
+import { issueSchema } from "../issues/issue.schemas";
 import { bookboxSchema, threadSchema } from "../models.schemas";
 
 export const searchBooksSchema = {
@@ -259,6 +260,45 @@ export const searchTransactionHistorySchema = {
                         }
                     }
                 }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+
+export const searchIssuesSchema = {
+    description: 'Search issues',
+    tags: ['issues'],
+    querystring: {
+        type: 'object',
+        properties: {
+            username: { type: 'string' },
+            bookboxId: { type: 'string' },
+            status: { type: 'string', enum: ['open', 'on_progress', 'resolved'] },
+        }
+    },
+    response: {
+        200: {
+            description: 'Issues found',
+            type: 'object',
+            properties: {
+                issues: {
+                    type: 'array',
+                    items: issueSchema
+                }
+            }
+        },
+        400: {
+            description: 'Invalid query parameters',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
             }
         },
         500: {

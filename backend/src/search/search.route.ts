@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { BookSearchQuery, MyFastifyInstance } from "../types";
+import { AuthenticatedRequest, BookSearchQuery, MyFastifyInstance } from "../types";
 import SearchService from "./search.service";
-import { findNearestBookboxesSchema, searchBookboxesSchema, searchBooksSchema, searchMyManagedBookboxesSchema, searchThreadsSchema, searchTransactionHistorySchema } from "./search.schemas";
+import { findNearestBookboxesSchema, searchBookboxesSchema, searchBooksSchema, searchIssuesSchema, searchMyManagedBookboxesSchema, searchThreadsSchema, searchTransactionHistorySchema } from "./search.schemas";
 
 async function searchBooks(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -76,6 +76,22 @@ async function searchTransactionHistory(request: FastifyRequest, reply: FastifyR
     }
 }  
 
+async function searchIssues(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const issues = await SearchService.searchIssues(request as 
+            { query: 
+                { username?: string; 
+                    bookboxId?: string; 
+                    status?: string; } 
+                });
+        reply.send({ issues });
+    } catch (error: unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
+    }
+}
+
 export default async function searchRoutes(server: MyFastifyInstance) {
     server.get('/search/books', { schema: searchBooksSchema }, searchBooks);
     server.get('/search/bookboxes', { schema: searchBookboxesSchema }, searchBookboxes);
@@ -86,5 +102,5 @@ export default async function searchRoutes(server: MyFastifyInstance) {
         schema: searchMyManagedBookboxesSchema
     }, searchMyManagedBookboxes);
     server.get('/search/transactions', { schema: searchTransactionHistorySchema }, searchTransactionHistory);
-
+    server.get('/search/issues', { schema: searchIssuesSchema }, searchIssues); 
 }

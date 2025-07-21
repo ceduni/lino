@@ -20,6 +20,7 @@ const searchRoutes = require('./search/search.route');
 const serviceRoutes = require('./services/services.route');
 const transactionRoutes = require('./transactions/transaction.route');
 const requestRoutes = require('./requests/request.route');
+const issueRoutes = require('./issues/issue.route');
 const adminRoutes = require('./admins/admin.route');
 const fastifyWebSocket = require('@fastify/websocket');
 import AdminService from './admins/admin.service';
@@ -241,6 +242,7 @@ server.register(transactionRoutes);
 server.register(serviceRoutes);
 server.register(adminRoutes);
 server.register(searchRoutes);
+server.register(issueRoutes);
 
 const start = async () => {
     try {

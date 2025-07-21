@@ -1,9 +1,10 @@
 import BookBox from "../bookboxes/bookbox.model";
+import Issue from "../issues/issue.model";
 import { getBoroughId } from "../services/borough.id.generator";
 import { newErr } from "../services/utilities";
 import Thread from "../threads/thread.model";
 import Transaction from "../transactions/transaction.model";
-import { BookSearchQuery } from "../types";
+import { AuthenticatedRequest, BookSearchQuery } from "../types";
 
 const searchService = {
     async searchBooks(request: { query: BookSearchQuery }) {
@@ -273,7 +274,26 @@ const searchService = {
         }
 
         return await query.exec();
-    }
+    },
+
+    
+    async searchIssues(request: { 
+        query: { username?: string; 
+            bookboxId?: string; 
+            status?: string;
+        }
+    }) {
+        const { username, bookboxId, status } = request.query;
+
+        const filter: any = {};
+        if (username) filter.username = username;
+        if (bookboxId) filter.bookboxId = bookboxId;
+        if (status) filter.status = status;
+
+        const issues = await Issue.find(filter);
+        return issues;
+    },
+
 }
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
