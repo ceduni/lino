@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import TransactionService from "./transaction.service";
-import { createCustomTransactionSchema, getTransactionHistorySchema } from "./transaction.schemas";
+import { getTransactionHistorySchema } from "./transaction.schemas";
 
 interface CreateCustomTransactionBody {
     username: string;
@@ -36,17 +36,18 @@ async function getTransactionHistory(request: FastifyRequest, reply: FastifyRepl
 
 interface MyFastifyInstance extends FastifyInstance {
     adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
+    superAdminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
 }
 
 export default async function transactionRoutes(server: MyFastifyInstance) {
     server.get('/books/transactions', { schema: getTransactionHistorySchema }, getTransactionHistory);
     server.post('/transactions/custom', { 
-        preValidation: [server.adminAuthenticate]
+        preValidation: [server.superAdminAuthenticate]
     }, createCustomTransaction);
 
 
     server.delete('/transactions/clear', {
-        preValidation: [server.adminAuthenticate]
+        preValidation: [server.superAdminAuthenticate]
     }, async (request: FastifyRequest, reply: FastifyReply) => {
         try {
             await TransactionService.clearCollection();

@@ -122,7 +122,7 @@ class BookBoxSelectionDialog extends StatelessWidget {
             style: TextStyle(fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8.0),
-          Text('Number of books: ${bookBoxController.selectedBookBox.value?.books.length ?? 0}'),
+          Text('Number of books: ${bookBoxController.selectedBookBox.value?.booksCount ?? 0}'),
           if (bookBoxController.selectedBookBox.value?.distance != null)
             Text(
               'Distance: ${bookBoxController.selectedBookBox.value!.distance!.toStringAsFixed(1)}m',
@@ -232,7 +232,7 @@ class BookBoxSelectionDialog extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.w500),
               ),
               subtitle: Text(
-                '${bookBox.books.length} books',
+                '${bookBox.booksCount} books',
                 style: TextStyle(fontSize: 12),
               ),
               trailing: Column(

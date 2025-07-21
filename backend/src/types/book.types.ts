@@ -57,7 +57,7 @@ export interface BookAddData {
 }
 
 export interface BookSearchQuery {
-  kw?: string;
+  q?: string;
   cls?: string;
   asc?: boolean;
 }

@@ -1,9 +1,8 @@
-// books_list.dart
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
+import 'package:Lino_app/services/search_services.dart';
 import 'package:flutter/material.dart';
-import 'package:Lino_app/services/book_services.dart';
 
 import '../books/book_details_page.dart';
 
@@ -15,7 +14,7 @@ class BooksList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<ExtendedBook>>(
-      future: BookService().searchBooks(kw: query),
+      future: SearchService().searchBooks(q: query),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());

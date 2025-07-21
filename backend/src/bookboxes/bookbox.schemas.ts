@@ -150,7 +150,7 @@ export const searchBookboxesSchema = {
     querystring: {
         type: 'object',
         properties: {
-            kw: { type: 'string' },
+            q: { type: 'string' },
             cls: { type: 'string' },
             asc: { type: 'boolean' },
             longitude: { type: 'number' },
@@ -165,7 +165,19 @@ export const searchBookboxesSchema = {
                 bookboxes: {
                     type: 'array',
                     items: {
-                        ...bookboxSchema
+                        type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                            name: { type: 'string' },
+                            infoText: { type: 'string' },
+                            longitude: { type: 'number' },
+                            latitude: { type: 'number' },
+                            booksCount: { type: 'number' },
+                            image: { type: 'string' },
+                            owner: { type: 'string' },
+                            boroughId: { type: 'string' },
+                            isActive: { type: 'boolean' }
+                        }
                     }
                 }
             }
@@ -303,7 +315,19 @@ export const findNearestBookboxesSchema = {
             description: 'Nearest bookboxes found',
             type: 'array',
             items: {
-                ...bookboxSchema
+                type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                            name: { type: 'string' },
+                            infoText: { type: 'string' },
+                            longitude: { type: 'number' },
+                            latitude: { type: 'number' },
+                            booksCount: { type: 'number' },
+                            image: { type: 'string' },
+                            owner: { type: 'string' },
+                            boroughId: { type: 'string' },
+                            isActive: { type: 'boolean' }
+                        }
             }
         },
         400: {

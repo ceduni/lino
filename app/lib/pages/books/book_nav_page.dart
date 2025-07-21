@@ -1,6 +1,7 @@
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
+import 'package:Lino_app/services/search_services.dart';
 import 'package:flutter/material.dart';
 import 'book_details_page.dart';
 // import 'package:Lino_app/pages/map/map_screen.dart';
@@ -18,11 +19,16 @@ class NavigationPage extends StatefulWidget {
 class _NavigationPageState extends State<NavigationPage> {
   final GlobalStateController globalState = Get.put(GlobalStateController());
 
-  List<BookBox> bookBoxes = [];
+  List<ShortenedBookBox> bookBoxes = [];
   bool isLoading = true;
   String? error;
   bool isGridMode = false; // Track if we are in grid mode
   Position? userLocation;
+  
+  // Track expanded bookboxes and their loaded books
+  Map<String, bool> expandedBookBoxes = {};
+  Map<String, List<Book>> loadedBooks = {};
+  Map<String, bool> loadingBooks = {};
 
   @override
   void initState() {
@@ -135,7 +141,7 @@ class _NavigationPageState extends State<NavigationPage> {
     });
 
     try {
-      final data = await BookboxService().searchBookboxes();
+      final data = await SearchService().searchBookboxes();
       setState(() {
         bookBoxes = data;
         isLoading = false;
@@ -164,6 +170,39 @@ class _NavigationPageState extends State<NavigationPage> {
     setState(() {
       isGridMode = !isGridMode; // Toggle between grid and horizontal mode
     });
+  }
+
+  Future<void> _toggleBookBoxExpansion(String bookBoxId) async {
+    setState(() {
+      expandedBookBoxes[bookBoxId] = !(expandedBookBoxes[bookBoxId] ?? false);
+    });
+
+    // If expanding and books not loaded yet, load them
+    if (expandedBookBoxes[bookBoxId] == true && !loadedBooks.containsKey(bookBoxId)) {
+      await _loadBooksForBookBox(bookBoxId);
+    }
+  }
+
+  Future<void> _loadBooksForBookBox(String bookBoxId) async {
+    setState(() {
+      loadingBooks[bookBoxId] = true;
+    });
+
+    try {
+      final bookBox = await BookboxService().getBookBox(bookBoxId);
+      setState(() {
+        loadedBooks[bookBoxId] = bookBox.books;
+        loadingBooks[bookBoxId] = false;
+      });
+    } catch (e) {
+      setState(() {
+        loadingBooks[bookBoxId] = false;
+      });
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading books: $e')),
+      );
+    }
   }
 
   @override
@@ -219,30 +258,44 @@ class _NavigationPageState extends State<NavigationPage> {
           child: Column(
             children: [
               for (var bb in bookBoxes) ...[
-                Container(
-                  width: double.infinity,
-                  height: 32,
-                  margin: const EdgeInsets.only(bottom: 0),
-                  color: Color.fromRGBO(125, 201, 236, 1), // (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? Color.fromRGBO(0, 136, 0, 1) : Color.fromRGBO(125, 201, 236, 1)),
-                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 16.0),
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Bookbox ${bb.name}', //+ (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? ' (Selected)' : ''),
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: const Color.fromRGBO(3, 51, 86, 1), // (globalState.currentSelectedBookBox.value?['name'] == bb['name'] ? const Color.fromARGB(255, 255, 255, 255) : const Color.fromRGBO(3, 51, 86, 1)),
+                GestureDetector(
+                  onTap: () => _toggleBookBoxExpansion(bb.id),
+                  child: Container(
+                    width: double.infinity,
+                    height: 32,
+                    margin: const EdgeInsets.only(bottom: 0),
+                    color: Color.fromRGBO(125, 201, 236, 1),
+                    padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 16.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Bookbox ${bb.name} (${bb.booksCount} books)',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: const Color.fromRGBO(3, 51, 86, 1),
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          expandedBookBoxes[bb.id] == true 
+                            ? Icons.expand_less 
+                            : Icons.expand_more,
+                          color: const Color.fromRGBO(3, 51, 86, 1),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                Container(
-                  color: Color.fromRGBO(250, 250, 240, 1),
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: isGridMode
-                      ? _buildGridBooks(bb.books) // Grid view mode
-                      : _buildHorizontalBooks(bb.books), // Horizontal scroll mode
-                ),
+                if (expandedBookBoxes[bb.id] == true) ...[
+                  Container(
+                    color: Color.fromRGBO(250, 250, 240, 1),
+                    margin: const EdgeInsets.only(bottom: 10),
+                    child: _buildBookBoxContent(bb.id),
+                  ),
+                ],
               ],
             ],
           ),
@@ -325,6 +378,42 @@ class _NavigationPageState extends State<NavigationPage> {
         );
       },
     );
+  }
+
+  Widget _buildBookBoxContent(String bookBoxId) {
+    // Show loading indicator while books are being loaded
+    if (loadingBooks[bookBoxId] == true) {
+      return Container(
+        height: 100,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    // Get the loaded books for this bookbox
+    final books = loadedBooks[bookBoxId];
+    
+    // If no books loaded or empty list
+    if (books == null || books.isEmpty) {
+      return Container(
+        height: 100,
+        child: Center(
+          child: Text(
+            'No books available',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Display books based on current view mode
+    return isGridMode
+        ? _buildGridBooks(books)
+        : _buildHorizontalBooks(books);
   }
 
   Widget _errorImage(String title) {

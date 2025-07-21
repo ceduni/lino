@@ -1,5 +1,5 @@
 import 'package:Lino_app/models/bookbox_model.dart';
-import 'package:Lino_app/services/bookbox_services.dart';
+import 'package:Lino_app/services/search_services.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -28,7 +28,7 @@ class MapController extends GetxController {
 }
 
 class BookBoxController extends GetxController {
-  var bookBoxes = <BookBox>[].obs;
+  var bookBoxes = <ShortenedBookBox>[].obs;
   var userLocation = Rxn<Position>();
   var highlightedBookBoxId = RxnString();
   var sortBy = 'by location'.obs;
@@ -46,7 +46,7 @@ class BookBoxController extends GetxController {
     var longitude = userLocation.value?.longitude;
     var latitude = userLocation.value?.latitude;
 
-    var bbs = await BookboxService().searchBookboxes(
+    var bbs = await SearchService().searchBookboxes(
       cls: sortBy.value,
       asc: isAscending.value ? true : false,
       longitude: sortBy.value == 'by location' ? longitude : null,

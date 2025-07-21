@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:Lino_app/models/book_model.dart';
+import 'package:Lino_app/services/search_services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../services/book_services.dart';
 import '../../../services/thread_services.dart';
 
 class AddThreadForm extends StatefulWidget {
@@ -52,8 +52,7 @@ class _AddThreadFormState extends State<AddThreadForm> {
 
   Future<void> _searchBooks(String? query) async {
     try {
-      var bs = BookService();
-      var response = await bs.searchBooks(kw: query);
+      var response = await SearchService().searchBooks(q: query);
       setState(() {
         books = response;
       });

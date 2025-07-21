@@ -138,6 +138,7 @@ async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
 interface MyFastifyInstance extends FastifyInstance {
     authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
     adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
+    superAdminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
 }
 export default async function userRoutes(server: MyFastifyInstance) {
     server.get('/users', { preValidation: [server.authenticate], schema : getUserSchema }, getUser);
@@ -149,7 +150,7 @@ export default async function userRoutes(server: MyFastifyInstance) {
     server.post('/users/location', { preValidation: [server.authenticate], schema : addUserFavLocationSchema }, addUserFavLocation);
     server.delete('/users/location', { preValidation: [server.authenticate], schema : deleteUserFavLocationSchema }, deleteUserFavLocation);
     server.delete('/users/clear', { preValidation: [server.adminAuthenticate], schema : clearCollectionSchema }, clearCollection);
-    server.delete('/users/notifications/clear', { preValidation: [server.adminAuthenticate] }, async (request: FastifyRequest, reply: FastifyReply) => {
+    server.delete('/users/notifications/clear', { preValidation: [server.superAdminAuthenticate] }, async (request: FastifyRequest, reply: FastifyReply) => {
         try {
             await UserService.clearNotifications();
             reply.send({ message: 'Notifications cleared' });

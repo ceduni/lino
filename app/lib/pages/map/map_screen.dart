@@ -183,7 +183,7 @@ class MapScreen extends HookWidget {
                                   style: TextStyle(color: Colors.white70),
                                 ),
                               Text(
-                                'Books: ${bbox.books.length}',
+                                'Books: ${bbox.booksCount}',
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ],

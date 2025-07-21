@@ -1,7 +1,7 @@
 import 'package:Lino_app/models/thread_model.dart';
+import 'package:Lino_app/services/search_services.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:Lino_app/services/thread_services.dart';
 
 import '../forum/threads/thread_message_screen.dart';
 
@@ -13,7 +13,7 @@ class ThreadsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Thread>>(
-      future: ThreadService().searchThreads(q: query),
+      future: SearchService().searchThreads(q: query),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());

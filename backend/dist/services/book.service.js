@@ -49,7 +49,7 @@ const bookService = {
     // Optimized using MongoDB aggregation pipeline for better performance
     searchBooks(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { kw, cls = 'by title', asc = true } = request.query;
+            const { q, cls = 'by title', asc = true } = request.query;
             // Build aggregation pipeline
             const pipeline = [
                 // Unwind the books array to work with individual books
@@ -63,14 +63,14 @@ const bookService = {
                 }
             ];
             // Add keyword filtering stage if keyword is provided
-            if (kw) {
+            if (q) {
                 // Use text search if available, otherwise use regex
                 pipeline.push({
                     $match: {
                         $or: [
-                            { 'books.title': { $regex: kw, $options: 'i' } },
-                            { 'books.authors': { $regex: kw, $options: 'i' } },
-                            { 'books.categories': { $regex: kw, $options: 'i' } }
+                            { 'books.title': { $regex: q, $options: 'i' } },
+                            { 'books.authors': { $regex: q, $options: 'i' } },
+                            { 'books.categories': { $regex: q, $options: 'i' } }
                         ]
                     }
                 });

@@ -10,7 +10,6 @@ import {
     getThreadSchema
 } from "./thread.schemas";
 import { clearCollectionSchema } from "../users/user.schemas";
-import { threadSchema } from "../models.schemas";
 import {broadcastMessage} from "../index";
 import { ThreadCreateData, MessageCreateData, ReactionData } from "../types/thread.types";
 import { AuthenticatedRequest } from "../types/common.types";
@@ -112,6 +111,7 @@ async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
 interface MyFastifyInstance extends FastifyInstance {
     authenticate: (request : FastifyRequest, reply: FastifyReply) => void;
     adminAuthenticate: (request : FastifyRequest, reply: FastifyReply) => void;
+    superAdminAuthenticate: (request : FastifyRequest, reply: FastifyReply) => void;
 }
 export default async function threadRoutes(server: MyFastifyInstance) {
     server.get('/threads/:threadId', { schema : getThreadSchema }, getThread);
@@ -120,5 +120,5 @@ export default async function threadRoutes(server: MyFastifyInstance) {
     server.delete('/threads/:threadId', { preValidation: [server.authenticate], schema : deleteThreadSchema }, deleteThread);
     server.post('/threads/messages', { preValidation: [server.authenticate], schema : addMessageSchema }, addThreadMessage);
     server.post('/threads/messages/reactions', { preValidation: [server.authenticate], schema : toggleReactionSchema }, toggleMessageReaction);
-    server.delete('/threads/clear', { preValidation: [server.adminAuthenticate], schema : clearCollectionSchema }, clearCollection);
+    server.delete('/threads/clear', { preValidation: [server.superAdminAuthenticate], schema : clearCollectionSchema }, clearCollection);
 }

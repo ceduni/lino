@@ -5,7 +5,6 @@ import {
     searchBooksSchema,
     getBookSchema
 } from "./book.schemas";
-import { bookSchema } from "../models.schemas";
 import { BookSearchQuery } from "../types/book.types";
 
 

@@ -8,8 +8,8 @@ import {
     IBook,
 } from '../types/book.types';
 import { AuthenticatedRequest } from '../types/common.types';
-import { getBoroughId } from "../services/borough.id.generator";
 import TransactionService from "../transactions/transaction.service";
+import { getBoroughId } from "../services/borough.id.generator";
 
 const bookboxService = {
     async getBookBox(bookBoxId: string) {
@@ -127,19 +127,19 @@ const bookboxService = {
 
     async searchBookboxes(request: { 
         query: { 
-            kw?: string; 
+            q?: string; 
             cls?: string; 
             asc?: boolean; 
             longitude?: number; 
             latitude?: number; 
         } 
     }) {
-        const kw = request.query.kw;
+        const q= request.query.q;
         let bookBoxes = await BookBox.find();
 
-        if (kw) {
+        if (q) {
             // Filter using regex for more flexibility
-            const regex = new RegExp(kw, 'i');
+            const regex = new RegExp(q, 'i');
             bookBoxes = bookBoxes.filter((bookBox) =>
                 regex.test(bookBox.name) || regex.test(bookBox.infoText || '')
             );
@@ -174,15 +174,19 @@ const bookboxService = {
             });
         }
 
-        // only return the ids of the bookboxes
-        const bookBoxIds = bookBoxes.map((bookBox) => bookBox._id.toString());
-        // get the full bookbox objects
-        const finalBookBoxes = [];
-        for (let i = 0; i < bookBoxIds.length; i++) {
-            finalBookBoxes.push(await this.getBookBox(bookBoxIds[i]));
-        }
-
-        return finalBookBoxes;
+        // Only return the necessary fields
+        return bookBoxes.map(bookBox => ({
+            id: bookBox._id.toString(),
+            name: bookBox.name,
+            infoText: bookBox.infoText,
+            longitude: bookBox.longitude,
+            latitude: bookBox.latitude,
+            booksCount: bookBox.books.length,
+            image: bookBox.image,
+            owner: bookBox.owner,
+            boroughId: bookBox.boroughId,
+            isActive: bookBox.isActive
+        }));
     },
 
     async clearCollection() {
@@ -213,19 +217,44 @@ const bookboxService = {
         return { message: 'Bookbox unfollowed successfully' };
     },
 
-    async findNearestBookboxes(longitude: number, latitude: number, maxDistance: number = 5) {
+    async findNearestBookboxes(
+        longitude: number, 
+        latitude: number, 
+        maxDistance: number = 5, 
+        searchByBorough: boolean = false
+    ) {
         if (!longitude || !latitude) {
             throw newErr(400, 'Longitude and latitude are required');
         }
 
         const bookboxes = await BookBox.find();
 
-        const nearbyBookboxes = bookboxes.filter(bookbox => {
-            const distance = this.calculateDistance(latitude, longitude, bookbox.latitude, bookbox.longitude);
-            return distance <= maxDistance;
-        });
+        let nearbyBookboxes;
 
-        return nearbyBookboxes;
+        if (searchByBorough) {
+            nearbyBookboxes = bookboxes.filter(async bookbox => {
+                const locationBoroughId = await getBoroughId(latitude, longitude);
+                return bookbox.boroughId === locationBoroughId;
+            });
+        } else {
+            nearbyBookboxes = bookboxes.filter(bookbox => {
+                const distance = this.calculateDistance(latitude, longitude, bookbox.latitude, bookbox.longitude);
+                return distance <= maxDistance;
+            });
+        }
+
+        return nearbyBookboxes.map(bookbox => ({
+            id: bookbox._id.toString(),
+            name: bookbox.name,
+            infoText: bookbox.infoText,
+            longitude: bookbox.longitude,
+            latitude: bookbox.latitude,
+            booksCount: bookbox.books.length,
+            image: bookbox.image,
+            owner: bookbox.owner,
+            boroughId: bookbox.boroughId,
+            isActive: bookbox.isActive
+        }));
     },
 
     calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {

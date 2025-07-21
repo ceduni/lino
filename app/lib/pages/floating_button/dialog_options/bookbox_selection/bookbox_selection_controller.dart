@@ -4,14 +4,15 @@ import 'package:Lino_app/pages/floating_button/dialog_options/book_removal/book_
 import 'package:Lino_app/pages/floating_button/dialog_options/form_submission/form_controller.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/isbn_entry/isbn_dialog.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
+import 'package:Lino_app/services/search_services.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 
 class BookBoxSelectionController extends GetxController {
-  final selectedBookBox = Rxn<BookBoxWithDistance>();
-  final bookBoxes = <BookBoxWithDistance>[].obs;
-  final nearbyBookBoxes = <BookBoxWithDistance>[].obs;
+  final selectedBookBox = Rxn<ShortenedBookBoxWithDistance>();
+  final bookBoxes = <ShortenedBookBoxWithDistance>[].obs;
+  final nearbyBookBoxes = <ShortenedBookBoxWithDistance>[].obs;
   final userLocation = Rxn<Position>();
   final isLoading = true.obs;
   final isBookBoxFound = false.obs;
@@ -25,8 +26,7 @@ class BookBoxSelectionController extends GetxController {
 
   void setSelectedBookBox(String bbid) {
     try {
-      selectedBookBox.value = bookBoxes
-          .firstWhere((element) => element.id == bbid);
+      selectedBookBox.value = bookBoxes.firstWhere((bb) => bb.id == bbid);
       isBookBoxFound.value = true;
     } catch (e) {
       selectedBookBox.value = null;
@@ -37,23 +37,22 @@ class BookBoxSelectionController extends GetxController {
   Future<void> getBookBoxes() async {
     isLoading.value = true;
     try {
-      List<BookBox> bbs;
+      List<ShortenedBookBox> bbs;
       if (userLocation.value != null) {
         final longitude = userLocation.value?.longitude;
         final latitude = userLocation.value?.latitude;
 
-        bbs = await BookboxService().searchBookboxes(
+        bbs = await SearchService().searchBookboxes(
           cls: 'by location',
           asc: true,
           longitude: longitude,
           latitude: latitude,
         );
       } else {
-        bbs = await BookboxService().searchBookboxes();
+        bbs = await SearchService().searchBookboxes();
       }
 
-      // Map bookboxes and calculate distances
-      List<BookBoxWithDistance> allBookBoxes = bbs.map<BookBoxWithDistance>((bb) {
+      bookBoxes.value = bbs.map((bb) {
         double? distance;
         if (userLocation.value != null) {
           distance = Geolocator.distanceBetween(
@@ -64,24 +63,24 @@ class BookBoxSelectionController extends GetxController {
           );
         }
 
-        return BookBoxWithDistance(
+        return ShortenedBookBoxWithDistance(
           id: bb.id,
           name: bb.name,
           infoText: bb.infoText,
           latitude: bb.latitude.toDouble(),
           longitude: bb.longitude.toDouble(),
-          books: bb.books,
+          booksCount: bb.booksCount,
           distance: distance,
           boroughId: bb.boroughId,
           image: bb.image,
+          owner: bb.owner,
+          isActive: bb.isActive,
         );
       }).toList();
 
-      bookBoxes.value = allBookBoxes;
-
       // Smart selection logic
       if (userLocation.value != null) {
-        await _performSmartSelection(allBookBoxes);
+        await _performSmartSelection(bookBoxes);
       }
     } catch (e) {
       print('Error fetching book boxes: $e');
@@ -90,7 +89,7 @@ class BookBoxSelectionController extends GetxController {
     }
   }
 
-  Future<void> _performSmartSelection(List<BookBoxWithDistance> allBookBoxes) async {
+  Future<void> _performSmartSelection(List<ShortenedBookBoxWithDistance> allBookBoxes) async {
     // Sort by distance (closest first)
     allBookBoxes.sort((a, b) {
       final distanceA = a.distance ?? double.infinity;
@@ -129,16 +128,18 @@ class BookBoxSelectionController extends GetxController {
     isLoading.value = true;
     try {
       final bookBox = await BookboxService().getBookBox(id);
-      selectedBookBox.value = BookBoxWithDistance(
+      selectedBookBox.value = ShortenedBookBoxWithDistance(
         id: bookBox.id,
         name: bookBox.name,
         infoText: bookBox.infoText,
         latitude: bookBox.latitude,
         longitude: bookBox.longitude,
-        books: bookBox.books,
+        booksCount: bookBox.books.length,
         boroughId: bookBox.boroughId,
         image: bookBox.image,
         distance: null,
+        owner: bookBox.owner,
+        isActive: bookBox.isActive,
       );
       isBookBoxFound.value = true;
     } catch (e) {
@@ -183,12 +184,14 @@ class BookBoxSelectionController extends GetxController {
     }
   }
 
-  void submitBookBox2() {
+  void submitBookBox2() async {
     if (selectedBookBox.value == null) return;
     
     // Check if the selected bookbox has books
-    final books = selectedBookBox.value!.books;
-    
+    final id = selectedBookBox.value!.id;
+    final bookBox = await BookboxService().getBookBox(id);
+    final books = bookBox.books;
+
     if (books.isEmpty) {
       Get.snackbar('Info', 'This bookbox has no books to remove',
         snackPosition: SnackPosition.BOTTOM,

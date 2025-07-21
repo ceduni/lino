@@ -49,7 +49,7 @@ export const searchBooksSchema = {
     querystring: {
         type: 'object',
         properties: {
-            kw: { type: 'string' },
+            q: { type: 'string' },
             cls: { type: 'string' },
             asc: { type: 'boolean' }
         }
@@ -105,7 +105,7 @@ export const getBookSchema = {
     tags: ['books'],
     params: {
         type: 'object',
-        properties: {
+        properties: { 
             id: { type: 'string' }
         },
         required: ['id']

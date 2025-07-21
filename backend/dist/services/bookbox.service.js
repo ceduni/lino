@@ -128,11 +128,11 @@ const bookboxService = {
     },
     searchBookboxes(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            const kw = request.query.kw;
+            const q= request.query.q;
             let bookBoxes = yield bookbox_model_1.default.find();
-            if (kw) {
+            if (q) {
                 // Filter using regex for more flexibility
-                const regex = new RegExp(kw, 'i');
+                const regex = new RegExp(q, 'i');
                 bookBoxes = bookBoxes.filter((bookBox) => regex.test(bookBox.name) || regex.test(bookBox.infoText || ''));
             }
             const cls = request.query.cls;

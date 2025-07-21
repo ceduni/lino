@@ -183,24 +183,24 @@ class HomeProfileSummary extends StatelessWidget {
     );
   }
 
-  String _formatImpact() {
-    // Choose the most impressive stat to highlight
-    if (savedTrees >= 1.0) {
-      return savedTrees.toStringAsFixed(1);
-    } else if (carbonSavings >= 100) {
-      return '${(carbonSavings / 1000).toStringAsFixed(1)}';
-    } else {
-      return carbonSavings.toStringAsFixed(0);
-    }
-  }
+  // String _formatImpact() {
+  //   // Choose the most impressive stat to highlight
+  //   if (savedTrees >= 1.0) {
+  //     return savedTrees.toStringAsFixed(1);
+  //   } else if (carbonSavings >= 100) {
+  //     return '${(carbonSavings / 1000).toStringAsFixed(1)}';
+  //   } else {
+  //     return carbonSavings.toStringAsFixed(0);
+  //   }
+  // }
 
-  String _getImpactLabel() {
-    if (savedTrees >= 1.0) {
-      return 'trees saved';
-    } else if (carbonSavings >= 100) {
-      return 'CO₂ saved';
-    } else {
-      return 'kg of carbon saved';
-    }
-  }
+  // String _getImpactLabel() {
+  //   if (savedTrees >= 1.0) {
+  //     return 'trees saved';
+  //   } else if (carbonSavings >= 100) {
+  //     return 'CO₂ saved';
+  //   } else {
+  //     return 'kg of carbon saved';
+  //   }
+  // }
 }

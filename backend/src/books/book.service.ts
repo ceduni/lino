@@ -35,7 +35,7 @@ const bookService = {
     // Function that searches for books across all bookboxes based on keyword search and ordering filters
     // Optimized using MongoDB aggregation pipeline for better performance
     async searchBooks(request: { query: BookSearchQuery }) {
-        const { kw, cls = 'by title', asc = true } = request.query;
+        const { q, cls = 'by title', asc = true } = request.query;
 
         // Build aggregation pipeline
         const pipeline: any[] = [
@@ -52,14 +52,14 @@ const bookService = {
         ];
 
         // Add keyword filtering stage if keyword is provided
-        if (kw) {
+        if (q) {
             // Use text search if available, otherwise use regex
             pipeline.push({
                 $match: {
                     $or: [
-                        { 'books.title': { $regex: kw, $options: 'i' } },
-                        { 'books.authors': { $regex: kw, $options: 'i' } },
-                        { 'books.categories': { $regex: kw, $options: 'i' } }
+                        { 'books.title': { $regex: q, $options: 'i' } },
+                        { 'books.authors': { $regex: q, $options: 'i' } },
+                        { 'books.categories': { $regex: q, $options: 'i' } }
                     ]
                 }
             });

@@ -210,7 +210,7 @@ exports.searchBookboxesSchema = {
     querystring: {
         type: 'object',
         properties: {
-            kw: { type: 'string' },
+            q: { type: 'string' },
             cls: { type: 'string' },
             asc: { type: 'boolean' },
             longitude: { type: 'number' },
