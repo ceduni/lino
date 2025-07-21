@@ -144,62 +144,6 @@ export const getBookboxSchema = {
     }
 };
 
-export const searchBookboxesSchema = {
-    description: 'Search bookboxes',
-    tags: ['bookboxes'],
-    querystring: {
-        type: 'object',
-        properties: {
-            q: { type: 'string' },
-            cls: { type: 'string' },
-            asc: { type: 'boolean' },
-            longitude: { type: 'number' },
-            latitude: { type: 'number' },
-        }
-    },
-    response: {
-        200: {
-            description: 'Bookboxes found', 
-            type: 'object',
-            properties: {
-                bookboxes: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            id: { type: 'string' },
-                            name: { type: 'string' },
-                            infoText: { type: 'string' },
-                            longitude: { type: 'number' },
-                            latitude: { type: 'number' },
-                            booksCount: { type: 'number' },
-                            image: { type: 'string' },
-                            owner: { type: 'string' },
-                            boroughId: { type: 'string' },
-                            isActive: { type: 'boolean' }
-                        }
-                    }
-                }
-            }
-        },
-        400: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: {type: 'string'}
-            }
-        }
-    }
-};
-
-
 export const followBookBoxSchema = {
     description: 'Follow a bookbox',
     tags: ['bookboxes'],
@@ -296,53 +240,4 @@ export const unfollowBookBoxSchema = {
             }
         }
     }
-};
-
-export const findNearestBookboxesSchema = {
-    description: 'Find nearest bookboxes',
-    tags: ['bookboxes'],
-    querystring: {
-        type: 'object',
-        properties: {
-            longitude: { type: 'number' },
-            latitude: { type: 'number' },
-            maxDistance: { type: 'number', default: 5000 }
-        },
-        required: ['longitude', 'latitude']
-    },
-    response: {
-        200: {
-            description: 'Nearest bookboxes found',
-            type: 'array',
-            items: {
-                type: 'object',
-                        properties: {
-                            id: { type: 'string' },
-                            name: { type: 'string' },
-                            infoText: { type: 'string' },
-                            longitude: { type: 'number' },
-                            latitude: { type: 'number' },
-                            booksCount: { type: 'number' },
-                            image: { type: 'string' },
-                            owner: { type: 'string' },
-                            boroughId: { type: 'string' },
-                            isActive: { type: 'boolean' }
-                        }
-            }
-        },
-        400: {
-            description: 'Error message',
-            type: 'object',
-            properties: {   
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};  
+}; 

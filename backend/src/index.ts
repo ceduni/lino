@@ -15,13 +15,15 @@ const fastifySwaggerUi = require('@fastify/swagger-ui');
 const bookRoutes = require('./books/book.route');
 const bookboxRoutes = require('./bookboxes/bookbox.route');
 const userRoutes = require('./users/user.route');
-const threadRoutes = require('./threads/thread.route');
+// const threadRoutes = require('./threads/thread.route');
+const searchRoutes = require('./search/search.route');
 const serviceRoutes = require('./services/services.route');
 const transactionRoutes = require('./transactions/transaction.route');
 const requestRoutes = require('./requests/request.route');
 const adminRoutes = require('./admins/admin.route');
 const fastifyWebSocket = require('@fastify/websocket');
 import AdminService from './admins/admin.service';
+
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
@@ -238,6 +240,7 @@ server.register(userRoutes);
 server.register(transactionRoutes);
 server.register(serviceRoutes);
 server.register(adminRoutes);
+server.register(searchRoutes);
 
 const start = async () => {
     try {

@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { getBoroughId } from "../services/borough.id.generator";
 import { boroughIdRouteSchema } from "./services.schemas";
+import { MyFastifyInstance } from "../types";
 
 async function getBoroughIdRoute(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { latitude, longitude } = request.query as { latitude: number; longitude: number };
@@ -19,11 +20,6 @@ async function getBoroughIdRoute(request: FastifyRequest, reply: FastifyReply): 
     }
 }
 
-
-interface MyFastifyInstance extends FastifyInstance {
-    authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-    adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-}
 export default async function serviceRoutes(server: MyFastifyInstance) {
     server.get('/services/borough-id', { schema: boroughIdRouteSchema }, getBoroughIdRoute);
 }

@@ -4,10 +4,8 @@ import {
     addBookToBookboxSchema,
     getBookFromBookBoxSchema,
     getBookboxSchema,
-    searchBookboxesSchema,
     followBookBoxSchema,
     unfollowBookBoxSchema,
-    findNearestBookboxesSchema
 } from "./bookbox.schemas";
 import { BookAddData } from "../types/book.types";
 import { AuthenticatedRequest } from "../types/common.types";
@@ -50,23 +48,7 @@ async function getBookbox(request: FastifyRequest<GetBookBoxParams>, reply: Fast
     }
 }
 
-async function searchBookboxes(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const bookboxes = await BookboxService.searchBookboxes(request as { 
-            query: { 
-                q?: string; 
-                cls?: string; 
-                asc?: boolean; 
-                longitude?: number; 
-                latitude?: number; 
-            } 
-        });
-        reply.send({bookboxes : bookboxes});
-    } catch (error : unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        reply.code(400).send({error: message});
-    }
-}
+
 
 async function followBookBox(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -90,23 +72,7 @@ async function unfollowBookBox(request: FastifyRequest, reply: FastifyReply) {
     }
 }
 
-async function findNearestBookboxes(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const { longitude, latitude, maxDistance, searchByBorough } = request.query as 
-        { 
-            longitude: number; 
-            latitude: number; 
-            maxDistance?: number;
-            searchByBorough?: boolean; 
-        };
-        const bookboxes = await BookboxService.findNearestBookboxes(longitude, latitude, maxDistance, searchByBorough);
-        reply.send({ bookboxes });
-    } catch (error : unknown) {
-        const statusCode = (error as any).statusCode || 500;
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        reply.code(statusCode).send({error: message});
-    }
-}
+
 
 interface MyFastifyInstance extends FastifyInstance {
     optionalAuthenticate: (request: FastifyRequest) => void;
@@ -118,8 +84,6 @@ interface MyFastifyInstance extends FastifyInstance {
 export default async function bookBoxRoutes(server: MyFastifyInstance) {
     // Public routes
     server.get('/bookboxes/:bookboxId', { schema: getBookboxSchema }, getBookbox);
-    server.get('/bookboxes/search', { schema: searchBookboxesSchema }, searchBookboxes);
-    server.get('/bookboxes/nearest', { schema: findNearestBookboxesSchema }, findNearestBookboxes);
 
     
     // User routes (authenticated)

@@ -246,6 +246,9 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Maintenance Banner (show when bookbox is inactive)
+          if (!bookBox.isActive) _buildMaintenanceBanner(),
+          
           // BookBox Info Card
           _buildBookBoxInfoCard(bookBox),
           
@@ -258,6 +261,54 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
           
           // Books Section
           _buildBooksSection(bookBox),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMaintenanceBanner() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.orange.shade100,
+        border: Border.all(color: Colors.orange.shade400, width: 2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.construction,
+            color: Colors.orange.shade700,
+            size: 28,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Under Maintenance',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Kanit',
+                    color: Colors.orange.shade800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'This BookBox is temporarily deactivated for maintenance. You can view the books inside but cannot exchange books from it until it\'s reactivated.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Kanit',
+                    color: Colors.orange.shade700,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -389,11 +440,11 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
     if (canInteract) {
       buttons.addAll([
         Expanded(
-          child: _buildAddBookButton(),
+          child: _buildAddBookButton(bookBox.isActive),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _buildRemoveBookButton(),
+          child: _buildRemoveBookButton(bookBox.isActive),
         ),
       ]);
     }
@@ -428,9 +479,9 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
     );
   }
 
-  Widget _buildAddBookButton() {
+  Widget _buildAddBookButton(bool isActive) {
     return ElevatedButton.icon(
-      onPressed: () {
+      onPressed: isActive ? () {
         // TODO: Add book functionality
         Get.snackbar(
           'Add Book',
@@ -439,30 +490,38 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
+      } : () {
+        Get.snackbar(
+          'BookBox Under Maintenance',
+          'Cannot add books while BookBox is deactivated for maintenance',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
       },
-      icon: const Icon(Icons.add, color: Colors.white),
-      label: const Text(
+      icon: Icon(Icons.add, color: isActive ? Colors.white : Colors.grey.shade400),
+      label: Text(
         'Add Book',
         style: TextStyle(
-          color: Colors.white,
+          color: isActive ? Colors.white : Colors.grey.shade400,
           fontFamily: 'Kanit',
           fontWeight: FontWeight.w600,
         ),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.green.shade600,
+        backgroundColor: isActive ? Colors.green.shade600 : Colors.grey.shade300,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        elevation: 3,
+        elevation: isActive ? 3 : 1,
       ),
     );
   }
 
-  Widget _buildRemoveBookButton() {
+  Widget _buildRemoveBookButton(bool isActive) {
     return ElevatedButton.icon(
-      onPressed: () {
+      onPressed: isActive ? () {
         // TODO: Remove book functionality
         Get.snackbar(
           'Remove Book',
@@ -471,23 +530,31 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
+      } : () {
+        Get.snackbar(
+          'BookBox Under Maintenance',
+          'Cannot remove books while BookBox is deactivated for maintenance',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
       },
-      icon: const Icon(Icons.remove, color: Colors.white),
-      label: const Text(
+      icon: Icon(Icons.remove, color: isActive ? Colors.white : Colors.grey.shade400),
+      label: Text(
         'Remove Book',
         style: TextStyle(
-          color: Colors.white,
+          color: isActive ? Colors.white : Colors.grey.shade400,
           fontFamily: 'Kanit',
           fontWeight: FontWeight.w600,
         ),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.red.shade600,
+        backgroundColor: isActive ? Colors.red.shade600 : Colors.grey.shade300,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        elevation: 3,
+        elevation: isActive ? 3 : 1,
       ),
     );
   }

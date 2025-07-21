@@ -43,62 +43,6 @@ export const getBookInfoFromISBNSchema = {
     }
 };
 
-export const searchBooksSchema = {
-    description: 'Search books across all bookboxes',
-    tags: ['books'],
-    querystring: {
-        type: 'object',
-        properties: {
-            q: { type: 'string' },
-            cls: { type: 'string' },
-            asc: { type: 'boolean' }
-        }
-    },
-    response: {
-        200: {
-            description: 'Books found',
-            type: 'object',
-            properties: {
-                books: {
-                    type: 'array',
-                    items: {
-                        type: 'object', 
-                        properties: {
-                            _id: { type: 'string' },
-                            isbn: { type: 'string' },
-                            title: { type: 'string' },
-                            authors: { type: 'array', items: { type: 'string' } },
-                            description: { type: 'string' },
-                            coverImage: { type: 'string' },
-                            publisher: { type: 'string' },
-                            categories: { type: 'array', items: { type: 'string' } },
-                            parutionYear: { type: 'number' },
-                            pages: { type: 'number' },
-                            dateAdded: { type: 'string' },
-                            bookboxId: { type: 'string' },
-                            bookboxName: { type: 'string' }
-                        }
-                    }
-                }
-            }
-        },
-        404: {
-            description: 'Error message',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
-
 
 export const getBookSchema = {
     description: 'Get book',

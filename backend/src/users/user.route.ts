@@ -13,7 +13,7 @@ import {
     deleteUserFavLocationSchema
 } from "./user.schemas";
 import { UserRegistrationData, UserLoginCredentials } from "../types/user.types";
-import { AuthenticatedRequest } from "../types/common.types";
+import { AuthenticatedRequest, MyFastifyInstance } from "../types/common.types";
 
 async function registerUser(request : FastifyRequest, reply : FastifyReply) {
     try {
@@ -135,11 +135,6 @@ async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
 }
 
  
-interface MyFastifyInstance extends FastifyInstance {
-    authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-    adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-    superAdminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-}
 export default async function userRoutes(server: MyFastifyInstance) {
     server.get('/users', { preValidation: [server.authenticate], schema : getUserSchema }, getUser);
     server.get('/users/notifications', { preValidation: [server.authenticate], schema : getUserNotificationsSchema }, getUserNotifications);
@@ -149,7 +144,7 @@ export default async function userRoutes(server: MyFastifyInstance) {
     server.post('/users/update', { preValidation: [server.authenticate], schema : updateUserSchema }, updateUser);
     server.post('/users/location', { preValidation: [server.authenticate], schema : addUserFavLocationSchema }, addUserFavLocation);
     server.delete('/users/location', { preValidation: [server.authenticate], schema : deleteUserFavLocationSchema }, deleteUserFavLocation);
-    server.delete('/users/clear', { preValidation: [server.adminAuthenticate], schema : clearCollectionSchema }, clearCollection);
+    server.delete('/users/clear', { preValidation: [server.superAdminAuthenticate], schema : clearCollectionSchema }, clearCollection);
     server.delete('/users/notifications/clear', { preValidation: [server.superAdminAuthenticate] }, async (request: FastifyRequest, reply: FastifyReply) => {
         try {
             await UserService.clearNotifications();

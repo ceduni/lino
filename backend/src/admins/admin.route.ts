@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import AdminService from './admin.service';
-import { AuthenticatedRequest } from '../types/common.types';
+import { AuthenticatedRequest, MyFastifyInstance } from '../types/common.types';
 import {
     getAllAdminsSchema,
     addAdminSchema,
@@ -13,7 +13,6 @@ import {
     deactivateBookBoxSchema,
     transferBookBoxOwnershipSchema,
     activateBookBoxSchema,
-    searchMyBookboxesSchema,
 } from './admin.schemas';
 
 async function getAllAdmins(request: FastifyRequest, reply: FastifyReply) {
@@ -83,16 +82,7 @@ async function clearAdmins(request: FastifyRequest, reply: FastifyReply) {
     }
 }
 
-async function searchMyBookboxes(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const bookboxes = await AdminService.searchMyBookboxes(request);
-        reply.send({ bookboxes });
-    } catch (error: unknown) {
-        const statusCode = (error as any).statusCode || 500;
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        reply.code(statusCode).send({ error: message });
-    }
-}
+
 
 // Bookbox Management Functions
 async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
@@ -187,11 +177,6 @@ async function transferBookBoxOwnership(request: FastifyRequest, reply: FastifyR
     }
 }
 
-interface MyFastifyInstance extends FastifyInstance {
-    authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-    adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-    superAdminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-}
 
 export default async function adminRoutes(server: MyFastifyInstance) {
     // Admin Management Routes
@@ -226,13 +211,7 @@ export default async function adminRoutes(server: MyFastifyInstance) {
         schema: clearAdminsSchema
     }, clearAdmins);
 
-    // Bookbox Management Routes
-
-    // Search my bookboxes (authenticated users only)
-    server.get('/admin/bookboxes/search', { 
-        preValidation: [server.adminAuthenticate],
-        schema: searchMyBookboxesSchema
-    }, searchMyBookboxes);
+    // Bookbox Management Routes    
 
     // Create new bookbox (admin only)
     server.post('/admin/bookboxes', { 

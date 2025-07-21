@@ -2,11 +2,6 @@ import axios from 'axios';
 import mongoose from 'mongoose';
 import BookBox from "../bookboxes/bookbox.model";
 import {newErr} from "../services/utilities";
-import { 
-    BookSearchQuery,
-    IBook,
-    ITransaction
-} from '../types/book.types';
 
 const bookService = {
 
@@ -32,90 +27,12 @@ const bookService = {
         };
     },
 
-    // Function that searches for books across all bookboxes based on keyword search and ordering filters
-    // Optimized using MongoDB aggregation pipeline for better performance
-    async searchBooks(request: { query: BookSearchQuery }) {
-        const { q, cls = 'by title', asc = true } = request.query;
-
-        // Build aggregation pipeline
-        const pipeline: any[] = [
-            // Unwind the books array to work with individual books
-            { $unwind: '$books' },
-            
-            // Add bookbox information to each book
-            {
-                $addFields: {
-                    'books.bookboxId': { $toString: '$_id' },
-                    'books.bookboxName': '$name'
-                }
-            }
-        ];
-
-        // Add keyword filtering stage if keyword is provided
-        if (q) {
-            // Use text search if available, otherwise use regex
-            pipeline.push({
-                $match: {
-                    $or: [
-                        { 'books.title': { $regex: q, $options: 'i' } },
-                        { 'books.authors': { $regex: q, $options: 'i' } },
-                        { 'books.categories': { $regex: q, $options: 'i' } }
-                    ]
-                }
-            });
-        }
-
-        // Add sorting stage
-        let sortField: string;
-        let sortOrder = asc ? 1 : -1;
-
-        switch (cls) {
-            case 'by title':
-                sortField = 'books.title';
-                break;
-            case 'by author':
-                sortField = 'books.authors';
-                break;
-            case 'by year':
-                sortField = 'books.parutionYear';
-                break;
-            case 'by recent activity':
-                sortField = 'books.dateAdded';
-                break;
-            default:
-                sortField = 'books.title';
-        }
-
-        pipeline.push({ $sort: { [sortField]: sortOrder } });
-
-        // Project the final structure
-        pipeline.push({
-            $project: {
-                _id: { $toString: '$books._id' },
-                isbn: { $ifNull: ['$books.isbn', 'Unknown ISBN'] },
-                title: '$books.title',
-                authors: { $ifNull: ['$books.authors', []] },
-                description: { $ifNull: ['$books.description', 'No description available'] },
-                coverImage: { $ifNull: ['$books.coverImage', 'No cover image available'] },
-                publisher: { $ifNull: ['$books.publisher', 'Unknown publisher'] },
-                categories: { $ifNull: ['$books.categories', ['Uncategorized']] },
-                parutionYear: '$books.parutionYear',
-                pages: '$books.pages',
-                dateAdded: { $ifNull: ['$books.dateAdded', new Date()] },
-                bookboxId: '$books.bookboxId',
-                bookboxName: '$books.bookboxName'
-            }
-        });
-
-        // Execute the aggregation pipeline
-        const results = await BookBox.aggregate(pipeline);
-        
-        return results;
-    },
-
     async getBook(id: string) {
         // Use aggregation pipeline to efficiently find book by ID
         const pipeline = [
+            // Filter out inactive bookboxes first
+            { $match: { isActive: true } },
+            
             // Unwind the books array
             { $unwind: '$books' },
             

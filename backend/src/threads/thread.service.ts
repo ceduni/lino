@@ -120,44 +120,6 @@ const ThreadService = {
         }
     },
 
-
-    async searchThreads(request: { query: { q?: string; cls?: string; asc?: boolean } }) {
-        const query = request.query.q;
-        let threads = await Thread.find();
-
-        if (query) {
-            // Filter using regex for more flexibility
-            const regex = new RegExp(query, 'i');
-            threads = threads.filter(thread =>
-                regex.test(thread.bookTitle) || regex.test(thread.title) || regex.test(thread.username)
-            );
-        }
-
-        // classify : ['by recent activity', 'by number of messages', 'by creation date']
-        let classify = request.query.cls || 'by recent activity';
-        const asc = request.query.asc; // Boolean
-
-        if (classify === 'by recent activity') {
-            threads.sort((a, b) => {
-                const aDate = a.messages.length > 0 ? a.messages[a.messages.length - 1].timestamp.getTime() : 0;
-                const bDate = b.messages.length > 0 ? b.messages[b.messages.length - 1].timestamp.getTime() : 0;
-                return asc ? aDate - bDate : bDate - aDate;
-            });
-        } else if (classify === 'by number of messages') {
-            threads.sort((a, b) => {
-                return asc ? a.messages.length - b.messages.length : b.messages.length - a.messages.length;
-            });
-        } else if (classify === 'by creation date') {
-            threads.sort((a, b) => { // if asc, most recent first
-                const aDate = a.timestamp.getTime();
-                const bDate = b.timestamp.getTime();
-                return asc ? aDate - bDate : bDate - aDate;
-            });
-        }
-
-        return { threads: threads };
-    },
-
     async clearCollection() {
         await Thread.deleteMany({});
     }

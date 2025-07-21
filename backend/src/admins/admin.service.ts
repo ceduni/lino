@@ -97,35 +97,6 @@ const AdminService = {
         }
     },
 
-    async searchMyBookboxes(request: any) {
-        try {
-            let bookboxes = await BookBox.find({ owner: request.user.username });
-            if (!bookboxes || bookboxes.length === 0) {
-                return [];
-            }
-            const q = request.query.q;
-            if (q) {
-                bookboxes = bookboxes.filter((bookbox) => bookbox.name.toLowerCase().includes(q.toLowerCase()));
-            }   
-            const cls = request.query.cls;
-            const asc = request.query.asc === 'true';
-
-            if (cls === 'by name') {
-                bookboxes.sort((a, b) => {
-                    return asc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-                });
-            } else if (cls === 'by number of books') {
-                bookboxes.sort((a, b) => {
-                    return asc ? a.books.length - b.books.length : b.books.length - a.books.length;
-                });
-            }
-
-            return bookboxes;
-        } catch (error) {
-            throw newErr(500, 'Failed to retrieve bookboxes');
-        }
-    },
-
     // Bookbox Management Functions
     async addNewBookbox(request: any) {
         try {

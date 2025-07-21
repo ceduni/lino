@@ -6,13 +6,12 @@ import {
     deleteThreadSchema,
     addMessageSchema,
     toggleReactionSchema,
-    searchThreadsSchema,
     getThreadSchema
 } from "./thread.schemas";
 import { clearCollectionSchema } from "../users/user.schemas";
 import {broadcastMessage} from "../index";
 import { ThreadCreateData, MessageCreateData, ReactionData } from "../types/thread.types";
-import { AuthenticatedRequest } from "../types/common.types";
+import { AuthenticatedRequest, MyFastifyInstance } from "../types/common.types";
 
 
 async function createThread(request : FastifyRequest, reply : FastifyReply) {
@@ -75,10 +74,6 @@ async function toggleMessageReaction(request : FastifyRequest<ToggleMessageReact
     }
 }
 
-async function searchThreads(request : FastifyRequest, reply : FastifyReply) {
-    const threads = await ThreadService.searchThreads(request as { query: { q?: string; cls?: string; asc?: boolean } });
-    reply.send(threads);
-}
 
 interface GetThreadParams extends RouteGenericInterface {
     Params: {
@@ -108,14 +103,8 @@ async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
 }
 
 
-interface MyFastifyInstance extends FastifyInstance {
-    authenticate: (request : FastifyRequest, reply: FastifyReply) => void;
-    adminAuthenticate: (request : FastifyRequest, reply: FastifyReply) => void;
-    superAdminAuthenticate: (request : FastifyRequest, reply: FastifyReply) => void;
-}
 export default async function threadRoutes(server: MyFastifyInstance) {
     server.get('/threads/:threadId', { schema : getThreadSchema }, getThread);
-    server.get('/threads/search', { schema : searchThreadsSchema }, searchThreads);
     server.post('/threads/new', { preValidation: [server.authenticate], schema : createThreadSchema }, createThread);
     server.delete('/threads/:threadId', { preValidation: [server.authenticate], schema : deleteThreadSchema }, deleteThread);
     server.post('/threads/messages', { preValidation: [server.authenticate], schema : addMessageSchema }, addThreadMessage);

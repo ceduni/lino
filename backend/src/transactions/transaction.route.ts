@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import TransactionService from "./transaction.service";
-import { getTransactionHistorySchema } from "./transaction.schemas";
+import { MyFastifyInstance } from "../types";
 
 interface CreateCustomTransactionBody {
     username: string;
@@ -23,24 +23,7 @@ async function createCustomTransaction(request: FastifyRequest, reply: FastifyRe
     }
 }
 
-async function getTransactionHistory(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const transactions = await TransactionService.getTransactionHistory(request as { query: { username?: string; bookTitle?: string; bookboxId?: string; limit?: number } });
-        reply.send({transactions});
-    } catch (error : unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        reply.code(500).send({error: message});
-    }
-} 
-
-
-interface MyFastifyInstance extends FastifyInstance {
-    adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-    superAdminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-}
-
 export default async function transactionRoutes(server: MyFastifyInstance) {
-    server.get('/books/transactions', { schema: getTransactionHistorySchema }, getTransactionHistory);
     server.post('/transactions/custom', { 
         preValidation: [server.superAdminAuthenticate]
     }, createCustomTransaction);

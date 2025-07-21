@@ -90,27 +90,4 @@ class ThreadService {
     }
     return Thread.fromJson(response);
   }
-
-  Future<List<Thread>> searchThreads({String? q, String? cls, bool? asc}) async {
-    var queryParams = {
-      if (q != null && q.isNotEmpty) 'q': q,
-      if (cls != null && cls.isNotEmpty) 'cls': cls,
-      if (asc != null) 'asc': asc.toString(),
-    };
-
-    final r = await http.get(Uri.parse('$url/threads/search').replace(queryParameters: queryParams),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-    final response = jsonDecode(r.body);
-    if (r.statusCode != 200) {
-      throw Exception(response['error']);
-    }
-    List<Thread> threads = [];
-    for (var thread in response['threads']) {
-      threads.add(Thread.fromJson(thread));
-    }
-    return threads;
-  }
 }

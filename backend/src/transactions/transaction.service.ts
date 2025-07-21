@@ -10,23 +10,6 @@ interface CreateCustomTransactionParams {
 }
 
 class TransactionService {
-    // Get transaction history
-    static async getTransactionHistory(request: { query: { username?: string; bookTitle?: string; bookboxId?: string; limit?: number } }) {
-        const { username, bookTitle, bookboxId, limit } = request.query;
-        
-        let filter: any = {};
-        if (username) filter.username = username;
-        if (bookTitle) filter.bookTitle = new RegExp(bookTitle, 'i');
-        if (bookboxId) filter.bookboxId = bookboxId;
-
-        let query = Transaction.find(filter).sort({ timestamp: -1 });
-        if (limit) {
-            query = query.limit(parseInt(limit.toString()));
-        }
-
-        return await query.exec();
-    }
-
     // Create a transaction record
     static async createTransaction(username: string, action: 'added' | 'took', bookTitle: string, bookboxId: string) {
         const transaction = new Transaction({

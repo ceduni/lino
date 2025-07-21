@@ -32,7 +32,7 @@ class SearchService {
     };
 
     final r = await http.get(
-      Uri.parse('$url/bookboxes/search').replace(queryParameters: queryParams),
+      Uri.parse('$url/search/bookboxes').replace(queryParameters: queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -62,7 +62,7 @@ class SearchService {
     };
 
     final r = await http.get(
-      Uri.parse('$url/bookboxes/nearest').replace(queryParameters: queryParams),
+      Uri.parse('$url/search/bookboxes/nearest').replace(queryParameters: queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -95,7 +95,7 @@ class SearchService {
     };
 
     final r = await http.get(
-      Uri.parse('$url/books/search').replace(queryParameters: queryParams),
+      Uri.parse('$url/search/books').replace(queryParameters: queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -119,7 +119,7 @@ class SearchService {
       if (asc != null) 'asc': asc.toString(),
     };
 
-    final r = await http.get(Uri.parse('$url/threads/search').replace(queryParameters: queryParams),
+    final r = await http.get(Uri.parse('$url/search/threads').replace(queryParameters: queryParams),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

@@ -209,31 +209,6 @@ export const toggleReactionSchema = {
     }
 };
 
-export const searchThreadsSchema = {
-    description: 'Search threads',
-    tags: ['threads'],
-    querystring: {
-        type: 'object',
-        properties: {
-            q: { type: 'string' },
-            cls: { type: 'string' },
-            asc: { type: 'boolean' }
-        }
-    },
-    response: {
-        200: {
-            description: 'Threads found',
-            type: 'object',
-            properties: {
-                threads: {
-                    type: 'array',
-                    items: threadSchema
-                }
-            }
-        }
-    }
-};
-
 export const getThreadSchema = {
     description: 'Get a thread by id',
     tags: ['threads'],

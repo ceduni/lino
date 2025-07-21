@@ -33,6 +33,9 @@ const bookboxService = {
         if (!bookBox) {
             throw newErr(404, 'Bookbox not found');
         }
+        if (!bookBox.isActive) {
+            throw newErr(400, 'This bookbox is not active');
+        }
 
         // Create new book object
         const newBook: IBook = {
@@ -91,6 +94,9 @@ const bookboxService = {
         if (!bookBox) {
             throw newErr(404, 'Bookbox not found');
         }
+        if (!bookBox.isActive) {
+            throw newErr(400, 'This bookbox is not active');
+        }
 
         // Find the book in the bookbox
         const bookIndex = bookBox.books.findIndex(book => book._id?.toString() === bookId);
@@ -124,71 +130,6 @@ const bookboxService = {
         return {book: book, books: bookBox.books};
     },
 
-
-    async searchBookboxes(request: { 
-        query: { 
-            q?: string; 
-            cls?: string; 
-            asc?: boolean; 
-            longitude?: number; 
-            latitude?: number; 
-        } 
-    }) {
-        const q= request.query.q;
-        let bookBoxes = await BookBox.find();
-
-        if (q) {
-            // Filter using regex for more flexibility
-            const regex = new RegExp(q, 'i');
-            bookBoxes = bookBoxes.filter((bookBox) =>
-                regex.test(bookBox.name) || regex.test(bookBox.infoText || '')
-            );
-        }
-
-        const cls = request.query.cls;
-        const asc = request.query.asc; // Boolean
-
-        if (cls === 'by name') {
-            bookBoxes.sort((a, b) => {
-                return asc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-            });
-        } else if (cls === 'by location') {
-            const userLongitude = request.query.longitude;
-            const userLatitude = request.query.latitude;
-            if (!userLongitude || !userLatitude) {
-                throw newErr(401, 'Location is required for this classification');
-            }
-            bookBoxes.sort((a, b) => {
-                if (a.longitude && a.latitude && b.longitude && b.latitude) {
-                    // calculate the distance between the user's location and the bookbox's location
-                    const aDist = this.calculateDistance(userLatitude, userLongitude, a.latitude, a.longitude);
-                    const bDist = this.calculateDistance(userLatitude, userLongitude, b.latitude, b.longitude);
-                    // sort in ascending or descending order of distance
-                    return asc ? aDist - bDist : bDist - aDist;
-                }
-                return 0;
-            });
-        } else if (cls === 'by number of books') {
-            bookBoxes.sort((a, b) => {
-                return asc ? a.books.length - b.books.length : b.books.length - a.books.length;
-            });
-        }
-
-        // Only return the necessary fields
-        return bookBoxes.map(bookBox => ({
-            id: bookBox._id.toString(),
-            name: bookBox.name,
-            infoText: bookBox.infoText,
-            longitude: bookBox.longitude,
-            latitude: bookBox.latitude,
-            booksCount: bookBox.books.length,
-            image: bookBox.image,
-            owner: bookBox.owner,
-            boroughId: bookBox.boroughId,
-            isActive: bookBox.isActive
-        }));
-    },
-
     async clearCollection() {
         await BookBox.deleteMany({});
     },
@@ -216,60 +157,6 @@ const bookboxService = {
         await user.save();
         return { message: 'Bookbox unfollowed successfully' };
     },
-
-    async findNearestBookboxes(
-        longitude: number, 
-        latitude: number, 
-        maxDistance: number = 5, 
-        searchByBorough: boolean = false
-    ) {
-        if (!longitude || !latitude) {
-            throw newErr(400, 'Longitude and latitude are required');
-        }
-
-        const bookboxes = await BookBox.find();
-
-        let nearbyBookboxes;
-
-        if (searchByBorough) {
-            nearbyBookboxes = bookboxes.filter(async bookbox => {
-                const locationBoroughId = await getBoroughId(latitude, longitude);
-                return bookbox.boroughId === locationBoroughId;
-            });
-        } else {
-            nearbyBookboxes = bookboxes.filter(bookbox => {
-                const distance = this.calculateDistance(latitude, longitude, bookbox.latitude, bookbox.longitude);
-                return distance <= maxDistance;
-            });
-        }
-
-        return nearbyBookboxes.map(bookbox => ({
-            id: bookbox._id.toString(),
-            name: bookbox.name,
-            infoText: bookbox.infoText,
-            longitude: bookbox.longitude,
-            latitude: bookbox.latitude,
-            booksCount: bookbox.books.length,
-            image: bookbox.image,
-            owner: bookbox.owner,
-            boroughId: bookbox.boroughId,
-            isActive: bookbox.isActive
-        }));
-    },
-
-    calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-        const R = 6371; // Earth's radius in km
-        
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
-    }
 };
 
 export default bookboxService;
