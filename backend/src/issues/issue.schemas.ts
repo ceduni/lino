@@ -3,6 +3,7 @@ export const issueSchema = {
     properties: {
         _id: { type: 'string' },
         username: { type: 'string' },
+        email: { type: 'string', format: 'email' },
         bookboxId: { type: 'string' },
         subject: { type: 'string', minLength: 1 },
         description: { type: 'string', minLength: 1 },
