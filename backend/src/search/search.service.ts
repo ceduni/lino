@@ -5,10 +5,19 @@ import { newErr } from "../services/utilities";
 import Thread from "../threads/thread.model";
 import Transaction from "../transactions/transaction.model";
 import { AuthenticatedRequest, BookSearchQuery } from "../types";
+import User from "../users/user.model";
 
 const searchService = {
-    async searchBooks(request: { query: BookSearchQuery }) {
-        const { q, cls = 'by title', asc = true } = request.query;
+    async searchBooks(
+        q?: string,
+        cls: string = 'by title',
+        asc: boolean = true,
+        limit: number = 20,
+        page: number = 1
+    ) {
+        // Get pagination parameters
+        const pageSize = limit;
+        const skipAmount = (page - 1) * pageSize;
 
         // Build aggregation pipeline
         const pipeline: any[] = [
@@ -64,6 +73,9 @@ const searchService = {
 
         pipeline.push({ $sort: { [sortField]: sortOrder } });
 
+        pipeline.push({ $skip: skipAmount });
+        pipeline.push({ $limit: pageSize });
+
         // Project the final structure
         pipeline.push({
             $project: {
@@ -89,225 +101,350 @@ const searchService = {
         return results;
     },
 
-    async searchBookboxes(request: { 
-        query: { 
-            q?: string; 
-            cls?: string; 
-            asc?: boolean; 
-            longitude?: number; 
-            latitude?: number; 
-        } 
-    }) {
-        const q= request.query.q;
-        let bookBoxes = await BookBox.find();
 
+    async searchBookboxes(
+        q?: string,
+        cls: string = 'by name',
+        asc: boolean = true,
+        longitude?: number,
+        latitude?: number,
+        limit: number = 20,
+        page: number = 1    
+    ) {
+        const pageSize = limit;
+        const skipAmount = (page - 1) * pageSize;
+
+        let filter: any = { isActive: true };
+        
         if (q) {
-            // Filter using regex for more flexibility
-            const regex = new RegExp(q, 'i');
-            bookBoxes = bookBoxes.filter((bookBox) =>
-                regex.test(bookBox.name) || regex.test(bookBox.infoText || '')
-            );
+            filter.$or = [
+                { name: { $regex: q, $options: 'i' } },
+                { infoText: { $regex: q, $options: 'i' } }
+            ];
         }
-
-        const cls = request.query.cls;
-        const asc = request.query.asc; // Boolean
-
-        if (cls === 'by name') {
-            bookBoxes.sort((a, b) => {
-                return asc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-            });
-        } else if (cls === 'by location') {
-            const userLongitude = request.query.longitude;
-            const userLatitude = request.query.latitude;
-            if (!userLongitude || !userLatitude) {
-                throw newErr(401, 'Location is required for this classification');
+        
+        // Handle location sorting with $geoNear
+        if (cls === 'by location') {
+            if (!longitude || !latitude) {
+                throw newErr(400, 'Location is required for this classification');
             }
-            bookBoxes.sort((a, b) => {
-                if (a.longitude && a.latitude && b.longitude && b.latitude) {
-                    // calculate the distance between the user's location and the bookbox's location
-                    const aDist = calculateDistance(userLatitude, userLongitude, a.latitude, a.longitude);
-                    const bDist = calculateDistance(userLatitude, userLongitude, b.latitude, b.longitude);
-                    // sort in ascending or descending order of distance
-                    return asc ? aDist - bDist : bDist - aDist;
+            
+            return await BookBox.aggregate([
+                {
+                    $geoNear: {
+                        near: { 
+                            type: 'Point', 
+                            coordinates: [longitude, latitude] 
+                        },
+                        distanceField: 'distance',
+                        spherical: true,
+                        query: filter
+                    }
+                },
+                { $sort: { distance: asc ? 1 : -1 } },
+                { $skip: skipAmount },
+                { $limit: pageSize },
+                {
+                    $project: {
+                        _id: 1, name: 1, infoText: 1, longitude: 1, latitude: 1,
+                        booksCount: 1, image: 1, owner: 1, boroughId: 1, isActive: 1,
+                        distance: { $divide: ['$distance', 1000] } // Convert meters to km
+                    }
                 }
-                return 0;
-            });
+            ]);
+        }
+        
+        // Handle other sorting with regular query + select
+        let query = BookBox.find(filter);
+        
+        if (cls === 'by name') {
+            query = query.sort({ name: asc ? 1 : -1 });
         } else if (cls === 'by number of books') {
-            bookBoxes.sort((a, b) => {
-                return asc ? a.books.length - b.books.length : b.books.length - a.books.length;
-            });
+            query = query.sort({ booksCount: asc ? 1 : -1 });
         }
 
-        // Only return the necessary fields
-        return bookBoxes.map(bookBox => ({
-            id: bookBox._id.toString(),
-            name: bookBox.name,
-            infoText: bookBox.infoText,
-            longitude: bookBox.longitude,
-            latitude: bookBox.latitude,
-            booksCount: bookBox.books.length,
-            image: bookBox.image,
-            owner: bookBox.owner,
-            boroughId: bookBox.boroughId,
-            isActive: bookBox.isActive
-        }));
+        return await query
+            .skip(skipAmount)
+            .limit(pageSize)
+            .select('_id name infoText longitude latitude booksCount image owner boroughId isActive')
+            .lean();
     },
 
     async findNearestBookboxes(
         longitude: number, 
         latitude: number, 
         maxDistance: number = 5, 
-        searchByBorough: boolean = false
+        searchByBorough: boolean = false,
+        limit: number = 20,
+        page: number = 1
     ) {
         if (!longitude || !latitude) {
             throw newErr(400, 'Longitude and latitude are required');
         }
 
-        const bookboxes = await BookBox.find();
-
-        let nearbyBookboxes;
+        const pageSize = limit;
+        const skipAmount = (page - 1) * pageSize;
 
         if (searchByBorough) {
-            nearbyBookboxes = bookboxes.filter(async bookbox => {
-                const locationBoroughId = await getBoroughId(latitude, longitude);
-                return bookbox.boroughId === locationBoroughId;
-            });
-        } else {
-            nearbyBookboxes = bookboxes.filter(bookbox => {
-                const distance = calculateDistance(latitude, longitude, bookbox.latitude, bookbox.longitude);
-                return distance <= maxDistance;
-            });
-        }
+            // Get borough ID first
+            const locationBoroughId = await getBoroughId(latitude, longitude);
+            
+            // Find bookboxes in the same borough
+            const bookboxes = await BookBox.find({ 
+                boroughId: locationBoroughId, 
+                isActive: true 
+            })
+            .skip(skipAmount)
+            .limit(pageSize)
+            .select('_id name infoText longitude latitude booksCount image owner boroughId isActive')
+            .lean();
 
-        return nearbyBookboxes.map(bookbox => ({
-            id: bookbox._id.toString(),
-            name: bookbox.name,
-            infoText: bookbox.infoText,
-            longitude: bookbox.longitude,
-            latitude: bookbox.latitude,
-            booksCount: bookbox.books.length,
-            image: bookbox.image,
-            owner: bookbox.owner,
-            boroughId: bookbox.boroughId,
-            isActive: bookbox.isActive
-        }));
+            return bookboxes;
+        } else {
+            // Use $geoNear for accurate distance calculation
+            const nearbyBookboxes = await BookBox.aggregate([
+                {
+                    $geoNear: {
+                        near: { 
+                            type: 'Point', 
+                            coordinates: [longitude, latitude] 
+                        },
+                        distanceField: 'distance',
+                        maxDistance: maxDistance * 1000, // Convert km to meters
+                        spherical: true,
+                        query: { isActive: true }
+                    }
+                },
+                { $sort: { distance: 1 } }, // Always closest first for "nearest"
+                { $skip: skipAmount },
+                { $limit: pageSize },
+                {
+                    $project: {
+                        _id: 1,
+                        name: 1,
+                        infoText: 1,
+                        longitude: 1,
+                        latitude: 1,
+                        booksCount: 1,
+                        image: 1,
+                        owner: 1,
+                        boroughId: 1,
+                        isActive: 1,
+                        distance: { $divide: ['$distance', 1000] } // Convert meters to km
+                    }
+                }
+            ]);
+
+            return nearbyBookboxes;
+        }
     },
 
-    async searchThreads(request: { query: { q?: string; cls?: string; asc?: boolean } }) {
-        const query = request.query.q;
-        let threads = await Thread.find();
-
-        if (query) {
-            // Filter using regex for more flexibility
-            const regex = new RegExp(query, 'i');
-            threads = threads.filter(thread =>
-                regex.test(thread.bookTitle) || regex.test(thread.title) || regex.test(thread.username)
-            );
+    async searchThreads(
+        q?: string,
+        cls: string = 'by recent activity',
+        asc: boolean = true,
+        limit: number = 20,
+        page: number = 1
+    ) {
+        const pageSize = limit;
+        const skipAmount = (page - 1) * pageSize;
+        
+        let filter: any = {};
+        
+        // Add search filter if q is provided
+        if (q) {
+            filter.$or = [
+                { bookTitle: { $regex: q, $options: 'i' } },
+                { title: { $regex: q, $options: 'i' } },
+                { username: { $regex: q, $options: 'i' } }
+            ];
         }
-
-        // classify : ['by recent activity', 'by number of messages', 'by creation date']
-        let classify = request.query.cls || 'by recent activity';
-        const asc = request.query.asc; // Boolean
-
-        if (classify === 'by recent activity') {
-            threads.sort((a, b) => {
-                const aDate = a.messages.length > 0 ? a.messages[a.messages.length - 1].timestamp.getTime() : 0;
-                const bDate = b.messages.length > 0 ? b.messages[b.messages.length - 1].timestamp.getTime() : 0;
-                return asc ? aDate - bDate : bDate - aDate;
-            });
-        } else if (classify === 'by number of messages') {
-            threads.sort((a, b) => {
-                return asc ? a.messages.length - b.messages.length : b.messages.length - a.messages.length;
-            });
-        } else if (classify === 'by creation date') {
-            threads.sort((a, b) => { // if asc, most recent first
-                const aDate = a.timestamp.getTime();
-                const bDate = b.timestamp.getTime();
-                return asc ? aDate - bDate : bDate - aDate;
-            });
+        
+        if (cls === 'by recent activity') {
+            // Use aggregation for sorting by last message timestamp
+            return await Thread.aggregate([
+                { $match: filter },
+                {
+                    $addFields: {
+                        lastMessageTime: {
+                            $cond: {
+                                if: { $gt: [{ $size: '$messages' }, 0] },
+                                then: { $arrayElemAt: ['$messages.timestamp', -1] },
+                                else: new Date(0) // Very old date for threads with no messages
+                            }
+                        }
+                    }
+                },
+                { $sort: { lastMessageTime: asc ? 1 : -1 } },
+                { $skip: skipAmount },
+                { $limit: pageSize },
+                {
+                    $project: {
+                        _id: 1,
+                        bookTitle: 1,
+                        title: 1,
+                        username: 1,
+                        timestamp: 1,
+                        messages: 1
+                        // Remove lastMessageTime from final output
+                    }
+                }
+            ]);
+        } else if (cls === 'by number of messages') {
+            // Use aggregation to sort by message count
+            return await Thread.aggregate([
+                { $match: filter },
+                {
+                    $addFields: {
+                        messageCount: { $size: '$messages' }
+                    }
+                },
+                { $sort: { messageCount: asc ? 1 : -1 } },
+                { $skip: skipAmount },
+                { $limit: pageSize },
+                {
+                    $project: {
+                        _id: 1,
+                        bookTitle: 1,
+                        title: 1,
+                        username: 1,
+                        timestamp: 1,
+                        messages: 1
+                    }
+                }
+            ]);
+        } else if (cls === 'by creation date') {
+            // Simple sort by timestamp
+            return await Thread.find(filter)
+                .sort({ timestamp: asc ? 1 : -1 })
+                .skip(skipAmount)
+                .limit(pageSize)
+                .lean();
         }
-
-        return { threads: threads };
+        
+        // Default fallback
+        return await Thread.find(filter)
+            .skip(skipAmount)
+            .limit(pageSize)
+            .lean();
     },
 
     
-    async searchMyManagedBookboxes(request: any) {
-        try {
-            let bookboxes = await BookBox.find({ owner: request.user.username });
-            if (!bookboxes || bookboxes.length === 0) {
-                return [];
-            }
-            const q = request.query.q;
-            if (q) {
-                bookboxes = bookboxes.filter((bookbox) => bookbox.name.toLowerCase().includes(q.toLowerCase()));
-            }   
-            const cls = request.query.cls;
-            const asc = request.query.asc === 'true';
+    async searchMyManagedBookboxes(
+        username: string,
+        q: string | undefined,
+        cls: string | undefined,
+        asc: boolean | undefined,
+        limit: number = 20,  
+        page: number = 1   
+    ) {
+        // Get pagination parameters
+        const pageSize = limit;
+        const skipAmount = (page - 1) * pageSize;
 
-            if (cls === 'by name') {
-                bookboxes.sort((a, b) => {
-                    return asc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-                });
-            } else if (cls === 'by number of books') {
-                bookboxes.sort((a, b) => {
-                    return asc ? a.books.length - b.books.length : b.books.length - a.books.length;
-                });
-            }
-
-            return bookboxes;
-        } catch (error) {
-            throw newErr(500, 'Failed to retrieve bookboxes');
+        // Build filter object
+        let filter: any = { owner: username };
+        if (q) {
+            filter.name = { $regex: q, $options: 'i' };
         }
+        
+        // Build sort object
+        let sort: any = {};
+        if (cls === 'by name') {
+            sort.name = asc ? 1 : -1;
+        } else if (cls === 'by number of books') {
+            sort.booksCount = asc ? 1 : -1; 
+        }
+        
+        const bookboxes = await BookBox.find(filter)
+            .sort(sort)
+            .skip(skipAmount)
+            .limit(pageSize);
+            
+        return bookboxes;
     },
 
-    async searchTransactionHistory(request: { query: { username?: string; bookTitle?: string; bookboxId?: string; limit?: number } }) {
-        const { username, bookTitle, bookboxId, limit } = request.query;
-        
+    async searchTransactionHistory(
+        username?: string,
+        bookTitle?: string,
+        bookboxId?: string,
+        limit: number = 100,
+        page: number = 1
+    ) {
+        const pageSize = limit;
+        const skipAmount = (page - 1) * pageSize;
+
         let filter: any = {};
         if (username) filter.username = username;
         if (bookTitle) filter.bookTitle = new RegExp(bookTitle, 'i');
         if (bookboxId) filter.bookboxId = bookboxId;
 
-        let query = Transaction.find(filter).sort({ timestamp: -1 });
-        if (limit) {
-            query = query.limit(parseInt(limit.toString()));
-        }
+        const transactions = await Transaction.find(filter)
+            .sort({ timestamp: -1 })
+            .skip(skipAmount)
+            .limit(pageSize)
+            .lean();
 
-        return await query.exec();
+        return transactions;
     },
 
     
-    async searchIssues(request: { 
-        query: { username?: string; 
-            bookboxId?: string; 
-            status?: string;
-        }
-    }) {
-        const { username, bookboxId, status } = request.query;
-
+    async searchIssues(
+        username?: string,
+        bookboxId?: string,
+        status?: string,
+        oldestFirst: boolean = false,
+        limit: number = 20,
+        page: number = 1
+    ) {
         const filter: any = {};
         if (username) filter.username = username;
         if (bookboxId) filter.bookboxId = bookboxId;
         if (status) filter.status = status;
 
-        const issues = await Issue.find(filter);
+        const pageSize = limit;
+        const skipAmount = (page - 1) * pageSize;
+
+        const issues = await Issue.find(filter)
+            .sort({ 
+                reportedAt: oldestFirst ? 1 : -1
+            })
+            .skip(skipAmount)
+            .limit(pageSize);
+
         return issues;
     },
 
+    async searchUsers(
+        q?: string,
+        limit: number = 10,
+        page: number = 1
+    ) {
+        const pageSize = limit;
+        const skipAmount = (page - 1) * pageSize;
+        
+        let filter: any = {};
+        
+        // Only add search filter if q is provided
+        if (q) {
+            const regex = new RegExp(q, 'i');
+            filter.$or = [
+                { username: regex },
+                { email: regex }
+            ];
+        }
+        
+        const users = await User.find(filter)
+            .skip(skipAmount) 
+            .limit(pageSize)   
+            .lean();
+
+        return users.map(user => ({
+            id: user._id.toString(),
+            username: user.username,
+            email: user.email,
+        }));
 }
-
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371; // Earth's radius in km
-        
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-        
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
 }
 
 export default searchService;

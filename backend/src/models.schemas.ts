@@ -27,6 +27,7 @@ export const bookboxSchema = {
         longitude: {type: 'number'},
         latitude: {type: 'number'},
         boroughId: {type: 'string'},
+        booksCount: {type: 'number'},
         infoText: {type: 'string'},
         isActive: {type: 'boolean'},
         books: {type: 'array', items: bookSchema}

@@ -1,5 +1,5 @@
 import { issueSchema } from "../issues/issue.schemas";
-import { bookboxSchema, threadSchema } from "../models.schemas";
+import { bookboxSchema, bookSchema, threadSchema } from "../models.schemas";
 
 export const searchBooksSchema = {
     description: 'Search books across all bookboxes',
@@ -9,7 +9,9 @@ export const searchBooksSchema = {
         properties: {
             q: { type: 'string' },
             cls: { type: 'string' },
-            asc: { type: 'boolean' }
+            asc: { type: 'boolean' },
+            limit: { type: 'number', default: 20 },
+            page: { type: 'number', default: 1 }
         }
     },
     response: {
@@ -19,24 +21,7 @@ export const searchBooksSchema = {
             properties: {
                 books: {
                     type: 'array',
-                    items: {
-                        type: 'object', 
-                        properties: {
-                            _id: { type: 'string' },
-                            isbn: { type: 'string' },
-                            title: { type: 'string' },
-                            authors: { type: 'array', items: { type: 'string' } },
-                            description: { type: 'string' },
-                            coverImage: { type: 'string' },
-                            publisher: { type: 'string' },
-                            categories: { type: 'array', items: { type: 'string' } },
-                            parutionYear: { type: 'number' },
-                            pages: { type: 'number' },
-                            dateAdded: { type: 'string' },
-                            bookboxId: { type: 'string' },
-                            bookboxName: { type: 'string' }
-                        }
-                    }
+                    items: bookSchema
                 }
             }
         },
@@ -68,6 +53,8 @@ export const searchBookboxesSchema = {
             asc: { type: 'boolean' },
             longitude: { type: 'number' },
             latitude: { type: 'number' },
+            limit: { type: 'number', default: 20 },
+            page: { type: 'number', default: 1 }
         }
     },
     response: {
@@ -80,7 +67,7 @@ export const searchBookboxesSchema = {
                     items: {
                         type: 'object',
                         properties: {
-                            id: { type: 'string' },
+                            _id: { type: 'string' },
                             name: { type: 'string' },
                             infoText: { type: 'string' },
                             longitude: { type: 'number' },
@@ -89,7 +76,8 @@ export const searchBookboxesSchema = {
                             image: { type: 'string' },
                             owner: { type: 'string' },
                             boroughId: { type: 'string' },
-                            isActive: { type: 'boolean' }
+                            isActive: { type: 'boolean' },
+                            distance: { type: 'number' } // distance from search point
                         }
                     }
                 }
@@ -120,7 +108,10 @@ export const findNearestBookboxesSchema = {
         properties: {
             longitude: { type: 'number' },
             latitude: { type: 'number' },
-            maxDistance: { type: 'number', default: 5000 }
+            maxDistance: { type: 'number' },
+            searchByBorough: { type: 'boolean' },
+            limit: { type: 'number', default: 20 },
+            page: { type: 'number', default: 1 }
         },
         required: ['longitude', 'latitude']
     },
@@ -131,7 +122,7 @@ export const findNearestBookboxesSchema = {
             items: {
                 type: 'object',
                         properties: {
-                            id: { type: 'string' },
+                            _id: { type: 'string' },
                             name: { type: 'string' },
                             infoText: { type: 'string' },
                             longitude: { type: 'number' },
@@ -203,7 +194,9 @@ export const searchMyManagedBookboxesSchema = {
         properties: {
             q: { type: 'string' },
             cls: { type: 'string' }, // classification type
-            asc: { type: 'boolean' }, //
+            asc: { type: 'boolean' }, // ascending order
+            limit: { type: 'number', default: 20 },
+            page: { type: 'number', default: 1 }
         },
     },
     response: {
@@ -213,9 +206,7 @@ export const searchMyManagedBookboxesSchema = {
             properties: {
                 bookboxes: {
                     type: 'array',
-                    items: {
-                        ...bookboxSchema
-                    }
+                    items: bookboxSchema
                 }
             }
         },
@@ -238,7 +229,8 @@ export const searchTransactionHistorySchema = {
             username: { type: 'string' },
             bookTitle: { type: 'string' },
             bookboxId: { type: 'string' },
-            limit: { type: 'number' }
+            limit: { type: 'number' },
+            page: { type: 'number' }
         }
     },
     response: {
@@ -281,6 +273,9 @@ export const searchIssuesSchema = {
             username: { type: 'string' },
             bookboxId: { type: 'string' },
             status: { type: 'string', enum: ['open', 'on_progress', 'resolved'] },
+            oldestFirst: { type: 'boolean' },
+            limit: { type: 'number' },
+            page: { type: 'number' }
         }
     },
     response: {
@@ -291,6 +286,53 @@ export const searchIssuesSchema = {
                 issues: {
                     type: 'array',
                     items: issueSchema
+                }
+            }
+        },
+        400: {
+            description: 'Invalid query parameters',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+
+
+export const searchUsersSchema = {
+    description: 'Search users',
+    tags: ['users'],
+    querystring: {
+        type: 'object',
+        properties: {
+            q: { type: 'string' },
+            limit: { type: 'number', default: 20 },
+            page: { type: 'number', default: 1 }
+        }
+    },
+    response: {
+        200: {
+            description: 'Users found',
+            type: 'object',
+            properties: {
+                users: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            _id: { type: 'string' },
+                            username: { type: 'string' },
+                            email: { type: 'string' },
+                        }   
+                    }
                 }
             }
         },

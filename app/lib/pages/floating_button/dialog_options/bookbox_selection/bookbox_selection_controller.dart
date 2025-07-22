@@ -10,9 +10,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 
 class BookBoxSelectionController extends GetxController {
-  final selectedBookBox = Rxn<ShortenedBookBoxWithDistance>();
-  final bookBoxes = <ShortenedBookBoxWithDistance>[].obs;
-  final nearbyBookBoxes = <ShortenedBookBoxWithDistance>[].obs;
+  final selectedBookBox = Rxn<ShortenedBookBox>();
+  final bookBoxes = <ShortenedBookBox>[].obs;
+  final nearbyBookBoxes = <ShortenedBookBox>[].obs;
   final userLocation = Rxn<Position>();
   final isLoading = true.obs;
   final isBookBoxFound = false.obs;
@@ -63,7 +63,7 @@ class BookBoxSelectionController extends GetxController {
           );
         }
 
-        return ShortenedBookBoxWithDistance(
+        return ShortenedBookBox(
           id: bb.id,
           name: bb.name,
           infoText: bb.infoText,
@@ -89,7 +89,7 @@ class BookBoxSelectionController extends GetxController {
     }
   }
 
-  Future<void> _performSmartSelection(List<ShortenedBookBoxWithDistance> allBookBoxes) async {
+  Future<void> _performSmartSelection(List<ShortenedBookBox> allBookBoxes) async {
     // Sort by distance (closest first)
     allBookBoxes.sort((a, b) {
       final distanceA = a.distance ?? double.infinity;
@@ -128,7 +128,7 @@ class BookBoxSelectionController extends GetxController {
     isLoading.value = true;
     try {
       final bookBox = await BookboxService().getBookBox(id);
-      selectedBookBox.value = ShortenedBookBoxWithDistance(
+      selectedBookBox.value = ShortenedBookBox(
         id: bookBox.id,
         name: bookBox.name,
         infoText: bookBox.infoText,

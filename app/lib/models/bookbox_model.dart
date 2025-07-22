@@ -73,6 +73,7 @@ class ShortenedBookBox {
   final int booksCount;
   final String owner;
   final bool isActive;
+  final double? distance; // Optional distance from the user's location 
 
   ShortenedBookBox({
     required this.id,
@@ -85,11 +86,12 @@ class ShortenedBookBox {
     required this.booksCount,
     required this.owner,
     required this.isActive,
+    this.distance,
   });
 
   factory ShortenedBookBox.fromJson(Map<String, dynamic> json) {
     return ShortenedBookBox(
-      id: json['id'],
+      id: json['_id'],
       name: json['name'],
       infoText: json['infoText'],
       image: json['image'],
@@ -99,24 +101,8 @@ class ShortenedBookBox {
       owner: json['owner'],
       isActive: json['isActive'],
       boroughId: json['boroughId'],
+      distance: json['distance'] != null ? (json['distance'] as num).toDouble() : null, // Handle optional distance
     );
   }
 }
 
-class ShortenedBookBoxWithDistance extends ShortenedBookBox {
-  final double? distance; // Distance from the user's location
-
-  ShortenedBookBoxWithDistance({
-    required super.id,
-    required super.name,
-    super.infoText,
-    super.image,
-    required super.longitude,
-    required super.latitude,
-    required super.boroughId,
-    required super.booksCount,
-    this.distance,
-    required super.owner,
-    required super.isActive,
-  });
-}

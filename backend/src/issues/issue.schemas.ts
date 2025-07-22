@@ -103,3 +103,28 @@ export const closeIssueSchema = {
         500: { type: 'object', properties: { error: { type: 'string' } } }
     }
 };
+
+export const reopenIssueSchema = {
+    description: 'Reopen a resolved issue',
+    tags: ['issues'],
+    params: {
+        type: 'object',
+        properties: {
+            id: { type: 'string' }
+        },
+        required: ['id']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' }
+        },
+        required: ['authorization']
+    },
+    response: {
+        200: issueSchema,
+        400: { type: 'object', properties: { error: { type: 'string' } } },
+        404: { type: 'object', properties: { error: { type: 'string' } } },
+        500: { type: 'object', properties: { error: { type: 'string' } } }
+    }
+};

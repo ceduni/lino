@@ -11,7 +11,6 @@ const issueSchema = new mongoose.Schema({
 });
 
 // Add indexes for faster querying
-issueSchema.index({ username: 1, bookboxId: 1 }, { unique: true });
 issueSchema.index({ status: 1 });
 issueSchema.index({ reportedAt: -1 }); 
 

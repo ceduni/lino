@@ -46,6 +46,21 @@ const IssueService = {
         issue.resolvedAt = new Date();
         await issue.save();
         return issue;
+    },
+
+    async reopenIssue(issueId: string) {
+        const issue = await Issue.findById(issueId);
+        if (!issue) {
+            throw newErr(404, 'Issue not found');
+        }   
+
+        if (issue.status !== 'resolved') {
+            throw newErr(400, 'Issue is not resolved');
+        }
+        issue.status = 'open';
+        issue.resolvedAt = null as any;
+        await issue.save();
+        return issue;
     }
 };
 
