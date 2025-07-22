@@ -1,4 +1,5 @@
 import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/pages/bookbox/book_box_issue_report_page.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/services/bookbox_state_service.dart';
 import 'package:flutter/material.dart';
@@ -159,6 +160,17 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
         foregroundColor: Colors.white,
         elevation: 2,
         actions: [
+          // Issue report button
+          IconButton(
+            onPressed: () {
+              Get.to(() => BookBoxIssueReportPage(bookboxId: bookBoxId!));
+            },
+            icon: const Icon(
+              Icons.report_problem,
+              color: Colors.white,
+            ),
+            tooltip: 'Report Issue',
+          ),
           // Follow/Unfollow button (only show if user is authenticated)
           if (token != null)
             isCheckingFollowStatus

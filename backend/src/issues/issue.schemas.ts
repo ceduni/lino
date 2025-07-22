@@ -29,7 +29,6 @@ export const createIssueSchema = {
         properties: {
             authorization: { type: 'string' }
         },
-        required: ['authorization']
     },
     response: {
         200: issueSchema,
