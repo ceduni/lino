@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/models/issue_model.dart';
+import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/models/thread_model.dart';
 import 'package:Lino_app/utils/constants/api_constants.dart';
 import 'package:http/http.dart' as http;
@@ -10,7 +11,7 @@ import 'package:http/http.dart' as http;
 class SearchService {
   final String url = baseApiUrl;
 
-  Future<List<ShortenedBookBox>> searchBookboxes(
+  Future<SearchModel<ShortenedBookBox>> searchBookboxes(
       {String? q,
       bool? asc,
       String? cls,
@@ -46,14 +47,15 @@ class SearchService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    List<ShortenedBookBox> bookboxes = [];
-    for (var bookBoxJson in response['bookboxes']) {
-      bookboxes.add(ShortenedBookBox.fromJson(bookBoxJson));
-    }
-    return bookboxes;
+    
+    return SearchModel<ShortenedBookBox>.fromJson(
+      response,
+      'bookboxes',
+      ShortenedBookBox.fromJson,
+    );
   }
 
-  Future<List<ShortenedBookBox>> findNearestBookboxes(
+  Future<SearchModel<ShortenedBookBox>> findNearestBookboxes(
     double longitude,
     double latitude,
     { 
@@ -82,14 +84,15 @@ class SearchService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    List<ShortenedBookBox> bookboxes = [];
-    for (var bookBoxJson in response['bookboxes']) {
-      bookboxes.add(ShortenedBookBox.fromJson(bookBoxJson));
-    }
-    return bookboxes;
+
+    return SearchModel<ShortenedBookBox>.fromJson(
+      response,
+      'bookboxes',
+      ShortenedBookBox.fromJson,
+    );
   }
 
-  Future<List<ExtendedBook>> searchBooks(
+  Future<SearchModel<ExtendedBook>> searchBooks(
       {String? q, String? cls, bool? asc, num? limit, num? page}) async {
     // Make a GET request to the server
     // Send the parameters to the server
@@ -117,15 +120,16 @@ class SearchService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    List<ExtendedBook> books = [];
-    for (var bookJson in response['books']) {
-      books.add(ExtendedBook.fromJson(bookJson));
-    }
-    return books;
+    
+    return SearchModel<ExtendedBook>.fromJson(
+      response,
+      'books',
+      ExtendedBook.fromJson,
+    );
   }
 
 
-  Future<List<Thread>> searchThreads({String? q, String? cls, bool? asc, num? limit, num? page}) async {
+  Future<SearchModel<Thread>> searchThreads({String? q, String? cls, bool? asc, num? limit, num? page}) async {
     var queryParams = {
       if (q != null && q.isNotEmpty) 'q': q,
       if (cls != null && cls.isNotEmpty) 'cls': cls,
@@ -143,14 +147,15 @@ class SearchService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    List<Thread> threads = [];
-    for (var thread in response['threads']) {
-      threads.add(Thread.fromJson(thread));
-    }
-    return threads;
+    
+    return SearchModel<Thread>.fromJson(
+      response,
+      'threads',
+      Thread.fromJson,
+    );
   }
 
-  Future<List<Issue>> searchIssues({String? username, String? bookboxId, String? status, bool? oldestFirst, num? limit, num? page}) async {
+  Future<SearchModel<Issue>> searchIssues({String? username, String? bookboxId, String? status, bool? oldestFirst, num? limit, num? page}) async {
     var queryParams = {
       if (username != null && username.isNotEmpty) 'username': username,
       if (bookboxId != null && bookboxId.isNotEmpty) 'bookboxId': bookboxId,
@@ -169,10 +174,11 @@ class SearchService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    List<Issue> issues = [];
-    for (var issueJson in response['issues']) {
-      issues.add(Issue.fromJson(issueJson));
-    }
-    return issues;
+    
+    return SearchModel<Issue>.fromJson(
+      response,
+      'issues',
+      Issue.fromJson,
+    );
   }
 }

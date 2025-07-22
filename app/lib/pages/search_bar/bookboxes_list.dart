@@ -1,4 +1,5 @@
 import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/services/search_services.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
@@ -45,18 +46,18 @@ class BookBoxesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<ShortenedBookBox>>(
+    return FutureBuilder<SearchModel<ShortenedBookBox>>(
       future: SearchService().searchBookboxes(q: query),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        } else if (!snapshot.hasData || snapshot.data!.results.isEmpty) {
           return Center(child: Text('No bookboxes found.'));
         }
 
-        final bookboxes = snapshot.data!;
+        final bookboxes = snapshot.data!.results;
         return FutureBuilder<Position>(
           future: _getUserLocation(),
           builder: (context, locationSnapshot) {

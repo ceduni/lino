@@ -1,3 +1,5 @@
+import 'package:Lino_app/models/book_model.dart';
+import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/services/search_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,9 +24,9 @@ class SearchController extends GetxController {
     if (query.isEmpty) {
       results.clear();
     } else {
-      var bookResults = await SearchService().searchBooks(q: query);
+      SearchModel<ExtendedBook> response = await SearchService().searchBooks(q: query);
       results.clear();
-      for (var book in bookResults) {
+      for (var book in response.results) {
         results.add(book.title);
       }
     }

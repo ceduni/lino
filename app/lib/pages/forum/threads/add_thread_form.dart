@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/services/search_services.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,7 +53,7 @@ class _AddThreadFormState extends State<AddThreadForm> {
     try {
       var response = await SearchService().searchBooks(q: query);
       setState(() {
-        books = response;
+        books = response.results;
       });
     } catch (e) {
       print('Error searching books: $e');

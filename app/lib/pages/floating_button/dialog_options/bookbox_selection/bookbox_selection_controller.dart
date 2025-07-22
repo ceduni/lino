@@ -1,4 +1,5 @@
 import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/pages/floating_button/common/barcode_controller.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/book_removal/book_removal_dialog.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/form_submission/form_controller.dart';
@@ -39,17 +40,20 @@ class BookBoxSelectionController extends GetxController {
     try {
       List<ShortenedBookBox> bbs;
       if (userLocation.value != null) {
-        final longitude = userLocation.value?.longitude;
-        final latitude = userLocation.value?.latitude;
+        double? longitude = userLocation.value?.longitude;
+        double? latitude = userLocation.value?.latitude;
 
-        bbs = await SearchService().searchBookboxes(
+        SearchModel<ShortenedBookBox> response = await SearchService().searchBookboxes(
           cls: 'by location',
           asc: true,
           longitude: longitude,
           latitude: latitude,
         );
+
+        bbs = response.results;
       } else {
-        bbs = await SearchService().searchBookboxes();
+        SearchModel<ShortenedBookBox> response = await SearchService().searchBookboxes();
+        bbs = response.results;
       }
 
       bookBoxes.value = bbs.map((bb) {

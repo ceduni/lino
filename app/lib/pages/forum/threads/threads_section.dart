@@ -1,3 +1,5 @@
+import 'package:Lino_app/models/search_model.dart';
+import 'package:Lino_app/models/thread_model.dart';
 import 'package:Lino_app/services/search_services.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -124,7 +126,8 @@ class ThreadsSectionState extends State<ThreadsSection> {
   }
 
   Future<List<Card>> getThreadTiles(BuildContext context, {String? q, String? cls, bool? asc}) async {
-    final threads = await SearchService().searchThreads(q: q, cls: cls, asc: asc);
+    SearchModel<Thread> response = await SearchService().searchThreads(q: q, cls: cls, asc: asc);
+    List<Thread> threads = response.results;
 
     return threads.map((thread) {
       final DateTime timestamp = DateTime.parse(thread.timestamp.toIso8601String());

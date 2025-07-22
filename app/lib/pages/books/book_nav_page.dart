@@ -1,5 +1,6 @@
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/services/search_services.dart';
 import 'package:flutter/material.dart';
@@ -141,9 +142,9 @@ class _NavigationPageState extends State<NavigationPage> {
     });
 
     try {
-      final data = await SearchService().searchBookboxes();
+      SearchModel<ShortenedBookBox> data = await SearchService().searchBookboxes();
       setState(() {
-        bookBoxes = data;
+        bookBoxes = data.results;
         isLoading = false;
       });
       

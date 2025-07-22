@@ -1,3 +1,4 @@
+import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/models/thread_model.dart';
 import 'package:Lino_app/services/search_services.dart';
 import 'package:flutter/material.dart';
@@ -12,18 +13,18 @@ class ThreadsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Thread>>(
+    return FutureBuilder<SearchModel<Thread>>(
       future: SearchService().searchThreads(q: query),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        } else if (!snapshot.hasData || snapshot.data!.results.isEmpty) {
           return Center(child: Text('No threads found.'));
         }
 
-        final threads = snapshot.data!;
+        final threads = snapshot.data!.results;
         return ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),

@@ -1,3 +1,4 @@
+import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:flutter/material.dart';
@@ -38,10 +39,12 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
       final bookboxService = BookboxService();
       
       // Fetch transactions
-      final fetchedTransactions = await transactionService.getUserTransactions(
+      SearchModel<Transaction> searchResults = await transactionService.getUserTransactions(
         widget.user.username,
         limit: 10, // Show 10 most recent transactions
       );
+
+      final fetchedTransactions = searchResults.results;
 
       // Get unique bookbox IDs
       final uniqueBookboxIds = fetchedTransactions

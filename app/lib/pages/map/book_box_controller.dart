@@ -1,4 +1,5 @@
 import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/services/search_services.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
@@ -43,15 +44,17 @@ class BookBoxController extends GetxController {
   }
 
   Future<void> getBookBoxes() async {
-    var longitude = userLocation.value?.longitude;
-    var latitude = userLocation.value?.latitude;
+    double? longitude = userLocation.value?.longitude;
+    double? latitude = userLocation.value?.latitude;
 
-    var bbs = await SearchService().searchBookboxes(
+    SearchModel<ShortenedBookBox> response = await SearchService().searchBookboxes(
       cls: sortBy.value,
       asc: isAscending.value ? true : false,
       longitude: sortBy.value == 'by location' ? longitude : null,
       latitude: sortBy.value == 'by location' ? latitude : null,
     );
+
+    List<ShortenedBookBox> bbs = response.results;
 
     bookBoxes.value = bbs;
   }
