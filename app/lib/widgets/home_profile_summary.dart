@@ -83,7 +83,8 @@ class HomeProfileSummary extends StatelessWidget {
                   SizedBox(height: 8),
                   
                   // Impact summary
-                  Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildQuickStat(
                         icon: Icons.book,
@@ -110,21 +111,21 @@ class HomeProfileSummary extends StatelessWidget {
   }
 
   static const descriptionList = [
-    "Tree Hugger in Training",
-    "Carbon Crusader", 
-    "Eco Warrior",
-    "Planet Protector",
-    "Environmental Champion"
+    'Tree Hugger in Training',
+    'Carbon Crusader',
+    'Eco Warrior',
+    'Planet Protector',
+    'Environmental Champion'
   ];
 
   String getMatchingDescription(double savedTrees) {
-    if (this.numSavedBooks >= 100) {
+    if (numSavedBooks >= 100) {
       return descriptionList[4];
-    } else if (this.numSavedBooks >= 50) {
+    } else if (numSavedBooks >= 50) {
       return descriptionList[3];
-    } else if (this.numSavedBooks >= 20) {
+    } else if (numSavedBooks >= 20) {
       return descriptionList[2];
-    } else if (this.numSavedBooks >= 10) {
+    } else if (numSavedBooks >= 10) {
       return descriptionList[1];
     } else {
       return descriptionList[0];
@@ -146,7 +147,7 @@ class HomeProfileSummary extends StatelessWidget {
         ),
         SizedBox(width: 4),
         Text(
-          '$label',
+          label,
           style: TextStyle(
             fontSize: 12,
             color: Colors.white.withValues(alpha: 0.9),

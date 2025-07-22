@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import '../forum/add_thread_form.dart'; // Commented out - threads functionality removed
 import '../forum/request_form.dart';
+import 'package:get/get.dart' as GetX;
 
 class LinoFloatingButton extends StatefulWidget {
   final int selectedIndex;
@@ -106,15 +107,10 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
   // }
 
   void _showRequestForm(BuildContext context, VoidCallback? onRequestCreated) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return Padding(
-          padding: MediaQuery.of(context).viewInsets,
-          child: RequestForm(onRequestCreated: onRequestCreated!),
-        );
-      },
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => RequestFormPage(onRequestCreated: onRequestCreated!),
+      ),
     );
   }
 }

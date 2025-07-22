@@ -105,7 +105,8 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : Container(
+          : SafeArea(child: 
+          Container(
         width: double.infinity,
         height: double.infinity,
         color: LinoColors.primary,
@@ -152,7 +153,7 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildTextField(TextEditingController controller, String hintText, IconData icon, {bool obscureText = false}) {

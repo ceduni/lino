@@ -279,7 +279,7 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Column(
+          : SafeArea(child: Column(
               children: [
                 // Search bar
                 Container(
@@ -410,7 +410,8 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
                         top: BorderSide(color: Colors.grey[300]!),
                       ),
                     ),
-                    child: Column(
+                    child: SafeArea(child: 
+                    Column(
                       children: [
                         Container(
                           padding: const EdgeInsets.all(16.0),
@@ -514,11 +515,11 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
                         ),
                       ],
                     ),
-                  ),
+                  )),
                 ),
               ],
             ),
-    );
+    ));
   }
 
   void _showInfoDialog() {

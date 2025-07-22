@@ -45,7 +45,7 @@ class HomePage extends HookWidget {
                   title: bbox.name,
                   snippet: bbox.infoText ?? '',
                 ),
-                icon: BitmapDescriptor.defaultMarker,
+                icon: bbox.isActive ? BitmapDescriptor.defaultMarker : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
                 onTap: () {
                   bookBoxController.highlightBookBox(bbox.id);
                 },

@@ -97,7 +97,7 @@ async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
             infoText?: string;
         };
         const response = await AdminService.addNewBookbox(
-            username, name, longitude, latitude, image, infoText
+            username, name, latitude, longitude, image, infoText
         );
         reply.code(201).send(response);
     } catch (error: unknown) {

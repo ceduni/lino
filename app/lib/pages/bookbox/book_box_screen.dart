@@ -162,8 +162,19 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
         actions: [
           // Issue report button
           IconButton(
-            onPressed: () {
-              Get.to(() => BookBoxIssueReportPage(bookboxId: bookBoxId!));
+            onPressed: () async {
+              final result = await Get.to(() => BookBoxIssueReportPage(bookboxId: bookBoxId!));
+              
+              // Show success snackbar if issue was reported successfully
+              if (result != null && result['success'] == true) {
+                Get.snackbar(
+                  'Success',
+                  result['message'] ?? 'Issue reported successfully',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.green,
+                  colorText: Colors.white,
+                );
+              }
             },
             icon: const Icon(
               Icons.report_problem,
@@ -195,7 +206,8 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
                   ),
         ],
       ),
-      body: FutureBuilder<BookBox>(
+      body: SafeArea(
+        child: FutureBuilder<BookBox>(
         future: _bookBoxDataFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -249,7 +261,7 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
           return _buildContent(context, snapshot.data!);
         },
       ),
-    );
+    ));
   }
 
   Widget _buildContent(BuildContext context, BookBox bookBox) {

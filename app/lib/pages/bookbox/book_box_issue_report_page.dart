@@ -90,14 +90,8 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
       );
 
       if (mounted) {
-        Get.snackbar(
-          'Success',
-          'Issue reported successfully',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
-        Get.back();
+        // Navigate back immediately and pass success result
+        Get.back(result: {'success': true, 'message': 'Issue reported successfully'});
       }
     } catch (e) {
       if (mounted) {

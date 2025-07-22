@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
-class RequestForm extends StatefulWidget {
+class RequestFormPage extends StatefulWidget {
   final VoidCallback onRequestCreated;
 
-  const RequestForm({required this.onRequestCreated, Key? key}) : super(key: key);
+  const RequestFormPage({required this.onRequestCreated, Key? key}) : super(key: key);
 
   @override
-  _RequestFormState createState() => _RequestFormState();
+  _RequestFormPageState createState() => _RequestFormPageState();
 }
 
-class _RequestFormState extends State<RequestForm> {
+class _RequestFormPageState extends State<RequestFormPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _messageController = TextEditingController();
@@ -139,7 +139,7 @@ class _RequestFormState extends State<RequestForm> {
         widget.onRequestCreated();  // Call the callback to re-fetch requests
 
         if (mounted) {
-          Navigator.of(context).pop(); // Close the modal
+          Navigator.of(context).pop(); // Go back to previous page
           _showSuccessSnackBar('Request sent successfully! 📚');
         }
       } catch (e) {
@@ -230,13 +230,49 @@ class _RequestFormState extends State<RequestForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+    return Scaffold(
+      backgroundColor: const Color.fromRGBO(245, 245, 235, 1),
+      appBar: AppBar(
+        title: const Text(
+          'Create Book Request',
+          style: TextStyle(
+            fontFamily: 'Kanit',
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+        foregroundColor: Colors.white,
+        elevation: 2,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header text
+                Text(
+                  'What book are you looking for?',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Kanit',
+                    color: Color.fromRGBO(101, 67, 33, 1),
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Search for a book or enter a custom title to request it from other users.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Kanit',
+                    color: Colors.grey[600],
+                  ),
+                ),
+                SizedBox(height: 24),
             // Book Title Field with Autocomplete
             TextFormField(
               controller: _titleController,
@@ -500,14 +536,43 @@ class _RequestFormState extends State<RequestForm> {
             
             SizedBox(height: 16),
             
-            // Submit Button
-            _isLoading
-                ? CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: _submitForm,
-                    child: Text('Send Request'),
-                  ),
-          ],
+                // Submit Button
+                SizedBox(height: 32),
+                Container(
+                  width: double.infinity,
+                  child: _isLoading
+                      ? Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color.fromRGBO(101, 67, 33, 1),
+                            ),
+                          ),
+                        )
+                      : ElevatedButton(
+                          onPressed: _submitForm,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromRGBO(101, 67, 33, 1),
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 3,
+                          ),
+                          child: Text(
+                            'Send Request',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Kanit',
+                            ),
+                          ),
+                        ),
+                ),
+                SizedBox(height: 16),
+              ],
+            ),
+          ),
         ),
       ),
     );

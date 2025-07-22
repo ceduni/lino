@@ -32,7 +32,7 @@ class _OptionsPageState extends State<OptionsPage> {
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
+          : SafeArea(child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
@@ -111,6 +111,6 @@ class _OptionsPageState extends State<OptionsPage> {
           ],
         ),
       ),
-    );
+    ));
   }
 }
