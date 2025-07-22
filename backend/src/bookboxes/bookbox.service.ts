@@ -108,8 +108,8 @@ const bookboxService = {
     },
 
     async getBookFromBookBox(
-        bookId: string,
         bookboxId: string,
+        bookId: string,
         userId?: string,
     ) {
         // Find the bookbox
