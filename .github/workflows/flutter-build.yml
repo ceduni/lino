@@ -50,6 +50,7 @@ jobs:
       run: |
         echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" > .env
         echo "IMGBB_API_KEY=${{ secrets.IMGBB_API_KEY }}" >> .env
+        echo "BOOK_MANIPULATION_TOKEN=${{ secrets.BOOK_MANIPULATION_TOKEN }}" >> .env
 
     # - name: Run tests (optional)
     #   working-directory: ./app

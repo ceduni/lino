@@ -58,6 +58,14 @@ export const userSchema = {
             },
             default: []
         },
+        numIssuesReported: { type: 'number' },
+        acceptedNotificationTypes: {
+            type: 'object',
+            properties: {
+                addedBook: { type: 'boolean' },
+                bookRequested: { type: 'boolean' }
+            },
+        },
         numSavedBooks: { type: 'number' },
         followedBookboxes: { type: 'array', items: { type: 'string' } },
         createdAt: { type: 'string', format: 'date-time' }

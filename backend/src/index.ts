@@ -28,7 +28,55 @@ import AdminService from './admins/admin.service';
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const server = Fastify({ logger: { level: 'error' } });
+const getLogLevel = () => {
+    switch (process.env.NODE_ENV) {
+        case 'production': return 'error';      // Deployment
+        case 'dev': return 'info';      // Local dev with npm run dev
+        case 'test': return 'silent';           // Jest tests
+        default: return 'info';                 // Fallback
+    }
+};
+
+const server = Fastify({ logger: { level: getLogLevel() } });
+
+server.setErrorHandler((error: any, request: FastifyRequest, reply: FastifyReply) => {
+    // Handle validation errors (schema failures)
+    if (error.validation) {
+        const validationErrors = error.validation.map((err: any) => {
+            const field = err.instancePath ? err.instancePath.replace('/', '') : err.schemaPath;
+            return `${field}: ${err.message}`;
+        });
+        
+        reply.code(400).send({
+            error: 'Validation failed',
+            details: validationErrors,
+            message: `Invalid request data: ${validationErrors.join(', ')}`
+        });
+        return;
+    }
+    
+    // Handle JWT errors
+    if (error.code === 'FST_JWT_NO_AUTHORIZATION_IN_HEADER') {
+        reply.code(401).send({ error: 'Missing authorization header' });
+        return;
+    }
+    
+    if (error.code === 'FST_JWT_AUTHORIZATION_TOKEN_INVALID') {
+        reply.code(401).send({ error: 'Invalid or expired token' });
+        return;
+    }
+    
+    // Handle other known error codes
+    const statusCode = (error as any).statusCode || 500;
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    
+    // Log server errors but not client errors
+    if (statusCode >= 500) {
+        console.error('Server Error:', error);
+    }
+    
+    reply.code(statusCode).send({ error: message });
+});
 
 server.register(fastifyCors, {
     origin: true,
@@ -111,7 +159,7 @@ server.decorate('authenticate', async (request: FastifyRequestWithJWT, reply: Fa
 server.decorate('bookManipAuth', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         const bookManipToken = request.headers['bm_token']; // Get custom header
-        const predefinedToken = 'LinoCanIAddOrRemoveBooksPlsThanksLmao';
+        const predefinedToken = process.env.BOOK_MANIPULATION_TOKEN;
 
         if (bookManipToken !== predefinedToken) {
             console.log('Invalid book manipulation token:', bookManipToken);

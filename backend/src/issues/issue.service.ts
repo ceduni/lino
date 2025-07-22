@@ -1,21 +1,33 @@
 import { newErr } from "../services/utilities";
 import { AuthenticatedRequest } from "../types";
+import User from "../users/user.model";
 import Issue from "./issue.model";
 
 const IssueService = {
     async createIssue(
-        request: AuthenticatedRequest & { body: { bookboxId: string; subject: string; description: string } }
+        username: string,
+        email: string,
+        bookboxId: string,
+        subject: string,
+        description: string
     ) {
-        const { bookboxId, subject, description } = request.body;
-        const username = request.user.username;
 
         const issue = new Issue({
             username,
+            email,
             bookboxId,
             subject,
             description
         });
         await issue.save();
+
+        // Increment the number of issues reported by the user
+        const user = await User.findOne({ email });
+        if (user) {
+            user.numIssuesReported += 1;
+            await user.save();
+        }
+        
         return issue;
     },
 

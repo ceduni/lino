@@ -21,9 +21,19 @@ const bookboxService = {
     },
 
     // Add a book to a bookbox as a nested document
-    async addBook(request: AuthenticatedRequest & { body: BookAddData; params: { bookboxId: string } }) {
-        const { title, isbn, authors, description, coverImage, publisher, parutionYear, pages, categories } = request.body;
-        const { bookboxId } = request.params;
+    async addBook(
+        bookboxId: string,
+        title: string,
+        isbn?: string,
+        authors?: string[],
+        description?: string,
+        coverImage?: string,
+        publisher?: string,
+        parutionYear?: number,
+        pages?: number,
+        categories?: string[],
+        userId?: string
+    ) {
         
         if (!title) {
             throw newErr(400, 'Book title is required');
@@ -59,7 +69,7 @@ const bookboxService = {
         const addedBook = bookBox.books[bookBox.books.length - 1];
 
         // Create transaction record
-        const username = request.user ? (await User.findById(request.user.id))?.username || 'guest' : 'guest';
+        const username = userId ? (await User.findById(userId))?.username || 'guest' : 'guest';
         await TransactionService.createTransaction(username, 'added', title, bookboxId);
 
         // Notify users about the new book
@@ -70,8 +80,8 @@ const bookboxService = {
         );
 
         // Increment user's added books count
-        if (request.user) {
-            const user = await User.findById(request.user.id);
+        if (userId) {
+            const user = await User.findById(userId);
             if (user) {
                 // Ensure the user has followed the bookbox
                 if (!user.followedBookboxes.includes(bookBox._id.toString())) {
@@ -85,10 +95,11 @@ const bookboxService = {
         return {bookId: addedBook._id?.toString(), books: bookBox.books};
     },
 
-    async getBookFromBookBox(request: AuthenticatedRequest & { params: { bookId: string; bookboxId: string } }) {
-        const bookId = request.params.bookId;
-        const bookboxId = request.params.bookboxId;
-
+    async getBookFromBookBox(
+        bookId: string,
+        bookboxId: string,
+        userId?: string,
+    ) {
         // Find the bookbox
         let bookBox = await BookBox.findById(bookboxId);
         if (!bookBox) {
@@ -111,12 +122,12 @@ const bookboxService = {
         await bookBox.save();
 
         // Create transaction record
-        const username = request.user ? (await User.findById(request.user.id))?.username || 'guest' : 'guest';
+        const username = userId ? (await User.findById(userId))?.username || 'guest' : 'guest';
         await TransactionService.createTransaction(username, 'took', book.title, bookboxId);
 
         // Increment user's saved books count
-        if (request.user) {
-            const user = await User.findById(request.user.id);
+        if (userId) {
+            const user = await User.findById(userId);
             if (user) {
                 // If the user doesn't follow this bookbox, add it to their followed bookboxes
                 if (!user.followedBookboxes.includes(bookBox._id.toString())) {
@@ -134,9 +145,11 @@ const bookboxService = {
         await BookBox.deleteMany({});
     },
 
-    async followBookBox(request: AuthenticatedRequest & { params: { bookboxId: string } }) {
-        const bookboxId = request.params.bookboxId;
-        const user = await User.findById(request.user.id);
+    async followBookBox(
+        id: string,
+        bookboxId: string
+    ) {
+        const user = await User.findById(id);
         if (!user) {
             throw newErr(404, 'User not found');
         }
@@ -147,9 +160,11 @@ const bookboxService = {
         return { message: 'Bookbox followed successfully' };
     },
 
-    async unfollowBookBox(request: AuthenticatedRequest & { params: { bookboxId: string } }) {
-        const bookboxId = request.params.bookboxId;
-        const user = await User.findById(request.user.id);
+    async unfollowBookBox(
+        id: string,
+        bookboxId: string
+    ) {
+        const user = await User.findById(id);
         if (!user) {
             throw newErr(404, 'User not found');
         }

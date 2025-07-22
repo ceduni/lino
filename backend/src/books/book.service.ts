@@ -5,8 +5,7 @@ import {newErr} from "../services/utilities";
 
 const bookService = {
 
-    async getBookInfoFromISBN(request: { params: { isbn: string } }) {
-        const isbn = request.params.isbn;
+    async getBookInfoFromISBN(isbn: string) {
         const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${process.env.GOOGLE_API_KEY}`);
         if (response.data.totalItems === 0) {
             throw newErr(404, 'Book not found');

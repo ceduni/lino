@@ -48,9 +48,9 @@ const NotificationService = {
     },
 
     // Get user notifications (last 30 days)
-    async getUserNotifications(request: AuthenticatedRequest) {
-        const userId = request.user.id;
-        
+    async getUserNotifications(id: string) {
+        const userId = id;
+
         // Calculate the date 30 days ago
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -64,9 +64,8 @@ const NotificationService = {
     },
 
     // Mark a notification as read
-    async readNotification(request: AuthenticatedRequest & { body: { notificationId: string } }) {
-        const userId = request.user.id;
-        const notificationId = request.body.notificationId; 
+    async readNotification(id: string, notificationId: string) {
+        const userId = id;
 
         const notification = await Notification.findOne({
             _id: notificationId,
@@ -81,7 +80,7 @@ const NotificationService = {
         await notification.save();
 
         // Return all user notifications after marking as read
-        return await this.getUserNotifications(request);
+        return await this.getUserNotifications(userId);
     },
 
     // Notify relevant users when a book is added to a bookbox
@@ -94,8 +93,8 @@ const NotificationService = {
         const users = await User.find();
         
         for (const user of users) {
-            if (user.username === username) {
-                continue; // Skip the user who added the book
+            if (user.username === username || !user.notificationSettings.addedBook) {
+                continue; // Skip the user who added the book or if they don't accept this notification type
             }
 
 
@@ -128,7 +127,7 @@ const NotificationService = {
                     }
                 }
 
-                const requests = await RequestService.getBookRequests({ query: { username: user.username } });
+                const requests = await RequestService.getBookRequests(user.username);
 
                 // Check if the book matches the user's request
                 if (requests.some(req => req.bookTitle.toLowerCase() === book.title.toLowerCase())) {

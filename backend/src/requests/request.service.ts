@@ -6,10 +6,12 @@ import {newErr} from "../services/utilities";
 import { AuthenticatedRequest } from '../types/common.types';
 
 const RequestService = {
-    async requestBookToUsers(request: AuthenticatedRequest & { 
-        body: { title: string; customMessage?: string }; 
-    }) {
-        const user = await User.findById(request.user.id);
+    async requestBookToUsers(
+        id: string,
+        title: string,
+        customMessage?: string
+    ) {
+        const user = await User.findById(id);
         if (!user) {
             throw newErr(404, 'User not found');
         }
@@ -23,15 +25,22 @@ const RequestService = {
 
         // Find users who share favourite locations (by boroughId) or followed bookboxes
         const usersToNotify = await User.find({
-            $or: [
-                // Users who have favourite locations with matching boroughIds
-                ...(userBoroughIds.length > 0 ? [{
-                    'favouriteLocations.boroughId': { $in: userBoroughIds }
-                }] : []),
-                // Users who follow at least one of the same bookboxes
-                ...(userFollowedBookboxes.length > 0 ? [{
-                    followedBookboxes: { $in: userFollowedBookboxes }
-                }] : [])
+            $and: [
+                {
+                    $or: [
+                        // Users who have favourite locations with matching boroughIds
+                        ...(userBoroughIds.length > 0 ? [{
+                            'favouriteLocations.boroughId': { $in: userBoroughIds }
+                        }] : []),
+                        // Users who follow at least one of the same bookboxes
+                        ...(userFollowedBookboxes.length > 0 ? [{
+                            followedBookboxes: { $in: userFollowedBookboxes }
+                        }] : [])
+                    ]
+                },
+                {
+                    'notificationSettings.bookRequested': true
+                }
             ]
         });
         
@@ -43,31 +52,29 @@ const RequestService = {
                 await NotificationService.createNotification(
                     usersToNotify[i]._id.toString(),
                     ['book_request'],
-                    request.body.title
+                    title
                 );
             }
         }
 
         const newRequest = new Request({
             username: user.username,
-            bookTitle: request.body.title,
-            customMessage: request.body.customMessage,
+            bookTitle: title,
+            customMessage
         });
         await newRequest.save();
         return newRequest;
     },
 
-    async deleteBookRequest(request: { params: { id: string } }) {
-        const requestId = request.params.id;
-        const requestToDelete = await Request.findById(requestId);
+    async deleteBookRequest(id: string) {
+        const requestToDelete = await Request.findById(id);
         if (!requestToDelete) {
             throw newErr(404, 'Request not found');
         }
         await requestToDelete.deleteOne();
     },
 
-    async getBookRequests(request: { query: { username?: string } }) {
-        let username = request.query.username;
+    async getBookRequests(username?: string) {
         if (!username) {
             return Request.find();
         } else {
@@ -75,9 +82,8 @@ const RequestService = {
         }
     },
 
-    async toggleSolvedStatus(request: { params: { id: string } }) {
-        const requestId = request.params.id;
-        const bookRequest = await Request.findById(requestId);
+    async toggleSolvedStatus(id: string) {
+        const bookRequest = await Request.findById(id);
         if (!bookRequest) {
             throw newErr(404, 'Request not found');
         }

@@ -2,12 +2,14 @@ class User {
   final String id;
   final String username;
   final String email;
-  final String? phone;
+  final String? phone; 
   final List<String> favouriteGenres;
   final int numSavedBooks;
   final List<String> followedBookboxes;
   final List<FavouriteLocation> favouriteLocations;
   final DateTime createdAt;
+  final int numIssuesReported; 
+  final UserNotificationSettings notificationSettings;
 
   User({
     required this.id,
@@ -19,6 +21,8 @@ class User {
     required this.followedBookboxes,
     required this.favouriteLocations,
     required this.createdAt,
+    required this.notificationSettings,
+    this.numIssuesReported = 0, 
   });
 
   // Calculate ecological impact based on numSavedBooks
@@ -43,6 +47,9 @@ class User {
         .map((location) => FavouriteLocation.fromJson(location))
         .toList();
 
+    UserNotificationSettings notificationSettings = UserNotificationSettings
+        .fromJson(json['notificationSettings'] ?? {});
+
     return User(
       id: json['_id'],
       username: json['username'],
@@ -53,6 +60,8 @@ class User {
       followedBookboxes: followedBookboxes,
       favouriteLocations: favouriteLocations,
       createdAt: DateTime.parse(json['createdAt']),
+      notificationSettings: notificationSettings,
+      numIssuesReported: json['numIssuesReported'] ?? 0,
     );
   }
 } 
@@ -92,6 +101,23 @@ class EcologicalImpact {
       carbonSavings: json['carbonSavings'].toDouble(),
       savedWater: json['savedWater'].toDouble(),
       savedTrees: json['savedTrees'].toDouble(),
+    );
+  }
+}
+
+class UserNotificationSettings {
+  final bool addedBook;
+  final bool bookRequested;
+
+  UserNotificationSettings({
+    this.addedBook = true,
+    this.bookRequested = true,
+  });
+
+  factory UserNotificationSettings.fromJson(Map<String, dynamic> json) {
+    return UserNotificationSettings(
+      addedBook: json['addedBook'] ?? true,
+      bookRequested: json['bookRequested'] ?? true,
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:Lino_app/utils/constants/api_constants.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class BookExchangeService {
@@ -24,7 +25,7 @@ class BookExchangeService {
     final headers = {
       'Content-Type': 'application/json; charset=UTF-8',
       if (token != null) 'Authorization': 'Bearer $token',
-      'bm_token': 'LinoCanIAddOrRemoveBooksPlsThanksLmao',  
+      'bm_token': dotenv.env['BOOK_MANIPULATION_TOKEN'] ?? 'not_set',
     };
 
     final r = await http.post(
@@ -53,7 +54,7 @@ class BookExchangeService {
       {String? token}) async {
     final headers = {
       if (token != null) 'Authorization': 'Bearer $token',
-      'bm_token': 'LinoCanIAddOrRemoveBooksPlsThanksLmao',
+      'bm_token': dotenv.env['BOOK_MANIPULATION_TOKEN'] ?? 'not_set',
     };
 
     // Make a DELETE request to the server

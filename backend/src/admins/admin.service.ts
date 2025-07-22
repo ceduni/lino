@@ -31,12 +31,13 @@ const AdminService = {
         }
     },
 
-    async trySetAdmin(request: any) {
+    async trySetAdmin(
+        username: string,
+        adminKey: string,
+    ) {
         try {
-            const username = request.user.username;
 
             // Check if the provided key matches the admin key
-            const { adminKey } = request.body;
             if (adminKey !== process.env.ADMIN_VERIFICATION_KEY) {
                 throw newErr(403, 'Invalid admin key');
             }
@@ -98,18 +99,25 @@ const AdminService = {
     },
 
     // Bookbox Management Functions
-    async addNewBookbox(request: any) {
+    async addNewBookbox(
+        owner: string,
+        name: string,
+        latitude: number,
+        longitude: number,
+        image: string,
+        infoText?: string
+    ) {
         try {
-            const boroughId = await getBoroughId(request.body.latitude, request.body.longitude);
+            const boroughId = await getBoroughId(latitude, longitude);
             const bookBox = new BookBox({
-                name: request.body.name,
-                owner: request.user.username,
+                name,
+                owner,
                 books: [],
-                image: request.body.image,
-                longitude: request.body.longitude,
-                latitude: request.body.latitude,
-                boroughId: boroughId,
-                infoText: request.body.infoText,
+                image,
+                longitude,
+                latitude,
+                boroughId,
+                infoText
             });
             await bookBox.save();
             return bookBox;
@@ -117,55 +125,54 @@ const AdminService = {
             throw newErr(500, 'Failed to create bookbox');
         }
     },
+    
 
-    async updateBookBox(request: any) {
+    async updateBookBox(
+        owner: string,
+        bookboxId: string,
+        name?: string,
+        image?: string,
+        latitude?: number,
+        longitude?: number,
+        infoText?: string
+    ) {
         try {
-            const bookBoxId = request.params.bookboxId;
-            const updateData = request.body;
-            const bookBox = await BookBox.findById(bookBoxId);
-            
+            const bookBox = await BookBox.findById(bookboxId);
+
             if (!bookBox) {
                 throw newErr(404, 'Bookbox not found');
             }
 
             // Check ownership (super admin or owner)
-            if (request.user.username !== process.env.ADMIN_USERNAME && bookBox.owner !== request.user.username) {
+            if (owner !== process.env.ADMIN_USERNAME && bookBox.owner !== owner) {
                 throw newErr(401, 'Unauthorized: You can only manage your own bookboxes');
             }
 
             // Update the bookbox fields if they are provided
-            if (updateData.name) {
-                bookBox.name = updateData.name;
+            if (name) {
+                bookBox.name = name;
             }
-            if (updateData.image) {
-                bookBox.image = updateData.image;
+            if (image) {
+                bookBox.image = image;
             }
-            if (updateData.longitude) {
-                bookBox.longitude = updateData.longitude;
+            if (longitude) {
+                bookBox.longitude = longitude;
             }
-            if (updateData.latitude) {
-                bookBox.latitude = updateData.latitude;
+            if (latitude) {
+                bookBox.latitude = latitude;
             }
-            if (updateData.latitude || updateData.longitude) {
+            if (latitude || longitude) {
                 // If either latitude or longitude is updated, we need to update the boroughId
-                const boroughId = await getBoroughId(updateData.latitude || bookBox.latitude, updateData.longitude || bookBox.longitude);
+                const boroughId = await getBoroughId(latitude || bookBox.latitude, longitude || bookBox.longitude);
                 bookBox.boroughId = boroughId;
             }
-            if (updateData.infoText) {
-                bookBox.infoText = updateData.infoText;
+            if (infoText) {
+                bookBox.infoText = infoText;
             }
             
             await bookBox.save();
 
-            return {
-                _id: bookBox._id.toString(),
-                name: bookBox.name,
-                image: bookBox.image,
-                longitude: bookBox.longitude,
-                latitude: bookBox.latitude,
-                boroughId: bookBox.boroughId,
-                infoText: bookBox.infoText
-            };
+            return bookBox;
         } catch (error) {
             if ((error as any).statusCode) {
                 throw error;
@@ -174,22 +181,25 @@ const AdminService = {
         }
     },
 
-    async deleteBookBox(request: any) {
+    async deleteBookBox(
+        owner: string,
+        bookboxId: string
+    ) {
         try {
-            const bookBox = await BookBox.findById(request.params.bookboxId);
+            const bookBox = await BookBox.findById(bookboxId);
             if (!bookBox) {
                 throw newErr(404, 'Bookbox not found');
             }
 
             // Check ownership (super admin or owner)
-            if (request.user.username !== process.env.ADMIN_USERNAME && bookBox.owner !== request.user.username) {
+            if (owner !== process.env.ADMIN_USERNAME && bookBox.owner !== owner) {
                 throw newErr(401, 'Unauthorized: You can only manage your own bookboxes');
             }
 
-            await BookBox.findByIdAndDelete(request.params.bookboxId);
-            
+            await BookBox.findByIdAndDelete(bookboxId);
+
             // Delete all transactions related to this bookbox
-            await Transaction.deleteMany({ bookboxId: request.params.bookboxId });
+            await Transaction.deleteMany({ bookboxId });
 
             return { message: 'Bookbox deleted successfully' };
         } catch (error) {
@@ -200,14 +210,17 @@ const AdminService = {
         }
     },
 
-    async activateBookBox(request: any) {
+    async activateBookBox(
+        owner: string,
+        bookboxId: string
+    ) {
         try {
-            const bookBox = await BookBox.findById(request.params.bookboxId);
+            const bookBox = await BookBox.findById(bookboxId);
             if (!bookBox) {
                 throw newErr(404, 'Bookbox not found');
             }
             // Check ownership (super admin or owner)
-            if (request.user.username !== process.env.ADMIN_USERNAME && bookBox.owner !== request.user.username) {
+            if (owner !== process.env.ADMIN_USERNAME && bookBox.owner !== owner) {
                 throw newErr(401, 'Unauthorized: You can only manage your own bookboxes');
             }   
             bookBox.isActive = true;
@@ -228,15 +241,18 @@ const AdminService = {
         }
     },
 
-    async deactivateBookBox(request: any) {
+    async deactivateBookBox(
+        owner: string,
+        bookboxId: string
+    ) {
         try {
-            const bookBox = await BookBox.findById(request.params.bookboxId);
+            const bookBox = await BookBox.findById(bookboxId);
             if (!bookBox) {
                 throw newErr(404, 'Bookbox not found');
             }
 
             // Check ownership (super admin or owner)
-            if (request.user.username !== process.env.ADMIN_USERNAME && bookBox.owner !== request.user.username) {
+            if (owner !== process.env.ADMIN_USERNAME && bookBox.owner !== owner) {
                 throw newErr(401, 'Unauthorized: You can only manage your own bookboxes');
             }
 
@@ -259,19 +275,22 @@ const AdminService = {
         }
     },
 
-    async transferBookBoxOwnership(request: any) {
-        try {            
-            const bookBox = await BookBox.findById(request.params.bookboxId);
+    async transferBookBoxOwnership(
+        owner: string,
+        bookboxId: string,
+        newOwner: string
+    ) {
+        try {
+            const bookBox = await BookBox.findById(bookboxId);
             if (!bookBox) {
                 throw newErr(404, 'Bookbox not found');
             }
 
             // Check ownership (super admin or owner)
-            if (request.user.username !== process.env.ADMIN_USERNAME && bookBox.owner !== request.user.username) {
+            if (owner !== process.env.ADMIN_USERNAME && bookBox.owner !== owner) {
                 throw newErr(401, 'Unauthorized: You can only manage your own bookboxes');
             }
 
-            const { newOwner } = request.body;
             if (!newOwner) {
                 throw newErr(400, 'New owner username is required');
             }

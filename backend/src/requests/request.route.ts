@@ -10,9 +10,12 @@ import { AuthenticatedRequest, MyFastifyInstance } from "../types/common.types";
 
 async function sendBookRequest(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const response = await RequestService.requestBookToUsers(request as AuthenticatedRequest & { 
-            body: { title: string; customMessage?: string }; 
-        });
+        const userId = (request as AuthenticatedRequest).user.id; // Extract user ID from JWT token
+        const { title, customMessage } = request.body as {
+            title: string;
+            customMessage?: string;
+        };
+        const response = await RequestService.requestBookToUsers(userId, title, customMessage);
         reply.code(201).send(response);
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
@@ -23,7 +26,8 @@ async function sendBookRequest(request: FastifyRequest, reply: FastifyReply) {
 
 async function deleteBookRequest(request: FastifyRequest, reply: FastifyReply) {
     try {
-        await RequestService.deleteBookRequest(request as { params: { id: string } });
+        const id = (request as { params: { id: string } }).params.id;
+        await RequestService.deleteBookRequest(id);
         reply.code(204).send({message: 'Book request deleted'});
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
@@ -34,7 +38,8 @@ async function deleteBookRequest(request: FastifyRequest, reply: FastifyReply) {
  
 async function getBookRequests(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const response = await RequestService.getBookRequests(request as { query: { username?: string } });
+        const username = (request as { query: { username?: string } }).query.username;
+        const response = await RequestService.getBookRequests(username);
         reply.code(200).send(response);
     } catch (error : unknown) {
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -44,7 +49,8 @@ async function getBookRequests(request: FastifyRequest, reply: FastifyReply) {
 
 async function toggleSolvedStatus(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const response = await RequestService.toggleSolvedStatus(request as { params: { id: string } });
+        const id = (request as { params: { id: string } }).params.id;
+        const response = await RequestService.toggleSolvedStatus(id);
         reply.code(200).send(response);
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;

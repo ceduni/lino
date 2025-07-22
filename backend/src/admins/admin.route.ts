@@ -14,6 +14,7 @@ import {
     transferBookBoxOwnershipSchema,
     activateBookBoxSchema,
 } from './admin.schemas';
+import { info } from 'console';
 
 async function getAllAdmins(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -87,15 +88,17 @@ async function clearAdmins(request: FastifyRequest, reply: FastifyReply) {
 // Bookbox Management Functions
 async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const response = await AdminService.addNewBookbox(request as AuthenticatedRequest & { 
-            body: { 
-                name: string; 
-                image?: string; 
-                longitude: number; 
-                latitude: number; 
-                infoText?: string; 
-            } 
-        });
+        const username = (request as AuthenticatedRequest).user.username;
+        const { name, image, longitude, latitude, infoText } = request.body as {
+            name: string;
+            image: string;
+            longitude: number;
+            latitude: number; 
+            infoText?: string;
+        };
+        const response = await AdminService.addNewBookbox(
+            username, name, longitude, latitude, image, infoText
+        );
         reply.code(201).send(response);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;
@@ -106,16 +109,21 @@ async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
 
 async function updateBookBox(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const response = await AdminService.updateBookBox(request as AuthenticatedRequest & { 
-            body: { 
-                name?: string;
-                image?: string;
-                longitude?: number; 
-                latitude?: number;
-                infoText?: string;
-            }; 
-            params: { bookboxId: string } 
-        });
+        const username = (request as AuthenticatedRequest).user.username;
+        const bookboxId = (request as { params: { bookboxId: string } }).params.bookboxId;
+        if (!bookboxId) {
+            return reply.code(400).send({ error: 'Bookbox ID is required' });
+        }
+        const { name, image, longitude, latitude, infoText } = request.body as {
+            name?: string;
+            image?: string;
+            longitude?: number;
+            latitude?: number;
+            infoText?: string;
+        };
+        const response = await AdminService.updateBookBox(
+            username, bookboxId, name, image, longitude, latitude, infoText
+        );
         reply.code(200).send(response);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;
@@ -126,9 +134,12 @@ async function updateBookBox(request: FastifyRequest, reply: FastifyReply) {
 
 async function deleteBookBox(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const response = await AdminService.deleteBookBox(request as AuthenticatedRequest & { 
-            params: { bookboxId: string } 
-        });
+        const username = (request as AuthenticatedRequest).user.username;
+        const bookboxId = (request as { params: { bookboxId: string } }).params.bookboxId;
+        if (!bookboxId) {
+            return reply.code(400).send({ error: 'Bookbox ID is required' });
+        }
+        const response = await AdminService.deleteBookBox(username, bookboxId);
         reply.code(200).send(response);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;
@@ -139,9 +150,12 @@ async function deleteBookBox(request: FastifyRequest, reply: FastifyReply) {
 
 async function activateBookBox(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const response = await AdminService.activateBookBox(request as AuthenticatedRequest & { 
-            params: { bookboxId: string } 
-        });
+        const username = (request as AuthenticatedRequest).user.username;
+        const bookboxId = (request as { params: { bookboxId: string } }).params.bookboxId;
+        if (!bookboxId) {
+            return reply.code(400).send({ error: 'Bookbox ID is required' });
+        }
+        const response = await AdminService.activateBookBox(username, bookboxId);
         reply.code(200).send(response);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;
@@ -152,9 +166,12 @@ async function activateBookBox(request: FastifyRequest, reply: FastifyReply) {
 
 async function deactivateBookBox(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const response = await AdminService.deactivateBookBox(request as AuthenticatedRequest & { 
-            params: { bookboxId: string } 
-        });
+        const username = (request as AuthenticatedRequest).user.username;
+        const bookboxId = (request as { params: { bookboxId: string } }).params.bookboxId;
+        if (!bookboxId) {
+            return reply.code(400).send({ error: 'Bookbox ID is required' });
+        }
+        const response = await AdminService.deactivateBookBox(username, bookboxId);
         reply.code(200).send(response);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;
@@ -165,10 +182,16 @@ async function deactivateBookBox(request: FastifyRequest, reply: FastifyReply) {
 
 async function transferBookBoxOwnership(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const response = await AdminService.transferBookBoxOwnership(request as AuthenticatedRequest & { 
-            params: { bookboxId: string };
-            body: { newOwner: string }
-        });
+        const username = (request as AuthenticatedRequest).user.username;
+        const bookboxId = (request as { params: { bookboxId: string } }).params.bookboxId;
+        const newOwner = (request as { body: { newOwner: string } }).body.newOwner;
+        if (!bookboxId) {
+            return reply.code(400).send({ error: 'Bookbox ID is required' });
+        }
+        if (!newOwner) {
+            return reply.code(400).send({ error: 'New owner is required' });
+        }
+        const response = await AdminService.transferBookBoxOwnership(username, bookboxId, newOwner);
         reply.code(200).send(response);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;

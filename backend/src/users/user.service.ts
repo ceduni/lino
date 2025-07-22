@@ -5,20 +5,17 @@ import dotenv from 'dotenv';
 import { newErr } from "../services/utilities";
 import NotificationService from '../notifications/notification.service';
 import { getBoroughId } from '../services/borough.id.generator';
-import AdminService from '../admins/admin.service';
-import { 
-    UserRegistrationData, 
-    UserLoginCredentials, 
-    IUser
-} from '../types/user.types';
-import { AuthenticatedRequest } from '../types/common.types';
 
 dotenv.config();
 
 const UserService = {
     // User service to register a new user's account
-    async registerUser(userData: UserRegistrationData) {
-        const { username, email, phone, password } = userData;
+    async registerUser(
+        username: string,
+        email: string,
+        password: string,
+        phone?: string,
+    ) {
         if (username === 'guest') {
             throw newErr(400, 'Username not allowed');
         }
@@ -59,28 +56,28 @@ const UserService = {
     },
 
     // User service to log in a user if they exist (can log with either a username or an email)
-    async loginUser(credentials: UserLoginCredentials) {
-        const identifier = credentials.identifier;
+    async loginUser(identifier: string, password: string) {
         const user = await User.findOne({ $or: [{ username : identifier }, { email : identifier }]});
         if (!user) {
             throw newErr(400, 'Invalid username or email');
         }
-        const validPassword = await argon2.verify(user.password, credentials.password);
+        const validPassword = await argon2.verify(user.password, password);
         if (!validPassword) {
             throw newErr(400, 'Invalid password');
         }
         // User authenticated successfully, generate tokens
         const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY as string);
 
-        return { user: user, token: token };
+        return { username: user.username, email: user.email, token: token };
     },
 
-    async getUserNotifications(request: AuthenticatedRequest) {
-        return await NotificationService.getUserNotifications(request);
+    async getUserNotifications(id: string) {
+        return await NotificationService.getUserNotifications(id);
     },
 
-    async readNotification(request: AuthenticatedRequest & { body: { notificationId: string } }) {
-        return await NotificationService.readNotification(request);
+
+    async readNotification(id: string, notificationId: string) {
+        return await NotificationService.readNotification(id, notificationId);
     },
 
 
@@ -91,60 +88,69 @@ const UserService = {
         }
         return user.username;
     },
-    async updateUser(request: AuthenticatedRequest & { 
-        body: { 
-            username?: string; 
-            password?: string; 
-            email?: string; 
-            phone?: string; 
-            favouriteGenres?: string[];
-        } 
-    }) {
-        const user = await User.findById(request.user.id);
+
+    
+    async getUser(id: string) {
+        const user = await User.findById(id);
         if (!user) {
             throw newErr(404, 'User not found');
         }
-        if (request.body.username) {
-            const check = await User.findOne({ username: request.body.username });
+        return user;
+    },
+
+
+    async updateUser(
+        id: string,
+        username?: string,
+        password?: string,
+        email?: string,
+        phone?: string,
+        favouriteGenres?: string[]
+    ) {
+        const user = await User.findById(id);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }
+        if (username) {
+            const check = await User.findOne({ username: username });
             if (check && check.username !== user.username) {
                 throw newErr(400, 'Username already taken');
             }
-            user.username = request.body.username;
+            user.username = username;
         }
-        if (request.body.password) {
-            user.password = await argon2.hash(request.body.password);
+        if (password) {
+            user.password = await argon2.hash(password);
         }
-        if (request.body.email && request.body.email !== user.email) {
-            const check = await User.findOne({ email: request.body.email });
+        if (email && email !== user.email) {
+            const check = await User.findOne({ email: email });
             if (check) {
                 throw newErr(400, 'Email already taken');
             }
-            user.email = request.body.email;
+            user.email = email;
         }
-        if (request.body.phone) {
-            user.phone = request.body.phone;
+        if (phone) {
+            user.phone = phone;
         }
-        if (request.body.favouriteGenres) {
-            user.favouriteGenres = request.body.favouriteGenres;
+        if (favouriteGenres) {
+            user.favouriteGenres = favouriteGenres;
         }
         await user.save();
         return user;
     },
 
-    async addUserFavLocation(request: AuthenticatedRequest & { 
-        body: { 
-            latitude: number; 
-            longitude: number;
-            name: string; // Name of the location
-            tag?: string; // Optional tag for the location
-        } 
-    }) {
-        const user = await User.findById(request.user.id);
+
+    async addUserFavLocation(
+        id: string,
+        latitude: number,
+        longitude: number,
+        name: string,
+        tag?: string    
+    ) {
+        const user = await User.findById(id);
         if (!user) {
             throw newErr(404, 'User not found');
         }
 
-        const { latitude, longitude, name } = request.body;
         if (!latitude || !longitude || !name) {
             throw newErr(400, 'Latitude, longitude and name are required');
         }
@@ -156,7 +162,7 @@ const UserService = {
             longitude: longitude,
             name: name,
             boroughId: boroughId,
-            tag: request.body.tag // Optional tag for the location
+            tag: tag // Optional tag for the location
         });
         
         await user.save();
@@ -165,20 +171,19 @@ const UserService = {
             longitude: longitude, 
             boroughId: boroughId, 
             name: name,
-            tag: request.body.tag // Return the tag if provided
+            tag: tag // Return the tag if provided
         };
     },
 
-    async deleteUserFavLocation(request: AuthenticatedRequest & { 
-        body: { 
-            name: string;
-        } 
-    }) {
-        const user = await User.findById(request.user.id);
+
+    async deleteUserFavLocation(
+        id: string,
+        name: string
+    ) {
+        const user = await User.findById(id);
         if (!user) {
             throw newErr(404, 'User not found');
         }   
-        const { name } = request.body;
         if (!name) {
             throw newErr(400, 'Name is required');
         }
@@ -192,9 +197,38 @@ const UserService = {
         await user.save();
     },
 
+
+    async toggleAcceptedNotificationType(
+        id: string,
+        type: string,
+        enabled: boolean
+    ) {
+        const user = await User.findById(id);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }
+        if (!user.notificationSettings) {
+            user.notificationSettings = {
+                addedBook: true,
+                bookRequested: true
+            };
+        }
+        if (type === 'addedBook') {
+            user.notificationSettings.addedBook = enabled;
+        } else if (type === 'bookRequested') {
+            user.notificationSettings.bookRequested = enabled;
+        } else {
+            throw newErr(400, 'Invalid notification type');
+        }
+        await user.save();
+        return user.notificationSettings;
+    },
+
+
     async clearCollection() {
         await User.deleteMany({ username: { $ne: process.env.ADMIN_USERNAME } });
     },
+
 
     async clearNotifications() {
         await NotificationService.clearCollection();

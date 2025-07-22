@@ -17,6 +17,17 @@ const userSchema = new mongoose.Schema({
             }
         ]
     },
+    notificationSettings: {
+        type: {
+            addedBook: { type: Boolean, default: true },
+            bookRequested: { type: Boolean, default: true },
+        },
+        default: {
+            addedBook: true,
+            bookRequested: true
+        }
+    },
+    numIssuesReported: { type: Number, default: 0 },
     numSavedBooks: { type: Number, default: 0 },
     followedBookboxes: { type: [String], default: [] }, // Array of bookbox IDs
     createdAt: { type: Date, default: Date.now },

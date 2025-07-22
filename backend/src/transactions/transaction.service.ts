@@ -11,7 +11,12 @@ interface CreateCustomTransactionParams {
 
 class TransactionService {
     // Create a transaction record
-    static async createTransaction(username: string, action: 'added' | 'took', bookTitle: string, bookboxId: string) {
+    static async createTransaction(
+        username: string, 
+        action: 'added' | 'took', 
+        bookTitle: string, 
+        bookboxId: string
+    ) {
         const transaction = new Transaction({
             username,
             action,
@@ -22,8 +27,14 @@ class TransactionService {
         return transaction;
     }
 
-    static async createCustomTransaction(params: CreateCustomTransactionParams) {
-        const { username, action, bookTitle, bookboxId, day, hour } = params;
+    static async createCustomTransaction(
+        username: string,
+        action: 'added' | 'took',
+        bookTitle: string,
+        bookboxId: string,
+        day: string, // Format: AAAA-MM-DD
+        hour: string // Format: HH:MM
+    ) {
         
         // Validate day format (AAAA-MM-DD)
         const dayRegex = /^\d{4}-\d{2}-\d{2}$/;

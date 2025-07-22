@@ -310,3 +310,47 @@ export const clearCollectionSchema = {
         }
     }
 };
+
+export const toggleAcceptedNotificationTypeSchema = {
+    description: 'Toggle accepted notification type',
+    tags: ['users'],
+    headers: {
+        type: 'object',
+        required: ['authorization'],
+        properties: {
+            authorization: {type: 'string'} // JWT token
+        }
+    },
+    body: {
+        type: 'object',
+        required: ['type', 'enabled'],
+        properties: {
+            type: { type: 'string', enum: ['addedBook', 'bookRequested'] },
+            enabled: { type: 'boolean' }
+        }
+    },
+    response: {
+        200: {
+            description: 'Notification type toggled',
+            type: 'object',
+            properties: {
+                type: { type: 'string', enum: ['addedBook', 'bookRequested'] },
+                enabled: { type: 'boolean' }
+            }
+        },
+        400: {
+            description: 'Invalid notification type',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'User not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};  

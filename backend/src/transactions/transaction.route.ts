@@ -2,19 +2,19 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import TransactionService from "./transaction.service";
 import { MyFastifyInstance } from "../types";
 
-interface CreateCustomTransactionBody {
-    username: string;
-    action: 'added' | 'took';
-    bookTitle: string;
-    bookboxId: string;
-    day: string; // Format: AAAA-MM-DD
-    hour: string; // Format: HH:MM
-}
-
 async function createCustomTransaction(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const body = request.body as CreateCustomTransactionBody;
-        const transaction = await TransactionService.createCustomTransaction(body);
+        const { username, action, bookTitle, bookboxId, day, hour } = request.body as {
+            username: string;
+            action: 'added' | 'took';
+            bookTitle: string;
+            bookboxId: string;
+            day: string; // Format: AAAA-MM-DD
+            hour: string; // Format: HH:MM
+        };
+        const transaction = await TransactionService.createCustomTransaction(
+            username, action, bookTitle, bookboxId, day, hour
+        );
         reply.code(201).send(transaction);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 400;

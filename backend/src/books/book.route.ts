@@ -7,14 +7,10 @@ import {
 import { MyFastifyInstance } from "../types";
 
 
-interface Params extends RouteGenericInterface { 
-    Params: {
-        isbn: string
-    }
-}
-async function getBookInfoFromISBN(request: FastifyRequest<Params>, reply: FastifyReply) {
+async function getBookInfoFromISBN(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const book = await BookService.getBookInfoFromISBN(request as { params: { isbn: string } });
+        const isbn = (request as { params: { isbn: string } }).params.isbn;
+        const book = await BookService.getBookInfoFromISBN(isbn);
         reply.send(book);
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
@@ -23,14 +19,11 @@ async function getBookInfoFromISBN(request: FastifyRequest<Params>, reply: Fasti
     }
 } 
 
-interface GetUniqueBookParams extends RouteGenericInterface {
-    Params: {
-        id: string
-    }
-}
-async function getBook(request: FastifyRequest<GetUniqueBookParams>, reply: FastifyReply) {
+
+async function getBook(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const book = await BookService.getBook(request.params.id);
+        const id = (request as { params: { id: string } }).params.id;
+        const book = await BookService.getBook(id);
         reply.send(book);
     } catch (error : unknown) {
         const message = error instanceof Error ? error.message : 'Unknown error';
