@@ -88,7 +88,7 @@ async function clearAdmins(request: FastifyRequest, reply: FastifyReply) {
 // Bookbox Management Functions
 async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const username = (request as AuthenticatedRequest).user.username;
+        const owner = (request as AuthenticatedRequest).user.username;
         const { name, image, longitude, latitude, infoText } = request.body as {
             name: string;
             image: string;
@@ -97,7 +97,7 @@ async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
             infoText?: string;
         };
         const response = await AdminService.addNewBookbox(
-            username, name, latitude, longitude, image, infoText
+            {owner, name, latitude, longitude, image, infoText}
         );
         reply.code(201).send(response);
     } catch (error: unknown) {
@@ -109,7 +109,7 @@ async function addNewBookbox(request: FastifyRequest, reply: FastifyReply) {
 
 async function updateBookBox(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const username = (request as AuthenticatedRequest).user.username;
+        const owner = (request as AuthenticatedRequest).user.username;
         const bookboxId = (request as { params: { bookboxId: string } }).params.bookboxId;
         if (!bookboxId) {
             return reply.code(400).send({ error: 'Bookbox ID is required' });
@@ -122,7 +122,7 @@ async function updateBookBox(request: FastifyRequest, reply: FastifyReply) {
             infoText?: string;
         };
         const response = await AdminService.updateBookBox(
-            username, bookboxId, name, image, longitude, latitude, infoText
+            {owner, bookboxId, name, image, longitude, latitude, infoText}
         );
         reply.code(200).send(response);
     } catch (error: unknown) {

@@ -99,14 +99,21 @@ const AdminService = {
     },
 
     // Bookbox Management Functions
-    async addNewBookbox(
-        owner: string,
-        name: string,
-        latitude: number,
-        longitude: number,
-        image: string,
-        infoText?: string
-    ) {
+    async addNewBookbox({
+        owner,
+        name,
+        latitude,
+        longitude,
+        image,
+        infoText
+    }: {
+        owner: string;
+        name: string;
+        latitude: number;
+        longitude: number;
+        image: string;
+        infoText?: string;
+    }) {
         try {
             const boroughId = await getBoroughId(latitude, longitude);
             const bookBox = new BookBox({
@@ -127,15 +134,23 @@ const AdminService = {
     },
     
 
-    async updateBookBox(
-        owner: string,
-        bookboxId: string,
-        name?: string,
-        image?: string,
-        latitude?: number,
-        longitude?: number,
-        infoText?: string
-    ) {
+    async updateBookBox({
+        owner,
+        bookboxId,
+        name,
+        image,
+        latitude,
+        longitude,
+        infoText
+    }: {
+        owner: string;
+        bookboxId: string;
+        name?: string;
+        image?: string;
+        latitude?: number;
+        longitude?: number;
+        infoText?: string;
+    }) {
         try {
             const bookBox = await BookBox.findById(bookboxId);
 

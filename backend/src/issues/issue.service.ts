@@ -4,13 +4,19 @@ import User from "../users/user.model";
 import Issue from "./issue.model";
 
 const IssueService = {
-    async createIssue(
+    async createIssue({
+        username,
+        email,
+        bookboxId,
+        subject,
+        description
+    } : {
         username: string,
         email: string,
         bookboxId: string,
         subject: string,
         description: string
-    ) {
+    }) {
 
         const issue = new Issue({
             username,

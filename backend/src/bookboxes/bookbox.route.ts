@@ -16,7 +16,7 @@ async function addBookToBookbox(request: FastifyRequest, reply: FastifyReply) {
         const userId = user?.id || undefined;
         const bookboxId = (request as { params: { bookboxId: string } }).params.bookboxId;
         const { title, isbn, authors, description, coverImage, publisher, parutionYear, pages, categories } = request.body as BookAddData;
-        const response = await BookboxService.addBook(
+        const response = await BookboxService.addBook({
             bookboxId, 
             title, 
             isbn, 
@@ -28,7 +28,7 @@ async function addBookToBookbox(request: FastifyRequest, reply: FastifyReply) {
             pages, 
             categories, 
             userId
-        );
+        });
         reply.code(201).send(response);
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;

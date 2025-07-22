@@ -1,6 +1,18 @@
 import { issueSchema } from "../issues/issue.schemas";
 import { bookboxSchema, bookSchema, threadSchema } from "../models.schemas";
 
+export const paginationSchema = {
+    type: 'object',
+    properties: {
+        currentPage: { type: 'number', default: 1 },
+        totalPages: { type: 'number', default: 1 },
+        totalResults: { type: 'number', default: 0 },
+        hasNextPage: { type: 'boolean', default: false },
+        hasPrevPage: { type: 'boolean', default: false },
+        limit: { type: 'number', default: 20 }
+    }
+};
+
 export const searchBooksSchema = {
     description: 'Search books across all bookboxes',
     tags: ['books'],
@@ -22,7 +34,8 @@ export const searchBooksSchema = {
                 books: {
                     type: 'array',
                     items: bookSchema
-                }
+                }, 
+                pagination: paginationSchema
             }
         },
         404: {
@@ -80,7 +93,8 @@ export const searchBookboxesSchema = {
                             distance: { type: 'number' } // distance from search point
                         }
                     }
-                }
+                }, 
+                pagination: paginationSchema
             }
         },
         400: {
@@ -118,9 +132,12 @@ export const findNearestBookboxesSchema = {
     response: {
         200: {
             description: 'Nearest bookboxes found',
-            type: 'array',
-            items: {
-                type: 'object',
+            type: 'object',
+            properties: {
+                bookboxes: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
                         properties: {
                             _id: { type: 'string' },
                             name: { type: 'string' },
@@ -131,8 +148,12 @@ export const findNearestBookboxesSchema = {
                             image: { type: 'string' },
                             owner: { type: 'string' },
                             boroughId: { type: 'string' },
-                            isActive: { type: 'boolean' }
+                            isActive: { type: 'boolean' },
+                            distance: { type: 'number' } // distance from search point
                         }
+                    }
+                }, 
+                pagination: paginationSchema
             }
         },
         400: {
@@ -172,7 +193,8 @@ export const searchThreadsSchema = {
                 threads: {
                     type: 'array',
                     items: threadSchema
-                }
+                },
+                pagination: paginationSchema
             }
         }
     }
@@ -207,7 +229,8 @@ export const searchMyManagedBookboxesSchema = {
                 bookboxes: {
                     type: 'array',
                     items: bookboxSchema
-                }
+                },
+                pagination: paginationSchema
             }
         },
         400: {
@@ -251,7 +274,8 @@ export const searchTransactionHistorySchema = {
                             timestamp: { type: 'string' }
                         }
                     }
-                }
+                },
+                pagination: paginationSchema
             }
         },
         500: {
@@ -286,7 +310,8 @@ export const searchIssuesSchema = {
                 issues: {
                     type: 'array',
                     items: issueSchema
-                }
+                },
+                pagination: paginationSchema
             }
         },
         400: {
@@ -333,7 +358,8 @@ export const searchUsersSchema = {
                             email: { type: 'string' },
                         }   
                     }
-                }
+                },
+                pagination: paginationSchema
             }
         },
         400: {

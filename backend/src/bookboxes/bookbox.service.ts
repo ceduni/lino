@@ -21,7 +21,19 @@ const bookboxService = {
     },
 
     // Add a book to a bookbox as a nested document
-    async addBook(
+    async addBook({
+        bookboxId,
+        title,
+        isbn,
+        authors,
+        description,
+        coverImage,
+        publisher,
+        parutionYear,
+        pages,
+        categories,
+        userId
+     }: {
         bookboxId: string,
         title: string,
         isbn?: string,
@@ -33,7 +45,7 @@ const bookboxService = {
         pages?: number,
         categories?: string[],
         userId?: string
-    ) {
+    }) {
         
         if (!title) {
             throw newErr(400, 'Book title is required');

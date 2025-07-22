@@ -32,7 +32,7 @@ async function createIssue(request: FastifyRequest, reply: FastifyReply) {
             subject: string; 
             description: string 
         };
-        const issue = await IssueService.createIssue(username, email, bookboxId, subject, description);
+        const issue = await IssueService.createIssue({username, email, bookboxId, subject, description});
         reply.code(201).send(issue);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;

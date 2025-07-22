@@ -12,14 +12,14 @@ async function searchBooks(request: FastifyRequest, reply: FastifyReply) {
             limit?: number; 
             page?: number; 
         };
-        const books = await SearchService.searchBooks(
+        const results = await SearchService.searchBooks(
             q,
             cls,
             asc,
             limit,
             page
         );
-        reply.send({ books });
+        reply.send(results);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -38,10 +38,10 @@ async function searchBookboxes(request: FastifyRequest, reply: FastifyReply) {
             limit?: number;
             page?: number;
         };
-        const bookboxes = await SearchService.searchBookboxes(
+        const results = await SearchService.searchBookboxes(
             q, cls, asc, longitude, latitude, limit, page
         );
-        reply.send({ bookboxes });
+        reply.send(results);
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Unknown error';
         reply.code(400).send({ error: message });
@@ -58,10 +58,10 @@ async function findNearestBookboxes(request: FastifyRequest, reply: FastifyReply
             limit?: number;
             page?: number;
         };
-        const bookboxes = await SearchService.findNearestBookboxes(
+        const results = await SearchService.findNearestBookboxes(
             longitude, latitude, maxDistance, searchByBorough, limit, page
         );
-        reply.send({ bookboxes });
+        reply.send(results);
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -77,8 +77,8 @@ async function searchThreads(request : FastifyRequest, reply : FastifyReply) {
         limit?: number;
         page?: number;
     };
-    const threads = await SearchService.searchThreads(q, cls, asc, limit, page);
-    reply.send(threads);
+    const results = await SearchService.searchThreads(q, cls, asc, limit, page);
+    reply.send(results);
 }
 
 async function searchMyManagedBookboxes(request: FastifyRequest, reply: FastifyReply) {
@@ -91,10 +91,10 @@ async function searchMyManagedBookboxes(request: FastifyRequest, reply: FastifyR
             limit?: number;
             page?: number;
         };
-        const bookboxes = await SearchService.searchMyManagedBookboxes(
+        const results = await SearchService.searchMyManagedBookboxes(
             username, q, cls, asc, limit, page
         );
-        reply.send({ bookboxes });
+        reply.send(results);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -111,10 +111,10 @@ async function searchTransactionHistory(request: FastifyRequest, reply: FastifyR
             limit?: number; 
             page?: number;
         };
-        const transactions = await SearchService.searchTransactionHistory(
+        const results = await SearchService.searchTransactionHistory(
             username, bookTitle, bookboxId, limit, page
         );
-        reply.send({ transactions });
+        reply.send(results);
     } catch (error : unknown) {
         const message = error instanceof Error ? error.message : 'Unknown error';
         reply.code(500).send({ error: message });
@@ -131,10 +131,10 @@ async function searchIssues(request: FastifyRequest, reply: FastifyReply) {
             limit?: number; 
             page?: number;
         };
-        const issues = await SearchService.searchIssues(
+        const results = await SearchService.searchIssues(
             username, bookboxId, status, oldestFirst, limit, page
         );
-        reply.send({ issues });
+        reply.send(results);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -149,8 +149,8 @@ async function searchUsers(request: FastifyRequest, reply: FastifyReply) {
             limit?: number; 
             page?: number;
         };
-        const users = await SearchService.searchUsers(q, limit, page);
-        reply.send({ users });
+        const results = await SearchService.searchUsers(q, limit, page);
+        reply.send(results);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
