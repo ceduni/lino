@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import AdminService from './admin.service';
 import { AuthenticatedRequest, MyFastifyInstance } from '../types/common.types';
 import {
-    getAllAdminsSchema,
+    searchAdminsSchema,
     addAdminSchema,
     removeAdminSchema,
     checkAdminStatusSchema,
@@ -14,12 +14,16 @@ import {
     transferBookBoxOwnershipSchema,
     activateBookBoxSchema,
 } from './admin.schemas';
-import { info } from 'console';
 
-async function getAllAdmins(request: FastifyRequest, reply: FastifyReply) {
+async function searchAdmins(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const admins = await AdminService.getAllAdmins();
-        reply.send({ admins });
+        const { q, limit = 20, page = 1 } = request.query as {
+            q?: string;
+            limit?: number;
+            page?: number;
+        };
+        const results = await AdminService.searchAdmins(q, limit, page);
+        reply.send(results);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -204,11 +208,11 @@ async function transferBookBoxOwnership(request: FastifyRequest, reply: FastifyR
 export default async function adminRoutes(server: MyFastifyInstance) {
     // Admin Management Routes
     
-    // Get all admins (admin only)
-    server.get('/admin/list', { 
+    // Search admins (admin only)
+    server.get('/search/admins', { 
         preValidation: [server.adminAuthenticate],
-        schema: getAllAdminsSchema
-    }, getAllAdmins);
+        schema: searchAdminsSchema
+    }, searchAdmins);
 
     // Add admin (super admin only)
     server.post('/admin/add', { 

@@ -79,10 +79,38 @@ const AdminService = {
     },
 
     // Get all admins
-    async getAllAdmins() {
+    async searchAdmins(
+        q?: string,
+        limit: number = 20,
+        page: number = 1
+    ) {
         try {
-            const admins = await Admin.find();
-            return admins;
+            const pageSize = limit;
+            const skip = (page - 1) * pageSize;
+            const query: any = {};
+            
+            if (q) {
+                query.$or = [
+                    { username: { $regex: q, $options: 'i' } }
+                ];
+            }
+
+            const admins = await Admin.find(query).skip(skip).limit(pageSize);
+            const total = await Admin.countDocuments(query);
+
+            const totalPages = Math.ceil(total / pageSize);
+            
+            return {
+                admins,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalResults: total,
+                    hasNextPage: page < totalPages,
+                    hasPrevPage: page > 1,
+                    limit: pageSize
+                }
+            };
         } catch (error) {
             throw newErr(500, 'Failed to retrieve admins');
         }

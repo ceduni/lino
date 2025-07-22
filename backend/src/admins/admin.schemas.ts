@@ -1,7 +1,7 @@
-import { bookboxSchema } from "../models.schemas";
+import { paginationSchema } from "../search/search.schemas";
 
-export const getAllAdminsSchema = {
-    description: 'Get all admin users',
+export const searchAdminsSchema = {
+    description: 'Search admin users',
     tags: ['admin'],
     headers: {
         type: 'object',
@@ -18,14 +18,15 @@ export const getAllAdminsSchema = {
                 admins: {
                     type: 'array',
                     items: {
-                        type: 'object',
+                        type: 'object', 
                         properties: {
                             _id: { type: 'string' },
                             username: { type: 'string' },
                             createdAt: { type: 'string' }
                         }
                     }
-                }
+                },
+                pagination: paginationSchema
             }
         }
     }
