@@ -30,7 +30,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const getLogLevel = () => {
     switch (process.env.NODE_ENV) {
-        case 'production': return 'error';      // Deployment
+        case 'prod': return 'error';      // Deployment
         case 'dev': return 'info';      // Local dev with npm run dev
         case 'test': return 'silent';           // Jest tests
         default: return 'info';                 // Fallback
