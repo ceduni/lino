@@ -19,7 +19,7 @@ const searchService = {
 
         // Build the base pipeline (without skip/limit for counting)
         const basePipeline: any[] = [
-            { $match: { isActive: true } },
+            { $match: {} },
             { $unwind: '$books' },
             {
                 $addFields: {
@@ -124,7 +124,7 @@ const searchService = {
         const pageSize = limit;
         const skipAmount = (page - 1) * pageSize;
 
-        let filter: any = { isActive: true };
+        let filter: any = { };
         
         if (q) {
             filter.$or = [
@@ -252,7 +252,6 @@ const searchService = {
             
             const filter = { 
                 boroughId: locationBoroughId, 
-                isActive: true 
             };
 
             // Find bookboxes in the same borough with count
@@ -291,7 +290,6 @@ const searchService = {
                             distanceField: 'distance',
                             maxDistance: maxDistance * 1000, // Convert km to meters
                             spherical: true,
-                            query: { isActive: true }
                         }
                     },
                     { $sort: { distance: 1 } }, // Always closest first for "nearest"
@@ -324,7 +322,6 @@ const searchService = {
                             distanceField: 'distance',
                             maxDistance: maxDistance * 1000,
                             spherical: true,
-                            query: { isActive: true }
                         }
                     },
                     { $count: "total" }

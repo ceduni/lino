@@ -55,7 +55,7 @@ async function createTestServer() {
     server.decorate('bookManipAuth', async (request: any, reply: any) => {
         try {
             const bookManipToken = request.headers['bm_token'];
-            const predefinedToken = 'LinoCanIAddOrRemoveBooksPlsThanksLmao';
+            const predefinedToken = process.env.BOOK_MANIPULATION_TOKEN || 'not_set';
 
             if (bookManipToken !== predefinedToken) {
                 return reply.status(401).send({ error: 'Unauthorized' });
@@ -384,7 +384,7 @@ async function addBookToBookbox(server: any, bookboxId: string, book: any, userT
             method: 'POST',
             url: `/bookboxes/${bookboxId}/books/add`,
             headers: {
-                'bm_token': 'LinoCanIAddOrRemoveBooksPlsThanksLmao',
+                'bm_token': process.env.BOOK_MANIPULATION_TOKEN || 'not_set',
                 'Authorization': `Bearer ${userToken}`
             },
             payload: book
