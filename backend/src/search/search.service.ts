@@ -527,7 +527,11 @@ const searchService = {
         const skipAmount = (page - 1) * pageSize;
 
         // Build filter object
-        let filter: any = { owner: username };
+        let filter: any = {};
+
+        // Only filter by owner if not admin
+        if (username !== process.env.ADMIN_USERNAME) filter.owner = username;
+
         if (q) {
             filter.name = { $regex: q, $options: 'i' };
         }
