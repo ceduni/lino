@@ -29,6 +29,16 @@ class _RegisterPageState extends State<RegisterPage> {
     final email = _emailController.text;
     final password = _passwordController.text;
 
+    if (username.length < 3 || username.length > 16) {
+      _showError('Username must be between 3 and 16 characters long.');
+      return;
+    } 
+
+    // No special characters, nor underscores allowed in username
+    if (!RegExp(r'^[a-zA-Z0-9 ]+$').hasMatch(username)) {
+      _showError('Username can only contain letters and numbers.');
+      return;
+    }
 
     if (!_isValidEmail(email)) {
       _showError('Please enter a valid email address.');

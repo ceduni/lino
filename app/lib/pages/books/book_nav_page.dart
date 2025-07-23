@@ -5,6 +5,7 @@ import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/services/search_services.dart';
 import 'package:flutter/material.dart';
 import 'book_details_page.dart';
+import '../bookbox/book_box_screen.dart';
 // import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -206,6 +207,16 @@ class _NavigationPageState extends State<NavigationPage> {
     }
   }
 
+  void _navigateToBookBoxScreen(String bookBoxId) {
+    Get.to(
+      () => const BookBoxScreen(),
+      arguments: {
+        'bookboxId': bookBoxId,
+        'canInteract': false,
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -259,17 +270,17 @@ class _NavigationPageState extends State<NavigationPage> {
           child: Column(
             children: [
               for (var bb in bookBoxes) ...[
-                GestureDetector(
-                  onTap: () => _toggleBookBoxExpansion(bb.id),
-                  child: Container(
-                    width: double.infinity,
-                    height: 32,
-                    margin: const EdgeInsets.only(bottom: 0),
-                    color: Color.fromRGBO(125, 201, 236, 1),
-                    padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 16.0),
-                    child: Row(
-                      children: [
-                        Expanded(
+                Container(
+                  width: double.infinity,
+                  height: 32,
+                  margin: const EdgeInsets.only(bottom: 0),
+                  color: Color.fromRGBO(125, 201, 236, 1),
+                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => _toggleBookBoxExpansion(bb.id),
                           child: Text(
                             'Bookbox ${bb.name} (${bb.booksCount} books)',
                             textAlign: TextAlign.left,
@@ -280,14 +291,37 @@ class _NavigationPageState extends State<NavigationPage> {
                             ),
                           ),
                         ),
-                        Icon(
+                      ),
+                      // View BookBox button
+                      GestureDetector(
+                        onTap: () => _navigateToBookBoxScreen(bb.id),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                          margin: const EdgeInsets.only(right: 8.0),
+                          decoration: BoxDecoration(
+                            color: const Color.fromRGBO(3, 51, 86, 1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'View BookBox',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => _toggleBookBoxExpansion(bb.id),
+                        child: Icon(
                           expandedBookBoxes[bb.id] == true 
                             ? Icons.expand_less 
                             : Icons.expand_more,
                           color: const Color.fromRGBO(3, 51, 86, 1),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 if (expandedBookBoxes[bb.id] == true) ...[
@@ -297,6 +331,7 @@ class _NavigationPageState extends State<NavigationPage> {
                     child: _buildBookBoxContent(bb.id),
                   ),
                 ],
+                SizedBox(height: 10), // Spacing between bookboxes
               ],
             ],
           ),

@@ -1,5 +1,7 @@
+import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -32,6 +34,21 @@ class HomePage extends HookWidget {
     }
   }
 
+  String getSnippet(ShortenedBookBox bbox) {
+    return
+      !bbox.isActive ? 
+      'This book box is currently inactive.' :
+      
+      bookBoxController.userLocation.value != null ? 
+      'Distance: ${(Geolocator.distanceBetween(
+        bookBoxController.userLocation.value!.latitude,
+        bookBoxController.userLocation.value!.longitude,
+        bbox.latitude,
+        bbox.longitude
+      ) / 1000).toStringAsFixed(2)} km' : 
+
+      '${bbox.booksCount} books available';
+  }
 
   Widget buildMapSection() {
     return Obx(() {
@@ -43,9 +60,9 @@ class HomePage extends HookWidget {
                 position: LatLng(bbox.latitude, bbox.longitude),
                 infoWindow: InfoWindow(
                   title: bbox.name,
-                  snippet: bbox.infoText ?? '',
+                  snippet: getSnippet(bbox),
                 ),
-                icon: bbox.isActive ? BitmapDescriptor.defaultMarker : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+                icon: bbox.isActive ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen) : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
                 onTap: () {
                   bookBoxController.highlightBookBox(bbox.id);
                 },
@@ -164,7 +181,7 @@ class HomePage extends HookWidget {
         children: [
           // Profile summary section
           HomeProfileSummary(
-            username: userData.data!.username,
+            user: userData.data!,
             numSavedBooks: userData.data!.numSavedBooks,
             savedTrees: userData.data!.ecologicalImpact.savedTrees,
             carbonSavings: userData.data!.ecologicalImpact.carbonSavings,

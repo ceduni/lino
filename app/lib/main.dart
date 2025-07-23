@@ -84,6 +84,8 @@ Future<String?> fetchUserId(SharedPreferences prefs) async {
       return user.id;
     } catch (e) {
       print('Error fetching user ID: $e');
+      // Set token to null if fetching user fails
+      await prefs.remove('token');
       return null;
     }
   }

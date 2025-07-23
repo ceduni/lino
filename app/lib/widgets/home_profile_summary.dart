@@ -1,8 +1,9 @@
+import 'package:Lino_app/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 
 class HomeProfileSummary extends StatelessWidget {
-  final String username;
+  final User user;
   final int numSavedBooks;
   final double savedTrees;
   final double carbonSavings;
@@ -10,7 +11,7 @@ class HomeProfileSummary extends StatelessWidget {
 
   const HomeProfileSummary({
     super.key,
-    required this.username,
+    required this.user,
     required this.numSavedBooks,
     required this.savedTrees,
     required this.carbonSavings,
@@ -49,7 +50,7 @@ class HomeProfileSummary extends StatelessWidget {
               radius: 30,
               backgroundColor: Colors.white.withValues(alpha: 0.2),
               child: Text(
-                username.isNotEmpty ? username[0].toUpperCase() : 'U',
+                user.username.isNotEmpty ? user.username[0].toUpperCase() : 'U',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -72,14 +73,28 @@ class HomeProfileSummary extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
-                  Text(
-                    username,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                    Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                      user.username,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      ),
+                      SizedBox(width: 3),
+                      if (user.isAdmin)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 2.0),
+                        child: Icon(
+                        Icons.shield,
+                        color: const Color.fromARGB(255, 212, 212, 212),
+                        ),
+                      ),
+                    ],
                     ),
-                  ),
                   SizedBox(height: 8),
                   
                   // Impact summary

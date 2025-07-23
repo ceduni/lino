@@ -36,7 +36,9 @@ class ProfileCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundImage: Image.network('https://imgs.search.brave.com/M3mi-is8_3t7e0PSznN7CZl9wCDVz6B_7hiUc3zgp3o/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG40/Lmljb25maW5kZXIu/Y29tL2RhdGEvaWNv/bnMvc3BvdHMvNTEy/L2ZhY2Utd29tYW4t/MTI4LnBuZw').image,
+                  backgroundImage: user.isAdmin ? 
+                    Image.network('https://www.pngmart.com/files/21/Admin-Profile-Vector-PNG-Clipart.png').image :
+                    Image.network('https://cdn-icons-png.flaticon.com/512/4305/4305692.png').image,
                 ),
                 SizedBox(width: 16),
                 Expanded(
@@ -55,13 +57,35 @@ class ProfileCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 16),
-            Text(
-              user.username,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  user.username,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(width: 3),
+                if (user.isAdmin)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2.0),
+                      child: Icon(
+                        Icons.shield,
+                        color: Colors.blue,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
               ),
-            ),
             Text(
               _getMemberSinceText(createdAt),
               style: TextStyle(
@@ -100,18 +124,18 @@ class ProfileCard extends StatelessWidget {
     
     if (difference.inDays >= 365) {
       final years = (difference.inDays / 365).floor();
-      return 'Member since $years year${years > 1 ? 's' : ''} ago';
+      return '${user.isAdmin ? 'Admin' : 'Member'} since $years year${years > 1 ? 's' : ''} ago';
     } else if (difference.inDays >= 30) {
       final months = (difference.inDays / 30).floor();
-      return 'Member since $months month${months > 1 ? 's' : ''} ago';
+      return '${user.isAdmin ? 'Admin' : 'Member'} since $months month${months > 1 ? 's' : ''} ago';
     } else if (difference.inDays >= 1) {
-      return 'Member since ${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
+      return '${user.isAdmin ? 'Admin' : 'Member'} since ${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
     } else if (difference.inHours >= 1) {
-      return 'Member since ${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
+      return '${user.isAdmin ? 'Admin' : 'Member'} since ${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
     } else if (difference.inMinutes >= 1) {
-      return 'Member since ${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
+      return '${user.isAdmin ? 'Admin' : 'Member'} since ${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
     } else {
-      return 'Member since just now';
+      return '${user.isAdmin ? 'Admin' : 'Member'} since just now';
     }
   }
 

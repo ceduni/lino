@@ -79,6 +79,15 @@ class BookBoxController extends GetxController {
 
     userLocation.value = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
+    
+    // Update map camera position to user's location
+    if (userLocation.value != null) {
+      mapController.moveToLocation(
+        userLocation.value!.latitude, 
+        userLocation.value!.longitude
+      );
+    }
+    
     await getBookBoxes();
   }
 

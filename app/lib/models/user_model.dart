@@ -10,6 +10,7 @@ class User {
   final DateTime createdAt;
   final int numIssuesReported; 
   final UserNotificationSettings notificationSettings;
+  final bool isAdmin; 
 
   User({
     required this.id,
@@ -23,6 +24,7 @@ class User {
     required this.createdAt,
     required this.notificationSettings,
     this.numIssuesReported = 0, 
+    required this.isAdmin,
   });
 
   // Calculate ecological impact based on numSavedBooks
@@ -62,6 +64,7 @@ class User {
       createdAt: DateTime.parse(json['createdAt']),
       notificationSettings: notificationSettings,
       numIssuesReported: json['numIssuesReported'] ?? 0,
+      isAdmin: json['isAdmin'] ?? false, 
     );
   }
 } 
