@@ -80,6 +80,7 @@ const AdminService = {
 
     // Get all admins
     async searchAdmins(
+        username: string,
         q?: string,
         limit: number = 20,
         page: number = 1
@@ -87,7 +88,8 @@ const AdminService = {
         try {
             const pageSize = limit;
             const skip = (page - 1) * pageSize;
-            const query: any = {};
+            // Skip our own username
+            const query: any = { username: { $ne: username } };
             
             if (q) {
                 query.$or = [

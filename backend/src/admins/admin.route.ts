@@ -22,7 +22,8 @@ async function searchAdmins(request: FastifyRequest, reply: FastifyReply) {
             limit?: number;
             page?: number;
         };
-        const results = await AdminService.searchAdmins(q, limit, page);
+        const username = (request as AuthenticatedRequest).user.username;
+        const results = await AdminService.searchAdmins(username, q, limit, page);
         reply.send(results);
     } catch (error: unknown) {
         const statusCode = (error as any).statusCode || 500;

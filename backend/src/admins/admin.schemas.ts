@@ -10,6 +10,15 @@ export const searchAdminsSchema = {
             authorization: { type: 'string' }
         }
     },
+    querystring: {
+        type: 'object', 
+        properties: {
+            q: { type: 'string', description: 'Search query' },
+            limit: { type: 'number', default: 20, description: 'Number of results per page' },
+            page: { type: 'number', default: 1, description: 'Page number for pagination' }
+        },
+        required: []
+    },
     response: {
         200: {
             description: 'List of admin users',
