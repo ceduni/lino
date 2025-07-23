@@ -1,4 +1,3 @@
-import { fa } from '@faker-js/faker';
 import { userSchema, notificationSchema } from '../models.schemas';
 
 export const registerUserSchema = {

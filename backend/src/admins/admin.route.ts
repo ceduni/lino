@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import AdminService from './admin.service';
 import { AuthenticatedRequest, MyFastifyInstance } from '../types/common.types';
 import {
@@ -87,7 +87,6 @@ async function clearAdmins(request: FastifyRequest, reply: FastifyReply) {
         reply.code(statusCode).send({ error: message });
     }
 }
-
 
 
 // Bookbox Management Functions

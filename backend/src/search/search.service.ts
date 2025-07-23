@@ -680,6 +680,7 @@ const searchService = {
                 _id: user._id.toString(),
                 username: user.username,
                 email: user.email,
+                isAdmin: user.isAdmin,
             })),
             pagination: {
                 currentPage: page,

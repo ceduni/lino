@@ -68,7 +68,8 @@ export const userSchema = {
         },
         numSavedBooks: { type: 'number' },
         followedBookboxes: { type: 'array', items: { type: 'string' } },
-        createdAt: { type: 'string', format: 'date-time' }
+        createdAt: { type: 'string', format: 'date-time' },
+        isAdmin: { type: 'boolean' }
     }
 };
 

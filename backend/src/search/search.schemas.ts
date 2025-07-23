@@ -356,6 +356,7 @@ export const searchUsersSchema = {
                             _id: { type: 'string' },
                             username: { type: 'string' },
                             email: { type: 'string' },
+                            isAdmin: { type: 'boolean' },
                         }   
                     }
                 },

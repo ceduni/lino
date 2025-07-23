@@ -1,4 +1,3 @@
-import Admin from './admin.model';
 import { newErr } from "../services/utilities";
 import User from '../users/user.model';
 import { getBoroughId } from '../services/borough.id.generator';
@@ -9,20 +8,24 @@ const AdminService = {
     // Add a user to the admin list
     async addAdmin(username: string) {
         try {
-            const existingAdmin = await Admin.findOne({ username });
-            if (existingAdmin) {
-                throw newErr(400, 'User is already an admin');
-            }
-
             // Verify that the username exists in the User collection
-            const userExists = await User.findOne({ username });
-            if (!userExists) {
+            const user = await User.findOne({ username });
+            if (!user) {
                 throw newErr(404, 'User not found');
             }
+
+            if (user.isAdmin) {
+                throw newErr(400, 'User is already an admin');
+            }
             
-            const admin = new Admin({ username });
-            await admin.save();
-            return admin;
+            // Set isAdmin to true
+            user.isAdmin = true;
+            await user.save();
+            
+            return {
+                username: user.username,
+                createdAt: new Date().toISOString()
+            };
         } catch (error) {
             if ((error as any).statusCode) {
                 throw error;
@@ -31,32 +34,11 @@ const AdminService = {
         }
     },
 
-    async trySetAdmin(
-        username: string,
-        adminKey: string,
-    ) {
-        try {
-
-            // Check if the provided key matches the admin key
-            if (adminKey !== process.env.ADMIN_VERIFICATION_KEY) {
-                throw newErr(403, 'Invalid admin key');
-            }
-
-            const admin = await this.addAdmin(username);
-            return { message: 'Admin added successfully', admin };
-        } catch (error) {
-            if ((error as any).statusCode) {
-                throw error;
-            }
-            throw newErr(500, 'Failed to set admin');
-        }
-    },
-
     // Check if a user is an admin
     async isAdmin(username: string): Promise<boolean> {
         try {
-            const admin = await Admin.findOne({ username });
-            return !!admin;
+            const user = await User.findOne({ username });
+            return user ? user.isAdmin : false;
         } catch (error) {
             return false;
         }
@@ -65,10 +47,18 @@ const AdminService = {
     // Remove a user from the admin list
     async removeAdmin(username: string) {
         try {
-            const result = await Admin.deleteOne({ username });
-            if (result.deletedCount === 0) {
-                throw newErr(404, 'Admin not found');
+            const user = await User.findOne({ username });
+            if (!user) {
+                throw newErr(404, 'User not found');
             }
+
+            if (!user.isAdmin) {
+                throw newErr(404, 'User is not an admin');
+            }
+
+            user.isAdmin = false;
+            await user.save();
+            
             return { message: 'Admin removed successfully' };
         } catch (error) {
             if ((error as any).statusCode) {
@@ -88,19 +78,36 @@ const AdminService = {
         try {
             const pageSize = limit;
             const skip = (page - 1) * pageSize;
-            // Skip our own username
-            const query: any = { username: { $ne: username } };
+            
+            // Start with users who have isAdmin = true and skip our own username
+            const query: any = { 
+                isAdmin: true,
+                username: { $ne: username } 
+            };
             
             if (q) {
-                query.$or = [
+                query.$and = [
+                    { isAdmin: true },
+                    { username: { $ne: username } },
                     { username: { $regex: q, $options: 'i' } }
                 ];
             }
 
-            const admins = await Admin.find(query).skip(skip).limit(pageSize);
-            const total = await Admin.countDocuments(query);
+            const users = await User.find(query)
+                .select('username createdAt')
+                .skip(skip)
+                .limit(pageSize);
+            
+            const total = await User.countDocuments(query);
 
             const totalPages = Math.ceil(total / pageSize);
+            
+            // Transform users to match the expected admin format
+            const admins = users.map(user => ({
+                _id: user._id,
+                username: user.username,
+                createdAt: user.createdAt
+            }));
             
             return {
                 admins,
@@ -121,7 +128,7 @@ const AdminService = {
     // Clear all admins (for testing purposes)
     async clearAdmins() {
         try {
-            await Admin.deleteMany({});
+            await User.updateMany({ isAdmin: true }, { isAdmin: false });
             return { message: 'All admins cleared' };
         } catch (error) {
             throw newErr(500, 'Failed to clear admins');

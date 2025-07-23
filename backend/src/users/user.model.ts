@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema({
     numSavedBooks: { type: Number, default: 0 },
     followedBookboxes: { type: [String], default: [] }, // Array of bookbox IDs
     createdAt: { type: Date, default: Date.now },
+    isAdmin: { type: Boolean, default: false },
 });
 
 const User = mongoose.model('User', userSchema, "users");
