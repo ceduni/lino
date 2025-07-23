@@ -70,7 +70,7 @@ async function followBookBox(request: FastifyRequest, reply: FastifyReply) {
         const user = (request as AuthenticatedRequest).user;
         const userId = user.id;
         const bookboxId = (request as { params: { bookboxId: string } }).params.bookboxId;
-        const response = await BookboxService.followBookBox(bookboxId, userId);
+        const response = await BookboxService.followBookBox(userId, bookboxId);
         reply.code(200).send(response);
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
@@ -84,7 +84,7 @@ async function unfollowBookBox(request: FastifyRequest, reply: FastifyReply) {
         const user = (request as AuthenticatedRequest).user;
         const userId = user.id;
         const bookboxId = (request as { params: { bookboxId: string } }).params.bookboxId;
-        const response = await BookboxService.unfollowBookBox(bookboxId, userId);
+        const response = await BookboxService.unfollowBookBox(userId, bookboxId);
         reply.code(200).send(response);
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
