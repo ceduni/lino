@@ -170,5 +170,22 @@ class UserService {
       throw Exception(data['error']);
     }
   }
+
+  Future<void> toggleReceivedNotificationType(String token, String type) async {
+    final response = await http.put(
+      Uri.parse('$url/users/notifications/toggle'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'type': type,
+      }),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception(data['error']);
+    }
+  }
 }
  
