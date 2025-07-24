@@ -322,10 +322,9 @@ export const toggleAcceptedNotificationTypeSchema = {
     },
     body: {
         type: 'object',
-        required: ['type', 'enabled'],
+        required: ['type'],
         properties: {
             type: { type: 'string', enum: ['addedBook', 'bookRequested'] },
-            enabled: { type: 'boolean' }
         }
     },
     response: {

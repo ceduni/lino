@@ -200,9 +200,7 @@ const UserService = {
 
     async toggleAcceptedNotificationType(
         id: string,
-        type: string,
-        enabled: boolean
-    ) {
+        type: string    ) {
         const user = await User.findById(id);
         if (!user) {
             throw newErr(404, 'User not found');
@@ -214,9 +212,9 @@ const UserService = {
             };
         }
         if (type === 'addedBook') {
-            user.notificationSettings.addedBook = enabled;
+            user.notificationSettings.addedBook = !user.notificationSettings.addedBook;
         } else if (type === 'bookRequested') {
-            user.notificationSettings.bookRequested = enabled;
+            user.notificationSettings.bookRequested = !user.notificationSettings.bookRequested;
         } else {
             throw newErr(400, 'Invalid notification type');
         }

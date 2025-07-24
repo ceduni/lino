@@ -145,8 +145,8 @@ async function deleteUserFavLocation(request : FastifyRequest, reply : FastifyRe
 async function toggleAcceptedNotificationType(request : FastifyRequest, reply : FastifyReply) {
     try {
         const userId = (request as AuthenticatedRequest).user.id;
-        const { type, enabled } = request.body as { type: string; enabled: boolean };
-        const user = await UserService.toggleAcceptedNotificationType(userId, type, enabled);
+        const { type } = request.body as { type: string; };
+        const user = await UserService.toggleAcceptedNotificationType(userId, type);
         reply.send({ user });
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
