@@ -1,0 +1,462 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.transferBookBoxOwnershipSchema = exports.deactivateBookBoxSchema = exports.activateBookBoxSchema = exports.deleteBookBoxSchema = exports.updateBookBoxSchema = exports.addNewBookboxSchema = exports.clearAdminsSchema = exports.checkAdminStatusSchema = exports.removeAdminSchema = exports.addAdminSchema = exports.searchAdminsSchema = void 0;
+exports.searchAdminsSchema = {
+    description: 'Search admin users',
+    tags: ['admin'],
+    headers: {
+        type: 'object',
+        required: ['authorization'],
+        properties: {
+            authorization: { type: 'string' }
+        }
+    },
+    querystring: {
+        type: 'object',
+        properties: {
+            q: { type: 'string', description: 'Search query' },
+            limit: { type: 'number', default: 20, description: 'Number of results per page' },
+            page: { type: 'number', default: 1, description: 'Page number for pagination' }
+        },
+        required: []
+    },
+    response: {
+        200: {
+            description: 'List of admin users',
+            type: 'object',
+            properties: {
+                admins: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            _id: { type: 'string' },
+                            username: { type: 'string' },
+                            createdAt: { type: 'string' }
+                        }
+                    }
+                },
+                pagination: {
+                    type: 'object',
+                    properties: {
+                        currentPage: { type: 'number', default: 1 },
+                        totalPages: { type: 'number', default: 1 },
+                        totalResults: { type: 'number', default: 0 },
+                        hasNextPage: { type: 'boolean', default: false },
+                        hasPrevPage: { type: 'boolean', default: false },
+                        limit: { type: 'number', default: 20 }
+                    }
+                }
+            }
+        }
+    }
+};
+exports.addAdminSchema = {
+    description: 'Add a new admin user',
+    tags: ['admin'],
+    headers: {
+        type: 'object',
+        required: ['authorization'],
+        properties: {
+            authorization: { type: 'string' }
+        }
+    },
+    body: {
+        type: 'object',
+        required: ['username'],
+        properties: {
+            username: { type: 'string' }
+        }
+    },
+    response: {
+        201: {
+            description: 'Admin added successfully',
+            type: 'object',
+            properties: {
+                message: { type: 'string' },
+                admin: {
+                    type: 'object',
+                    properties: {
+                        username: { type: 'string' },
+                        createdAt: { type: 'string' }
+                    }
+                }
+            }
+        }
+    }
+};
+exports.removeAdminSchema = {
+    description: 'Remove an admin user',
+    tags: ['admin'],
+    headers: {
+        type: 'object',
+        required: ['authorization'],
+        properties: {
+            authorization: { type: 'string' }
+        }
+    },
+    body: {
+        type: 'object',
+        required: ['username'],
+        properties: {
+            username: { type: 'string' }
+        }
+    },
+    response: {
+        200: {
+            description: 'Admin removed successfully',
+            type: 'object',
+            properties: {
+                message: { type: 'string' }
+            }
+        }
+    }
+};
+exports.checkAdminStatusSchema = {
+    description: 'Check if current user is an admin',
+    tags: ['admin'],
+    headers: {
+        type: 'object',
+        required: ['authorization'],
+        properties: {
+            authorization: { type: 'string' }
+        }
+    },
+    response: {
+        200: {
+            description: 'Admin status',
+            type: 'object',
+            properties: {
+                username: { type: 'string' },
+                isAdmin: { type: 'boolean' }
+            }
+        }
+    }
+};
+exports.clearAdminsSchema = {
+    description: 'Clear all admin users',
+    tags: ['admin'],
+    headers: {
+        type: 'object',
+        required: ['authorization'],
+        properties: {
+            authorization: { type: 'string' }
+        }
+    },
+    response: {
+        200: {
+            description: 'All admins cleared',
+            type: 'object',
+            properties: {
+                message: { type: 'string' }
+            }
+        }
+    }
+};
+// Bookbox Management Schemas
+exports.addNewBookboxSchema = {
+    description: 'Add new bookbox',
+    tags: ['admin', 'bookboxes'],
+    body: {
+        type: 'object',
+        properties: {
+            name: { type: 'string' },
+            infoText: { type: 'string' },
+            latitude: { type: 'number' },
+            longitude: { type: 'number' },
+            image: { type: 'string' }
+        },
+        required: ['name', 'infoText', 'latitude', 'longitude', 'image'],
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' }
+        },
+        required: ['authorization']
+    },
+    response: {
+        201: {
+            description: 'Bookbox added',
+            type: 'object',
+            properties: {
+                _id: { type: 'string' },
+                name: { type: 'string' },
+                owner: { type: 'string' },
+                image: { type: 'string' },
+                longitude: { type: 'number' },
+                latitude: { type: 'number' },
+                boroughId: { type: 'string' },
+                infoText: { type: 'string' },
+                isActive: { type: 'boolean' },
+                books: { type: 'array' }
+            }
+        },
+        400: {
+            description: 'Error message',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+exports.updateBookBoxSchema = {
+    description: 'Update a bookbox',
+    tags: ['admin', 'bookboxes'],
+    params: {
+        type: 'object',
+        properties: {
+            bookboxId: { type: 'string' }
+        },
+        required: ['bookboxId']
+    },
+    body: {
+        type: 'object',
+        properties: {
+            name: { type: 'string' },
+            infoText: { type: 'string' },
+            latitude: { type: 'number' },
+            longitude: { type: 'number' },
+            image: { type: 'string' },
+        },
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' },
+        },
+        required: ['authorization']
+    },
+    response: {
+        200: {
+            description: 'Bookbox updated',
+            type: 'object',
+            properties: {
+                _id: { type: 'string' },
+                name: { type: 'string' },
+                latitude: { type: 'number' },
+                longitude: { type: 'number' },
+                image: { type: 'string' },
+                boroughId: { type: 'string' },
+                infoText: { type: 'string' },
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Bookbox not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+exports.deleteBookBoxSchema = {
+    description: 'Delete a bookbox',
+    tags: ['admin', 'bookboxes'],
+    params: {
+        type: 'object',
+        properties: {
+            bookboxId: { type: 'string' }
+        },
+        required: ['bookboxId']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' },
+        },
+        required: ['authorization']
+    },
+    response: {
+        200: {
+            description: 'Bookbox deleted',
+            type: 'object',
+            properties: {
+                message: { type: 'string' }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Bookbox not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+exports.activateBookBoxSchema = {
+    description: 'Activate a bookbox',
+    tags: ['admin', 'bookboxes'],
+    params: {
+        type: 'object',
+        properties: {
+            bookboxId: { type: 'string' }
+        },
+        required: ['bookboxId']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' },
+        },
+        required: ['authorization']
+    },
+    response: {
+        200: {
+            description: 'Bookbox activated',
+            type: 'object',
+            properties: {
+                message: { type: 'string' },
+                bookbox: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string' },
+                        name: { type: 'string' },
+                        isActive: { type: 'boolean' }
+                    }
+                }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Bookbox not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+exports.deactivateBookBoxSchema = {
+    description: 'Deactivate a bookbox',
+    tags: ['admin', 'bookboxes'],
+    params: {
+        type: 'object',
+        properties: {
+            bookboxId: { type: 'string' }
+        },
+        required: ['bookboxId']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' },
+        },
+        required: ['authorization']
+    },
+    response: {
+        200: {
+            description: 'Bookbox deactivated',
+            type: 'object',
+            properties: {
+                message: { type: 'string' },
+                bookbox: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string' },
+                        name: { type: 'string' },
+                        isActive: { type: 'boolean' }
+                    }
+                }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Bookbox not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+exports.transferBookBoxOwnershipSchema = {
+    description: 'Transfer ownership of a bookbox to another admin',
+    tags: ['admin', 'bookboxes'],
+    params: {
+        type: 'object',
+        properties: {
+            bookboxId: { type: 'string' }
+        },
+        required: ['bookboxId']
+    },
+    body: {
+        type: 'object',
+        properties: {
+            newOwner: { type: 'string' }
+        },
+        required: ['newOwner']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' },
+        },
+        required: ['authorization']
+    },
+    response: {
+        200: {
+            description: 'Bookbox ownership transferred',
+            type: 'object',
+            properties: {
+                message: { type: 'string' },
+                bookbox: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string' },
+                        name: { type: 'string' },
+                        owner: { type: 'string' }
+                    }
+                }
+            }
+        },
+        400: {
+            description: 'Invalid request',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        404: {
+            description: 'Bookbox or new owner not found',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};

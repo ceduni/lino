@@ -1,0 +1,26 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.serviceRoutes = exports.userRoutes = exports.transactionRoutes = exports.threadRoutes = exports.searchRoutes = exports.requestRoutes = exports.issueRoutes = exports.bookboxRoutes = exports.bookRoutes = exports.adminRoutes = void 0;
+var admin_route_1 = require("./admin.route");
+Object.defineProperty(exports, "adminRoutes", { enumerable: true, get: function () { return __importDefault(admin_route_1).default; } });
+var book_route_1 = require("./book.route");
+Object.defineProperty(exports, "bookRoutes", { enumerable: true, get: function () { return __importDefault(book_route_1).default; } });
+var bookbox_route_1 = require("./bookbox.route");
+Object.defineProperty(exports, "bookboxRoutes", { enumerable: true, get: function () { return __importDefault(bookbox_route_1).default; } });
+var issue_route_1 = require("./issue.route");
+Object.defineProperty(exports, "issueRoutes", { enumerable: true, get: function () { return __importDefault(issue_route_1).default; } });
+var request_route_1 = require("./request.route");
+Object.defineProperty(exports, "requestRoutes", { enumerable: true, get: function () { return __importDefault(request_route_1).default; } });
+var search_route_1 = require("./search.route");
+Object.defineProperty(exports, "searchRoutes", { enumerable: true, get: function () { return __importDefault(search_route_1).default; } });
+var thread_route_1 = require("./thread.route");
+Object.defineProperty(exports, "threadRoutes", { enumerable: true, get: function () { return __importDefault(thread_route_1).default; } });
+var transaction_route_1 = require("./transaction.route");
+Object.defineProperty(exports, "transactionRoutes", { enumerable: true, get: function () { return __importDefault(transaction_route_1).default; } });
+var user_route_1 = require("./user.route");
+Object.defineProperty(exports, "userRoutes", { enumerable: true, get: function () { return __importDefault(user_route_1).default; } });
+var services_route_1 = require("./services.route");
+Object.defineProperty(exports, "serviceRoutes", { enumerable: true, get: function () { return __importDefault(services_route_1).default; } });
