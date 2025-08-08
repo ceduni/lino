@@ -11,14 +11,14 @@ class ImageUploadService {
   /// Returns null if upload fails
   Future<String?> uploadImage(File imageFile) async {
     // Check if API key is configured
-    if (!(await ImageConfig.isImgbbConfigured())) {
+    if (!ImageConfig.isImgbbConfigured()) {
       print('ImgBB API key not configured.');
       return null;
     }
     
     try {
       // Get API key
-      final apiKey = await ImageConfig.getImgbbApiKey();
+      final apiKey = ImageConfig.getImgbbApiKey();
       
       // Compress the image before uploading
       final compressedImage = await _compressImage(imageFile);

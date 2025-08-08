@@ -1,40 +1,41 @@
-// books_list.dart
+import 'package:Lino_app/models/book_model.dart';
+import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/models/search_model.dart';
+import 'package:Lino_app/services/bookbox_services.dart';
+import 'package:Lino_app/services/search_services.dart';
 import 'package:flutter/material.dart';
-import 'package:Lino_app/services/book_services.dart';
 
-import '../Books/book_details_page.dart';
+import '../books/book_details_page.dart';
 
 class BooksList extends StatelessWidget {
   final String query;
 
-  BooksList({required this.query});
+  const BooksList({required this.query});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map<String, dynamic>>(
-      future: BookService().searchBooks(kw: query),
+    return FutureBuilder<SearchModel<ExtendedBook>>(
+      future: SearchService().searchBooks(q: query),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!['books'].isEmpty) {
+        } else if (!snapshot.hasData || snapshot.data!.results.isEmpty) {
           return Center(child: Text('No books found.'));
         }
 
-        final books = snapshot.data!['books'];
+        final books = snapshot.data!.results;
         return ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           itemCount: books.length,
           itemBuilder: (context, index) {
             final book = books[index];
-            final bbid = (book['bookboxPresence'] != null && book['bookboxPresence'].isNotEmpty)
-                ? book['bookboxPresence'][0]
-                : '';
+            final bbid = book.bookboxId;
 
-            return FutureBuilder<Map<String, dynamic>>(
-              future: (bbid.isNotEmpty) ? BookService().getBookBox(bbid) : null,
+            return FutureBuilder<BookBox>(
+              future: (bbid.isNotEmpty) ? BookboxService().getBookBox(bbid) : null,
               builder: (context, bbSnapshot) {
                 String bookboxStatus = 'Currently not in a bookbox';
                 if (bbSnapshot.connectionState == ConnectionState.waiting) {
@@ -42,7 +43,7 @@ class BooksList extends StatelessWidget {
                 } else if (bbSnapshot.hasError) {
                   bookboxStatus = 'Error loading bookbox';
                 } else if (bbSnapshot.hasData && bbSnapshot.data != null) {
-                  bookboxStatus = 'In bookbox "${bbSnapshot.data!['name']}"';
+                  bookboxStatus = 'In bookbox "${bbSnapshot.data!.name}"';
                 }
 
                 return Card(
@@ -50,7 +51,7 @@ class BooksList extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                   child: ListTile(
                     leading: Image.network(
-                      book['coverImage'],
+                      book.coverImage ?? '',
                       fit: BoxFit.cover,
                       width: 50,
                       height: 75,
@@ -61,7 +62,7 @@ class BooksList extends StatelessWidget {
                           color: Colors.grey,
                           child: Center(
                             child: Text(
-                              book['title'],
+                              book.title,
                               textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.white, fontSize: 12),
                             ),
@@ -70,11 +71,11 @@ class BooksList extends StatelessWidget {
                       },
                     ),
                     title: Text(
-                      book['title'],
+                      book.title,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(
-                      book['authors'].join(', '),
+                      book.authors.join(', '),
                       style: TextStyle(fontStyle: FontStyle.italic),
                     ),
                     trailing: SizedBox(

@@ -1,7 +1,8 @@
+import 'package:Lino_app/models/request_model.dart';
+import 'package:Lino_app/services/book_request_services.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import '../../services/book_services.dart';
 import '../../services/user_services.dart';
 import '../../utils/constants/colors.dart';
 
@@ -13,7 +14,7 @@ class RequestsSection extends StatefulWidget {
 }
 
 class RequestsSectionState extends State<RequestsSection> {
-  List<Map<String, dynamic>> requests = [];
+  List<Request> requests = [];
   bool isLoading = true;
   String? currentUsername;
   bool showAllRequests = true;
@@ -31,7 +32,7 @@ class RequestsSectionState extends State<RequestsSection> {
     if (token != null) {
       final user = await UserService().getUser(token);
       setState(() {
-        currentUsername = user['user']['username'];
+        currentUsername = user.username;
       });
     }
   }
@@ -42,15 +43,18 @@ class RequestsSectionState extends State<RequestsSection> {
     });
 
     try {
-      var bs = BookService();
-      final List<dynamic> requestList = allRequests
-          ? await bs.getBookRequests()
-          : await bs.getBookRequests(username: currentUsername);
+      var brs = BookRequestService();
+      final List<Request> requestList = allRequests
+          ? await brs.getBookRequests()
+          : await brs.getBookRequests(username: currentUsername);
+      
+      
       setState(() {
-        requests = requestList.cast<Map<String, dynamic>>();
+        requests = requestList;
         isLoading = false;
       });
     } catch (e) {
+      showToast('Error loading requests: ${e.toString()}');
       setState(() {
         isLoading = false;
       });
@@ -122,23 +126,51 @@ class RequestsSectionState extends State<RequestsSection> {
           children: [
             isLoading
                 ? Center(child: CircularProgressIndicator())
-                : ListView.builder(
+                : requests.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.book_outlined, size: 64, color: LinoColors.accent),
+                            SizedBox(height: 16),
+                            Text(
+                              showAllRequests ? 'No book requests found' : 'You have no requests',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: LinoColors.accent,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              showAllRequests 
+                                  ? 'Be the first to request a book!'
+                                  : 'Start requesting books you\'d like to read',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: LinoColors.accent.withValues(alpha: 0.7),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
               padding: const EdgeInsets.all(8.0),
               itemCount: requests.length,
               itemBuilder: (context, index) {
                 final request = requests[index];
-                final isOwner = request['username'] == currentUsername;
+                final isOwner = request.username == currentUsername;
 
                 return GestureDetector(
                   onLongPress: isOwner
                       ? () {
-                    _showDeleteDialog(context, request['_id'],
-                        request['bookTitle']);
+                    _showDeleteDialog(context, request.id,
+                        request.bookTitle);
                   }
                       : null,
                   child: isOwner
                       ? Dismissible(
-                    key: Key(request['_id']),
+                    key: Key(request.id),
                     direction: DismissDirection.endToStart,
                     background: Container(
                       margin: EdgeInsets.symmetric(
@@ -154,7 +186,7 @@ class RequestsSectionState extends State<RequestsSection> {
                     confirmDismiss: (direction) async {
                       if (isOwner) {
                         return await _showDeleteDialog(context,
-                            request['_id'], request['bookTitle']);
+                            request.id, request.bookTitle);
                       }
                       return false;
                     },
@@ -170,7 +202,7 @@ class RequestsSectionState extends State<RequestsSection> {
     );
   }
 
-  Widget _buildRequestCard(Map<String, dynamic> request, bool isOwner) {
+  Widget _buildRequestCard(Request request, bool isOwner) {
     return Card(
       color: isOwner ? LinoColors.accent : LinoColors.secondary,
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Add margin between cards
@@ -178,10 +210,10 @@ class RequestsSectionState extends State<RequestsSection> {
         borderRadius: BorderRadius.circular(8.0), // Match the border radius
       ),
       child: ListTile(
-        title: Text(request['bookTitle'],
+        title: Text(request.bookTitle,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        subtitle: request['customMessage'] != null
-            ? Text(request['customMessage'])
+        subtitle: request.customMessage != null && request.customMessage!.isNotEmpty
+            ? Text(request.customMessage!)
             : null,
       ),
     );
@@ -213,7 +245,7 @@ class RequestsSectionState extends State<RequestsSection> {
       final token = prefs.getString('token');
       if (token != null) {
         try {
-          await BookService().deleteBookRequest(token, requestId);
+          await BookRequestService().deleteBookRequest(token, requestId);
           fetchRequests(showAllRequests); // Re-fetch requests
           showToast('Request deleted successfully!');
         } catch (e) {

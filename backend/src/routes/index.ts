@@ -1,0 +1,10 @@
+export { default as adminRoutes } from './admin.route';
+export { default as bookRoutes } from './book.route';
+export { default as bookboxRoutes } from './bookbox.route';
+export { default as issueRoutes } from './issue.route';
+export { default as requestRoutes } from './request.route';
+export { default as searchRoutes } from './search.route';
+export { default as threadRoutes } from './thread.route';
+export { default as transactionRoutes } from './transaction.route';
+export { default as userRoutes } from './user.route';
+export { default as serviceRoutes } from './services.route';

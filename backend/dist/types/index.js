@@ -15,7 +15,6 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 // Re-export all types from organized files
-__exportStar(require("./user.types"), exports);
 __exportStar(require("./book.types"), exports);
 __exportStar(require("./thread.types"), exports);
 __exportStar(require("./common.types"), exports);

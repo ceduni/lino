@@ -1,16 +1,47 @@
-import 'package:Lino_app/pages/Books/book_nav_page.dart';
+import 'package:Lino_app/pages/books/book_nav_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:Lino_app/pages/map/map_screen.dart';
+// import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:Lino_app/pages/floating_button/floating_action_button.dart';
 import 'package:Lino_app/pages/forum/forum_screen.dart';
 // import 'package:Lino_app/pages/forum/requests_section.dart'; // Direct import for requests section
 import 'package:Lino_app/pages/appbar/observable_appbar.dart';
 import 'package:Lino_app/pages/search_bar/results_screen.dart';
 import 'package:Lino_app/pages/search_bar/search_bar.dart' as sb;
+import 'package:Lino_app/pages/profile/profile_page.dart';
+import 'package:Lino_app/pages/home/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../services/user_services.dart';
 
-class BookNavPage extends StatelessWidget {
+class BookNavPage extends StatefulWidget {
   const BookNavPage({super.key});
+
+  @override
+  _BookNavPageState createState() => _BookNavPageState();
+}
+
+class _BookNavPageState extends State<BookNavPage> {
+  late Future<bool> _isUserLoggedInFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _isUserLoggedInFuture = _isUserLoggedIn();
+  }
+
+  Future<bool> _isUserLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null) return false;
+    try {
+      final userService = UserService();
+      await userService.getUser(token);
+      return true;
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +55,10 @@ class BookNavPage extends StatelessWidget {
             sourcePage: controller.selectedIndex),
       ),
       floatingActionButton: Obx(() {
-        if (controller.selectedIndex.value == 2) {
+        if (controller.selectedIndex.value == 0) {
+          // pr cacher
+          return SizedBox.shrink();
+        } else if (controller.selectedIndex.value == 2) {
           // Requests page is active
           return LinoFloatingButton(
             selectedIndex: controller.selectedIndex.value,
@@ -39,7 +73,7 @@ class BookNavPage extends StatelessWidget {
               selectedIndex: controller.selectedIndex.value);
         }
       }),
-      bottomNavigationBar: Obx(() => _buildNavigationBar(controller)),
+      bottomNavigationBar: _buildNavigationBar(context, controller),
       body: Stack(
         children: [
           Obx(() => controller.screens[controller.selectedIndex.value]),
@@ -61,28 +95,62 @@ class BookNavPage extends StatelessWidget {
     );
   }
 
-  Widget _buildNavigationBar(NavigationController controller) {
-    return NavigationBar(
-      height: 80,
-      elevation: 10, 
-      selectedIndex: controller.selectedIndex.value,
-      indicatorColor: Color.fromRGBO(239, 174, 133, 1),
-      onDestinationSelected: (index) => controller.selectedIndex.value = index,
-      labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.book),
-          label: 'Books',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.map),
-          label: 'Map',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.chat),
-          label: 'Requests',
-        ),
-      ],
+  Widget _buildNavigationBar(BuildContext context, NavigationController controller) {
+    return GetBuilder<NavigationController>(
+      builder: (controller) {
+        return FutureBuilder<bool>(
+          future: _isUserLoggedInFuture,
+          builder: (context, snapshot) {
+            bool isLoggedIn = snapshot.data ?? false;
+            
+            return NavigationBar(
+              height: 80,
+              elevation: 10, 
+              selectedIndex: controller.selectedIndex.value,
+              indicatorColor: Color.fromRGBO(239, 174, 133, 1),
+              onDestinationSelected: (index) async {
+                if (index == 3) { // Profile tab index
+                  if (!isLoggedIn) {
+                    // User not logged in, redirect to login instead of showing profile tab
+                    Navigator.of(context).pushReplacementNamed('/login');
+                  } else {
+                    // User logged in, show profile tab like other tabs
+                    controller.selectedIndex.value = index;
+                    controller.update(); // Trigger rebuild
+                  }
+                } else {
+                  // Normal tab selection for other tabs
+                  controller.selectedIndex.value = index;
+                  controller.update(); // Trigger rebuild
+                }
+              },
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+              destinations: [
+                NavigationDestination(
+                  icon: Icon(Icons.home),
+                  label: 'Home',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.search),
+                  label: 'Search',
+                ),
+                /*NavigationDestination(
+                  icon: Icon(Icons.map),
+                  label: 'Map',
+                ),*/
+                NavigationDestination(
+                  icon: Icon(Icons.chat),
+                  label: 'Requests',
+                ),
+                NavigationDestination(
+                  icon: Icon(isLoggedIn ? Icons.person : Icons.login),
+                  label: isLoggedIn ? 'Profile' : 'Log In',
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -99,9 +167,11 @@ class NavigationController extends GetxController {
   NavigationController() {
     forumQuery = '';
     screens = [
+      HomePage(),
       NavigationPage(),
-      MapScreen(),
+      //MapScreen(),
       ForumScreen(key: forumScreenKey, query: forumQuery),
+      ProfilePage() // Added back for tab navigation
     ];
   }
 

@@ -1,5 +1,7 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { getBoroughId } from "../services/borough.id.generator";
+import { FastifyReply, FastifyRequest } from "fastify";
+import { getBoroughId } from "../utilities/borough.id.generator";
+import { boroughIdRouteSchema } from "../schemas/services.schemas";
+import { MyFastifyInstance } from "../types";
 
 async function getBoroughIdRoute(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { latitude, longitude } = request.query as { latitude: number; longitude: number };
@@ -8,7 +10,7 @@ async function getBoroughIdRoute(request: FastifyRequest, reply: FastifyReply): 
         reply.status(400).send({ error: 'Invalid latitude or longitude' });
         return;
     }
-
+  
     try {
         const boroughId = await getBoroughId(latitude, longitude);
         reply.send({ boroughId });
@@ -18,42 +20,6 @@ async function getBoroughIdRoute(request: FastifyRequest, reply: FastifyReply): 
     }
 }
 
-const boroughIdRouteSchema = {
-    querystring: {
-        type: 'object',
-        properties: {
-            latitude: { type: 'number' },
-            longitude: { type: 'number' }
-        },
-        required: ['latitude', 'longitude']
-    },
-    response: {
-        200: {
-            type: 'object',
-            properties: {
-                boroughId: { type: 'string' }
-            }
-        },
-        400: {
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        },
-        500: {
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-
-};
-
-interface MyFastifyInstance extends FastifyInstance {
-    authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-    adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-}
 export default async function serviceRoutes(server: MyFastifyInstance) {
     server.get('/services/borough-id', { schema: boroughIdRouteSchema }, getBoroughIdRoute);
 }

@@ -1,95 +1,54 @@
-import {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify';
-import UserService from "../services/user.service";
-import User from "../models/user.model";
-import { userSchema, clearCollectionSchema } from "../services/utilities";
-import { UserRegistrationData, UserLoginCredentials } from "../types/user.types";
-import { AuthenticatedRequest } from "../types/common.types";
+import { FastifyReply, FastifyRequest} from 'fastify';
+import { UserService } from "../services";
+import { User } from "../models";
+import { 
+    registerUserSchema,
+    loginUserSchema,
+    getUserSchema,
+    getUserNotificationsSchema,
+    readNotificationSchema,
+    updateUserSchema,
+    addUserFavLocationSchema,
+    clearCollectionSchema,
+    deleteUserFavLocationSchema,
+    toggleAcceptedNotificationTypeSchema
+} from "../schemas";
+import { AuthenticatedRequest, MyFastifyInstance } from "../types";
 
 async function registerUser(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const response = await UserService.registerUser(request.body as UserRegistrationData);
+        const { username, email, phone, password } = request.body as {
+            username: string;
+            email: string;
+            password: string;
+            phone?: string;
+        }
+
+        const response = await UserService.registerUser(
+            username, email, password, phone
+        );
         reply.code(201).send(response);
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
         reply.code(statusCode).send({ error: message });
     }
-}
-
-const registerUserSchema = {
-    description: 'Register a new user',
-    tags: ['users'],
-    body: {
-        type: 'object',
-        required: ['username', 'password', 'email'],
-        properties: {
-            username: { type: 'string' },
-            password: { type: 'string' },
-            email: { type: 'string' },
-            phone: { type: 'string' },
-            getAlerted: { type: 'boolean' },
-        }
-    },
-    response: {
-        201: {
-            description: 'User registered successfully',
-            type: 'object',
-            properties: {
-                username: { type: 'string' },
-                password: { type: 'string' }
-            }
-        },
-        400: {
-            description: 'Problem in the request : missing or invalid fields',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
+} 
 
 async function loginUser(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const response = await UserService.loginUser(request.body as UserLoginCredentials);
-        reply.send({ token : response.token });
+        const { identifier, password } = request.body as {
+            identifier: string; // can be either username or email
+            password: string;
+        }
+        const response = await UserService.loginUser(identifier, password);
+        reply.send(response);
     } catch (error : unknown ) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
         reply.code(statusCode).send({ error: message });
     }
 }
-
-const loginUserSchema = {
-    description: 'Login a user',
-    tags: ['users'],
-    body: {
-        type: 'object',
-        required: ['identifier', 'password'],
-        properties: {
-            identifier: { type: 'string' }, // can be either username or email
-            password: { type: 'string' }
-        },
-    },
-    response: {
-        200: {
-            description: 'User logged in successfully',
-            type: 'object',
-            properties: {
-                user: userSchema,
-                token: { type: 'string' }
-            }
-        },
-        400: {
-            description: 'Invalid credentials',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    },
-};
-
 
 async function getUser(request : FastifyRequest, reply : FastifyReply) {
     try {
@@ -104,157 +63,45 @@ async function getUser(request : FastifyRequest, reply : FastifyReply) {
     }
 }
 
-const getUserSchema = {
-    description: 'Get user infos',
-    tags: ['users'],
-    headers: {
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: {type: 'string'} // JWT token
-        }
-    },
-    response: {
-        200: {
-            description: 'User infos',
-            type: 'object',
-            properties: {
-                user: userSchema
-            }
-        },
-        500: {
-            description: 'Internal server error',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
-    }
-};
-
 async function getUserNotifications(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const notifications = await UserService.getUserNotifications(request as AuthenticatedRequest);
-        reply.send({ notifications : notifications });
+        const userId = (request as AuthenticatedRequest).user.id;  
+        const notifications = await UserService.getUserNotifications(userId);
+        reply.send({ notifications });
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
         reply.code(statusCode).send({ error: message });
-    }
-}
-
-const getUserNotificationsSchema = {
-    description: 'Get user notifications',
-    tags: ['users'],
-    headers: {
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: {type: 'string'} // JWT token
-        }
-    },
-    response: {
-        200: {
-            description: 'User notifications',
-            type: 'object',
-            properties: {
-                notifications: {
-                    type: 'array', items:
-                        {
-                            type: 'object',
-                            properties: {
-                                _id: { type: 'string' },
-                                title: { type: 'string' },
-                                timestamp: { type: 'string' },
-                                content: { type: 'string' },
-                                read: { type: 'boolean' }
-                            }
-                        }
-                }
-            }
-        },
-        404: {
-            description: 'User not found',
-            type: 'object',
-            properties: {
-                error: {type: 'string'}
-            }
-        }
     }
 }
 
 async function readNotification(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const notifications = await UserService.readNotification(request as AuthenticatedRequest & { body: { notificationId: string } });
-        reply.code(200).send({ notifications : notifications });
+        const userId = (request as AuthenticatedRequest).user.id;
+        const { notificationId } = request.body as { notificationId: string };
+        const notifications = await UserService.readNotification(userId, notificationId);
+        reply.code(200).send({ notifications });
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
         reply.code(statusCode).send({ error: message });
     }
 }
-
-const readNotificationSchema = {
-    description: 'Read a user notification',
-    tags: ['users'],
-    headers: {
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: {type: 'string'} // JWT token
-        }
-    },
-    body: {
-        type: 'object',
-        required: ['notificationId'],
-        properties: {
-            notificationId: { type: 'string' }
-        }
-    },
-    response: {
-        200: {
-            description: 'Notification read',
-            type: 'object',
-            properties: {
-                notifications: {
-                    type: 'array', items:
-                        {
-                            type: 'object',
-                            properties: {
-                                _id: { type: 'string' },
-                                title: { type: 'string' },
-                                timestamp: { type: 'string' },
-                                content: { type: 'string' },
-                                read: { type: 'boolean' }
-                            }
-                        }
-                }
-            }
-        },
-        404: {
-            description: 'User or notification not found',
-            type: 'object',
-            properties: {
-                error: {type: 'string'}
-            }
-        }
-    }
-}
-
 
 async function updateUser(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const user = await UserService.updateUser(request as AuthenticatedRequest & { 
-            body: { 
-                username?: string; 
-                password?: string; 
-                email?: string; 
-                phone?: string; 
-                getAlerted?: boolean; 
-                keyWords?: string; 
-            } 
-        });
-        reply.send({ user: user });
+        const userId = (request as AuthenticatedRequest).user.id;
+        const { username, password, email, phone, favouriteGenres } = request.body as {
+            username?: string;
+            password?: string;
+            email?: string;
+            phone?: string;
+            favouriteGenres?: string[];
+        };
+        const user = await UserService.updateUser(
+            userId, username, password, email, phone, favouriteGenres
+        );
+        reply.send({ user });
     } catch (error : unknown) {
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -262,44 +109,51 @@ async function updateUser(request : FastifyRequest, reply : FastifyReply) {
     }
 }
 
-const updateUserSchema = {
-    description: 'Update user infos',
-    tags: ['users'],
-    headers: {
-        type: 'object',
-        required: ['authorization'],
-        properties: {
-            authorization: {type: 'string'} // JWT token
-        }
-    },
-    body: {
-        type: 'object',
-        properties: {
-            username: { type: 'string' },
-            email: { type: 'string' },
-            password: { type: 'string' },
-            phone: { type: 'string' },
-            getAlerted: { type: 'boolean' },
-            keyWords: { type: 'string' }
-        }
-    },
-    response: {
-        200: {
-            description: 'Updated user infos',
-            type: 'object',
-            properties: {
-                user: userSchema
-            }
-        },
-        401: {
-            description: 'Unauthorized',
-            type: 'object',
-            properties: {
-                error: { type: 'string' }
-            }
-        }
+async function addUserFavLocation(request : FastifyRequest, reply : FastifyReply) {
+    try {
+        const userId = (request as AuthenticatedRequest).user.id;
+        const { latitude, longitude, name, tag } = request.body as {
+            latitude: number;
+            longitude: number;
+            name: string;
+            tag?: string; // Optional tag for the location
+        };
+        const result = await UserService.addUserFavLocation(
+            userId, latitude, longitude, name, tag
+        );
+        reply.send(result);
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
     }
-};
+}
+
+async function deleteUserFavLocation(request : FastifyRequest, reply : FastifyReply) {
+    try {
+        const userId = (request as AuthenticatedRequest).user.id;
+        const { name } = request.body as { name: string };
+        await UserService.deleteUserFavLocation(userId, name);
+        reply.send({ message: 'Location removed from favourites' });
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
+    }
+}
+
+async function toggleAcceptedNotificationType(request : FastifyRequest, reply : FastifyReply) {
+    try {
+        const userId = (request as AuthenticatedRequest).user.id;
+        const { type } = request.body as { type: string; };
+        const user = await UserService.toggleAcceptedNotificationType(userId, type);
+        reply.send({ user });
+    } catch (error : unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+       reply.code(statusCode).send({ error: message });
+    }
+}
 
 async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
     try {
@@ -311,11 +165,7 @@ async function clearCollection(request : FastifyRequest, reply : FastifyReply) {
     }
 }
 
-
-interface MyFastifyInstance extends FastifyInstance {
-    authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-    adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
-}
+ 
 export default async function userRoutes(server: MyFastifyInstance) {
     server.get('/users', { preValidation: [server.authenticate], schema : getUserSchema }, getUser);
     server.get('/users/notifications', { preValidation: [server.authenticate], schema : getUserNotificationsSchema }, getUserNotifications);
@@ -323,5 +173,18 @@ export default async function userRoutes(server: MyFastifyInstance) {
     server.post('/users/register', { schema : registerUserSchema }, registerUser);
     server.post('/users/login', { schema : loginUserSchema }, loginUser);
     server.post('/users/update', { preValidation: [server.authenticate], schema : updateUserSchema }, updateUser);
-    server.delete('/users/clear', { preValidation: [server.adminAuthenticate], schema : clearCollectionSchema }, clearCollection);
+    server.post('/users/location', { preValidation: [server.authenticate], schema : addUserFavLocationSchema }, addUserFavLocation);
+    server.delete('/users/location', { preValidation: [server.authenticate], schema : deleteUserFavLocationSchema }, deleteUserFavLocation);
+    server.put('/users/notifications/toggle', { preValidation: [server.authenticate], schema : toggleAcceptedNotificationTypeSchema }, toggleAcceptedNotificationType);
+    server.delete('/users/clear', { preValidation: [server.superAdminAuthenticate], schema : clearCollectionSchema }, clearCollection);
+    server.delete('/users/notifications/clear', { preValidation: [server.superAdminAuthenticate] }, async (request: FastifyRequest, reply: FastifyReply) => {
+        try {
+            await UserService.clearNotifications();
+            reply.send({ message: 'Notifications cleared' });
+        } catch (error: unknown) {
+            const statusCode = (error as any).statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
+        }
+    });
 }

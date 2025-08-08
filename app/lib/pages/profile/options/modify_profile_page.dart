@@ -31,10 +31,10 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
     final user = await userService.getUser(_token);
 
     setState(() {
-      _usernameController = TextEditingController(text: user['user']['username'] ?? '');
+      _usernameController = TextEditingController(text: user.username);
       _passwordController = TextEditingController(text: '');
-      _emailController = TextEditingController(text: user['user']['email'] ?? '');
-      _phoneController = TextEditingController(text: user['user']['phone'] ?? '');
+      _emailController = TextEditingController(text: user.email);
+      _phoneController = TextEditingController(text: user.phone ?? '');
       _isLoading = false;
     });
   }
@@ -105,7 +105,8 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : Container(
+          : SafeArea(child: 
+          Container(
         width: double.infinity,
         height: double.infinity,
         color: LinoColors.primary,
@@ -152,7 +153,7 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildTextField(TextEditingController controller, String hintText, IconData icon, {bool obscureText = false}) {
@@ -161,19 +162,19 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
       keyboardType: hintText == 'Phone' ? TextInputType.phone : TextInputType.text,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
+        hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.3)),
         filled: true,
         fillColor: LinoColors.secondary,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.0),
           borderSide: BorderSide.none,
         ),
-        prefixIcon: Icon(icon, color: Colors.black.withOpacity(0.5)),
+        prefixIcon: Icon(icon, color: Colors.black.withValues(alpha: 0.5)),
         suffixIcon: hintText == 'Password'
             ? IconButton(
           icon: Icon(
             _obscureText ? Icons.visibility_off : Icons.visibility,
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
           ),
           onPressed: _togglePasswordVisibility,
         )

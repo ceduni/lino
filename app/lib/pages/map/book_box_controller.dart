@@ -1,7 +1,9 @@
+import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/models/search_model.dart';
+import 'package:Lino_app/services/search_services.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../services/book_services.dart';
 
 
 class MapController extends GetxController {
@@ -27,7 +29,7 @@ class MapController extends GetxController {
 }
 
 class BookBoxController extends GetxController {
-  var bookBoxes = <Map<String, dynamic>>[].obs;
+  var bookBoxes = <ShortenedBookBox>[].obs;
   var userLocation = Rxn<Position>();
   var highlightedBookBoxId = RxnString();
   var sortBy = 'by location'.obs;
@@ -42,26 +44,19 @@ class BookBoxController extends GetxController {
   }
 
   Future<void> getBookBoxes() async {
-    var longitude = userLocation.value?.longitude;
-    var latitude = userLocation.value?.latitude;
+    double? longitude = userLocation.value?.longitude;
+    double? latitude = userLocation.value?.latitude;
 
-    var bbs = await BookService().searchBookboxes(
+    SearchModel<ShortenedBookBox> response = await SearchService().searchBookboxes(
       cls: sortBy.value,
       asc: isAscending.value ? true : false,
       longitude: sortBy.value == 'by location' ? longitude : null,
       latitude: sortBy.value == 'by location' ? latitude : null,
     );
 
-    bookBoxes.value = bbs['bookboxes'].map<Map<String, dynamic>>((bb) {
-      return {
-        'id': bb['id'],
-        'name': bb['name'],
-        'infoText': bb['infoText'],
-        'latitude': bb['latitude'].toDouble(),
-        'longitude': bb['longitude'].toDouble(),
-        'books': bb['books']
-      };
-    }).toList();
+    List<ShortenedBookBox> bbs = response.results;
+
+    bookBoxes.value = bbs;
   }
 
   Future<void> getUserLocation() async {
@@ -84,12 +79,21 @@ class BookBoxController extends GetxController {
 
     userLocation.value = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
+    
+    // Update map camera position to user's location
+    if (userLocation.value != null) {
+      mapController.moveToLocation(
+        userLocation.value!.latitude, 
+        userLocation.value!.longitude
+      );
+    }
+    
     await getBookBoxes();
   }
 
   void highlightBookBox(String bookBoxId) {
     highlightedBookBoxId.value = bookBoxId;
-    final index = bookBoxes.indexWhere((bb) => bb['id'] == bookBoxId);
+    final index = bookBoxes.indexWhere((bb) => bb.id == bookBoxId);
     if (index != -1) {
       final highlightedBookBox = bookBoxes.removeAt(index);
       bookBoxes.insert(0, highlightedBookBox);

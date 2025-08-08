@@ -40,6 +40,7 @@ export interface IRequest extends Document {
   bookTitle: string;
   timestamp: Date;
   customMessage?: string;
+  isSolved: boolean;
 }
 
 // Book service method types
@@ -56,7 +57,7 @@ export interface BookAddData {
 }
 
 export interface BookSearchQuery {
-  kw?: string;
+  q?: string;
   cls?: string;
   asc?: boolean;
 }

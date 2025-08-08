@@ -1,4 +1,6 @@
+import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/pages/floating_button/common/build_banner.dart';
+import 'package:Lino_app/services/book_exchange_services.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/services/bookbox_state_service.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BookConfirmDialog extends StatefulWidget {
-  final Future<Map<String, dynamic>> bookInfoFuture;
+  final Future<Book> bookInfoFuture;
   final String bookBoxId;
 
   const BookConfirmDialog({
@@ -22,7 +24,7 @@ class BookConfirmDialog extends StatefulWidget {
 
 class _BookConfirmDialogState extends State<BookConfirmDialog> {
   final BookService bookService = BookService();
-  late Map<String, dynamic> editableBookInfo;
+  late ModifiableBook editableBookInfo;
   bool isEditing = false;
   bool isLoading = false;
 
@@ -30,7 +32,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: FutureBuilder<Map<String, dynamic>>(
+      child: FutureBuilder<Book>(
         future: widget.bookInfoFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -41,7 +43,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
             return _buildNoDataDialog();
           }
 
-          editableBookInfo = snapshot.data!;
+          editableBookInfo = ModifiableBook.fromBook(snapshot.data!);
           return _buildDialogContent();
         },
       ),
@@ -75,9 +77,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
   }
 
   Widget _buildDialogContent() {
-    final List<String> authors = editableBookInfo['authors'] != null
-        ? List<String>.from(editableBookInfo['authors'])
-        : [];
+    final List<String> authors = editableBookInfo.authors;
 
     return SingleChildScrollView(
       child: Padding(
@@ -110,8 +110,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
         children: [
           Center(child: _buildBookCoverImage()),
           SizedBox(height: 8),
-          _buildInfoRow(
-              'Title', editableBookInfo['title'] ?? 'Unknown', 'title'),
+          _buildInfoRow('Title', editableBookInfo.title, 'title'),
           SizedBox(height: 8),
           _buildInfoRow('Author${authors.length > 1 ? 's' : ''}',
               authors.join(', '), 'authors'),
@@ -121,9 +120,9 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
   }
 
   Widget _buildBookCoverImage() {
-    return editableBookInfo['coverImage'] != null
+    return editableBookInfo.coverImage != null
         ? Image.network(
-      editableBookInfo['coverImage']!,
+      editableBookInfo.coverImage!,
       height: 150,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
@@ -133,7 +132,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
           color: Colors.grey,
           child: Center(
             child: Text(
-              editableBookInfo['title'] ?? 'No Image',
+              editableBookInfo.title,
               style: TextStyle(color: Colors.white),
             ),
           ),
@@ -144,9 +143,7 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
   }
 
   Widget _buildBookInfoContainer() {
-    final List<String> categories = editableBookInfo['categories'] != null
-        ? List<String>.from(editableBookInfo['categories'])
-        : [];
+    final List<String> categories = editableBookInfo.categories;
 
     return Container(
       decoration: BoxDecoration(
@@ -159,32 +156,32 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
         children: [
           _buildInfoRow(
               'Description',
-              editableBookInfo['description'] ?? 'No description available.',
+              editableBookInfo.description ?? 'No description available.',
               'description'),
           SizedBox(height: 8),
           _buildInfoRow(
-              'ISBN', editableBookInfo['isbn'] ?? 'No ISBN available', 'isbn'),
+              'ISBN', editableBookInfo.isbn ?? 'No ISBN available', 'isbn'),
           SizedBox(height: 8),
           _buildInfoRow(
               'Publisher',
-              editableBookInfo['publisher'] ?? 'No publisher available',
+              editableBookInfo.publisher ?? 'No publisher available',
               'publisher'),
           SizedBox(height: 8),
           _buildInfoRow(
               'Categories',
-              categories.isNotEmpty? categories.join(', ') :
+              categories.isNotEmpty ? categories.join(', ') :
                   'No categories available',
               'categories'),
           SizedBox(height: 8),
           _buildInfoRow(
               'Year',
-              editableBookInfo['parutionYear']?.toString() ??
+              editableBookInfo.parutionYear?.toString() ??
                   'No year available',
               'parutionYear'),
           SizedBox(height: 8),
           _buildInfoRow(
               'Pages',
-              editableBookInfo['pages']?.toString() ??
+              editableBookInfo.pages?.toString() ??
                   'No page count available',
               'pages'),
         ],
@@ -210,27 +207,27 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
     var token = prefs.getString('token');
 
     try {
-      print('Categories: ${editableBookInfo['categories']}');
-      final cat = List<String>.from(editableBookInfo['categories'] ?? []);
+      print('Categories: ${editableBookInfo.categories}');
+      final cat = List<String>.from(editableBookInfo.categories);
       if (cat.isEmpty) {
         cat.add('Unknown category');
       }
 
-      print('Authors: ${editableBookInfo['authors']}');
-      final authors = List<String>.from(editableBookInfo['authors'] ?? []);
+      print('Authors: ${editableBookInfo.authors}');
+      final authors = List<String>.from(editableBookInfo.authors);
 
       // Directly add the book to the bookbox
-      await BookService().addBookToBB(
+      await BookExchangeService().addBookToBB(
         widget.bookBoxId,
         token: token,
-        isbn: editableBookInfo['isbn'],
-        title: editableBookInfo['title'],
+        isbn: editableBookInfo.isbn,
+        title: editableBookInfo.title,
         authors: authors,
-        description: editableBookInfo['description'],
-        coverImage: editableBookInfo['coverImage'],
-        publisher: editableBookInfo['publisher'],
-        parutionYear: editableBookInfo['parutionYear'],
-        pages: editableBookInfo['pages'],
+        description: editableBookInfo.description,
+        coverImage: editableBookInfo.coverImage,
+        publisher: editableBookInfo.publisher,
+        parutionYear: editableBookInfo.parutionYear,
+        pages: editableBookInfo.pages,
         categories: cat,
       );
 
@@ -322,17 +319,28 @@ class _BookConfirmDialogState extends State<BookConfirmDialog> {
               child: Text('Save'),
               onPressed: () {
                 setState(() {
-                  if (key == 'authors' || key == 'categories') {
-                    // Handle list fields
-                    editableBookInfo[key] = controller.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-                  } else if (key == 'parutionYear' || key == 'pages') {
-                    // Handle integer fields
+                  if (key == 'authors') {
+                    editableBookInfo.authors = controller.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+                  } else if (key == 'categories') {
+                    editableBookInfo.categories = controller.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+                  } else if (key == 'parutionYear') {
                     final intValue = int.tryParse(controller.text.trim());
-                    editableBookInfo[key] = intValue;
-                  } else {
-                    // Handle string fields
+                    editableBookInfo.parutionYear = intValue;
+                  } else if (key == 'pages') {
+                    final intValue = int.tryParse(controller.text.trim());
+                    editableBookInfo.pages = intValue;
+                  } else if (key == 'title') {
                     final stringValue = controller.text.trim();
-                    editableBookInfo[key] = stringValue.isNotEmpty ? stringValue : null;
+                    editableBookInfo.title = stringValue.isNotEmpty ? stringValue : editableBookInfo.title;
+                  } else if (key == 'description') {
+                    final stringValue = controller.text.trim();
+                    editableBookInfo.description = stringValue.isNotEmpty ? stringValue : null;
+                  } else if (key == 'isbn') {
+                    final stringValue = controller.text.trim();
+                    editableBookInfo.isbn = stringValue.isNotEmpty ? stringValue : null;
+                  } else if (key == 'publisher') {
+                    final stringValue = controller.text.trim();
+                    editableBookInfo.publisher = stringValue.isNotEmpty ? stringValue : null;
                   }
                 });
                 Navigator.of(context).pop();

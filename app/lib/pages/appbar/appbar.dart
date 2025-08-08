@@ -1,4 +1,3 @@
-import 'package:Lino_app/pages/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/user_services.dart';
@@ -39,21 +38,18 @@ class _LinoAppBarState extends State<LinoAppBar> {
     try {
       final userService = UserService();
       final user = await userService.getUser(token);
-      if (user['user'] != null) {
-        // Initialize WebSocket connection here
-        webSocketService.connect(
-          webSocketUrl,
-          userId: user['user']['_id'],
-          onEvent: (event, data) async {
-            if (event == 'newNotification') {
-              await _fetchAndUpdateUnreadCount();
-            }
-          },
-        );
+      // Initialize WebSocket connection here
+      webSocketService.connect(
+        webSocketUrl,
+        userId: user.id,
+        onEvent: (event, data) async {
+          if (event == 'newNotification') {
+            await _fetchAndUpdateUnreadCount();
+          }
+        },
+      );
 
-        return true;
-      }
-      return false;
+      return true;
     } catch (e) {
       print('Error: $e'); // Debug statement
       return false;
@@ -77,7 +73,7 @@ class _LinoAppBarState extends State<LinoAppBar> {
     try {
       final userService = UserService();
       final notifications = await userService.getUserNotifications(token);
-      final count = notifications['notifications'].where((n) => !n['read']).length;
+      final count = notifications.where((n) => !n.isRead).length;
       print('Unread count from service: $count'); // Debug statement
       return count;
     } catch (e) {
@@ -100,42 +96,44 @@ class _LinoAppBarState extends State<LinoAppBar> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      if (!isLoggedIn) {
-                        Navigator.of(context).pushReplacementNamed('/login');
-                      } else {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ProfilePage(),
-                          ),
-                        );
-                      }
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isLoggedIn ? Icons.person : Icons.login,
-                          color: isLoggedIn ? Colors.white : Colors.red,
-                        ),
-                        SizedBox(height: 2), // Minimal space between icon and text
-                        Text(
-                          isLoggedIn ? 'Profile' : 'Log In',
-                          style: isLoggedIn ? TextStyle(color: Colors.white) : TextStyle(color: Colors.red),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 8.0),
+                //   child: GestureDetector(
+                //     onTap: () {
+                //       if (!isLoggedIn) {
+                //         Navigator.of(context).pushReplacementNamed('/login');
+                //       } else {
+                //         Navigator.of(context).push(
+                //           MaterialPageRoute(
+                //             builder: (context) => ProfilePage(),
+                //           ),
+                //         );
+                //       }
+                //     },
+                //     child: Column(
+                //       mainAxisSize: MainAxisSize.min,
+                //       
+                //       children: [
+                //         Icon(
+                //           isLoggedIn ? Icons.person : Icons.login,
+                //           color: isLoggedIn ? Colors.white : Colors.red,
+                //         ),
+                //         SizedBox(height: 2), // Minimal space between icon and text
+                //         Text(
+                //           isLoggedIn ? 'Profile' : 'Log In',
+                //           style: isLoggedIn ? TextStyle(color: Colors.white) : TextStyle(color: Colors.red),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6.0),
                     child: LinoSearchBar(sourcePage: widget.sourcePage),
                   ),
                 ),
+                
                 if (isLoggedIn)
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),

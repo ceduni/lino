@@ -1,3 +1,5 @@
+import 'package:Lino_app/models/search_model.dart';
+
 import '../utils/constants/api_constants.dart';
 import '../models/transaction_model.dart';
 import 'dart:convert';
@@ -7,11 +9,12 @@ import 'package:http/http.dart' as http;
 class TransactionServices {
   final String url = baseApiUrl;
 
-  Future<Map<String, dynamic>> getTransactions({
+  Future<SearchModel<Transaction>> searchTransactions({
     String? username,
-    String? bookTitle,
+    String? bookTitle, 
     String? bookboxId,
     int? limit,
+    int? page,
   }) async {
     // Make a GET request to the server
     // Send the token to the server
@@ -22,39 +25,40 @@ class TransactionServices {
     if (bookTitle != null) queryParameters['bookTitle'] = bookTitle;
     if (bookboxId != null) queryParameters['bookboxId'] = bookboxId;
     if (limit != null) queryParameters['limit'] = limit.toString();
-    final response = await http.get(
-      Uri.parse('$url/books/transactions').replace(queryParameters: queryParameters),
+    if (page != null) queryParameters['page'] = page.toString();
+    final r = await http.get(
+      Uri.parse('$url/search/transactions').replace(queryParameters: queryParameters),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
-
-    if (response.statusCode != 200) {
+    final response = jsonDecode(r.body);
+    if (r.statusCode != 200) {
       throw Exception('Failed to load transactions');
     }
 
-    return response.body.isNotEmpty ? jsonDecode(response.body) : {};
+    return SearchModel<Transaction>.fromJson(
+      response,
+      'transactions',
+      Transaction.fromJson,
+    );
   }
 
-  Future<Map<String, dynamic>> getUserTransactions(String username, {int? limit}) async {
-    return await getTransactions(username: username, limit: limit);
-  }
-
-  Future<List<Transaction>> getUserTransactionsList(String username, {int? limit}) async {
+  Future<SearchModel<Transaction>> getUserTransactions(String username, {int? limit}) async {
     try {
-      final response = await getUserTransactions(username, limit: limit);
-      if (response['transactions'] != null) {
-        List<dynamic> transactionData = response['transactions'];
-        return transactionData.map((json) => Transaction.fromJson(json)).toList();
-      }
-      return [];
+      return await searchTransactions(username: username, limit: limit);
     } catch (e) {
       print('Error fetching user transactions: $e');
-      return [];
+      rethrow;
     }
   }
 
-  Future<Map<String, dynamic>> getBookBoxTransactions(String bookId, {int? limit}) async {
-    return await getTransactions(bookboxId: bookId, limit: limit);
+  Future<SearchModel<Transaction>> getBookBoxTransactions(String bookboxId, {int? limit}) async {
+    try {
+      return await searchTransactions(bookboxId: bookboxId, limit: limit);
+    } catch (e) {
+      print('Error fetching book box transactions: $e');
+      rethrow;
+    }
   }
 }

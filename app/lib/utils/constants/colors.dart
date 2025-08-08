@@ -19,7 +19,7 @@ class LinoColors {
 
   // Background Container colors
   static const Color lightContainer = Color(0xFFF6F6F6);
-  // static Color darkContainer = AppColors.white.withOpacity(0.1);
+  // static Color darkContainer = AppColors.white.withValues(alpha: 0.1);
 
   // Button colors
   static const Color buttonPrimary = Color(0xFF394672);

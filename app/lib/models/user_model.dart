@@ -1,26 +1,30 @@
 class User {
+  final String id;
   final String username;
-  final String password;
   final String email;
-  final String? phone;
-  final double requestNotificationRadius;
-  final List<String> notificationKeyWords;
+  final String? phone; 
+  final List<String> favouriteGenres;
   final int numSavedBooks;
-  final List<Notification> notifications;
   final List<String> followedBookboxes;
+  final List<FavouriteLocation> favouriteLocations;
   final DateTime createdAt;
+  final int numIssuesReported; 
+  final UserNotificationSettings notificationSettings;
+  final bool isAdmin; 
 
   User({
+    required this.id,
     required this.username,
-    required this.password, 
     required this.email,
     this.phone,
-    this.requestNotificationRadius = 5.0,
-    required this.notificationKeyWords,
+    required this.favouriteGenres,
     this.numSavedBooks = 0,
-    required this.notifications,
     required this.followedBookboxes,
+    required this.favouriteLocations,
     required this.createdAt,
+    required this.notificationSettings,
+    this.numIssuesReported = 0, 
+    required this.isAdmin,
   });
 
   // Calculate ecological impact based on numSavedBooks
@@ -32,45 +36,58 @@ class User {
     );
   }
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    var notificationKeyWordsList = json['notificationKeyWords'] as List? ?? [];
-    List<String> notificationKeyWords = notificationKeyWordsList.cast<String>();
 
-    var notificationsList = json['notifications'] as List? ?? [];
-    List<Notification> notifications = notificationsList.map((i) => Notification.fromJson(i)).toList();
+  factory User.fromJson(Map<String, dynamic> json) {
+    var favouriteGenresList = json['favouriteGenres'] as List? ?? [];
+    List<String> favouriteGenres = favouriteGenresList.cast<String>();
 
     var followedBookboxesList = json['followedBookboxes'] as List? ?? [];
     List<String> followedBookboxes = followedBookboxesList.cast<String>();
 
+    var favouriteLocationsList = json['favouriteLocations'] as List? ?? [];
+    List<FavouriteLocation> favouriteLocations = favouriteLocationsList
+        .map((location) => FavouriteLocation.fromJson(location))
+        .toList();
+
+    UserNotificationSettings notificationSettings = UserNotificationSettings
+        .fromJson(json['notificationSettings'] ?? {});
+
     return User(
+      id: json['_id'],
       username: json['username'],
-      password: json['password'],
       email: json['email'],
       phone: json['phone'],
-      requestNotificationRadius: (json['requestNotificationRadius'] ?? 5.0).toDouble(),
-      notificationKeyWords: notificationKeyWords,
+      favouriteGenres: favouriteGenres,
       numSavedBooks: json['numSavedBooks'] ?? 0,
-      notifications: notifications,
       followedBookboxes: followedBookboxes,
+      favouriteLocations: favouriteLocations,
       createdAt: DateTime.parse(json['createdAt']),
+      notificationSettings: notificationSettings,
+      numIssuesReported: json['numIssuesReported'] ?? 0,
+      isAdmin: json['isAdmin'] ?? false, 
     );
   }
 } 
 
-class Notification {
-  final DateTime timestamp;
-  final String title;
-  final String content;
-  final bool read;
+class FavouriteLocation {
+  final double latitude;
+  final double longitude;
+  final String name; // Name of the location
+  final String boroughId;
 
-  Notification({required this.timestamp, required this.title, required this.content, required this.read});
+  FavouriteLocation({
+    required this.latitude,
+    required this.longitude,
+    required this.name,
+    required this.boroughId,
+  });
 
-  factory Notification.fromJson(Map<String, dynamic> json) {
-    return Notification(
-      timestamp: DateTime.parse(json['timestamp']),
-      title: json['title'],
-      content: json['content'],
-      read: json['read'],
+  factory FavouriteLocation.fromJson(Map<String, dynamic> json) {
+    return FavouriteLocation(
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      name: json['name'] as String? ?? 'Unknown Location',
+      boroughId: json['boroughId'] as String? ?? '',
     );
   }
 }
@@ -87,6 +104,23 @@ class EcologicalImpact {
       carbonSavings: json['carbonSavings'].toDouble(),
       savedWater: json['savedWater'].toDouble(),
       savedTrees: json['savedTrees'].toDouble(),
+    );
+  }
+}
+
+class UserNotificationSettings {
+  final bool addedBook;
+  final bool bookRequested;
+
+  UserNotificationSettings({
+    this.addedBook = true,
+    this.bookRequested = true,
+  });
+
+  factory UserNotificationSettings.fromJson(Map<String, dynamic> json) {
+    return UserNotificationSettings(
+      addedBook: json['addedBook'] ?? true,
+      bookRequested: json['bookRequested'] ?? true,
     );
   }
 }

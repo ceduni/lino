@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'keyword_input_page.dart';
+import 'favourite_genres_input_page.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -29,8 +29,14 @@ class _RegisterPageState extends State<RegisterPage> {
     final email = _emailController.text;
     final password = _passwordController.text;
 
-    if (username.length < 4 || username.length > 16) {
-      _showError('Username must be between 4 and 16 characters.');
+    if (username.length < 3 || username.length > 16) {
+      _showError('Username must be between 3 and 16 characters long.');
+      return;
+    } 
+
+    // No special characters, nor underscores allowed in username
+    if (!RegExp(r'^[a-zA-Z0-9 ]+$').hasMatch(username)) {
+      _showError('Username can only contain letters and numbers.');
       return;
     }
 
@@ -152,19 +158,19 @@ class _RegisterPageState extends State<RegisterPage> {
       controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
+        hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.3)),
         filled: true,
         fillColor: Color(0xFFE0F7FA),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.0),
           borderSide: BorderSide.none,
         ),
-        prefixIcon: Icon(icon, color: Colors.black.withOpacity(0.5)),
+        prefixIcon: Icon(icon, color: Colors.black.withValues(alpha: 0.5)),
         suffixIcon: hintText == 'Password'
             ? IconButton(
           icon: Icon(
             _obscureText ? Icons.visibility_off : Icons.visibility,
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
           ),
           onPressed: _togglePasswordVisibility,
         )
@@ -224,7 +230,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     Future.delayed(Duration(seconds: 1), () {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => KeywordInputPage(token: widget.token, prefs: widget.prefs)),
+        MaterialPageRoute(builder: (context) => FavouriteGenresInputPage(token: widget.token, prefs: widget.prefs)),
             (route) => false, // Remove all previous routes
       );
     });

@@ -18,61 +18,53 @@ Lino est un projet visant à **bonifier l'initiative des boîtes à livres et en
 
 ## Fonctionnalités📱
 
-### Public
+### Utilisateur non-connecté:
 
-- [ ] Localiser les boîtes à livres sur une carte (avec preview) `phase 1`
-- [ ] Voir la liste des boites à livres à proximité `phase 1`
-- [ ] Voir les livres contenus dans les boîtes à livre `phase 1`
-- [ ] Voir les livres contenus dans une boîte à livre spécifique `phase 1`
-- [ ] Chercher des livres disponibles dans les boîtes à livres selon différents critères et mots clés `phase 2`
-- [ ] Ajouter un nouveau livre à une boîte à livre et à la base de données, générer un code QR et le coller su2 le livre `phase 2`
-- [ ] Retirer un livre d'une boîte à livres en scannant son code QR `phase 2`
+- [x] Créer un compte
+- [x] Récupérer et filtrer la liste des boîtes à livres
+- [ ] Chercher les boîtes à livres par livre
+- [x] Chercher les boîtes à proximité d'une adresse (rayon)
+- [x] Chercher les boîtes à livre par arrondissement
+- [x] Voir le contenu des boîtes à livre
+- [x] Déposer un livre dans une boîte à livre
+- [x] Récupérer un livre dans une boîte à livre
 
-### Avec compte
+### Utilisateur connecté
 
-- [ ] Créer une alerte pour les utilisateurs pour signaler qu'on souhaite avoir un livre avec un titre spécifique dans une des boîtes à livres
-- [ ] Recevoir une notification quand une action est faite sur un livre qu'on suit ou qu'on a mis en favoris
-- [ ] Consulter l'impact écologique total de nos transactions `phase 3`
-- [ ] Créer des threads de discussion liés à un titre de livre en particulier `phase 2`
-- [ ] Envoyer et répondre à des messages dans des threads `phase 2`
-- [ ] Réagir à des messages `phase 2`
+- [x] Émettre une requête de livres
+- [x] Annuler une requête de livres
+- [x] Marquer une requête comme résolu
+- [x] Voir historique de requête 
+- [x] Recevoir une notification d'ajout de livres
+- [x] Recevoir une notification de requête
+- [ ] Signaler un problème associé à une boîte à livres
+- [x] Voir et modifier mon profil et mes préférences de livre (genre)
+- [x] Se désabonner d'une boite à livre
+- [x] S'abonner à une boite à livre
+- [ ] Modifier mes préférences de notification
+- [x] Supprimer mon compte
 
-## 📅 Échéancier
+### Type de notifications
 
-> Début du projet: 6 mai 2024  
-> Fin du projet: 16 aout 2024
+#### Ajout d'un livre
 
-Le développement du projet sera divisé en plusieurs phases:
+1. Ajout dans une bookbox suivi par l'utilisateur
+2. Ajout dans une bookbox a proximité d'un endroit favori
+3. Ajout dans une bookbox favori
 
-### Phase 1: Élaboration des exigences
+#### Nouvelle requête
 
-- Semaine 1
-- Semaine 2
+1. Envoie à tout utilisateur qui suit les boites à livre à proximité des endroits favoris de l'utilisateur
+2. Envoie à tout utilisateur qui a le même endroit favori que l'utilisateur
 
-### Phase 2: Prototypage et conception
+### Administrateur
 
-- Semaine 3
-- Semaine 4
-- Semaine 5
-- Semaine 6
-
-### Phase 3: Développement 
-
-- Semaine 7
-- Semaine 8
-- Semaine 9
-- Semaine 10
-- Semaine 11
-- Semaine 12
-
-### Phase 4: Tests & Rapports
-
-- Semaine 13
-- Semaine 14
-- Semaine 15
-- Semaine 16
-
-Le suivi du projet est présenté dans le fichier [**TIMELINE**](TIMELINE.md).
+- [x] Créer un compte admin
+- [x] Enregistrer une boîte à livre
+- [x] Désactiver une boîte à livre
+- [x] Générer un code QR
+- [x] Supprimer une boîte à livre
+- [x] Voir les statistiques d'utilisation d'une boîte à livre
 
 
 ## 🌐 Infrastructure

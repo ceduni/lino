@@ -1,14 +1,12 @@
-import Thread from "../models/thread.model";
-import UserService, {notifyUser} from "./user.service";
-import User from "../models/user.model";
-import BookService from "./book.service";
-import {newErr} from "./utilities";
+import { Thread } from "../models";
+import { UserService, BookService } from ".";
+import { newErr } from "../utilities/utilities";
 import { 
+    AuthenticatedRequest,
     ThreadCreateData, 
     MessageCreateData, 
     ReactionData
-} from '../types/thread.types';
-import { AuthenticatedRequest } from '../types/common.types';
+} from '../types';
 
 const ThreadService = {
     async createThread(request: AuthenticatedRequest & { body: ThreadCreateData }) {
@@ -66,19 +64,19 @@ const ThreadService = {
         await thread.save();
 
         // Notify the user that someone has responded to their message
-        if (respondsTo != null) {
-            const parentMessage = thread.messages.id(respondsTo);
-            if (!parentMessage) {
-                throw newErr(404, 'Parent message not found');
-            }
-            if (parentMessage.username !== username) {
-                const userParent = await User.findOne({ username: parentMessage.username });
-                if (!userParent) {
-                    throw newErr(404, 'User not found');
-                }
-                await notifyUser(userParent.id, `${username} in ${thread.title}`, message.content);
-            }
-        }
+        // if (respondsTo != null) {
+        //     const parentMessage = thread.messages.id(respondsTo);
+        //     if (!parentMessage) {
+        //         throw newErr(404, 'Parent message not found');
+        //     }
+        //     if (parentMessage.username !== username) {
+        //         const userParent = await User.findOne({ username: parentMessage.username });
+        //         if (!userParent) {
+        //             throw newErr(404, 'User not found');
+        //         }
+        //         await notifyUser(userParent.id, `${username} in ${thread.title}`, message.content);
+        //     }
+        // }
 
         // Get the _id of the newly created message
         const messageId = thread.messages[thread.messages.length - 1].id;
@@ -118,44 +116,6 @@ const ThreadService = {
         } else {
             return null;
         }
-    },
-
-
-    async searchThreads(request: { query: { q?: string; cls?: string; asc?: boolean } }) {
-        const query = request.query.q;
-        let threads = await Thread.find();
-
-        if (query) {
-            // Filter using regex for more flexibility
-            const regex = new RegExp(query, 'i');
-            threads = threads.filter(thread =>
-                regex.test(thread.bookTitle) || regex.test(thread.title) || regex.test(thread.username)
-            );
-        }
-
-        // classify : ['by recent activity', 'by number of messages', 'by creation date']
-        let classify = request.query.cls || 'by recent activity';
-        const asc = request.query.asc; // Boolean
-
-        if (classify === 'by recent activity') {
-            threads.sort((a, b) => {
-                const aDate = a.messages.length > 0 ? a.messages[a.messages.length - 1].timestamp.getTime() : 0;
-                const bDate = b.messages.length > 0 ? b.messages[b.messages.length - 1].timestamp.getTime() : 0;
-                return asc ? aDate - bDate : bDate - aDate;
-            });
-        } else if (classify === 'by number of messages') {
-            threads.sort((a, b) => {
-                return asc ? a.messages.length - b.messages.length : b.messages.length - a.messages.length;
-            });
-        } else if (classify === 'by creation date') {
-            threads.sort((a, b) => { // if asc, most recent first
-                const aDate = a.timestamp.getTime();
-                const bDate = b.timestamp.getTime();
-                return asc ? aDate - bDate : bDate - aDate;
-            });
-        }
-
-        return { threads: threads };
     },
 
     async clearCollection() {

@@ -1,4 +1,5 @@
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/get.dart';
@@ -6,12 +7,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../bookbox/book_box_screen.dart';
 import 'book_box_controller.dart';
+import '../../controllers/global_state_controller.dart';
 
 class MapScreen extends HookWidget {
   MapScreen({super.key});
-
+  final GlobalStateController globalState = Get.put(GlobalStateController());
   final BookBoxController bookBoxController = Get.put(BookBoxController());
 
   Future<void> _checkLocationPermission(BuildContext context) async {
@@ -38,7 +39,21 @@ class MapScreen extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Book Boxes'),
+        title: Obx(() {
+          // final selectedBookBox = globalState.currentSelectedBookBox.value;
+          
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Book Boxes'),
+              //if (selectedBookBox != null)
+                //Text(
+                  //'Selected bookbox : ${selectedBookBox['name']}',
+                  //style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+                //),
+            ],
+          );
+        }),
         actions: [
           Row(
             children: [
@@ -82,18 +97,27 @@ class MapScreen extends HookWidget {
             flex: 1,
             child: Obx(() {
               final bboxes = bookBoxController.bookBoxes;
+              // final selectedBookBox = globalState.currentSelectedBookBox.value;
+              
               List<Marker> markers = bboxes
-                  .map((bbox) => Marker(
-                markerId: MarkerId(bbox['id']),
-                position: LatLng(bbox['latitude'], bbox['longitude']),
-                infoWindow: InfoWindow(
-                  title: bbox['name'],
-                  snippet: bbox['infoText'],
-                ),
-                onTap: () {
-                  bookBoxController.highlightBookBox(bbox['id']);
-                },
-              ))
+                  .map((bbox) {
+                    // final isSelected = selectedBookBox != null && bbox['id'] == selectedBookBox['id'];
+                    
+                    return Marker(
+                      markerId: MarkerId(bbox.id),
+                      position: LatLng(bbox.latitude, bbox.longitude),
+                      infoWindow: InfoWindow(
+                        title: bbox.name,
+                        snippet: bbox.infoText ?? '',
+                      ),
+                      // icon: isSelected 
+                          //? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
+                      icon : BitmapDescriptor.defaultMarker,
+                      onTap: () {
+                        bookBoxController.highlightBookBox(bbox.id);
+                      },
+                    );
+                  })
                   .toList();
 
               return GoogleMap(
@@ -123,52 +147,60 @@ class MapScreen extends HookWidget {
                     distance = Geolocator.distanceBetween(
                       userLocation.latitude,
                       userLocation.longitude,
-                      bbox['latitude'],
-                      bbox['longitude'],
+                      bbox.latitude,
+                      bbox.longitude,
                     );
                   }
 
-                  return Opacity(
-                    opacity: highlightedBookBoxId == bbox['id'] ||
-                        highlightedBookBoxId == null
-                        ? 1.0
-                        : 0.5,
-                    child: Container(
-                      margin:
-                      EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                      decoration: BoxDecoration(
-                        color: LinoColors.secondary,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: ListTile(
-                        title: Text(
-                          bbox['name'],
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.white),
+                  return Obx(() {
+                    // final selectedBookBox = globalState.currentSelectedBookBox.value;
+                    // final isSelected = selectedBookBox != null && bbox['id'] == selectedBookBox['id'];
+                    
+                    return Opacity(
+                      opacity: highlightedBookBoxId == bbox.id ||
+                          highlightedBookBoxId == null
+                          ? 1.0
+                          : 0.5,
+                      child: Container(
+                        margin:
+                        EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                        decoration: BoxDecoration(
+                          color: LinoColors.secondary,// isSelected ? Colors.green : LinoColors.secondary,
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (distance != null)
+                        child: ListTile(
+                          title: Text(
+                            bbox.name,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (distance != null)
+                                Text(
+                                  '${(distance / 1000).toStringAsFixed(2)} km away',
+                                  style: TextStyle(color: Colors.white70),
+                                ),
                               Text(
-                                '${(distance / 1000).toStringAsFixed(2)} km away',
+                                'Books: ${bbox.booksCount}',
                                 style: TextStyle(color: Colors.white70),
                               ),
-                            Text(
-                              'Books: ${bbox['books'].length}',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                          ],
+                            ],
+                          ),
+                          onTap: () {
+                            Get.toNamed(
+                              AppRoutes.bookbox,
+                              arguments: {
+                                'bookboxId': bbox.id,
+                                'canInteract': false,
+                              },
+                            );
+                          },
                         ),
-                        onTap: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) =>
-                                  BookBoxScreen(bookBoxId: bbox['id']));
-                        },
                       ),
-                    ),
-                  );
+                    );
+                  });
                 },
               );
             }),

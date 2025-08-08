@@ -12,7 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.clients = exports.server = void 0;
 exports.broadcastToUser = broadcastToUser;
 exports.broadcastMessage = broadcastMessage;
-const utilities_1 = require("./services/utilities");
+const utilities_1 = require("./utilities/utilities");
+const middlewares_1 = require("./middlewares");
+const routes_1 = require("./routes");
 const Fastify = require('fastify');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -21,14 +23,50 @@ const fastifyJwt = require('@fastify/jwt');
 const fastifyCors = require('@fastify/cors');
 const fastifySwagger = require('@fastify/swagger');
 const fastifySwaggerUi = require('@fastify/swagger-ui');
-const bookRoutes = require('./routes/book.route');
-const bookboxRoutes = require('./routes/bookbox.route');
-const userRoutes = require('./routes/user.route');
-const threadRoutes = require('./routes/thread.route');
 const fastifyWebSocket = require('@fastify/websocket');
 dotenv.config({ path: path.join(__dirname, '../.env') });
-const server = Fastify({ logger: { level: 'error' } });
+const getLogLevel = () => {
+    switch (process.env.NODE_ENV) {
+        case 'prod': return 'error'; // Deployment
+        case 'dev': return 'info'; // Local dev with npm run dev
+        case 'test': return 'silent'; // Jest tests
+        default: return 'info'; // Fallback
+    }
+};
+const server = Fastify({ logger: { level: getLogLevel() } });
 exports.server = server;
+server.setErrorHandler((error, request, reply) => {
+    // Handle validation errors (schema failures)
+    if (error.validation) {
+        const validationErrors = error.validation.map((err) => {
+            const field = err.instancePath ? err.instancePath.replace('/', '') : err.schemaPath;
+            return `${field}: ${err.message}`;
+        });
+        reply.code(400).send({
+            error: 'Validation failed',
+            details: validationErrors,
+            message: `Invalid request data: ${validationErrors.join(', ')}`
+        });
+        return;
+    }
+    // Handle JWT errors
+    if (error.code === 'FST_JWT_NO_AUTHORIZATION_IN_HEADER') {
+        reply.code(401).send({ error: 'Missing authorization header' });
+        return;
+    }
+    if (error.code === 'FST_JWT_AUTHORIZATION_TOKEN_INVALID') {
+        reply.code(401).send({ error: 'Invalid or expired token' });
+        return;
+    }
+    // Handle other known error codes
+    const statusCode = error.statusCode || 500;
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    // Log server errors but not client errors
+    if (statusCode >= 500) {
+        console.error('Server Error:', error);
+    }
+    reply.code(statusCode).send({ error: message });
+});
 server.register(fastifyCors, {
     origin: true,
 });
@@ -90,61 +128,12 @@ server.register(function (server) {
 });
 // Register JWT plugin
 server.register(fastifyJwt, { secret: process.env.JWT_SECRET_KEY });
-// Authentication hooks
-server.decorate('authenticate', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield request.jwtVerify();
-    }
-    catch (err) {
-        reply.send(err); // will send an error 401
-    }
-}));
-// Book manipulation token validation preValidation
-server.decorate('bookManipAuth', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const bookManipToken = request.headers['bm_token']; // Get custom header
-        const predefinedToken = 'LinoCanIAddOrRemoveBooksPlsThanksLmao';
-        if (bookManipToken !== predefinedToken) {
-            console.log('Invalid book manipulation token:', bookManipToken);
-            return reply.status(401).send({ error: 'Unauthorized' });
-        }
-        console.log('Valid book manipulation token');
-    }
-    catch (error) {
-        return reply.status(401).send({ error: 'Unauthorized' });
-    }
-}));
-server.decorate('optionalAuthenticate', (request) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const authHeader = request.headers.authorization;
-        if (authHeader) {
-            request.user = yield server.jwt.verify(authHeader.split(' ')[1]);
-        }
-        else {
-            request.user = null;
-        }
-    }
-    catch (error) {
-        request.user = null;
-    }
-}));
-server.decorate('adminAuthenticate', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const authHeader = request.headers.authorization;
-        if (!authHeader) {
-            return reply.status(401).send({ error: 'Unauthorized' });
-        }
-        const token = authHeader.split(' ')[1];
-        const user = yield server.jwt.verify(token);
-        if (user.username !== process.env.ADMIN_USERNAME) {
-            console.log('Non-user tried to access admin route: ', user.username);
-            reply.status(401).send({ error: 'Unauthorized' });
-        }
-    }
-    catch (error) {
-        reply.status(401).send({ error: 'Unauthorized' });
-    }
-}));
+// Register authentication middleware as decorators
+server.decorate('authenticate', middlewares_1.authenticate);
+server.decorate('bookManipAuth', middlewares_1.bookManipAuth);
+server.decorate('optionalAuthenticate', (request) => (0, middlewares_1.optionalAuthenticate)(request, server));
+server.decorate('adminAuthenticate', (request, reply) => (0, middlewares_1.adminAuthenticate)(request, reply, server));
+server.decorate('superAdminAuthenticate', (request, reply) => (0, middlewares_1.superAdminAuthenticate)(request, reply, server));
 server.register(fastifySwagger, {
     swagger: {
         info: {
@@ -180,6 +169,14 @@ server.register(fastifySwagger, {
             {
                 name: 'messages',
                 description: 'Operations related to messages (e.g. add, react)'
+            },
+            {
+                name: 'transactions',
+                description: 'Operations related to transactions (e.g. create custom transaction)'
+            },
+            {
+                name: 'admin',
+                description: 'Admin-only operations'
             }
         ]
     },
@@ -189,10 +186,16 @@ server.register(fastifySwaggerUi, {
     routePrefix: '/docs',
 });
 // Register routes
-server.register(bookRoutes);
-server.register(bookboxRoutes);
-server.register(userRoutes);
-server.register(threadRoutes);
+server.register(routes_1.bookRoutes);
+server.register(routes_1.bookboxRoutes);
+server.register(routes_1.requestRoutes);
+server.register(routes_1.userRoutes);
+// server.register(threadRoutes); // Uncomment if you want to enable thread routes
+server.register(routes_1.transactionRoutes);
+server.register(routes_1.serviceRoutes);
+server.register(routes_1.adminRoutes);
+server.register(routes_1.searchRoutes);
+server.register(routes_1.issueRoutes);
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log('Starting server initialization...');

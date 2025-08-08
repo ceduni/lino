@@ -1,23 +1,21 @@
-import User from '../models/user.model';
+import { User } from '../models';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { newErr } from "./utilities";
-import {broadcastToUser} from '../index';
-import { 
-    UserRegistrationData, 
-    UserLoginCredentials, 
-    IUser,
-    INotification 
-} from '../types/user.types';
-import { AuthenticatedRequest } from '../types/common.types';
+import { newErr } from "../utilities/utilities";
+import { NotificationService } from '.';
+import { getBoroughId } from '../utilities/borough.id.generator';
 
 dotenv.config();
 
 const UserService = {
     // User service to register a new user's account
-    async registerUser(userData: UserRegistrationData) {
-        const { username, email, phone, password } = userData;
+    async registerUser(
+        username: string,
+        email: string,
+        password: string,
+        phone?: string,
+    ) {
         if (username === 'guest') {
             throw newErr(400, 'Username not allowed');
         }
@@ -51,63 +49,35 @@ const UserService = {
                 password: hashedPassword
             });
         await user.save();
-        return {username: user.username, password: user.password};
+
+        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY as string);
+
+        return {username: user.username, email: user.email, token: token };
     },
 
     // User service to log in a user if they exist (can log with either a username or an email)
-    async loginUser(credentials: UserLoginCredentials) {
-        const identifier = credentials.identifier;
+    async loginUser(identifier: string, password: string) {
         const user = await User.findOne({ $or: [{ username : identifier }, { email : identifier }]});
         if (!user) {
             throw newErr(400, 'Invalid username or email');
         }
-        const validPassword = await argon2.verify(user.password, credentials.password);
+        const validPassword = await argon2.verify(user.password, password);
         if (!validPassword) {
             throw newErr(400, 'Invalid password');
         }
         // User authenticated successfully, generate tokens
         const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY as string);
 
-        return { user: user, token: token };
+        return { username: user.username, email: user.email, token: token };
     },
 
-    async getUserNotifications(request: AuthenticatedRequest) {
-        const userId = request.user.id;
-        const user = await User.findById(userId);
-        if (!user) {
-            throw newErr(404, 'User not found');
-        }
-
-        // Calculate the date 30 days ago
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-        // Filter out notifications older than 30 days
-        const filteredNotifications = user.notifications.filter(notification => {
-            const notificationDate = new Date(notification.timestamp);
-            return notificationDate >= thirtyDaysAgo;
-        });
-        user.notifications = filteredNotifications as any;
-
-        // Save the updated user document
-        await user.save();
-        return user.notifications;
+    async getUserNotifications(id: string) {
+        return await NotificationService.getUserNotifications(id);
     },
 
-    async readNotification(request: AuthenticatedRequest & { body: { notificationId: string } }) {
-        const userId = request.user.id;
-        const user = await User.findById(userId);
-        if (!user) {
-            throw newErr(404, 'User not found');
-        }
-        const notificationId = request.body.notificationId;
-        const notification = user.notifications.id(notificationId);
-        if (!notification) {
-            throw newErr(404, 'Notification not found');
-        }
-        notification.read = true;
-        await user.save();
-        return user.notifications;
+
+    async readNotification(id: string, notificationId: string) {
+        return await NotificationService.readNotification(id, notificationId);
     },
 
 
@@ -118,76 +88,150 @@ const UserService = {
         }
         return user.username;
     },
-    async parseKeyWords(text: string) {
-        return text.split(',');
-    },
 
-    async updateUser(request: AuthenticatedRequest & { 
-        body: { 
-            username?: string; 
-            password?: string; 
-            email?: string; 
-            phone?: string; 
-            keyWords?: string; 
-        } 
-    }) {
-        const user = await User.findById(request.user.id);
+    
+    async getUser(id: string) {
+        const user = await User.findById(id);
         if (!user) {
             throw newErr(404, 'User not found');
         }
-        if (request.body.username) {
-            const check = await User.findOne({ username: request.body.username });
+        return user;
+    },
+
+
+    async updateUser(
+        id: string,
+        username?: string,
+        password?: string,
+        email?: string,
+        phone?: string,
+        favouriteGenres?: string[]
+    ) {
+        const user = await User.findById(id);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }
+        if (username) {
+            const check = await User.findOne({ username: username });
             if (check && check.username !== user.username) {
                 throw newErr(400, 'Username already taken');
             }
-            user.username = request.body.username;
+            user.username = username;
         }
-        if (request.body.password) {
-            user.password = await argon2.hash(request.body.password);
+        if (password) {
+            user.password = await argon2.hash(password);
         }
-        if (request.body.email && request.body.email !== user.email) {
-            const check = await User.findOne({ email: request.body.email });
+        if (email && email !== user.email) {
+            const check = await User.findOne({ email: email });
             if (check) {
                 throw newErr(400, 'Email already taken');
             }
-            user.email = request.body.email;
+            user.email = email;
         }
-        if (request.body.phone) {
-            user.phone = request.body.phone;
+        if (phone) {
+            user.phone = phone;
         }
-        if (request.body.keyWords) {
-            user.notificationKeyWords = await this.parseKeyWords(request.body.keyWords);
+        if (favouriteGenres) {
+            user.favouriteGenres = favouriteGenres;
         }
         await user.save();
         return user;
     },
 
+
+    async addUserFavLocation(
+        id: string,
+        latitude: number,
+        longitude: number,
+        name: string,
+        tag?: string    
+    ) {
+        const user = await User.findById(id);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }
+
+        if (!latitude || !longitude || !name) {
+            throw newErr(400, 'Latitude, longitude and name are required');
+        }
+
+        // Get borough ID from coordinates
+        const boroughId = await getBoroughId(latitude, longitude);
+        user.favouriteLocations.push({
+            latitude: latitude,
+            longitude: longitude,
+            name: name,
+            boroughId: boroughId,
+            tag: tag // Optional tag for the location
+        });
+        
+        await user.save();
+        return { 
+            latitude: latitude, 
+            longitude: longitude, 
+            boroughId: boroughId, 
+            name: name,
+            tag: tag // Return the tag if provided
+        };
+    },
+
+
+    async deleteUserFavLocation(
+        id: string,
+        name: string
+    ) {
+        const user = await User.findById(id);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }   
+        if (!name) {
+            throw newErr(400, 'Name is required');
+        }
+        // Find the index of the location to remove
+        const index = user.favouriteLocations.findIndex(location => location.name === name);
+        if (index === -1) {
+            throw newErr(404, 'Location not found in favourites');
+        }
+        // Remove the location from the array
+        user.favouriteLocations.splice(index, 1);   
+        await user.save();
+    },
+
+
+    async toggleAcceptedNotificationType(
+        id: string,
+        type: string    ) {
+        const user = await User.findById(id);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }
+        if (!user.notificationSettings) {
+            user.notificationSettings = {
+                addedBook: true,
+                bookRequested: true
+            };
+        }
+        if (type === 'addedBook') {
+            user.notificationSettings.addedBook = !user.notificationSettings.addedBook;
+        } else if (type === 'bookRequested') {
+            user.notificationSettings.bookRequested = !user.notificationSettings.bookRequested;
+        } else {
+            throw newErr(400, 'Invalid notification type');
+        }
+        await user.save();
+        return user.notificationSettings;
+    },
+
+
     async clearCollection() {
         await User.deleteMany({ username: { $ne: process.env.ADMIN_USERNAME } });
+    },
+
+
+    async clearNotifications() {
+        await NotificationService.clearCollection();
+        return { message: 'Notifications cleared' };
     }
 };
-
-export async function notifyUser(userId: string, title: string, message: string) {
-    let user = await User.findById(userId);
-    if (!user) {
-        throw newErr(404, 'User not found');
-    }
-    const notification: INotification = { title: title, content: message, timestamp: new Date(), read: false };
-
-    // Validate and push the notification into the user's notifications array
-    try {
-        user.notifications.push(notification);
-        await user.save();
-    } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        throw new Error(`Failed to save notification: ${errorMessage}`);
-    }
-
-    // Broadcast the notification to the user if they are connected via WebSocket
-    broadcastToUser(userId, { event: 'newNotification', data: notification });
-
-    return user;
-}
-
 
 export default UserService;

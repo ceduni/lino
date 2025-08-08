@@ -1,3 +1,4 @@
+import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/pages/floating_button/common/barcode_controller.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/form_submission/form_controller.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class ISBNController extends GetxController {
   var isbnText = ''.obs;
   var bookTitle = ''.obs;
   var bookAuthor = ''.obs;
-  var bookInfo = Rxn<Map<String, dynamic>>();
+  var bookInfo = Rxn<Book>();
 
   Timer? _debounceTimer;
 
@@ -69,10 +70,10 @@ class ISBNController extends GetxController {
       isLoading.value = true;
       try {
         final fetchedBookInfo = await bookService.getBookInfo(isbn);
-        bookInfo.value = fetchedBookInfo;
+        bookInfo.value = Book.fromBookInfo(fetchedBookInfo);
         print('Fetched book info: $fetchedBookInfo');
-        bookTitle.value = fetchedBookInfo['title'] ?? 'Unknown Title';
-        bookAuthor.value = fetchedBookInfo['authors']?.join(', ') ?? 'Unknown Author';
+        bookTitle.value = bookInfo.value?.title ?? 'Unknown Title';
+        bookAuthor.value = bookInfo.value?.authors.join(', ') ?? 'Unknown Author';
       } catch (error) {
         // Pour clean
         bookTitle.value = '';
@@ -95,17 +96,19 @@ class ISBNController extends GetxController {
     errorMessage.value = '';
     try {
       // Use already fetched book info if available, otherwise fetch it
-      Map<String, dynamic> bookInfoToUse;
+      Book bookInfoToUse;
       if (bookInfo.value != null && bookTitle.value.isNotEmpty) {
         bookInfoToUse = bookInfo.value!;
       } else {
-        bookInfoToUse = await bookService.getBookInfo(isbn);
+        final fetchedBookInfo = await bookService.getBookInfo(isbn);
+        bookInfoToUse = Book.fromBookInfo(fetchedBookInfo);
       }
       
       formController.setSelectedISBN(isbn);
       Get.delete<BarcodeController>();
+      final book = bookInfoToUse;
       Get.dialog(BookConfirmDialog(
-          bookInfoFuture: Future.value(bookInfoToUse),
+          bookInfoFuture: Future.value(book),
           bookBoxId: formController.selectedBookBox.value));
     } catch (error) {
       errorMessage.value = 'An error occurred: $error';

@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:Lino_app/models/notification_model.dart';
+import 'package:Lino_app/models/user_model.dart';
 import 'package:http/http.dart' as http;
 import '../utils/constants/api_constants.dart';
 
@@ -11,7 +13,7 @@ class UserService {
     // Send the username, email, phone, and password to the server
     // If the server returns a 201 status code, the user is registered
     // If the server returns another status code, the user is not registered
-    final userData = await http.post(
+    final r = await http.post(
       Uri.parse('$url/users/register'), 
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -23,11 +25,11 @@ class UserService {
         'password': password,
       }),
     );
-    final data = jsonDecode(userData.body);
-    if (userData.statusCode != 201) {
-      throw Exception(data['error']);
+    final response = jsonDecode(r.body);
+    if (r.statusCode != 201) {
+      throw Exception(response['error']);
     }
-    final token = await loginUser(username, password);
+    final token = response['token'];
     return token;
   }
 
@@ -54,7 +56,7 @@ class UserService {
     return token;
   }
 
-  Future<Map<String, dynamic>> getUser(String token) async {
+  Future<User> getUser(String token) async {
     // Make a GET request to the server
     // Send the token to the server
     // If the server returns a 200 status code, the user is returned
@@ -70,10 +72,10 @@ class UserService {
     if (response.statusCode != 200) {
       throw Exception(data['error']);
     }
-    return data;
+    return User.fromJson(data['user']);
   }
 
-  Future<Map<String, dynamic>> updateUser(String token, {String? username, String? password, String? email, String? phone, String? keyWords}) async {
+  Future<void> updateUser(String token, {String? username, String? password, String? email, String? phone, List<String>? favouriteGenres}) async {
     // Make a PUT request to the server
     // Send the token and the updated user information to the server
     // If the server returns a 200 status code, the user is updated
@@ -87,19 +89,18 @@ class UserService {
       body: jsonEncode(<String, dynamic>{
         'username': username,
         'password': password,
-        'email': email,
+        'email': email, 
         'phone': phone,
-        'keyWords': keyWords,
+        'favouriteGenres': favouriteGenres,
       }),
     );
     final data = jsonDecode(response.body);
     if (response.statusCode != 200) {
       throw Exception(data['error']);
     }
-    return data;
   }
 
-  Future<Map<String, dynamic>> getUserNotifications(String token) async {
+  Future<List<Notif>> getUserNotifications(String token) async {
     final response = await http.get(
         Uri.parse('$url/users/notifications'),
         headers: <String, String>{
@@ -110,7 +111,12 @@ class UserService {
     if (response.statusCode != 200) {
       throw Exception(data['error']);
     }
-    return data;
+
+    List<Notif> notifications = [];
+    for (var notification in data['notifications']) {
+      notifications.add(Notif.fromJson(notification));
+    }
+    return notifications;
   }
 
   Future<void> markNotificationAsRead(String token, String id) async {
@@ -125,8 +131,61 @@ class UserService {
         }));
     final data = jsonDecode(response.body);
     if (response.statusCode != 200) {
-      print(data);
+      throw Exception(data['error']);
+    }
+  }
+
+  Future<void> addUserFavLocation(String token, double latitude, double longitude, String name) async {
+    final response = await http.post(
+      Uri.parse('$url/users/location'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'latitude': latitude,
+        'longitude': longitude,
+        'name': name,
+      }),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception(data['error']);
+    }
+  }
+
+  Future<void> deleteUserFavLocation(String token, String name) async {
+    final response = await http.delete(
+      Uri.parse('$url/users/location'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'name': name,
+      }),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception(data['error']);
+    }
+  }
+
+  Future<void> toggleReceivedNotificationType(String token, String type) async {
+    final response = await http.put(
+      Uri.parse('$url/users/notifications/toggle'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'type': type,
+      }),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
       throw Exception(data['error']);
     }
   }
 }
+ 

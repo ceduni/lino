@@ -1,18 +1,19 @@
 import 'dart:convert';
+import 'package:Lino_app/models/thread_model.dart';
 import 'package:http/http.dart' as http;
 import '../utils/constants/api_constants.dart';
 
 class ThreadService {
   final String url = baseApiUrl;
 
-  Future<Map<String, dynamic>> createThread(String token, String bookid, String title) async {
+  Future<void> createThread(String token, String bookid, String title) async {
     final r = await http.post(
       Uri.parse('$url/threads/new'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode(<String, dynamic>{
+      body: jsonEncode(<String, String>{
         'bookId': bookid,
         'title': title, 
       }),
@@ -21,7 +22,6 @@ class ThreadService {
     if (r.statusCode != 201) {
       throw Exception(response['error']);
     }
-    return response;
   }
 
   Future<void> deleteThread(String token, String threadId) async {
@@ -36,9 +36,9 @@ class ThreadService {
     }
   }
 
-  Future<Map<String, dynamic>> addMessage(String token, String threadId, String content, {String? respondsTo}) async {
+  Future<void> addMessage(String token, String threadId, String content, {String? respondsTo}) async {
     // Initialize the request body with mandatory fields
-    Map<String, dynamic> requestBody = {
+    Map<String, String> requestBody = {
       'threadId': threadId,
       'content': content,
     };
@@ -61,17 +61,16 @@ class ThreadService {
     if (r.statusCode != 201) {
       throw Exception(response['error']);
     }
-    return response;
   }
 
-  Future<Map<String, dynamic>> toggleMessageReaction(String token, String threadId, String messageId, bool isGood) async {
+  Future<void> toggleMessageReaction(String token, String threadId, String messageId, bool isGood) async {
     final r = await http.post(
       Uri.parse('$url/threads/messages/reactions'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode(<String, dynamic>{
+      body: jsonEncode(<String, String>{
         'threadId': threadId,
         'messageId': messageId,
         'reactIcon': isGood? 'good' : 'bad',
@@ -81,34 +80,14 @@ class ThreadService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    return response;
   }
 
-  Future<Map<String, dynamic>> getThread(String threadId) async {
+  Future<Thread> getThread(String threadId) async {
     final r = await http.get(Uri.parse('$url/threads/$threadId'));
     final response = jsonDecode(r.body);
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    return response;
-  }
-
-  Future<Map<String, dynamic>> searchThreads({String? q, String? cls, bool? asc}) async {
-    var queryParams = {
-      if (q != null && q.isNotEmpty) 'q': q,
-      if (cls != null && cls.isNotEmpty) 'cls': cls,
-      if (asc != null) 'asc': asc.toString(),
-    };
-
-    final r = await http.get(Uri.parse('$url/threads/search').replace(queryParameters: queryParams),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-    final response = jsonDecode(r.body);
-    if (r.statusCode != 200) {
-      throw Exception(response['error']);
-    }
-    return response;
+    return Thread.fromJson(response);
   }
 }

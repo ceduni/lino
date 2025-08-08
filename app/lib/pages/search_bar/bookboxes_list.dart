@@ -1,7 +1,10 @@
+import 'package:Lino_app/models/bookbox_model.dart';
+import 'package:Lino_app/models/search_model.dart';
+import 'package:Lino_app/services/search_services.dart';
+import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:Lino_app/services/book_services.dart';
-import '../bookbox/book_box_screen.dart'; 
+import 'package:get/get.dart';
 
 class BookBoxesList extends StatelessWidget {
   final String query;
@@ -43,18 +46,18 @@ class BookBoxesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map<String, dynamic>>(
-      future: BookService().searchBookboxes(kw: query),
+    return FutureBuilder<SearchModel<ShortenedBookBox>>(
+      future: SearchService().searchBookboxes(q: query),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!['bookboxes'].isEmpty) {
+        } else if (!snapshot.hasData || snapshot.data!.results.isEmpty) {
           return Center(child: Text('No bookboxes found.'));
         }
 
-        final bookboxes = snapshot.data!['bookboxes'];
+        final bookboxes = snapshot.data!.results;
         return FutureBuilder<Position>(
           future: _getUserLocation(),
           builder: (context, locationSnapshot) {
@@ -73,14 +76,14 @@ class BookBoxesList extends StatelessWidget {
               itemCount: bookboxes.length,
               itemBuilder: (context, index) {
                 final bookbox = bookboxes[index];
-                final distance = _calculateDistance(userLocation, bookbox['latitude'], bookbox['longitude']);
+                final distance = _calculateDistance(userLocation, bookbox.latitude, bookbox.longitude);
                 final distanceStr = '${distance.toStringAsFixed(2)} km';
                 return Card(
                     color: Colors.blueGrey[50],
                     margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                     child: ListTile(
                       leading: Image.network(
-                        bookbox['image'],
+                        bookbox.image ?? '',
                         fit: BoxFit.cover,
                         width: 50,
                         height: 75,
@@ -89,20 +92,21 @@ class BookBoxesList extends StatelessWidget {
                         },
                       ),
                       title: Text(
-                        bookbox['name'],
+                        bookbox.name,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(
-                        '${bookbox['books'].length} books',
+                        '${bookbox.booksCount} books',
                         style: TextStyle(fontStyle: FontStyle.italic),
                       ),
                       trailing: Text(distanceStr),
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BookBoxScreen(bookBoxId: bookbox['id']),
-                          ),
+                        Get.toNamed(
+                          AppRoutes.bookbox,
+                          arguments: {
+                            'bookboxId': bookbox.id,
+                            'canInteract': false,
+                          },
                         );
                       },
                     )

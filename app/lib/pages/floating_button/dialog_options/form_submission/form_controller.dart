@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/pages/floating_button/dialog_options/form_submission/confirm_book.dart';
 import 'package:Lino_app/services/book_services.dart';
 import 'package:Lino_app/services/image_upload_service.dart';
@@ -84,7 +85,8 @@ class FormController extends GetxController {
   // Submit form with ISBN
   Future<void> submitFormWithISBN() async {
     try {
-      final bookInfo = await BookService().getBookInfo(selectedISBN.value);
+      final bookInfoMap = await BookService().getBookInfo(selectedISBN.value);
+      final bookInfo = Book.fromBookInfo(bookInfoMap);
       Get.dialog(BookConfirmDialog(
           bookInfoFuture: Future.value(bookInfo),
           bookBoxId: selectedBookBox.value));
@@ -142,7 +144,7 @@ class FormController extends GetxController {
         ? authorsText.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
         : <String>[];
 
-    final bookInfo = {
+    final bookInfoMap = {
       'title': additionalFieldsForISBN['Title']!.text.trim(),
       'authors': authors,
       'description': additionalFieldsForISBN['Description']!.text.trim().isNotEmpty 
@@ -158,6 +160,7 @@ class FormController extends GetxController {
       'coverImage': coverImageUrl, // Use uploaded image URL
     };
 
+    final bookInfo = Book.fromBookInfo(bookInfoMap);
     Get.dialog(BookConfirmDialog(
         bookInfoFuture: Future.value(bookInfo),
         bookBoxId: selectedBookBox.value));

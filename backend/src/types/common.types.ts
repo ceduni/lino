@@ -1,4 +1,4 @@
-import { FastifyRequest } from 'fastify';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 // Common API types
 export interface ApiError {
@@ -26,4 +26,12 @@ export interface WebSocketClient extends WebSocket {
   on(event: 'message', listener: (data: Buffer) => void): this;
   on(event: 'close', listener: () => void): this;
   on(event: string, listener: (...args: any[]) => void): this;
+}
+
+export interface MyFastifyInstance extends FastifyInstance {
+    optionalAuthenticate: (request: FastifyRequest) => void;
+    authenticate: (request: FastifyRequest, reply: FastifyReply) => void;
+    adminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
+    superAdminAuthenticate: (request: FastifyRequest, reply: FastifyReply) => void;
+    bookManipAuth: (request: FastifyRequest, reply: FastifyReply) => void;
 }

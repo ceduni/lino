@@ -1,17 +1,31 @@
-import Transaction from '../models/transaction.model';
-
-interface CreateCustomTransactionParams {
-    username: string;
-    action: 'added' | 'took';
-    bookTitle: string;
-    bookboxId: string;
-    day: string; // Format: AAAA-MM-DD
-    hour: string; // Format: HH:MM
-}
+import { Transaction } from '../models';
 
 class TransactionService {
-    static async createCustomTransaction(params: CreateCustomTransactionParams) {
-        const { username, action, bookTitle, bookboxId, day, hour } = params;
+    // Create a transaction record
+    static async createTransaction(
+        username: string, 
+        action: 'added' | 'took', 
+        bookTitle: string, 
+        bookboxId: string
+    ) {
+        const transaction = new Transaction({
+            username,
+            action,
+            bookTitle,
+            bookboxId
+        });
+        await transaction.save();
+        return transaction;
+    }
+
+    static async createCustomTransaction(
+        username: string,
+        action: 'added' | 'took',
+        bookTitle: string,
+        bookboxId: string,
+        day: string, // Format: AAAA-MM-DD
+        hour: string // Format: HH:MM
+    ) {
         
         // Validate day format (AAAA-MM-DD)
         const dayRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -45,6 +59,11 @@ class TransactionService {
         
         const savedTransaction = await transaction.save();
         return savedTransaction;
+    }
+
+    static async clearCollection() {
+        await Transaction.deleteMany({});
+        return { message: 'Transactions cleared' };
     }
 }
 
