@@ -177,7 +177,7 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
               }
             },
             icon: const Icon(
-              Icons.report_problem,
+              Icons.report,
               color: Colors.white,
             ),
             tooltip: 'Report Issue',

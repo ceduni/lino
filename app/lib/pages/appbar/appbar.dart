@@ -92,7 +92,7 @@ class _LinoAppBarState extends State<LinoAppBar> {
         return AppBar(
           backgroundColor: LinoColors.accent,
           flexibleSpace: Padding(
-            padding: EdgeInsets.only(top: 50),
+            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.center,
