@@ -548,7 +548,7 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
       onPressed: isActive ? () {
         // TODO: Remove book functionality
         Get.snackbar(
-          'Remove Book',
+          'Take Book',
           'Remove book functionality will be implemented',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
@@ -565,7 +565,7 @@ class _BookBoxScreenState extends State<BookBoxScreen> {
       },
       icon: Icon(Icons.remove, color: isActive ? Colors.white : Colors.grey.shade400),
       label: Text(
-        'Remove Book',
+        'Take Book',
         style: TextStyle(
           color: isActive ? Colors.white : Colors.grey.shade400,
           fontFamily: 'Kanit',

@@ -83,7 +83,7 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
           ),
           SpeedDialChild(
             child: Icon(Icons.remove),
-            label: 'Remove Book',
+            label: 'Take Book',
             onTap: () async {
               Get.dialog(BookBoxSelectionDialog(isAddBook: false));
             },

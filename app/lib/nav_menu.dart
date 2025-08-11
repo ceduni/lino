@@ -55,7 +55,7 @@ class _BookNavPageState extends State<BookNavPage> {
             sourcePage: controller.selectedIndex),
       ),
       floatingActionButton: Obx(() {
-        if (controller.selectedIndex.value == 0) {
+        if (controller.selectedIndex.value == 0 || controller.selectedIndex.value == 3) {
           // pr cacher
           return SizedBox.shrink();
         } else if (controller.selectedIndex.value == 2) {

@@ -145,7 +145,7 @@ class BookRemovalController extends GetxController {
       BookBoxStateService.instance.triggerRefresh();
 
       // Show success message
-      showToast('Book has been successfully removed from the Book Box.');
+      showToast('Book has been successfully taken from the Book Box.');
       
       // Close all dialogs and return to main screen
       Get.back(); // Close current dialog

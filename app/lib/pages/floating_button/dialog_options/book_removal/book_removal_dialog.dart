@@ -31,7 +31,7 @@ class BookRemovalDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            buildBanner(context, 'Remove Book'),
+            buildBanner(context, 'Take Book'),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -363,7 +363,7 @@ class BookRemovalDialog extends StatelessWidget {
         ),
         child: controller.isLoading.value
             ? const CircularProgressIndicator(color: Colors.white)
-            : const Text('Remove Book'),
+            : const Text('Take Book'),
       );
     });
   }
