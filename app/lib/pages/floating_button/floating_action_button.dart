@@ -107,10 +107,21 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
   // }
 
   void _showRequestForm(BuildContext context, VoidCallback? onRequestCreated) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => RequestFormPage(onRequestCreated: onRequestCreated!),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.55, // 55%
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: RequestFormPage(onRequestCreated: onRequestCreated!),
+        );
+      },
     );
   }
 }

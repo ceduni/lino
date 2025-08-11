@@ -233,6 +233,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(245, 245, 235, 1),
       appBar: AppBar(
+        automaticallyImplyLeading: false, 
         title: const Text(
           'Create Book Request',
           style: TextStyle(
