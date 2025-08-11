@@ -95,6 +95,7 @@ class _LinoAppBarState extends State<LinoAppBar> {
             padding: EdgeInsets.only(top: 50),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Padding(
                 //   padding: const EdgeInsets.only(left: 8.0),
@@ -127,12 +128,35 @@ class _LinoAppBarState extends State<LinoAppBar> {
                 //     ),
                 //   ),
                 // ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                    child: LinoSearchBar(sourcePage: widget.sourcePage),
+                if (widget.sourcePage == 1) // on laisse que pour SearchPage
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                      child: LinoSearchBar(sourcePage: widget.sourcePage),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: Container(
+                      height: 40, 
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 16.0),
+                          child: Text(
+                            widget.sourcePage == 0 ? 'Home' : 
+                            widget.sourcePage == 2 ? 'Requests' : 
+                            widget.sourcePage == 3 ? 'My Profile' : '',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
                 
                 if (isLoggedIn)
                   Padding(
