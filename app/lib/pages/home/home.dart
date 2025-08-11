@@ -11,6 +11,7 @@ import '../../models/user_model.dart';
 import '../../services/user_services.dart';
 import '../../widgets/home_profile_summary.dart';
 import '../map/book_box_controller.dart';
+import '../../nav_menu.dart';
 
 class HomePage extends HookWidget {
   final BookBoxController bookBoxController = Get.put(BookBoxController());
@@ -186,7 +187,10 @@ class HomePage extends HookWidget {
             savedTrees: userData.data!.ecologicalImpact.savedTrees,
             carbonSavings: userData.data!.ecologicalImpact.carbonSavings,
             onTap: () {
-              addClick();
+              //addClick();
+              final NavigationController navController = Get.find<NavigationController>();
+              navController.selectedIndex.value = 3; // Profile page 
+              navController.update(); // Trigger rebuild
             },
           ),
           // Map section
