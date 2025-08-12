@@ -94,6 +94,7 @@ export const notificationSchema = {
         _id: { type: 'string' },
         userId: { type: 'string' },
         bookId: { type: 'string' },
+        requestId: { type: 'string' },
         bookTitle: { type: 'string' },
         bookboxId: { type: 'string' },
         reason: { 
@@ -164,6 +165,9 @@ export const bookRequestSchema = {
         username: { type: 'string' },
         bookTitle: { type: 'string' },
         timestamp: { type: 'string', format: 'date-time' },
+        upvoters: { type: 'array', items: { type: 'string' } },
+        nbPeopleNotified: { type: 'number' },
+        bookboxIds: { type: 'array', items: { type: 'string' } },
         customMessage: { type: 'string' },
         isSolved: { type: 'boolean' }
     }

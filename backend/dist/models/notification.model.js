@@ -7,6 +7,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const notificationSchema = new mongoose_1.default.Schema({
     userId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: true },
     bookId: { type: mongoose_1.default.Schema.Types.ObjectId }, // Optional for book requests
+    requestId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Request' }, // Optional for book requests
     bookTitle: { type: String, required: true },
     bookboxId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'BookBox' }, // Optional for book requests
     reason: {

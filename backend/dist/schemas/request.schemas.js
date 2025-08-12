@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toggleSolvedStatusSchema = exports.getBookRequestsSchema = exports.deleteBookRequestSchema = exports.sendBookRequestSchema = void 0;
+exports.toggleUpvoteSchema = exports.toggleSolvedStatusSchema = exports.getBookRequestsSchema = exports.deleteBookRequestSchema = exports.sendBookRequestSchema = void 0;
+const _1 = require(".");
 exports.sendBookRequestSchema = {
     description: 'Send a book request to users',
     tags: ['books', 'users'],
@@ -8,6 +9,10 @@ exports.sendBookRequestSchema = {
         type: 'object',
         properties: {
             title: { type: 'string' },
+            bookboxIds: {
+                type: 'array',
+                items: { type: 'string' }
+            },
             customMessage: { type: 'string' }
         },
         required: ['title']
@@ -16,22 +21,10 @@ exports.sendBookRequestSchema = {
         type: 'object',
         properties: {
             authorization: { type: 'string' }
-        },
-        required: ['authorization']
+        }
     },
     response: {
-        201: {
-            description: 'Book request sent',
-            type: 'object',
-            properties: {
-                _id: { type: 'string' },
-                username: { type: 'string' },
-                bookTitle: { type: 'string' },
-                timestamp: { type: 'string', format: 'date-time' },
-                customMessage: { type: 'string' },
-                isSolved: { type: 'boolean' }
-            }
-        },
+        201: Object.assign({ description: 'Book request sent' }, _1.bookRequestSchema),
         400: {
             description: 'Error message',
             type: 'object',
@@ -62,8 +55,7 @@ exports.deleteBookRequestSchema = {
         type: 'object',
         properties: {
             authorization: { type: 'string' }
-        },
-        required: ['authorization']
+        }
     },
     response: {
         204: {
@@ -97,29 +89,47 @@ exports.deleteBookRequestSchema = {
     }
 };
 exports.getBookRequestsSchema = {
-    description: 'Get book requests',
+    description: 'Get book requests with filtering and sorting options',
     tags: ['books', 'users'],
     querystring: {
         type: 'object',
         properties: {
-            username: { type: 'string' }
+            username: { type: 'string' },
+            filter: {
+                type: 'string',
+                enum: ['all', 'notified', 'upvoted', 'mine'],
+                default: 'all'
+            },
+            sortBy: {
+                type: 'string',
+                enum: ['date', 'upvoters', 'peopleNotified'],
+                default: 'date'
+            },
+            sortOrder: {
+                type: 'string',
+                enum: ['asc', 'desc'],
+                default: 'desc'
+            }
+        }
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' }
         }
     },
     response: {
         200: {
             description: 'Book requests found',
             type: 'array',
-            items: {
-                type: 'object',
-                properties: {
-                    _id: { type: 'string' },
-                    username: { type: 'string' },
-                    bookTitle: { type: 'string' },
-                    timestamp: { type: 'string', format: 'date-time' },
-                    customMessage: { type: 'string' },
-                    isSolved: { type: 'boolean' }
-                }
-            },
+            items: Object.assign({}, _1.bookRequestSchema),
+        },
+        401: {
+            description: 'Authentication required for this filter',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
         },
         500: {
             description: 'Error message',
@@ -158,6 +168,57 @@ exports.toggleSolvedStatusSchema = {
         },
         404: {
             description: 'Error message',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        401: {
+            description: 'Unauthorized',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+exports.toggleUpvoteSchema = {
+    description: 'Toggle upvote on a book request',
+    tags: ['books', 'users'],
+    params: {
+        type: 'object',
+        properties: {
+            id: { type: 'string' }
+        },
+        required: ['id']
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' }
+        },
+        required: ['authorization']
+    },
+    response: {
+        200: {
+            description: 'Book request upvote toggled',
+            type: 'object',
+            properties: {
+                message: { type: 'string' },
+                isUpvoted: { type: 'boolean' },
+                upvoteCount: { type: 'number' },
+                request: Object.assign({}, _1.bookRequestSchema)
+            }
+        },
+        404: {
+            description: 'Request or user not found',
             type: 'object',
             properties: {
                 error: { type: 'string' }
