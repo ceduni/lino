@@ -1,5 +1,5 @@
 import 'package:Lino_app/models/user_model.dart';
-import 'package:Lino_app/pages/profile/options/modify_profile_page.dart';
+import 'package:Lino_app/views/profile/options/modify_profile_page.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 

@@ -9,7 +9,7 @@ class BookRequestService {
   final String url = baseApiUrl;
   
   Future<void> requestBookToUsers(String token, String title,
-      {String? cm}) async {
+      {String? cm, List<String>? bookboxIds}) async {
     final r = await http.post(
       Uri.parse('$url/books/request'),
       headers: <String, String>{
@@ -19,6 +19,7 @@ class BookRequestService {
       body: jsonEncode(<String, dynamic>{
         'title': title,
         'customMessage': cm,
+        'bookboxIds': bookboxIds,
       }),
     );
     if (r.statusCode != 201) {
@@ -37,19 +38,36 @@ class BookRequestService {
     }
   }
 
-  Future<List<Request>> getBookRequests({String? username}) async {
-    var queryParams = {
+  Future<List<Request>> getBookRequests({
+    String? username,
+    String? token,
+    RequestFilter filter = RequestFilter.all,
+    RequestSortBy sortBy = RequestSortBy.date,
+    SortOrder sortOrder = SortOrder.desc,
+  }) async {
+    var queryParams = <String, String>{
       if (username != null) 'username': username,
+      'filter': filter.value,
+      'sortBy': sortBy.value,
+      'sortOrder': sortOrder.value,
     };
     
     final uri = Uri.parse('$url/books/requests').replace(queryParameters: queryParams);
     
-    final r = await http.get(
-      uri,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
+    final headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    
+    // Add authorization header if token is provided (required for filtered requests)
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    
+    final r = await http.get(uri, headers: headers);
+    
+    if (r.statusCode == 401) {
+      throw Exception('Authentication required for this filter');
+    }
     
     if (r.statusCode != 200) {
       final response = jsonDecode(r.body);
@@ -62,6 +80,57 @@ class BookRequestService {
       requests.add(Request.fromJson(reqJson));
     }
     return requests;
+  }
+
+  Future<UpvoteResponse> toggleUpvote(String token, String requestId) async {
+    final r = await http.patch(
+      Uri.parse('$url/books/request/$requestId/upvote'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+    
+    if (r.statusCode == 401) {
+      throw Exception('Authentication required');
+    }
+    
+    if (r.statusCode == 404) {
+      throw Exception('Request not found');
+    }
+    
+    if (r.statusCode != 200) {
+      final response = jsonDecode(r.body);
+      throw Exception(response['error']);
+    }
+    
+    final responseBody = jsonDecode(r.body);
+    return UpvoteResponse.fromJson(responseBody);
+  }
+
+  Future<SolveResponse> toggleSolvedStatus(String token, String requestId) async {
+    final r = await http.patch(
+      Uri.parse('$url/books/request/$requestId/solve'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    
+    if (r.statusCode == 401) {
+      throw Exception('Authentication required');
+    }
+    
+    if (r.statusCode == 404) {
+      throw Exception('Request not found');
+    }
+    
+    if (r.statusCode != 200) {
+      final response = jsonDecode(r.body);
+      throw Exception(response['error']);
+    }
+    
+    final responseBody = jsonDecode(r.body);
+    return SolveResponse.fromJson(responseBody);
   }
 
   Future<List<BookSuggestion>> getBookSuggestions(String query, {int limit = 10}) async {
@@ -137,5 +206,74 @@ class BookSuggestion {
   @override
   String toString() {
     return 'BookSuggestion(title: $title, author: $author)';
+  }
+}
+
+// Enums for filtering and sorting
+enum RequestFilter {
+  all('all'),
+  notified('notified'),
+  upvoted('upvoted'),
+  mine('mine');
+
+  const RequestFilter(this.value);
+  final String value;
+}
+
+enum RequestSortBy {
+  date('date'),
+  upvoters('upvoters'),
+  peopleNotified('peopleNotified');
+
+  const RequestSortBy(this.value);
+  final String value;
+}
+
+enum SortOrder {
+  asc('asc'),
+  desc('desc');
+
+  const SortOrder(this.value);
+  final String value;
+}
+
+// Response models
+class UpvoteResponse {
+  final String message;
+  final bool isUpvoted;
+  final int upvoteCount;
+  final Request request;
+
+  UpvoteResponse({
+    required this.message,
+    required this.isUpvoted,
+    required this.upvoteCount,
+    required this.request,
+  });
+
+  factory UpvoteResponse.fromJson(Map<String, dynamic> json) {
+    return UpvoteResponse(
+      message: json['message'] as String,
+      isUpvoted: json['isUpvoted'] as bool,
+      upvoteCount: json['upvoteCount'] as int,
+      request: Request.fromJson(json['request'] as Map<String, dynamic>),
+    );
+  }
+}
+
+class SolveResponse {
+  final String message;
+  final bool isSolved;
+
+  SolveResponse({
+    required this.message,
+    required this.isSolved,
+  });
+
+  factory SolveResponse.fromJson(Map<String, dynamic> json) {
+    return SolveResponse(
+      message: json['message'] as String,
+      isSolved: json['isSolved'] as bool,
+    );
   }
 }

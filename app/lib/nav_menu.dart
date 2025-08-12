@@ -4,11 +4,11 @@ import 'package:get/get.dart';
 // import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:Lino_app/pages/floating_button/floating_action_button.dart';
 import 'package:Lino_app/pages/forum/forum_screen.dart';
-// import 'package:Lino_app/pages/forum/requests_section.dart'; // Direct import for requests section
+// import 'package:Lino_app/pages/forum/requests_section.dart';
 import 'package:Lino_app/pages/appbar/observable_appbar.dart';
 import 'package:Lino_app/pages/search_bar/results_screen.dart';
 import 'package:Lino_app/pages/search_bar/search_bar.dart' as sb;
-import 'package:Lino_app/pages/profile/profile_page.dart';
+import 'package:Lino_app/views/profile/profile_page.dart';
 import 'package:Lino_app/pages/home/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/user_services.dart';
@@ -171,7 +171,7 @@ class NavigationController extends GetxController {
       NavigationPage(),
       //MapScreen(),
       ForumScreen(key: forumScreenKey, query: forumQuery),
-      ProfilePage() // Added back for tab navigation
+      ProfilePage()
     ];
   }
 
