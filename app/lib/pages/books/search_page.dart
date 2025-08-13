@@ -5,7 +5,7 @@ import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/services/search_services.dart';
 import 'package:flutter/material.dart';
 import 'book_details_page.dart';
-import '../bookbox/book_box_screen.dart';
+import 'package:Lino_app/views/bookboxes/book_box_page.dart';
 // import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -209,7 +209,7 @@ class _NavigationPageState extends State<NavigationPage> {
 
   void _navigateToBookBoxScreen(String bookBoxId) {
     Get.to(
-      () => const BookBoxScreen(),
+      () => const BookBoxPage(),
       arguments: {
         'bookboxId': bookBoxId,
         'canInteract': false,
