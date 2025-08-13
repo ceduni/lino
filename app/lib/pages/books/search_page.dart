@@ -11,14 +11,14 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import '../../controllers/global_state_controller.dart';
 
-class NavigationPage extends StatefulWidget {
-  const NavigationPage({super.key});
+class SearchPage extends StatefulWidget {
+  const SearchPage({super.key});
 
   @override
-  _NavigationPageState createState() => _NavigationPageState();
+  _SearchPageState createState() => _SearchPageState();
 }
 
-class _NavigationPageState extends State<NavigationPage> {
+class _SearchPageState extends State<SearchPage> {
   final GlobalStateController globalState = Get.put(GlobalStateController());
 
   List<ShortenedBookBox> bookBoxes = [];

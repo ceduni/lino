@@ -1,15 +1,13 @@
-import 'package:Lino_app/pages/books/book_nav_page.dart';
+import 'package:Lino_app/views/search/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:Lino_app/pages/floating_button/floating_action_button.dart';
 import 'package:Lino_app/pages/forum/forum_screen.dart';
 // import 'package:Lino_app/pages/forum/requests_section.dart';
-import 'package:Lino_app/pages/appbar/observable_appbar.dart';
-import 'package:Lino_app/pages/search_bar/results_screen.dart';
-import 'package:Lino_app/pages/search_bar/search_bar.dart' as sb;
+import 'package:Lino_app/views/layout/appbar.dart';
 import 'package:Lino_app/views/profile/profile_page.dart';
-import 'package:Lino_app/pages/home/home.dart';
+import 'package:Lino_app/views/home/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/user_services.dart';
 
@@ -46,14 +44,9 @@ class _BookNavPageState extends State<BookNavPage> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(NavigationController());
-    final searchController = Get.put(sb.SearchController());
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80.0),
-        child: ObservableAppBar(
-            sourcePage: controller.selectedIndex),
-      ),
+      appBar: LinoAppBar(sourcePage: controller.selectedIndex.value),
       floatingActionButton: Obx(() {
         if (controller.selectedIndex.value == 0 || controller.selectedIndex.value == 3) {
           // pr cacher
@@ -74,24 +67,7 @@ class _BookNavPageState extends State<BookNavPage> {
         }
       }),
       bottomNavigationBar: _buildNavigationBar(context, controller),
-      body: Stack(
-        children: [
-          Obx(() => controller.screens[controller.selectedIndex.value]),
-          Obx(() {
-            if (searchController.query.isNotEmpty) {
-              return Positioned.fill(
-                child: ResultsPage(
-                  query: searchController.query.value,
-                  sourcePage: controller.selectedIndex.value,
-                  onBack: searchController.hideSearchResults,
-                ),
-              );
-            } else {
-              return SizedBox.shrink();
-            }
-          }),
-        ],
-      ),
+      body: Obx(() => controller.screens[controller.selectedIndex.value]),
     );
   }
 
@@ -168,7 +144,7 @@ class NavigationController extends GetxController {
     forumQuery = '';
     screens = [
       HomePage(),
-      NavigationPage(),
+      SearchPage(),
       //MapScreen(),
       ForumScreen(key: forumScreenKey, query: forumQuery),
       ProfilePage()

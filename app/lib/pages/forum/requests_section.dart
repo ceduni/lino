@@ -43,10 +43,19 @@ class RequestsSectionState extends State<RequestsSection> {
     });
 
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) {
+        showToast('You need to be logged in to view requests.');
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
       var brs = BookRequestService();
       final List<Request> requestList = allRequests
-          ? await brs.getBookRequests()
-          : await brs.getBookRequests(username: currentUsername);
+          ? await brs.getBookRequests(token)
+          : await brs.getBookRequests(token, username: currentUsername);
       
       
       setState(() {

@@ -6,7 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 // import '../../nav_menu.dart';
 // import './add_thread_form.dart';
 // import '../../services/user_services.dart';
-import './expandable_text.dart';
+import '../../widgets/expandable_text.dart';
 
 class BookDetailsPage extends StatefulWidget {
   final Book book;

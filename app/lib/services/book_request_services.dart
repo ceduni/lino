@@ -38,9 +38,10 @@ class BookRequestService {
     }
   }
 
-  Future<List<Request>> getBookRequests({
+  Future<List<Request>> getBookRequests(
+    String token, 
+    {
     String? username,
-    String? token,
     RequestFilter filter = RequestFilter.all,
     RequestSortBy sortBy = RequestSortBy.date,
     SortOrder sortOrder = SortOrder.desc,
@@ -56,12 +57,8 @@ class BookRequestService {
     
     final headers = <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $token',
     };
-    
-    // Add authorization header if token is provided (required for filtered requests)
-    if (token != null) {
-      headers['Authorization'] = 'Bearer $token';
-    }
     
     final r = await http.get(uri, headers: headers);
     
