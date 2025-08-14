@@ -80,9 +80,6 @@ class _HomePageState extends State<HomePage> {
             carbonSavings: viewModel.userData!.ecologicalImpact.carbonSavings,
             onTap: viewModel.navigateToProfile,
           ),
-          Expanded(
-            child: _buildMapSection(viewModel),
-          ),
         ],
       ),
     );

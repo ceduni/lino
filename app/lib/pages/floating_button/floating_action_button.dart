@@ -69,7 +69,7 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
         shape: BoxShape.circle,
       ),
       child: SpeedDial(
-        icon: Icons.add,
+        icon: Icons.book,
         backgroundColor: Color(0xFF4AC3FF),
         children: [
           SpeedDialChild(
@@ -107,6 +107,13 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
   // }
 
   void _showRequestForm(BuildContext context, VoidCallback? onRequestCreated) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+      builder: (context) => RequestFormPage(onRequestCreated: onRequestCreated!),
+    ),
+    );
+
+    /** 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -123,5 +130,6 @@ class _LinoFloatingButtonState extends State<LinoFloatingButton> {
         );
       },
     );
+    */
   }
 }

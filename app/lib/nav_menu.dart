@@ -62,8 +62,7 @@ class _BookNavPageState extends State<BookNavPage> {
           );
         } else {
           // Default Floating Button
-          return LinoFloatingButton(
-              selectedIndex: controller.selectedIndex.value);
+          return SizedBox.shrink();
         }
       }),
       bottomNavigationBar: _buildNavigationBar(context, controller),

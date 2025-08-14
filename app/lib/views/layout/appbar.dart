@@ -30,10 +30,16 @@ class _LinoAppBarState extends State<LinoAppBar> {
     return Consumer<AppBarViewModel>(
       builder: (context, viewModel, child) {
         return AppBar(
-          backgroundColor: LinoColors.accent,
+          title: Center(
+            child: Image.asset(
+              'assets/logos/logo_without_bird.png',
+              height: 40,
+            ),
+          ), // TODO : update with new logo
+          //backgroundColor: LinoColors.accent,
           flexibleSpace: Padding(
             padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-            child: _buildAppBarContent(viewModel),
+            //child: _buildAppBarContent(viewModel),
           ),
         );
       },
@@ -99,11 +105,7 @@ class _LinoAppBarState extends State<LinoAppBar> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.notifications, color: Colors.white),
-                SizedBox(height: 2),
-                Text(
-                  'Notifications',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                ),
+                
               ],
             ),
             if (viewModel.unreadCount > 0)
