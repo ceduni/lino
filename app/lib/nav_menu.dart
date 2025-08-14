@@ -46,7 +46,7 @@ class _BookNavPageState extends State<BookNavPage> {
     final controller = Get.put(NavigationController());
 
     return Scaffold(
-      appBar: LinoAppBar(sourcePage: controller.selectedIndex.value),
+      appBar: OBxLinoAppBar(controller: controller),
       floatingActionButton: Obx(() {
         if (controller.selectedIndex.value == 0 || controller.selectedIndex.value == 3) {
           // pr cacher
@@ -157,5 +157,19 @@ class NavigationController extends GetxController {
     screens[2] = ForumScreen(
         key: forumScreenKey,
         query: forumQuery); // Update ForumScreen with new query
+  }
+}
+
+class OBxLinoAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final NavigationController controller;
+  
+  const OBxLinoAppBar({Key? key, required this.controller}) : super(key: key);
+
+  @override
+  Size get preferredSize => const Size.fromHeight(60);
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => LinoAppBar(sourcePage: controller.selectedIndex.value));
   }
 }
