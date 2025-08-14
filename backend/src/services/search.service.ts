@@ -129,13 +129,25 @@ const searchService = {
             ];
         }
         
-        // Handle location sorting with $geoNear
-        if (cls === 'by location') {
-            if (!longitude || !latitude) {
-                throw newErr(400, 'Location is required for this classification');
+        // Check if location is required for 'by location' classification
+        if (cls === 'by location' && (!longitude || !latitude)) {
+            throw newErr(400, 'Location is required for this classification');
+        }
+        
+        // If coordinates are provided, use $geoNear to include distance for all classifications
+        if (longitude && latitude) {
+            let sortStage: any;
+            
+            if (cls === 'by location') {
+                sortStage = { $sort: { distance: asc ? 1 : -1 } };
+            } else if (cls === 'by name') {
+                sortStage = { $sort: { name: asc ? 1 : -1 } };
+            } else if (cls === 'by number of books') {
+                sortStage = { $sort: { booksCount: asc ? 1 : -1 } };
+            } else {
+                sortStage = { $sort: { name: asc ? 1 : -1 } }; // default sort
             }
             
-            // For $geoNear, we need to get count differently
             const [bookboxes, countResult] = await Promise.all([
                 BookBox.aggregate([
                     {
@@ -149,7 +161,7 @@ const searchService = {
                             query: filter
                         }
                     },
-                    { $sort: { distance: asc ? 1 : -1 } },
+                    sortStage,
                     { $skip: skipAmount },
                     { $limit: pageSize },
                     {
@@ -160,7 +172,7 @@ const searchService = {
                         }
                     }
                 ]),
-                // Count for location queries
+                // Count for queries with coordinates
                 BookBox.aggregate([
                     {
                         $geoNear: {
@@ -193,7 +205,7 @@ const searchService = {
             };
         }
         
-        // Handle other sorting with regular query + count
+        // Handle sorting without coordinates (no distance field)
         let sortObj: any = {};
         if (cls === 'by name') {
             sortObj.name = asc ? 1 : -1;

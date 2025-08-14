@@ -140,17 +140,48 @@ class _SearchPageState extends State<SearchPage> {
 
     if (viewModel.error != null) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error, size: 64, color: Colors.red),
-            const SizedBox(height: 16),
-            Text(
-              'Error: ${viewModel.error}',
-              style: const TextStyle(color: Colors.red),
-              textAlign: TextAlign.center,
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Colors.red.shade400,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                viewModel.error!,
+                style: TextStyle(
+                  color: Colors.red.shade700,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: viewModel.retrySearch,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: LinoColors.accent,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  TextButton(
+                    onPressed: viewModel.clearError,
+                    child: const Text('Dismiss'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -225,56 +256,162 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildBookboxItem(ShortenedBookBox bookbox, SearchPageViewModel viewModel) {
+    // Color scheme based on active status
+    final backgroundColor = bookbox.isActive 
+        ? Colors.green.shade50 
+        : Colors.red.shade50;
+    final borderColor = bookbox.isActive 
+        ? Colors.green.shade200 
+        : Colors.red.shade200;
+    final statusColor = bookbox.isActive 
+        ? Colors.green.shade700 
+        : Colors.red.shade700;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: ListTile(
-        leading: bookbox.image != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(
-                  bookbox.image!,
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        side: BorderSide(color: borderColor, width: 1.5),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(16.0),
+          leading: Stack(
+            children: [
+              bookbox.image != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        bookbox.image!,
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: const Icon(Icons.image_not_supported),
+                          );
+                        },
+                      ),
+                    )
+                  : Container(
                       width: 60,
                       height: 60,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.image_not_supported),
-                    );
-                  },
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: const Icon(Icons.library_books),
+                    ),
+              // Status indicator dot
+              Positioned(
+                top: 2,
+                right: 2,
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
                 ),
-              )
-            : Container(
-                width: 60,
-                height: 60,
-                color: Colors.grey[300],
-                child: const Icon(Icons.library_books),
               ),
-        title: Text(
-          bookbox.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  bookbox.isActive ? Icons.check_circle : Icons.cancel,
-                  color: bookbox.isActive ? Colors.green : Colors.red,
-                  size: 16,
+            ],
+          ),
+          title: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  bookbox.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-                const SizedBox(width: 4),
-                Text(bookbox.isActive ? 'Active' : 'Inactive'),
+              ),
+              // Books count badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: LinoColors.accent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.book, size: 14, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${bookbox.booksCount}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+              // Status with visual indicator
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: statusColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    bookbox.isActive ? 'Active' : 'Inactive',
+                    style: TextStyle(
+                      color: statusColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+              // Distance if available
+              if (bookbox.distance != null) ...[
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${bookbox.distance!.toStringAsFixed(1)} km away',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
               ],
-            ),
-            if (bookbox.distance != null)
-              Text('Distance: ${bookbox.distance!.toStringAsFixed(2)} km'),
-          ],
+            ],
+          ),
+          onTap: () => viewModel.onBookboxTap(bookbox),
         ),
-        onTap: () => viewModel.onBookboxTap(bookbox),
       ),
     );
   }
@@ -374,46 +511,141 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildBookItem(ExtendedBook book, SearchPageViewModel viewModel) {
+    // Gradient colors for book items
+    final gradientColors = [
+      Colors.blue.shade50,
+      Colors.purple.shade50,
+    ];
+    final borderColor = Colors.blue.shade200;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: ListTile(
-        leading: book.coverImage != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(
-                  book.coverImage!,
-                  width: 60,
-                  height: 80,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        side: BorderSide(color: borderColor, width: 1.5),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: gradientColors,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(16.0),
+          leading: Stack(
+            children: [
+              book.coverImage != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        book.coverImage!,
+                        width: 60,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 60,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: const Icon(Icons.book, size: 24),
+                          );
+                        },
+                      ),
+                    )
+                  : Container(
                       width: 60,
                       height: 80,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.book),
-                    );
-                  },
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: const Icon(Icons.book, size: 24),
+                    ),
+              // Book indicator
+              Positioned(
+                top: 2,
+                right: 2,
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade600,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
                 ),
-              )
-            : Container(
-                width: 60,
-                height: 80,
-                color: Colors.grey[300],
-                child: const Icon(Icons.book),
               ),
-        title: Text(
-          book.title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+            ],
+          ),
+          title: Text(
+            book.title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+              // Authors
+              if (book.authors.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.person, size: 14, color: Colors.grey[600]),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        book.authors.join(', '),
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 13,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+              ],
+              // Bookbox location
+              Row(
+                children: [
+                  Icon(Icons.library_books, size: 14, color: Colors.grey[600]),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      book.bookboxName,
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          trailing: Icon(
+            Icons.arrow_forward_ios,
+            size: 16,
+            color: Colors.grey[400],
+          ),
+          onTap: () => viewModel.onBookTap(book),
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (book.authors.isNotEmpty)
-              Text('By: ${book.authors.join(', ')}'),
-            Text('In: ${book.bookboxName}'),
-          ],
-        ),
-        onTap: () => viewModel.onBookTap(book),
       ),
     );
   }

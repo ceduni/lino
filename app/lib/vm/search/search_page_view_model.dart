@@ -1,5 +1,7 @@
 // app/lib/vm/search/search_page_view_model.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/models/search_model.dart';
@@ -23,11 +25,20 @@ class SearchPageViewModel extends ChangeNotifier {
   final SearchService _searchService = SearchService();
   final TextEditingController _searchController = TextEditingController();
 
+  // Debouncing
+  Timer? _debounceTimer;
+  static const Duration _debounceDuration = Duration(milliseconds: 500);
+
   // Current search state
   SearchType _currentSearchType = SearchType.bookboxes;
   String _searchQuery = '';
   bool _isLoading = false;
   String? _error;
+  bool _hasSearched = false; // Track if we've performed at least one search
+
+  // User location
+  Position? _userPosition;
+  bool _locationPermissionGranted = false;
 
   // Bookboxes results
   List<ShortenedBookBox> _bookboxResults = [];
@@ -66,22 +77,70 @@ class SearchPageViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _searchController.dispose();
     super.dispose();
   }
 
   void initialize() {
     _searchController.addListener(_onSearchChanged);
+    _requestLocationPermission();
+  }
+
+  Future<void> _requestLocationPermission() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.whileInUse || 
+          permission == LocationPermission.always) {
+        _locationPermissionGranted = true;
+        await _getCurrentLocation();
+      } else {
+        _locationPermissionGranted = false;
+        print('Location permission denied');
+      }
+    } catch (e) {
+      print('Error requesting location permission: $e');
+      _locationPermissionGranted = false;
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      if (_locationPermissionGranted) {
+        _userPosition = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+            timeLimit: Duration(seconds: 10),
+          ),
+        );
+        print('User location: ${_userPosition?.latitude}, ${_userPosition?.longitude}');
+      }
+    } catch (e) {
+      print('Error getting current location: $e');
+      _userPosition = null;
+    }
   }
 
   void _onSearchChanged() {
     final query = _searchController.text.trim();
     if (query != _searchQuery) {
       _searchQuery = query;
+      
+      // Cancel previous timer
+      _debounceTimer?.cancel();
+      
       if (query.isNotEmpty) {
-        _performSearch();
+        // Start new debounced search
+        _debounceTimer = Timer(_debounceDuration, () {
+          _performSearch();
+        });
       } else {
         _clearResults();
+        notifyListeners();
       }
     }
   }
@@ -118,17 +177,49 @@ class SearchPageViewModel extends ChangeNotifier {
       switch (_currentSearchType) {
         case SearchType.bookboxes:
           await _searchBookboxes();
-          break;
+          _hasSearched = true;
         case SearchType.books:
           await _searchBooks();
-          break;
+          _hasSearched = true;
       }
     } catch (e) {
-      _error = e.toString();
-      print('Search error: $e');
+      _handleSearchError(e);
     }
 
     _isLoading = false;
+    notifyListeners();
+  }
+
+  void _handleSearchError(dynamic error) {
+    String errorMessage = 'An error occurred while searching';
+    
+    // Parse different types of errors
+    if (error.toString().contains('400')) {
+      errorMessage = 'Invalid search query. Please try different keywords.';
+    } else if (error.toString().contains('404')) {
+      errorMessage = 'No results found for your search.';
+    } else if (error.toString().contains('500')) {
+      errorMessage = 'Server error. Please try again later.';
+    } else if (error.toString().contains('timeout') || error.toString().contains('TimeoutException')) {
+      errorMessage = 'Search timed out. Please check your connection and try again.';
+    } else if (error.toString().contains('SocketException') || error.toString().contains('NetworkException')) {
+      errorMessage = 'Network error. Please check your internet connection.';
+    }
+    
+    _error = errorMessage;
+    print('Search error: $error');
+  }
+
+  // Method to retry search (useful for error recovery)
+  void retrySearch() {
+    if (_searchQuery.isNotEmpty) {
+      _performSearch();
+    }
+  }
+
+  // Method to clear error state
+  void clearError() {
+    _error = null;
     notifyListeners();
   }
 
@@ -139,6 +230,9 @@ class SearchPageViewModel extends ChangeNotifier {
       asc: _bookboxAscending,
       limit: 10,
       page: _bookboxCurrentPage,
+      // Include user location if available for distance calculation
+      longitude: _userPosition?.longitude,
+      latitude: _userPosition?.latitude,
     );
 
     _bookboxResults = response.results;

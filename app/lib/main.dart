@@ -7,7 +7,6 @@ import 'package:Lino_app/services/user_services.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:Lino_app/vm/home/home_view_model.dart';
 import 'package:Lino_app/vm/layout/appbar_view_model.dart';
-import 'package:Lino_app/vm/search/search_bar_view_model.dart';
 import 'package:Lino_app/vm/search/search_view_model.dart';
 import 'package:Lino_app/vm/search/search_page_view_model.dart';
 import 'package:Lino_app/vm/profile/notifications_view_model.dart';
@@ -89,7 +88,6 @@ class _MyAppState extends State<MyApp> {
       ChangeNotifierProvider(create: (_) => BookBoxIssueReportViewModel()),
       ChangeNotifierProvider(create: (_) => HomeViewModel()),
       ChangeNotifierProvider(create: (_) => AppBarViewModel()),
-      ChangeNotifierProvider(create: (_) => SearchBarViewModel()),
       ChangeNotifierProvider(create: (_) => SearchViewModel()),
       ChangeNotifierProvider(create: (_) => SearchPageViewModel()),
       ChangeNotifierProvider(create: (_) => NotificationsViewModel()),
