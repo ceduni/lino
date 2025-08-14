@@ -1,5 +1,5 @@
-import { BookBox, User, Notification } from '../models';
-import { newErr } from '../utilities/utilities';
+import { BookBox, User, Notification, Request } from '../models';
+import { newErr, isFuzzyMatch } from '../utilities/utilities';
 import { broadcastToUser } from '../index';
 import { IBook } from '../types';
 import { RequestService } from '.';
@@ -13,6 +13,7 @@ const NotificationService = {
         options: {
             bookId?: string;
             bookboxId?: string;
+            requestId?: string;
         } = {}
     ) {
         const notification = new Notification({
@@ -20,6 +21,7 @@ const NotificationService = {
             bookId: options.bookId,
             bookTitle: bookTitle,
             bookboxId: options.bookboxId,
+            requestId: options.requestId,
             reason: reasons,
             read: false
         });
@@ -35,6 +37,7 @@ const NotificationService = {
                 bookId: notification.bookId,
                 bookTitle: notification.bookTitle,
                 bookboxId: notification.bookboxId,
+                requestId: notification.requestId,
                 reason: notification.reason,
                 read: notification.read,
                 createdAt: notification.createdAt
@@ -81,20 +84,91 @@ const NotificationService = {
     },
 
     // Notify relevant users when a book is added to a bookbox
-    async notifyRelevantUsers(username: string, book: IBook, bookboxId: string) {
+    async notifyRelevantUsers(excludedUsername: string, book: IBook, bookboxId: string) {
         const bookBox = await BookBox.findById(bookboxId);
         if (!bookBox) {
             throw newErr(404, 'Bookbox not found');
         }
 
-        const users = await User.find();
-        
-        for (const user of users) {
-            if (user.username === username || !user.notificationSettings.addedBook) {
-                continue; // Skip the user who added the book or if they don't accept this notification type
+        // Find all requests that fuzzy match the book's title
+        const allRequests = await Request.find();
+        const matchingRequests = allRequests.filter(request => 
+            isFuzzyMatch(request.bookTitle, book.title, 0.8)
+        );
+
+        // Get all users who upvoted matching requests
+        const upvoterUsernames = new Set<string>();
+        const requestIdsByUpvoter = new Map<string, string>();
+
+        for (const request of matchingRequests) {
+            for (const upvoterUsername of request.upvoters) {
+                if (upvoterUsername !== excludedUsername) {
+                    upvoterUsernames.add(upvoterUsername);
+                    requestIdsByUpvoter.set(upvoterUsername, request._id.toString());
+                }
+            }
+        }
+
+        // Get user objects for all upvoters
+        const upvoterUsers = await User.find({ 
+            username: { $in: Array.from(upvoterUsernames) },
+            'notificationSettings.addedBook': true
+        });
+
+        // Notify each upvoter
+        for (const user of upvoterUsers) {
+            const reasons: string[] = ['solved_book_request'];
+            
+            // Check if user follows this bookbox
+            if (user.followedBookboxes.includes(bookboxId)) {
+                reasons.push('fav_bookbox');
             }
 
+            // Check if the borough matches one of the user's favourite locations
+            for (const location of user.favouriteLocations) {
+                if (location.boroughId === bookBox.boroughId) {
+                    reasons.push('same_borough');
+                    break; // Exit early since we only need to find one match
+                }
+            }
 
+            // Check if book categories match user's favourite genres
+            if (user.favouriteGenres && user.favouriteGenres.length > 0 && book.categories) {
+                const hasMatchingGenre = book.categories.some(category => 
+                    user.favouriteGenres.some(genre => 
+                        genre.toLowerCase() === category.toLowerCase()
+                    )
+                );
+                if (hasMatchingGenre) {
+                    reasons.push('fav_genre');
+                }
+            }
+            
+            const notificationOptions: any = {
+                bookboxId: bookboxId,
+                requestId: requestIdsByUpvoter.get(user.username)
+            };
+            
+            // Only include bookId if it exists and is not empty
+            if (book._id && book._id.toString()) {
+                notificationOptions.bookId = book._id.toString();
+            }
+            
+            await this.createNotification(
+                user._id.toString(),
+                reasons,
+                book.title,
+                notificationOptions
+            );
+        }
+
+        // Also notify users based on other criteria (bookbox followers, location, genre) who didn't upvote
+        const users = await User.find({
+            username: { $nin: [excludedUsername, ...Array.from(upvoterUsernames)] },
+            'notificationSettings.addedBook': true
+        });
+        
+        for (const user of users) {
             const reasons: string[] = [];
 
             // Check if user follows this bookbox
@@ -112,7 +186,7 @@ const NotificationService = {
 
             // Create notification if there's at least a reason related to the book box
             if (reasons.length > 0) {
-                 // Check if book categories match user's favourite genres
+                // Check if book categories match user's favourite genres
                 if (user.favouriteGenres && user.favouriteGenres.length > 0 && book.categories) {
                     const hasMatchingGenre = book.categories.some(category => 
                         user.favouriteGenres.some(genre => 
@@ -122,13 +196,6 @@ const NotificationService = {
                     if (hasMatchingGenre) {
                         reasons.push('fav_genre');
                     }
-                }
-
-                const requests = await RequestService.getBookRequests(user.username);
-
-                // Check if the book matches the user's request
-                if (requests.some(req => req.bookTitle.toLowerCase() === book.title.toLowerCase())) {
-                    reasons.push('solved_book_request');
                 }
                 
                 const notificationOptions: any = {

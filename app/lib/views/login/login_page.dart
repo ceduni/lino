@@ -1,0 +1,192 @@
+// app/lib/views/login/login_page.dart
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:Lino_app/vm/login/login_view_model.dart';
+import 'register_page.dart';
+
+class LoginPage extends StatefulWidget {
+  final SharedPreferences prefs;
+  const LoginPage({required this.prefs, super.key});
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Consumer<LoginViewModel>(
+        builder: (context, viewModel, child) {
+          return Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: const Color(0xFF4277B8),
+            child: Stack(
+              children: [
+                _buildCloseButton(),
+                _buildMainContent(viewModel),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCloseButton() {
+    return Positioned(
+      top: 50,
+      left: 16,
+      child: IconButton(
+        onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
+        icon: const Icon(
+          Icons.close,
+          color: Colors.white,
+          size: 30,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainContent(LoginViewModel viewModel) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Spacer(flex: 2),
+          Image.asset('assets/logos/logo_with_bird.png', height: 150),
+          const Spacer(flex: 1),
+          _buildTextField(
+            viewModel.identifierController,
+            'Username or Email',
+            Icons.person,
+          ),
+          const SizedBox(height: 20),
+          _buildTextField(
+            viewModel.passwordController,
+            'Password',
+            Icons.lock,
+            obscureText: viewModel.obscureText,
+            onToggleVisibility: viewModel.togglePasswordVisibility,
+          ),
+          const SizedBox(height: 20),
+          _buildLoginButton(viewModel),
+          const Spacer(flex: 1),
+          _buildFooterText(viewModel),
+          const Spacer(flex: 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+      TextEditingController controller,
+      String hintText,
+      IconData icon, {
+        bool obscureText = false,
+        VoidCallback? onToggleVisibility,
+      }) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
+        filled: true,
+        fillColor: const Color(0xFFE0F7FA),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0),
+          borderSide: BorderSide.none,
+        ),
+        prefixIcon: Icon(icon, color: Colors.black.withOpacity(0.5)),
+        suffixIcon: hintText == 'Password'
+            ? IconButton(
+          icon: Icon(
+            obscureText ? Icons.visibility_off : Icons.visibility,
+            color: Colors.black.withOpacity(0.5),
+          ),
+          onPressed: onToggleVisibility,
+        )
+            : null,
+      ),
+      obscureText: obscureText,
+    );
+  }
+
+  Widget _buildLoginButton(LoginViewModel viewModel) {
+    return ElevatedButton(
+      onPressed: viewModel.isLoading
+          ? null
+          : () async {
+        final success = await viewModel.login(widget.prefs);
+        if (success && mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+      ),
+      child: viewModel.isLoading
+          ? const CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+      )
+          : const Text('Login'),
+    );
+  }
+
+  Widget _buildFooterText(LoginViewModel viewModel) {
+    return Container(
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              text: "Don't have an account? ",
+              style: const TextStyle(color: Colors.white),
+              children: [
+                TextSpan(
+                  text: 'Register here',
+                  style: const TextStyle(
+                    color: Color(0xFF063F6A),
+                    decoration: TextDecoration.underline,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RegisterPage(prefs: widget.prefs),
+                        ),
+                      );
+                    },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () async {
+              await viewModel.openAsGuest(widget.prefs);
+              if (mounted) {
+                Navigator.pushReplacementNamed(context, '/home');
+              }
+            },
+            child: const Text(
+              'Open as a guest',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
