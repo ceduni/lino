@@ -34,7 +34,6 @@ class SearchPageViewModel extends ChangeNotifier {
   String _searchQuery = '';
   bool _isLoading = false;
   String? _error;
-  bool _hasSearched = false; // Track if we've performed at least one search
 
   // User location
   Position? _userPosition;
@@ -177,10 +176,8 @@ class SearchPageViewModel extends ChangeNotifier {
       switch (_currentSearchType) {
         case SearchType.bookboxes:
           await _searchBookboxes();
-          _hasSearched = true;
         case SearchType.books:
           await _searchBooks();
-          _hasSearched = true;
       }
     } catch (e) {
       _handleSearchError(e);

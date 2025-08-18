@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/home/home_view_model.dart';
+import 'package:Lino_app/vm/bookboxes/bookbox_list_view_model.dart';
+import 'package:Lino_app/vm/map/map_view_model.dart';
 import 'package:Lino_app/widgets/home_profile_summary.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,8 +20,13 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final viewModel = context.read<HomeViewModel>();
+      viewModel.setContext(context);
       viewModel.initialize();
       viewModel.checkLocationPermission();
+      
+      // Initialize bookbox data
+      final bookboxViewModel = context.read<BookboxListViewModel>();
+      bookboxViewModel.initialize();
     });
   }
 
@@ -173,14 +180,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildMap(HomeViewModel viewModel) {
-    return StreamBuilder<Object>(
-      stream: viewModel.bookBoxController.bookBoxes.stream,
-      builder: (context, snapshot) {
+    return Consumer2<BookboxListViewModel, MapViewModel>(
+      builder: (context, bookboxViewModel, mapViewModel, child) {
         final markers = viewModel.getMarkers();
 
         return GoogleMap(
-          onMapCreated: viewModel.bookBoxController.mapController.onMapCreated,
-          initialCameraPosition: viewModel.bookBoxController.mapController.cameraPosition.value,
+          onMapCreated: mapViewModel.onMapCreated,
+          initialCameraPosition: mapViewModel.cameraPosition,
           myLocationEnabled: true,
           myLocationButtonEnabled: true,
           markers: Set<Marker>.of(markers),

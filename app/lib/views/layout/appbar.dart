@@ -1,7 +1,7 @@
 // app/lib/pages/appbar/appbar_view_model.dart
+import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:Lino_app/vm/layout/appbar_view_model.dart';
 
 class LinoAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -54,7 +54,7 @@ class _LinoAppBarState extends State<LinoAppBar> {
           width: 20,
           child: CircularProgressIndicator(
             strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            valueColor: AlwaysStoppedAnimation<Color>(LinoColors.accent),
           ),
         ),
       );

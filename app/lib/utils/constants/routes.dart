@@ -5,5 +5,6 @@ class AppRoutes {
   static const favouriteLocations = '/favourite-locations';
   static const favouriteLocationsInput = '/favourite-locations-input';
   static const bookbox = '/bookbox';
+  static const bookboxSelection = '/bookbox-selection';
 // Add more routes here as needed
 }

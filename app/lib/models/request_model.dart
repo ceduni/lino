@@ -55,3 +55,63 @@ class Request {
     };
   }
 }
+
+enum RequestFilter {
+  all('all'),
+  notified('notified'),
+  upvoted('upvoted'),
+  mine('mine');
+
+  const RequestFilter(this.value);
+  final String value;
+}
+
+enum RequestSortBy {
+  date('date'),
+  upvoters('upvoters'),
+  peopleNotified('peopleNotified');
+
+  const RequestSortBy(this.value);
+  final String value;
+}
+
+// Response models
+class UpvoteResponse {
+  final String message;
+  final bool isUpvoted;
+  final int upvoteCount;
+  final Request request;
+
+  UpvoteResponse({
+    required this.message,
+    required this.isUpvoted,
+    required this.upvoteCount,
+    required this.request,
+  });
+
+  factory UpvoteResponse.fromJson(Map<String, dynamic> json) {
+    return UpvoteResponse(
+      message: json['message'] as String,
+      isUpvoted: json['isUpvoted'] as bool,
+      upvoteCount: json['upvoteCount'] as int,
+      request: Request.fromJson(json['request'] as Map<String, dynamic>),
+    );
+  }
+}
+
+class SolveResponse {
+  final String message;
+  final bool isSolved;
+
+  SolveResponse({
+    required this.message,
+    required this.isSolved,
+  });
+
+  factory SolveResponse.fromJson(Map<String, dynamic> json) {
+    return SolveResponse(
+      message: json['message'] as String,
+      isSolved: json['isSolved'] as bool,
+    );
+  }
+}

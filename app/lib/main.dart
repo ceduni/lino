@@ -1,6 +1,6 @@
-import 'package:Lino_app/pages/map/book_box_controller.dart';
 import 'package:Lino_app/views/bookboxes/book_box_page.dart';
 import 'package:Lino_app/views/login/login_page.dart';
+import 'package:Lino_app/views/forum/bookbox_selection_page.dart';
 import 'package:Lino_app/services/bookbox_state_service.dart';
 import 'package:Lino_app/services/deep_link_service.dart';
 import 'package:Lino_app/services/user_services.dart';
@@ -28,6 +28,11 @@ import 'package:Lino_app/vm/login/login_view_model.dart';
 import 'package:Lino_app/vm/login/onboarding/favourite_genres_input_view_model.dart';
 import 'package:Lino_app/vm/login/onboarding/favourite_locations_input_view_model.dart';
 import 'package:Lino_app/vm/login/register_view_model.dart';
+import 'package:Lino_app/vm/map/map_view_model.dart';
+import 'package:Lino_app/vm/bookboxes/bookbox_list_view_model.dart';
+import 'package:Lino_app/vm/forum/forum_view_model.dart';
+import 'package:Lino_app/vm/forum/requests_view_model.dart';
+import 'package:Lino_app/vm/forum/request_form_view_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +46,6 @@ Future<void> main() async {
 
   // Initialize GetX services
   Get.put(BookBoxStateService());
-  Get.put(BookBoxController());
 
   final prefs = await SharedPreferences.getInstance();
   String? userId;
@@ -91,6 +95,11 @@ class _MyAppState extends State<MyApp> {
       ChangeNotifierProvider(create: (_) => SearchViewModel()),
       ChangeNotifierProvider(create: (_) => SearchPageViewModel()),
       ChangeNotifierProvider(create: (_) => NotificationsViewModel()),
+      ChangeNotifierProvider(create: (_) => MapViewModel()),
+      ChangeNotifierProvider(create: (_) => BookboxListViewModel()),
+      ChangeNotifierProvider(create: (_) => ForumViewModel()),
+      ChangeNotifierProvider(create: (_) => RequestsViewModel()),
+      ChangeNotifierProvider(create: (_) => RequestFormViewModel()),
       ],
       child: GetMaterialApp(
         title: 'Lino',
@@ -102,6 +111,10 @@ class _MyAppState extends State<MyApp> {
           GetPage(name: AppRoutes.login, page: () => LoginPage(prefs: widget.prefs)),
           GetPage(name: AppRoutes.home, page: () => const BookNavPage()),
           GetPage(name: AppRoutes.bookbox, page: () => const BookBoxPage()),
+          GetPage(
+            name: AppRoutes.bookboxSelection, 
+            page: () => BookboxSelectionPage(arguments: Get.arguments ?? {}),
+          ),
           // Add more routes here as needed
         ],
         onReady: () {

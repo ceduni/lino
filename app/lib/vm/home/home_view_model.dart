@@ -6,14 +6,15 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:provider/provider.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/services/user_services.dart';
-import 'package:Lino_app/pages/map/book_box_controller.dart';
+import 'package:Lino_app/vm/bookboxes/bookbox_list_view_model.dart';
+import 'package:Lino_app/vm/map/map_view_model.dart';
 import 'package:Lino_app/nav_menu.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  final BookBoxController _bookBoxController = Get.find<BookBoxController>();
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   bool _isInitialized = false;
@@ -23,12 +24,18 @@ class HomeViewModel extends ChangeNotifier {
   String? _error;
   int _clickCount = 0;
 
+  // Context for accessing other ViewModels
+  BuildContext? _context;
+
   bool get isInitialized => _isInitialized;
   String? get token => _token;
   User? get userData => _userData;
   bool get isLoadingUser => _isLoadingUser;
   String? get error => _error;
-  BookBoxController get bookBoxController => _bookBoxController;
+
+  void setContext(BuildContext context) {
+    _context = context;
+  }
 
   @override
   void dispose() {
@@ -73,12 +80,15 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<void> checkLocationPermission() async {
+    if (_context == null) return;
+    
     PermissionStatus status = await Permission.locationWhenInUse.status;
     if (status.isDenied) {
       status = await Permission.locationWhenInUse.request();
     }
     if (status.isGranted) {
-      _bookBoxController.getUserLocation();
+      final bookboxViewModel = Provider.of<BookboxListViewModel>(_context!, listen: false);
+      await bookboxViewModel.refreshBookboxes();
     }
   }
 
@@ -87,21 +97,27 @@ class HomeViewModel extends ChangeNotifier {
       return 'This book box is currently inactive.';
     }
 
-    if (_bookBoxController.userLocation.value != null) {
-      final distance = Geolocator.distanceBetween(
-        _bookBoxController.userLocation.value!.latitude,
-        _bookBoxController.userLocation.value!.longitude,
-        bbox.latitude,
-        bbox.longitude,
-      ) / 1000;
-      return 'Distance: ${distance.toStringAsFixed(2)} km';
+    if (_context != null) {
+      final bookboxViewModel = Provider.of<BookboxListViewModel>(_context!, listen: false);
+      if (bookboxViewModel.userPosition != null) {
+        final distance = Geolocator.distanceBetween(
+          bookboxViewModel.userPosition!.latitude,
+          bookboxViewModel.userPosition!.longitude,
+          bbox.latitude,
+          bbox.longitude,
+        ) / 1000;
+        return 'Distance: ${distance.toStringAsFixed(2)} km';
+      }
     }
 
     return '${bbox.booksCount} books available';
   }
 
   List<Marker> getMarkers() {
-    final bboxes = _bookBoxController.bookBoxes;
+    if (_context == null) return [];
+    
+    final bookboxViewModel = Provider.of<BookboxListViewModel>(_context!, listen: false);
+    final bboxes = bookboxViewModel.bookboxes;
 
     return bboxes.map((bbox) => Marker(
       markerId: MarkerId(bbox.id),
@@ -114,9 +130,20 @@ class HomeViewModel extends ChangeNotifier {
           ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
           : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       onTap: () {
-        _bookBoxController.highlightBookBox(bbox.id);
+        bookboxViewModel.highlightBookbox(bbox.id);
       },
     )).toList();
+  }
+
+  // Helper methods for accessing ViewModels
+  BookboxListViewModel? getBookboxViewModel() {
+    if (_context == null) return null;
+    return Provider.of<BookboxListViewModel>(_context!, listen: false);
+  }
+
+  MapViewModel? getMapViewModel() {
+    if (_context == null) return null;
+    return Provider.of<MapViewModel>(_context!, listen: false);
   }
 
   void navigateToProfile() {

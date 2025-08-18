@@ -7,8 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/services/thread_services.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
-import 'package:Lino_app/pages/forum/threads/thread_message_screen.dart';
-import '../../../services/user_services.dart';
+import './thread_message_screen.dart';
+import 'package:Lino_app/services/user_services.dart';
 
 class ThreadsSection extends StatefulWidget {
   final String? query;
