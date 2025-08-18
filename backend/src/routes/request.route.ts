@@ -3,7 +3,6 @@ import { RequestService } from "../services";
 import { 
     sendBookRequestSchema,
     deleteBookRequestSchema,
-    getBookRequestsSchema,
     toggleSolvedStatusSchema,
     toggleUpvoteSchema
 } from "../schemas";
@@ -38,34 +37,6 @@ async function deleteBookRequest(request: FastifyRequest, reply: FastifyReply) {
     }
 }
  
-async function getBookRequests(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const { username, filter, sortBy, sortOrder } = (request as { 
-            query: { 
-                username?: string;
-                filter?: 'all' | 'notified' | 'upvoted' | 'mine';
-                sortBy?: 'date' | 'upvoters' | 'peopleNotified';
-                sortOrder?: 'asc' | 'desc';
-            } 
-        }).query;
-
-        let userId: string | undefined;
-        if ((request as AuthenticatedRequest).user) {
-            userId = (request as AuthenticatedRequest).user.id; // Extract user ID from JWT token if available
-        }
-
-        const response = await RequestService.getBookRequests(username, {
-            filter,
-            sortBy,
-            sortOrder,
-            userId
-        });
-        reply.code(200).send(response);
-    } catch (error : unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        reply.code(500).send({error: message});
-    }
-}
 
 async function toggleSolvedStatus(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -96,7 +67,6 @@ async function toggleUpvote(request: FastifyRequest, reply: FastifyReply) {
 export default async function requestRoutes(server: MyFastifyInstance) {
     server.post('/books/request', { preValidation: [server.authenticate], schema: sendBookRequestSchema }, sendBookRequest);
     server.delete('/books/request/:id', { preValidation: [server.authenticate], schema: deleteBookRequestSchema }, deleteBookRequest);
-    server.get('/books/requests', { preValidation: [server.optionalAuthenticate], schema: getBookRequestsSchema }, getBookRequests);
     server.patch('/books/request/:id/solve', { preValidation: [server.authenticate], schema: toggleSolvedStatusSchema }, toggleSolvedStatus);
     server.patch('/books/request/:id/upvote', { preValidation: [server.authenticate], schema: toggleUpvoteSchema }, toggleUpvote);
 }

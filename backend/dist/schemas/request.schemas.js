@@ -89,12 +89,11 @@ exports.deleteBookRequestSchema = {
     }
 };
 exports.getBookRequestsSchema = {
-    description: 'Get book requests with filtering and sorting options',
+    description: 'Get book requests with filtering and sorting options. Authentication is optional but required for certain filters.',
     tags: ['books', 'users'],
     querystring: {
         type: 'object',
         properties: {
-            username: { type: 'string' },
             filter: {
                 type: 'string',
                 enum: ['all', 'notified', 'upvoted', 'mine'],
@@ -125,7 +124,7 @@ exports.getBookRequestsSchema = {
             items: Object.assign({}, _1.bookRequestSchema),
         },
         401: {
-            description: 'Authentication required for this filter',
+            description: 'Authentication required for this filter (notified, upvoted, mine)',
             type: 'object',
             properties: {
                 error: { type: 'string' }

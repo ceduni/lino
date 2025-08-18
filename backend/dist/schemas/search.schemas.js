@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchUsersSchema = exports.searchIssuesSchema = exports.searchTransactionHistorySchema = exports.searchMyManagedBookboxesSchema = exports.searchThreadsSchema = exports.findNearestBookboxesSchema = exports.searchBookboxesSchema = exports.searchBooksSchema = exports.paginationSchema = void 0;
+exports.searchBookRequestsSchema = exports.searchUsersSchema = exports.searchIssuesSchema = exports.searchTransactionHistorySchema = exports.searchMyManagedBookboxesSchema = exports.searchThreadsSchema = exports.findNearestBookboxesSchema = exports.searchBookboxesSchema = exports.searchBooksSchema = exports.paginationSchema = void 0;
+const models_schemas_1 = require("./models.schemas");
 exports.paginationSchema = {
     type: 'object',
     properties: {
@@ -534,6 +535,76 @@ exports.searchUsersSchema = {
         },
         400: {
             description: 'Invalid query parameters',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+exports.searchBookRequestsSchema = {
+    description: 'Search book requests with filtering, sorting, and pagination. Authentication is optional but required for certain filters.',
+    tags: ['books', 'requests'],
+    querystring: {
+        type: 'object',
+        properties: {
+            q: { type: 'string' },
+            filter: {
+                type: 'string',
+                enum: ['all', 'notified', 'upvoted', 'mine'],
+                default: 'all'
+            },
+            sortBy: {
+                type: 'string',
+                enum: ['date', 'upvoters', 'peopleNotified'],
+                default: 'date'
+            },
+            sortOrder: {
+                type: 'string',
+                enum: ['asc', 'desc'],
+                default: 'desc'
+            },
+            limit: { type: 'number', default: 20 },
+            page: { type: 'number', default: 1 }
+        }
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' }
+        }
+    },
+    response: {
+        200: {
+            description: 'Book requests found',
+            type: 'object',
+            properties: {
+                requests: {
+                    type: 'array',
+                    items: Object.assign({}, models_schemas_1.bookRequestSchema)
+                },
+                pagination: {
+                    type: 'object',
+                    properties: {
+                        currentPage: { type: 'number', default: 1 },
+                        totalPages: { type: 'number', default: 1 },
+                        totalResults: { type: 'number', default: 0 },
+                        hasNextPage: { type: 'boolean', default: false },
+                        hasPrevPage: { type: 'boolean', default: false },
+                        limit: { type: 'number', default: 20 }
+                    }
+                }
+            }
+        },
+        401: {
+            description: 'Authentication required for this filter (notified, upvoted, mine)',
             type: 'object',
             properties: {
                 error: { type: 'string' }

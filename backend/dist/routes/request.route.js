@@ -41,39 +41,6 @@ function deleteBookRequest(request, reply) {
         }
     });
 }
-function getBookRequests(request, reply) {
-    return __awaiter(this, void 0, void 0, function* () {
-        var _a;
-        try {
-            const { username, filter, sortBy, sortOrder } = request.query;
-            // Extract user ID from JWT token if available (for filtering by notified/upvoted)
-            let userId;
-            try {
-                userId = (_a = request.user) === null || _a === void 0 ? void 0 : _a.id;
-            }
-            catch (_b) {
-                // User not authenticated, which is fine for 'all' filter
-                userId = undefined;
-            }
-            // If filter requires authentication but user is not authenticated, return error
-            if ((filter === 'notified' || filter === 'upvoted' || filter === 'mine') && !userId) {
-                reply.code(401).send({ error: 'Authentication required for this filter' });
-                return;
-            }
-            const response = yield services_1.RequestService.getBookRequests(username, {
-                filter,
-                sortBy,
-                sortOrder,
-                userId
-            });
-            reply.code(200).send(response);
-        }
-        catch (error) {
-            const message = error instanceof Error ? error.message : 'Unknown error';
-            reply.code(500).send({ error: message });
-        }
-    });
-}
 function toggleSolvedStatus(request, reply) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -107,7 +74,6 @@ function requestRoutes(server) {
     return __awaiter(this, void 0, void 0, function* () {
         server.post('/books/request', { preValidation: [server.authenticate], schema: schemas_1.sendBookRequestSchema }, sendBookRequest);
         server.delete('/books/request/:id', { preValidation: [server.authenticate], schema: schemas_1.deleteBookRequestSchema }, deleteBookRequest);
-        server.get('/books/requests', { schema: schemas_1.getBookRequestsSchema }, getBookRequests);
         server.patch('/books/request/:id/solve', { preValidation: [server.authenticate], schema: schemas_1.toggleSolvedStatusSchema }, toggleSolvedStatus);
         server.patch('/books/request/:id/upvote', { preValidation: [server.authenticate], schema: schemas_1.toggleUpvoteSchema }, toggleUpvote);
     });

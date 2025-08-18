@@ -1,4 +1,4 @@
-import { BookBox, Issue, Thread, Transaction, User } from "../models";
+import { BookBox, Issue, Thread, Transaction, User, Request, Notification } from "../models";
 import { getBoroughId } from "../utilities/borough.id.generator";
 import { newErr } from "../utilities/utilities";
 
@@ -703,6 +703,166 @@ const searchService = {
                 limit: pageSize
             }
         };
+    },
+
+    async searchBookRequests(
+        q?: string,
+        filter: 'all' | 'notified' | 'upvoted' | 'mine' = 'all',
+        sortBy: 'date' | 'upvoters' | 'peopleNotified' = 'date',
+        sortOrder: 'asc' | 'desc' = 'desc',
+        userId?: string,
+        limit: number = 20,
+        page: number = 1
+    ) {
+        const pageSize = limit;
+        const skipAmount = (page - 1) * pageSize;
+        
+        // Restrict certain filters to authenticated users only
+        if (!userId && ['notified', 'upvoted', 'mine'].includes(filter)) {
+            throw newErr(401, 'Authentication required for this filter');
+        }
+        
+        let query: any = {};
+        
+        // Add search filter if q is provided
+        if (q) {
+            query.bookTitle = { $regex: q, $options: 'i' };
+        }
+        
+        // Apply specific filters based on user interactions
+        if (filter === 'notified' && userId) {
+            // Get notifications for this user that have 'book_request' in reasons
+            const notifications = await Notification.find({
+                userId: userId,
+                reason: { $in: ['book_request'] },
+                requestId: { $exists: true, $ne: null }
+            });
+            
+            const requestIds = notifications.map(notification => notification.requestId);
+            query._id = { $in: requestIds };
+            
+        } else if (filter === 'upvoted' && userId) {
+            // Find user object to get username
+            const user = await User.findById(userId);
+            if (user) {
+                query.upvoters = { $in: [user.username] };
+            } else {
+                // If user not found, return empty result
+                return {
+                    requests: [],
+                    pagination: {
+                        currentPage: page,
+                        totalPages: 0,
+                        totalResults: 0,
+                        hasNextPage: false,
+                        hasPrevPage: false,
+                        limit: pageSize
+                    }
+                };
+            }
+        } else if (filter === 'mine' && userId) {
+            // Get user's own requests
+            const user = await User.findById(userId);
+            if (user) {
+                query.username = user.username;
+            } else {
+                // If user not found, return empty result
+                return {
+                    requests: [],
+                    pagination: {
+                        currentPage: page,
+                        totalPages: 0,
+                        totalResults: 0,
+                        hasNextPage: false,
+                        hasPrevPage: false,
+                        limit: pageSize
+                    }
+                };
+            }
+        }
+        // For 'all' filter or non-authenticated users, no additional query filters are applied
+        
+        // Handle sorting
+        if (sortBy === 'upvoters') {
+            // Use aggregation for sorting by number of upvoters
+            const aggregationPipeline = [
+                { $match: query },
+                {
+                    $addFields: {
+                        upvotersCount: { $size: "$upvoters" }
+                    }
+                },
+                {
+                    $sort: {
+                        upvotersCount: (sortOrder === 'asc' ? 1 : -1) as 1 | -1
+                    }
+                },
+                { $skip: skipAmount },
+                { $limit: pageSize }
+            ];
+
+            const countPipeline = [
+                { $match: query },
+                { $count: "total" }
+            ];
+
+            const [requests, countResult] = await Promise.all([
+                Request.aggregate(aggregationPipeline),
+                Request.aggregate(countPipeline)
+            ]);
+
+            const total = countResult[0]?.total || 0;
+            const totalPages = Math.ceil(total / pageSize);
+
+            return {
+                requests,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalResults: total,
+                    hasNextPage: page < totalPages,
+                    hasPrevPage: page > 1,
+                    limit: pageSize
+                }
+            };
+        } else {
+            // Use regular find with sorting for other sort options
+            let sortOptions: any = {};
+            
+            switch (sortBy) {
+                case 'date':
+                    sortOptions.timestamp = sortOrder === 'asc' ? 1 : -1;
+                    break;
+                case 'peopleNotified':
+                    sortOptions.nbPeopleNotified = sortOrder === 'asc' ? 1 : -1;
+                    break;
+                default:
+                    sortOptions.timestamp = -1; // Default to newest first
+            }
+
+            const [requests, total] = await Promise.all([
+                Request.find(query)
+                    .sort(sortOptions)
+                    .skip(skipAmount)
+                    .limit(pageSize)
+                    .lean(),
+                Request.countDocuments(query)
+            ]);
+
+            const totalPages = Math.ceil(total / pageSize);
+
+            return {
+                requests,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalResults: total,
+                    hasNextPage: page < totalPages,
+                    hasPrevPage: page > 1,
+                    limit: pageSize
+                }
+            };
+        }
     }
 }
 

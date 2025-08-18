@@ -9,7 +9,8 @@ import {
     searchMyManagedBookboxesSchema, 
     searchThreadsSchema, 
     searchTransactionHistorySchema, 
-    searchUsersSchema 
+    searchUsersSchema,
+    searchBookRequestsSchema
 } from "../schemas";
 
 async function searchBooks(request: FastifyRequest, reply: FastifyReply) {
@@ -167,6 +168,33 @@ async function searchUsers(request: FastifyRequest, reply: FastifyReply) {
     }
 }
 
+async function searchBookRequests(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const { q, filter, sortBy, sortOrder, limit, page } = request.query as { 
+            q?: string;
+            filter?: 'all' | 'notified' | 'upvoted' | 'mine';
+            sortBy?: 'date' | 'upvoters' | 'peopleNotified';
+            sortOrder?: 'asc' | 'desc';
+            limit?: number; 
+            page?: number;
+        };
+
+        let userId: string | undefined;
+        if ((request as AuthenticatedRequest).user) {
+            userId = (request as AuthenticatedRequest).user.id;
+        }
+
+        const results = await SearchService.searchBookRequests(
+            q, filter, sortBy, sortOrder, userId, limit, page
+        );
+        reply.send(results);
+    } catch (error: unknown) {
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
+    }
+}
+
 export default async function searchRoutes(server: MyFastifyInstance) {
     server.get('/search/books', { schema: searchBooksSchema }, searchBooks);
     server.get('/search/bookboxes', { schema: searchBookboxesSchema }, searchBookboxes);
@@ -182,4 +210,8 @@ export default async function searchRoutes(server: MyFastifyInstance) {
         preValidation: [server.adminAuthenticate],
         schema: searchUsersSchema 
     }, searchUsers);
+    server.get('/search/requests', { 
+        preValidation: [server.optionalAuthenticate],
+        schema: searchBookRequestsSchema 
+    }, searchBookRequests);
 }

@@ -1,4 +1,4 @@
-import { issueSchema, bookboxSchema, bookSchema, threadSchema } from "./models.schemas";
+import { issueSchema, bookboxSchema, bookSchema, threadSchema, bookRequestSchema } from "./models.schemas";
 
 export const paginationSchema = {
     type: 'object',
@@ -52,15 +52,7 @@ export const searchBooksSchema = {
                     }
                 }, 
                 pagination: {
-                    type: 'object',
-                    properties: {
-                        currentPage: { type: 'number', default: 1 },
-                        totalPages: { type: 'number', default: 1 },
-                        totalResults: { type: 'number', default: 0 },
-                        hasNextPage: { type: 'boolean', default: false },
-                        hasPrevPage: { type: 'boolean', default: false },
-                        limit: { type: 'number', default: 20 }
-                    }
+                    ...paginationSchema
                 }
             }
         },
@@ -121,15 +113,7 @@ export const searchBookboxesSchema = {
                     }
                 }, 
                 pagination: {
-                    type: 'object',
-                    properties: {
-                        currentPage: { type: 'number', default: 1 },
-                        totalPages: { type: 'number', default: 1 },
-                        totalResults: { type: 'number', default: 0 },
-                        hasNextPage: { type: 'boolean', default: false },
-                        hasPrevPage: { type: 'boolean', default: false },
-                        limit: { type: 'number', default: 20 }
-                    }
+                    ...paginationSchema
                 }
             }
         },
@@ -190,15 +174,7 @@ export const findNearestBookboxesSchema = {
                     }
                 }, 
                 pagination: {
-                    type: 'object',
-                    properties: {
-                        currentPage: { type: 'number', default: 1 },
-                        totalPages: { type: 'number', default: 1 },
-                        totalResults: { type: 'number', default: 0 },
-                        hasNextPage: { type: 'boolean', default: false },
-                        hasPrevPage: { type: 'boolean', default: false },
-                        limit: { type: 'number', default: 20 }
-                    }
+                    ...paginationSchema
                 }
             }
         },
@@ -276,15 +252,7 @@ export const searchThreadsSchema = {
                     }
                 },
                 pagination: {
-                    type: 'object',
-                    properties: {
-                        currentPage: { type: 'number', default: 1 },
-                        totalPages: { type: 'number', default: 1 },
-                        totalResults: { type: 'number', default: 0 },
-                        hasNextPage: { type: 'boolean', default: false },
-                        hasPrevPage: { type: 'boolean', default: false },
-                        limit: { type: 'number', default: 20 }
-                    }
+                    ...paginationSchema
                 }
             }
         }
@@ -357,15 +325,7 @@ export const searchMyManagedBookboxesSchema = {
                     }
                 },
                 pagination: {
-                    type: 'object',
-                    properties: {
-                        currentPage: { type: 'number', default: 1 },
-                        totalPages: { type: 'number', default: 1 },
-                        totalResults: { type: 'number', default: 0 },
-                        hasNextPage: { type: 'boolean', default: false },
-                        hasPrevPage: { type: 'boolean', default: false },
-                        limit: { type: 'number', default: 20 }
-                    }
+                    ...paginationSchema
                 }
             }
         },
@@ -412,15 +372,7 @@ export const searchTransactionHistorySchema = {
                     }
                 },
                 pagination: {
-                    type: 'object',
-                    properties: {
-                        currentPage: { type: 'number', default: 1 },
-                        totalPages: { type: 'number', default: 1 },
-                        totalResults: { type: 'number', default: 0 },
-                        hasNextPage: { type: 'boolean', default: false },
-                        hasPrevPage: { type: 'boolean', default: false },
-                        limit: { type: 'number', default: 20 }
-                    }
+                    ...paginationSchema
                 }
             }
         },
@@ -471,15 +423,7 @@ export const searchIssuesSchema = {
                     }
                 },
                 pagination: {
-                    type: 'object',
-                    properties: {
-                        currentPage: { type: 'number', default: 1 },
-                        totalPages: { type: 'number', default: 1 },
-                        totalResults: { type: 'number', default: 0 },
-                        hasNextPage: { type: 'boolean', default: false },
-                        hasPrevPage: { type: 'boolean', default: false },
-                        limit: { type: 'number', default: 20 }
-                    }
+                    ...paginationSchema
                 }
             }
         },
@@ -530,20 +474,77 @@ export const searchUsersSchema = {
                     }
                 },
                 pagination: {
-                    type: 'object',
-                    properties: {
-                        currentPage: { type: 'number', default: 1 },
-                        totalPages: { type: 'number', default: 1 },
-                        totalResults: { type: 'number', default: 0 },
-                        hasNextPage: { type: 'boolean', default: false },
-                        hasPrevPage: { type: 'boolean', default: false },
-                        limit: { type: 'number', default: 20 }
-                    }
+                    ...paginationSchema
                 }
             }
         },
         400: {
             description: 'Invalid query parameters',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        }
+    }
+};
+
+export const searchBookRequestsSchema = {
+    description: 'Search book requests with filtering, sorting, and pagination. Authentication is optional but required for certain filters.',
+    tags: ['books', 'requests'],
+    querystring: {
+        type: 'object',
+        properties: {
+            q: { type: 'string' },
+            filter: { 
+                type: 'string', 
+                enum: ['all', 'notified', 'upvoted', 'mine'],
+                default: 'all'
+            },
+            sortBy: { 
+                type: 'string', 
+                enum: ['date', 'upvoters', 'peopleNotified'],
+                default: 'date'
+            },
+            sortOrder: { 
+                type: 'string', 
+                enum: ['asc', 'desc'],
+                default: 'desc'
+            },
+            limit: { type: 'number', default: 20 },
+            page: { type: 'number', default: 1 }
+        }
+    },
+    headers: {
+        type: 'object',
+        properties: {
+            authorization: { type: 'string' }
+        }
+    },
+    response: {
+        200: {
+            description: 'Book requests found',
+            type: 'object',
+            properties: {
+                requests: {
+                    type: 'array',
+                    items: {
+                        ...bookRequestSchema
+                    }
+                },
+                pagination: {
+                    ...paginationSchema
+                }
+            }
+        },
+        401: {
+            description: 'Authentication required for this filter (notified, upvoted, mine)',
             type: 'object',
             properties: {
                 error: { type: 'string' }

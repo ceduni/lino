@@ -116,12 +116,25 @@ const searchService = {
                     { infoText: { $regex: q, $options: 'i' } }
                 ];
             }
-            // Handle location sorting with $geoNear
-            if (cls === 'by location') {
-                if (!longitude || !latitude) {
-                    throw (0, utilities_1.newErr)(400, 'Location is required for this classification');
+            // Check if location is required for 'by location' classification
+            if (cls === 'by location' && (!longitude || !latitude)) {
+                throw (0, utilities_1.newErr)(400, 'Location is required for this classification');
+            }
+            // If coordinates are provided, use $geoNear to include distance for all classifications
+            if (longitude && latitude) {
+                let sortStage;
+                if (cls === 'by location') {
+                    sortStage = { $sort: { distance: asc ? 1 : -1 } };
                 }
-                // For $geoNear, we need to get count differently
+                else if (cls === 'by name') {
+                    sortStage = { $sort: { name: asc ? 1 : -1 } };
+                }
+                else if (cls === 'by number of books') {
+                    sortStage = { $sort: { booksCount: asc ? 1 : -1 } };
+                }
+                else {
+                    sortStage = { $sort: { name: asc ? 1 : -1 } }; // default sort
+                }
                 const [bookboxes, countResult] = yield Promise.all([
                     models_1.BookBox.aggregate([
                         {
@@ -135,7 +148,7 @@ const searchService = {
                                 query: filter
                             }
                         },
-                        { $sort: { distance: asc ? 1 : -1 } },
+                        sortStage,
                         { $skip: skipAmount },
                         { $limit: pageSize },
                         {
@@ -146,7 +159,7 @@ const searchService = {
                             }
                         }
                     ]),
-                    // Count for location queries
+                    // Count for queries with coordinates
                     models_1.BookBox.aggregate([
                         {
                             $geoNear: {
@@ -176,7 +189,7 @@ const searchService = {
                     }
                 };
             }
-            // Handle other sorting with regular query + count
+            // Handle sorting without coordinates (no distance field)
             let sortObj = {};
             if (cls === 'by name') {
                 sortObj.name = asc ? 1 : -1;
@@ -610,6 +623,150 @@ const searchService = {
                     limit: pageSize
                 }
             };
+        });
+    },
+    searchBookRequests(q_1) {
+        return __awaiter(this, arguments, void 0, function* (q, filter = 'all', sortBy = 'date', sortOrder = 'desc', userId, limit = 20, page = 1) {
+            var _a;
+            const pageSize = limit;
+            const skipAmount = (page - 1) * pageSize;
+            // Restrict certain filters to authenticated users only
+            if (!userId && ['notified', 'upvoted', 'mine'].includes(filter)) {
+                throw (0, utilities_1.newErr)(401, 'Authentication required for this filter');
+            }
+            let query = {};
+            // Add search filter if q is provided
+            if (q) {
+                query.bookTitle = { $regex: q, $options: 'i' };
+            }
+            // Apply specific filters based on user interactions
+            if (filter === 'notified' && userId) {
+                // Get notifications for this user that have 'book_request' in reasons
+                const notifications = yield models_1.Notification.find({
+                    userId: userId,
+                    reason: { $in: ['book_request'] },
+                    requestId: { $exists: true, $ne: null }
+                });
+                const requestIds = notifications.map(notification => notification.requestId);
+                query._id = { $in: requestIds };
+            }
+            else if (filter === 'upvoted' && userId) {
+                // Find user object to get username
+                const user = yield models_1.User.findById(userId);
+                if (user) {
+                    query.upvoters = { $in: [user.username] };
+                }
+                else {
+                    // If user not found, return empty result
+                    return {
+                        requests: [],
+                        pagination: {
+                            currentPage: page,
+                            totalPages: 0,
+                            totalResults: 0,
+                            hasNextPage: false,
+                            hasPrevPage: false,
+                            limit: pageSize
+                        }
+                    };
+                }
+            }
+            else if (filter === 'mine' && userId) {
+                // Get user's own requests
+                const user = yield models_1.User.findById(userId);
+                if (user) {
+                    query.username = user.username;
+                }
+                else {
+                    // If user not found, return empty result
+                    return {
+                        requests: [],
+                        pagination: {
+                            currentPage: page,
+                            totalPages: 0,
+                            totalResults: 0,
+                            hasNextPage: false,
+                            hasPrevPage: false,
+                            limit: pageSize
+                        }
+                    };
+                }
+            }
+            // For 'all' filter or non-authenticated users, no additional query filters are applied
+            // Handle sorting
+            if (sortBy === 'upvoters') {
+                // Use aggregation for sorting by number of upvoters
+                const aggregationPipeline = [
+                    { $match: query },
+                    {
+                        $addFields: {
+                            upvotersCount: { $size: "$upvoters" }
+                        }
+                    },
+                    {
+                        $sort: {
+                            upvotersCount: (sortOrder === 'asc' ? 1 : -1)
+                        }
+                    },
+                    { $skip: skipAmount },
+                    { $limit: pageSize }
+                ];
+                const countPipeline = [
+                    { $match: query },
+                    { $count: "total" }
+                ];
+                const [requests, countResult] = yield Promise.all([
+                    models_1.Request.aggregate(aggregationPipeline),
+                    models_1.Request.aggregate(countPipeline)
+                ]);
+                const total = ((_a = countResult[0]) === null || _a === void 0 ? void 0 : _a.total) || 0;
+                const totalPages = Math.ceil(total / pageSize);
+                return {
+                    requests,
+                    pagination: {
+                        currentPage: page,
+                        totalPages,
+                        totalResults: total,
+                        hasNextPage: page < totalPages,
+                        hasPrevPage: page > 1,
+                        limit: pageSize
+                    }
+                };
+            }
+            else {
+                // Use regular find with sorting for other sort options
+                let sortOptions = {};
+                switch (sortBy) {
+                    case 'date':
+                        sortOptions.timestamp = sortOrder === 'asc' ? 1 : -1;
+                        break;
+                    case 'peopleNotified':
+                        sortOptions.nbPeopleNotified = sortOrder === 'asc' ? 1 : -1;
+                        break;
+                    default:
+                        sortOptions.timestamp = -1; // Default to newest first
+                }
+                const [requests, total] = yield Promise.all([
+                    models_1.Request.find(query)
+                        .sort(sortOptions)
+                        .skip(skipAmount)
+                        .limit(pageSize)
+                        .lean(),
+                    models_1.Request.countDocuments(query)
+                ]);
+                const totalPages = Math.ceil(total / pageSize);
+                return {
+                    requests,
+                    pagination: {
+                        currentPage: page,
+                        totalPages,
+                        totalResults: total,
+                        hasNextPage: page < totalPages,
+                        hasPrevPage: page > 1,
+                        limit: pageSize
+                    }
+                };
+            }
         });
     }
 };

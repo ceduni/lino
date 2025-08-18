@@ -116,6 +116,24 @@ function searchUsers(request, reply) {
         }
     });
 }
+function searchBookRequests(request, reply) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { q, filter, sortBy, sortOrder, limit, page } = request.query;
+            let userId;
+            if (request.user) {
+                userId = request.user.id;
+            }
+            const results = yield services_1.SearchService.searchBookRequests(q, filter, sortBy, sortOrder, userId, limit, page);
+            reply.send(results);
+        }
+        catch (error) {
+            const statusCode = error.statusCode || 500;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            reply.code(statusCode).send({ error: message });
+        }
+    });
+}
 function searchRoutes(server) {
     return __awaiter(this, void 0, void 0, function* () {
         server.get('/search/books', { schema: schemas_1.searchBooksSchema }, searchBooks);
@@ -132,5 +150,9 @@ function searchRoutes(server) {
             preValidation: [server.adminAuthenticate],
             schema: schemas_1.searchUsersSchema
         }, searchUsers);
+        server.get('/search/requests', {
+            preValidation: [server.optionalAuthenticate],
+            schema: schemas_1.searchBookRequestsSchema
+        }, searchBookRequests);
     });
 }
