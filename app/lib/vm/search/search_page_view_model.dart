@@ -2,11 +2,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/services/search_services.dart';
 import 'package:Lino_app/utils/constants/search_types.dart';
+import 'package:Lino_app/views/forum/request_form.dart';
 
 enum SortOption {
   byName('by name'),
@@ -84,6 +86,20 @@ class SearchPageViewModel extends ChangeNotifier {
   void initialize() {
     _searchController.addListener(_onSearchChanged);
     _requestLocationPermission();
+    
+    // Load nearby bookboxes on initialization if we're on bookboxes tab
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_currentSearchType == SearchType.bookboxes && _searchQuery.isEmpty && _userPosition != null) {
+        _loadNearbyBookboxes();
+      }
+    });
+  }
+
+  void createRequest(String book) {
+    print('create request for book: ${book}');
+    
+    // Navigate to the request form page
+    Get.to(() => const RequestFormPage());
   }
 
   Future<void> _requestLocationPermission() async {
@@ -117,6 +133,11 @@ class SearchPageViewModel extends ChangeNotifier {
           ),
         );
         print('User location: ${_userPosition?.latitude}, ${_userPosition?.longitude}');
+        
+        // Load nearby bookboxes after getting location
+        if (_currentSearchType == SearchType.bookboxes && _searchQuery.isEmpty) {
+          await _loadNearbyBookboxes();
+        }
       }
     } catch (e) {
       print('Error getting current location: $e');
@@ -139,7 +160,12 @@ class SearchPageViewModel extends ChangeNotifier {
         });
       } else {
         _clearResults();
-        notifyListeners();
+        // Load nearby bookboxes when search query is cleared and we're on bookboxes tab
+        if (_currentSearchType == SearchType.bookboxes && _userPosition != null) {
+          _loadNearbyBookboxes();
+        } else {
+          notifyListeners();
+        }
       }
     }
   }
@@ -150,6 +176,9 @@ class SearchPageViewModel extends ChangeNotifier {
       _clearResults();
       if (_searchQuery.isNotEmpty) {
         _performSearch();
+      } else if (type == SearchType.bookboxes && _userPosition != null) {
+        // Load nearby bookboxes when switching to bookboxes tab with no search query
+        _loadNearbyBookboxes();
       }
       notifyListeners();
     }
@@ -220,6 +249,13 @@ class SearchPageViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Public method to load nearby bookboxes
+  Future<void> loadNearbyBookboxes() async {
+    if (_currentSearchType == SearchType.bookboxes) {
+      await _loadNearbyBookboxes();
+    }
+  }
+
   Future<void> _searchBookboxes() async {
     final response = await _searchService.searchBookboxes(
       q: _searchQuery,
@@ -247,6 +283,32 @@ class SearchPageViewModel extends ChangeNotifier {
 
     _bookResults = response.results;
     _bookPagination = response.pagination;
+  }
+
+  Future<void> _loadNearbyBookboxes() async {
+    if (_userPosition == null) return;
+
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final response = await _searchService.findNearestBookboxes(
+        _userPosition!.longitude,
+        _userPosition!.latitude,
+        maxDistance: 10.0, // 10km radius
+        limit: 20,
+        page: _bookboxCurrentPage,
+      );
+
+      _bookboxResults = response.results;
+      _bookboxPagination = response.pagination;
+    } catch (e) {
+      _handleSearchError(e);
+    }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   // Bookbox sorting and pagination

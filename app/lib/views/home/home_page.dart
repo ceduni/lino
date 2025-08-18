@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/home/home_view_model.dart';
 import 'package:Lino_app/vm/bookboxes/bookbox_list_view_model.dart';
 import 'package:Lino_app/vm/map/map_view_model.dart';
-import 'package:Lino_app/widgets/home_profile_summary.dart';
+import 'package:Lino_app/widgets/user_dashboard/profile_card_widget.dart';
+import 'package:Lino_app/widgets/user_dashboard/ecological_impact_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -80,12 +81,118 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Column(
         children: [
-          HomeProfileSummary(
-            user: viewModel.userData!,
-            numSavedBooks: viewModel.userData!.numSavedBooks,
-            savedTrees: viewModel.userData!.ecologicalImpact.savedTrees,
-            carbonSavings: viewModel.userData!.ecologicalImpact.carbonSavings,
-            onTap: viewModel.navigateToProfile,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  ProfileCard(
+                    user: viewModel.userData!,
+                    includeModifyButton: true,
+                  ),
+                  EcologicalImpactCard(
+                    user: viewModel.userData!,
+                  ),
+                  // Action buttons section
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Scan Bookbox - full width
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () => print("scan bookbox"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue.shade600,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 3,
+                            ),
+                            child: const Text(
+                              "Scan Bookbox",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // Add Book and Take Book - half width each
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () => print("add book"),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green.shade600,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 3,
+                                ),
+                                child: const Text(
+                                  "Add Book",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () => print("take book"),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red.shade600,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 3,
+                                ),
+                                child: const Text(
+                                  "Take Book",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  Container(
+                    height: 300,
+                    margin: const EdgeInsets.all(16.0),
+                    child: Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: _buildMap(viewModel),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                ],
+              ),
+            ),
+
           ),
         ],
       ),

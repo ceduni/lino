@@ -48,7 +48,7 @@ class ProfileCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Expanded(child: _buildStatColumn('$numSavedBooks', 'Books Saved')),
-                          Expanded(child: _buildStatColumn(savedTrees.toStringAsFixed(2), 'Trees Saved')),
+                          //Expanded(child: _buildStatColumn(savedTrees.toStringAsFixed(2), 'Trees Saved')),
                         ],
                       ),
                     ],

@@ -23,13 +23,14 @@ class _UserDashboardState extends State<UserDashboard> {
     return SingleChildScrollView(
       child: Column(
         children: [
+          /*
           ProfileCard(
             user: widget.user,
             includeModifyButton: true,
           ),
           EcologicalImpactCard(
             user: widget.user,
-          ),
+          ), */
           FollowedBookboxesWidget(
             user: widget.user,
           ),

@@ -60,13 +60,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Icon(Icons.settings, color: Colors.white),
-                    Text(
-                      'Options',
-                      style: TextStyle(color: Colors.white, fontSize: 10),
-                    ),
                   ],
                 ),
               ),
+              /*
               SizedBox(width: 10),
               GestureDetector(
                 onTap: () => viewModel.disconnect(context),
@@ -74,14 +71,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.logout, color: Colors.red),
-                    Text(
-                      'Disconnect',
-                      style: TextStyle(color: Colors.red, fontSize: 10),
-                    ),
+                    
                   ],
                 ),
-              ),
-              SizedBox(width: 10),
+              ),*/
+              SizedBox(width: 10), 
             ],
           ),
           body: UserDashboard(user: viewModel.user!),

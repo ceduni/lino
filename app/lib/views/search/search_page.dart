@@ -125,15 +125,6 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildSearchResults(SearchPageViewModel viewModel) {
-    if (viewModel.searchQuery.isEmpty) {
-      return const Center(
-        child: Text(
-          'Enter a search term to find bookboxes or books',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
-        ),
-      );
-    }
-
     if (viewModel.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -186,6 +177,57 @@ class _SearchPageState extends State<SearchPage> {
       );
     }
 
+    // Show nearby bookboxes when search query is empty and we're on bookboxes tab
+    if (viewModel.searchQuery.isEmpty && viewModel.currentSearchType == SearchType.bookboxes) {
+      return Column(
+        children: [
+          // Header for nearby bookboxes
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Icon(Icons.location_on, color: LinoColors.accent),
+                const SizedBox(width: 8),
+                const Text(
+                  'Bookboxes near you',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: viewModel.loadNearbyBookboxes,
+                  icon: const Icon(Icons.refresh),
+                  tooltip: 'Refresh nearby bookboxes',
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: viewModel.bookboxResults.isEmpty
+                ? const Center(
+                    child: Text(
+                      'No bookboxes found in your area',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  )
+                : _buildBookboxResults(viewModel),
+          ),
+        ],
+      );
+    }
+
+    // Show empty state for books or when search query is empty for books
+    if (viewModel.searchQuery.isEmpty) {
+      return const Center(
+        child: Text(
+          'Enter a search term to find bookboxes or books',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
     return viewModel.currentSearchType == SearchType.bookboxes
         ? _buildBookboxResults(viewModel)
         : _buildBookResults(viewModel);
@@ -194,13 +236,17 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildBookboxResults(SearchPageViewModel viewModel) {
     return Column(
       children: [
-        _buildBookboxSortingFilter(viewModel),
+        // Only show sorting filter when there's a search query
+        if (viewModel.searchQuery.isNotEmpty)
+          _buildBookboxSortingFilter(viewModel),
         Expanded(
           child: viewModel.bookboxResults.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
-                    'No bookboxes found',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    viewModel.searchQuery.isEmpty 
+                      ? 'No bookboxes found in your area'
+                      : 'No bookboxes found',
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                 )
               : ListView.builder(
@@ -452,11 +498,21 @@ class _SearchPageState extends State<SearchPage> {
         _buildBookSortingFilter(viewModel),
         Expanded(
           child: viewModel.bookResults.isEmpty
-              ? const Center(
-                  child: Text(
-                    'No books found',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.book, size: 64, color: Colors.grey),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No books found for "${viewModel.searchQuery}"',
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    TextButton(
+                      onPressed: () => viewModel.createRequest(viewModel.searchQuery), 
+                      child: const Text('Create a new request for this book !'),
+                    ),
+                    
+                  ],
                 )
               : ListView.builder(
                   itemCount: viewModel.bookResults.length,
