@@ -93,7 +93,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-                  'Recent Transactions',
+                  'Your Bookbox Trail',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

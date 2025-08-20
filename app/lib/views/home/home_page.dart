@@ -7,6 +7,8 @@ import 'package:Lino_app/vm/bookboxes/bookbox_list_view_model.dart';
 import 'package:Lino_app/vm/map/map_view_model.dart';
 import 'package:Lino_app/widgets/user_dashboard/profile_card_widget.dart';
 import 'package:Lino_app/widgets/user_dashboard/ecological_impact_widget.dart';
+import 'package:Lino_app/widgets/home_page.dart';
+import 'package:Lino_app/widgets/recommendation_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,20 +21,20 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final viewModel = context.read<HomeViewModel>();
       viewModel.setContext(context);
       viewModel.initialize();
       viewModel.checkLocationPermission();
       
-      // Initialize bookbox data
       final bookboxViewModel = context.read<BookboxListViewModel>();
-      bookboxViewModel.initialize();
+      await bookboxViewModel.initialize();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Consumer<HomeViewModel>(
       builder: (context, viewModel, child) {
         if (!viewModel.isInitialized) {
@@ -52,13 +54,13 @@ class _HomePageState extends State<HomePage> {
         }
 
         if (viewModel.error != null || viewModel.userData == null) {
+          
           return Scaffold(
             body: Center(
               child: Text('Error loading user data: ${viewModel.error}'),
             ),
           );
         }
-
         return _buildAuthenticatedView(viewModel);
       },
     );
@@ -74,128 +76,83 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+            onPressed: () => print("scan bookbox"),
+            backgroundColor: Colors.blue.shade600,
+            foregroundColor: Colors.white,
+            icon: const Icon(Icons.qr_code_scanner),
+            label: const Text(
+              "Scan",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
   Widget _buildAuthenticatedView(HomeViewModel viewModel) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  ProfileCard(
-                    user: viewModel.userData!,
-                    includeModifyButton: true,
-                  ),
-                  EcologicalImpactCard(
-                    user: viewModel.userData!,
-                  ),
-                  // Action buttons section
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        // Scan Bookbox - full width
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () => print("scan bookbox"),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue.shade600,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 3,
-                            ),
-                            child: const Text(
-                              "Scan Bookbox",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+    return Consumer<BookboxListViewModel>(
+      builder: (context, bookboxViewModel, child) {
+        
+        return Scaffold(
+          body: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      
+                      MergedProfileStatsWidget(
+                        userName: viewModel.userData!.username,
+                        booksSaved: viewModel.userData!.numSavedBooks,
+                        waterSaved: viewModel.userData!.ecologicalImpact.savedWater,
+                        treesSaved: viewModel.userData!.ecologicalImpact.savedTrees,
+                      ),
+                      RecommendationWidget(
+                        recommendedBooks: [
+                          RecommendedBook(title: "livre", coverImageUrl: "rien"),
+                          RecommendedBook(title: "livre", coverImageUrl: "rien"),
+                          RecommendedBook(title: "livre", coverImageUrl: "rien"),
+                        ],
+                      ),
+                      Container(
+                        height: 300,
+                        margin: const EdgeInsets.all(16.0),
+                        child: Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: _buildMap(viewModel),
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        // Add Book and Take Book - half width each
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () => print("add book"),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green.shade600,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  elevation: 3,
-                                ),
-                                child: const Text(
-                                  "Add Book",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () => print("take book"),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red.shade600,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  elevation: 3,
-                                ),
-                                child: const Text(
-                                  "Take Book",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  Container(
-                    height: 300,
-                    margin: const EdgeInsets.all(16.0),
-                    child: Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: _buildMap(viewModel),
-                      ),
-                    ),
+                      const SizedBox(height: 16),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-
-                ],
+                ),
+              ),
+            ],
+          ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () => print("scan bookbox"),
+            backgroundColor: Colors.blue.shade600,
+            foregroundColor: Colors.white,
+            icon: const Icon(Icons.qr_code_scanner),
+            label: const Text(
+              "Scan",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
               ),
             ),
-
           ),
-        ],
-      ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        );
+      },
     );
   }
 
