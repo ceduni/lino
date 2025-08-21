@@ -379,7 +379,7 @@ class SearchPageViewModel extends ChangeNotifier {
   }
 
   void onBookTap(ExtendedBook book) {
-    // TODO: Navigate to book details page
+    SearchViewModel().navigateToBookDetailsScreen(book);
     print('Tapped on book: ${book.title}');
   }
 

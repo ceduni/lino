@@ -1,4 +1,5 @@
 // app/lib/vm/search_view_model.dart
+import 'package:Lino_app/views/books/book_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Lino_app/models/book_model.dart';
@@ -96,6 +97,14 @@ class SearchViewModel extends ChangeNotifier {
       arguments: {
         'bookboxId': bookBoxId,
         'canInteract': false,
+      },
+    );
+  }
+
+  void navigateToBookDetailsScreen(Book book) {
+    Get.to(() => BookDetailsPage(book: book),
+      arguments: {
+        'book': book,
       },
     );
   }

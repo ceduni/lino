@@ -41,4 +41,18 @@ class BookService {
     }
     return ExtendedBook.fromJson(response);
   }
+
+  Future<BookStats> getBookStats(String isbn) async {
+    final r = await http.get(
+      Uri.parse('$url/books/stats/$isbn'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    final response = jsonDecode(r.body);
+    if (r.statusCode != 200) {
+      throw Exception(response['error']);
+    }
+    return BookStats.fromJson(response);
+  }
 }

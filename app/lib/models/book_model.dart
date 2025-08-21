@@ -220,3 +220,20 @@ class ExtendedBook extends Book {
     );
   }
 }
+
+class BookStats {
+  final int totalAdded;
+  final int totalTook;
+
+  BookStats({
+    required this.totalAdded,
+    required this.totalTook,
+  });
+
+  factory BookStats.fromJson(Map<String, dynamic> json) {
+    return BookStats(
+      totalAdded: json['totalAdded'],
+      totalTook: json['totalTook'],
+    );
+  }
+}
