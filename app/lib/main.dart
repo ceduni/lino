@@ -1,6 +1,7 @@
 import 'package:Lino_app/views/bookboxes/book_box_page.dart';
 import 'package:Lino_app/views/login/login_page.dart';
 import 'package:Lino_app/views/forum/bookbox_selection_page.dart';
+import 'package:Lino_app/views/qr_scanner/qr_scanner_page.dart';
 import 'package:Lino_app/services/bookbox_state_service.dart';
 import 'package:Lino_app/services/deep_link_service.dart';
 import 'package:Lino_app/services/user_services.dart';
@@ -115,6 +116,7 @@ class _MyAppState extends State<MyApp> {
             name: AppRoutes.bookboxSelection, 
             page: () => BookboxSelectionPage(arguments: Get.arguments ?? {}),
           ),
+          GetPage(name: AppRoutes.qrScanner, page: () => const QRScannerPage()),
           // Add more routes here as needed
         ],
         onReady: () {

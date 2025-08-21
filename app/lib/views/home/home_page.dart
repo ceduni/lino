@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import 'package:Lino_app/vm/home/home_view_model.dart';
 import 'package:Lino_app/vm/bookboxes/bookbox_list_view_model.dart';
 import 'package:Lino_app/vm/map/map_view_model.dart';
@@ -9,6 +10,7 @@ import 'package:Lino_app/widgets/user_dashboard/profile_card_widget.dart';
 import 'package:Lino_app/widgets/user_dashboard/ecological_impact_widget.dart';
 import 'package:Lino_app/widgets/home_page.dart';
 import 'package:Lino_app/widgets/recommendation_widget.dart';
+import 'package:Lino_app/utils/constants/routes.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -77,12 +79,12 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => print("scan bookbox"),
+            onPressed: () => Get.toNamed(AppRoutes.qrScanner),
             backgroundColor: Colors.blue.shade600,
             foregroundColor: Colors.white,
             icon: const Icon(Icons.qr_code_scanner),
             label: const Text(
-              "Scan",
+              'Scan',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -139,12 +141,12 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => print("scan bookbox"),
+            onPressed: () => Get.toNamed(AppRoutes.qrScanner),
             backgroundColor: Colors.blue.shade600,
             foregroundColor: Colors.white,
             icon: const Icon(Icons.qr_code_scanner),
             label: const Text(
-              "Scan",
+              'Scan',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),

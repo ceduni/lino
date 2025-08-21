@@ -6,5 +6,6 @@ class AppRoutes {
   static const favouriteLocationsInput = '/favourite-locations-input';
   static const bookbox = '/bookbox';
   static const bookboxSelection = '/bookbox-selection';
+  static const qrScanner = '/qr-scanner';
 // Add more routes here as needed
 }

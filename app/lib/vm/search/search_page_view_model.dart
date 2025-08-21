@@ -1,4 +1,4 @@
-// app/lib/vm/search/search_page_view_model.dart
+import 'package:Lino_app/vm/search/search_view_model.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -96,8 +96,7 @@ class SearchPageViewModel extends ChangeNotifier {
   }
 
   void createRequest(String book) {
-    print('create request for book: ${book}');
-    
+
     // Navigate to the request form page
     Get.to(() => const RequestFormPage());
   }
@@ -375,7 +374,7 @@ class SearchPageViewModel extends ChangeNotifier {
 
   // Placeholder methods for navigation
   void onBookboxTap(ShortenedBookBox bookbox) {
-    // TODO: Navigate to bookbox details page
+    SearchViewModel().navigateToBookBoxScreen(bookbox.id);
     print('Tapped on bookbox: ${bookbox.name}');
   }
 
