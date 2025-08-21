@@ -25,7 +25,7 @@ const RequestService = {
 
         const userBoroughIds = user.favouriteLocations.map(location => location.boroughId);
 
-        // Find users who share favourite locations (by boroughId) or followed bookboxes
+        // Find users who share favourite locations (by boroughId) or follow chosen bookboxes
         const usersToNotify = await User.find({
             $and: [
                 {
@@ -34,12 +34,13 @@ const RequestService = {
                         ...(userBoroughIds.length > 0 ? [{
                             'favouriteLocations.boroughId': { $in: userBoroughIds }
                         }] : []),
-                        // Users who follow at least one of the same bookboxes
+                        // Users who follow at least one of the specified bookboxes
                         ...(bookboxIds.length > 0 ? [{
                             followedBookboxes: { $in: bookboxIds }
                         }] : [])
                     ]
                 },
+                // Users who have opted in for book request notifications
                 {
                     'notificationSettings.bookRequested': true
                 }
