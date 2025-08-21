@@ -5,13 +5,13 @@ class TransactionService {
     static async createTransaction(
         username: string, 
         action: 'added' | 'took', 
-        bookTitle: string, 
+        isbn: string, 
         bookboxId: string
     ) {
         const transaction = new Transaction({
             username,
             action,
-            bookTitle,
+            isbn,
             bookboxId
         });
         await transaction.save();
@@ -21,7 +21,7 @@ class TransactionService {
     static async createCustomTransaction(
         username: string,
         action: 'added' | 'took',
-        bookTitle: string,
+        isbn: string,
         bookboxId: string,
         day: string, // Format: AAAA-MM-DD
         hour: string // Format: HH:MM
@@ -52,7 +52,7 @@ class TransactionService {
         const transaction = new Transaction({
             username,
             action,
-            bookTitle,
+            isbn,
             bookboxId,
             timestamp
         });

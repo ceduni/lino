@@ -578,7 +578,7 @@ const searchService = {
 
     async searchTransactionHistory(
         username?: string,
-        bookTitle?: string,
+        isbn?: string,
         bookboxId?: string,
         limit: number = 100,
         page: number = 1
@@ -588,7 +588,7 @@ const searchService = {
 
         let filter: any = {};
         if (username) filter.username = username;
-        if (bookTitle) filter.bookTitle = new RegExp(bookTitle, 'i');
+        if (isbn) filter.isbn = new RegExp(isbn, 'i');
         if (bookboxId) filter.bookboxId = bookboxId;
 
         const [transactions, total] = await Promise.all([

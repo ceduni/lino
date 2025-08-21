@@ -26,7 +26,7 @@ async function getAdminToken() {
 
 async function generateTransaction(
     username,
-    bookTitle,
+    isbn,
     bookboxId,
     action = null, // 'added' or 'took', if null it will be randomly chosen
     day = null, // Date in "YYYY-MM-DD" format, if null it will be randomly chosen
@@ -56,7 +56,7 @@ async function generateTransaction(
    // Create transaction object
    const transaction = {
        username,
-       bookTitle,
+       isbn,
        bookboxId,
        action,
        day,
@@ -117,16 +117,16 @@ async function populateTransactions(selectedDay = null) {
         }
         for (let i = 0; i < limit; i++) {
             const username = faker.internet.userName();
-            const bookTitle = faker.lorem.words(3);
+            const isbn = faker.lorem.words(3);
             const bookboxId = bookboxes[Math.floor(Math.random() * bookboxes.length)].id;
 
             let transaction;
             if (selectedDay) {
                 // Use the selected day for all transactions
-                transaction = await generateTransaction(username, bookTitle, bookboxId, null, selectedDay);
+                transaction = await generateTransaction(username, isbn, bookboxId, null, selectedDay);
             } else {
                 // Generate a random transaction
-                transaction = await generateTransaction(username, bookTitle, bookboxId);
+                transaction = await generateTransaction(username, isbn, bookboxId);
             }
             await submitTransaction(adminToken, transaction);
             console.log(`Transaction ${i + 1} submitted:`, transaction);

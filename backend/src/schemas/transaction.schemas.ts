@@ -6,7 +6,7 @@ export const createCustomTransactionSchema = {
         properties: {
             username: { type: 'string' },
             action: { type: 'string', enum: ['added', 'took'] },
-            bookTitle: { type: 'string' },
+            isbn: { type: 'string' },
             bookboxId: { type: 'string' },
             day: { 
                 type: 'string',
@@ -19,7 +19,7 @@ export const createCustomTransactionSchema = {
                 description: 'Time in format HH:MM'
             }
         },
-        required: ['username', 'action', 'bookTitle', 'bookboxId', 'day', 'hour']
+        required: ['username', 'action', 'isbn', 'bookboxId', 'day', 'hour']
     },
     response: {
         201: {
@@ -29,7 +29,7 @@ export const createCustomTransactionSchema = {
                 _id: { type: 'string' },
                 username: { type: 'string' },
                 action: { type: 'string' },
-                bookTitle: { type: 'string' },
+                isbn: { type: 'string' },
                 bookboxId: { type: 'string' },
                 timestamp: { type: 'string' },
                 __v: { type: 'number' }

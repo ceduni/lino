@@ -114,15 +114,15 @@ async function searchMyManagedBookboxes(request: FastifyRequest, reply: FastifyR
 
 async function searchTransactionHistory(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const { username, bookTitle, bookboxId, limit, page } = request.query as { 
+        const { username, isbn, bookboxId, limit, page } = request.query as { 
             username?: string; 
-            bookTitle?: string; 
+            isbn?: string; 
             bookboxId?: string; 
             limit?: number; 
             page?: number;
         };
         const results = await SearchService.searchTransactionHistory(
-            username, bookTitle, bookboxId, limit, page
+            username, isbn, bookboxId, limit, page
         );
         reply.send(results);
     } catch (error : unknown) {

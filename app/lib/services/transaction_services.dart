@@ -11,7 +11,7 @@ class TransactionServices {
 
   Future<SearchModel<Transaction>> searchTransactions({
     String? username,
-    String? bookTitle, 
+    String? isbn, 
     String? bookboxId,
     int? limit,
     int? page,
@@ -22,7 +22,7 @@ class TransactionServices {
     // If the server returns another status code, an error is thrown
     final queryParameters = <String, String>{};
     if (username != null) queryParameters['username'] = username;
-    if (bookTitle != null) queryParameters['bookTitle'] = bookTitle;
+    if (isbn != null) queryParameters['isbn'] = isbn;
     if (bookboxId != null) queryParameters['bookboxId'] = bookboxId;
     if (limit != null) queryParameters['limit'] = limit.toString();
     if (page != null) queryParameters['page'] = page.toString();

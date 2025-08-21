@@ -200,7 +200,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
         ),
       ),
       title: Text(
-        transaction.bookTitle,
+        transaction.isbn,
         style: TextStyle(
           fontWeight: FontWeight.w500,
           fontSize: 14,
