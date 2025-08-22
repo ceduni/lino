@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:Lino_app/vm/forum/request_form_view_model.dart';
-import 'package:Lino_app/vm/forum/requests_view_model.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 
 class RequestFormPage extends StatefulWidget {

@@ -1,7 +1,9 @@
 // app/lib/pages/bookbox/book_box_page.dart
+import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/views/bookboxes/book_box_issue_report_page.dart';
 import 'package:Lino_app/services/bookbox_state_service.dart';
+import 'package:Lino_app/views/books/book_details_page.dart';
 import 'package:Lino_app/vm/bookboxes/book_box_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -206,8 +208,10 @@ class _BookBoxPageState extends State<BookBoxPage> {
           _buildBookBoxInfoCard(bookBox),
           const SizedBox(height: 20),
           _buildActionButtons(bookBox),
-          const SizedBox(height: 20),
-          _buildBooksSection(bookBox),
+          if (!canInteract) ...[
+            const SizedBox(height: 20),
+            _buildBooksSection(bookBox),
+          ],
         ],
       ),
     );
@@ -319,7 +323,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                 ),
               ),
               const SizedBox(height: 12),
-              if (bookBox.infoText != null && bookBox.infoText!.isNotEmpty)
+              if (!canInteract && bookBox.infoText != null && bookBox.infoText!.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -549,9 +553,9 @@ class _BookBoxPageState extends State<BookBoxPage> {
     );
   }
 
-  Widget _buildBookCard(book) {
-    String title = book.title ?? 'Unknown Title';
-    List<String> authors = book.authors ?? [];
+  Widget _buildBookCard(Book book) {
+    String title = book.title;
+    List<String> authors = book.authors;
     String authorsString = authors.isNotEmpty ? authors.join(', ') : 'Unknown Author';
     String timeAgo = _getTimeAgo(book.dateAdded);
 
@@ -560,11 +564,9 @@ class _BookBoxPageState extends State<BookBoxPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: InkWell(
         onTap: () {
-          Get.snackbar(
-            'Book Details',
-            'Opening details for: $title',
-            snackPosition: SnackPosition.BOTTOM,
-          );
+          Get.to(
+            () => BookDetailsPage(book: book)
+            );
         },
         borderRadius: BorderRadius.circular(8),
         child: Container(
