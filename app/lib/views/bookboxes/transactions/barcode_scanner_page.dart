@@ -364,6 +364,9 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                     child: ElevatedButton(
                       onPressed: () {
                         // TODO: Implement manual entry or book list functionality
+                        widget.addingBook
+                            ? print('Navigate to manual entry form')
+                            : print('Navigate to book list');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
@@ -403,6 +406,9 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
             child: ElevatedButton(
               onPressed: () {
                 // TODO: Implement continue functionality
+                widget.addingBook
+                    ? print('Add book to BookBox: ${widget.bookboxId}')
+                    : print('Take book from BookBox: ${widget.bookboxId}');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green.shade600,
