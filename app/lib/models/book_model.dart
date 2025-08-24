@@ -88,7 +88,6 @@ class Book {
 }
 
 class ModifiableBook {
-  String id;
   String? isbn;
   String title;
   List<String> authors; 
@@ -98,10 +97,8 @@ class ModifiableBook {
   List<String> categories;
   int? parutionYear;
   int? pages; 
-  DateTime dateAdded;
 
   ModifiableBook({
-    required this.id,
     this.isbn,
     required this.title,
     required this.authors,
@@ -111,74 +108,44 @@ class ModifiableBook {
     required this.categories,
     this.parutionYear,
     this.pages,
-    required this.dateAdded,
+  });
+}
+
+class EditableBook {
+  String isbn;
+  String title;
+  List<String> authors;
+  String description;
+  String coverImage;
+  String publisher;
+  int? parutionYear;
+  int? pages;
+  List<String> categories;
+
+  EditableBook({
+    required this.isbn,
+    this.title = 'Unknown Title',
+    this.authors = const ['Unknown Author'],
+    this.description = 'No description available',
+    this.coverImage = 'No thumbnail available',
+    this.publisher = 'Unknown publisher',
+    this.parutionYear,
+    this.pages,
+    this.categories = const ['Uncategorized'],
   });
 
-  // Constructor to create ModifiableBook from Book
-  ModifiableBook.fromBook(Book book)
-      : id = book.id,
-        isbn = book.isbn,
-        title = book.title,
-        authors = List<String>.from(book.authors),
-        description = book.description,
-        coverImage = book.coverImage,
-        publisher = book.publisher,
-        categories = List<String>.from(book.categories),
-        parutionYear = book.parutionYear,
-        pages = book.pages,
-        dateAdded = book.dateAdded;
-
-  // Method to convert back to immutable Book
-  Book toBook() {
-    return Book(
-      id: id,
-      isbn: isbn,
-      title: title,
-      authors: List<String>.from(authors),
-      description: description,
-      coverImage: coverImage,
-      publisher: publisher,
-      categories: List<String>.from(categories),
-      parutionYear: parutionYear,
-      pages: pages,
-      dateAdded: dateAdded,
+  factory EditableBook.fromJson(Map<String, dynamic> json) {
+    return EditableBook(
+      isbn: json['isbn'],
+      title: json['title'],
+      authors: (json['authors'] as List).cast<String>(),
+      description: json['description'],
+      coverImage: json['coverImage'],
+      publisher: json['publisher'],
+      parutionYear: json['parutionYear'],
+      pages: json['pages'],
+      categories: (json['categories'] as List).cast<String>(),
     );
-  }
-
-  // Operator overload for field access by string key
-  operator [](String key) {
-    switch (key) {
-      case 'id': return id;
-      case 'isbn': return isbn;
-      case 'title': return title;
-      case 'authors': return authors;
-      case 'description': return description;
-      case 'coverImage': return coverImage;
-      case 'publisher': return publisher;
-      case 'categories': return categories;
-      case 'parutionYear': return parutionYear;
-      case 'pages': return pages;
-      case 'dateAdded': return dateAdded;
-      default: throw ArgumentError('Invalid key: $key');
-    }
-  }
-
-  // Operator overload for field assignment by string key
-  operator []=(String key, dynamic value) {
-    switch (key) {
-      case 'id': id = value; 
-      case 'isbn': isbn = value; 
-      case 'title': title = value;
-      case 'authors': authors = value;
-      case 'description': description = value;
-      case 'coverImage': coverImage = value; 
-      case 'publisher': publisher = value; 
-      case 'categories': categories = value;
-      case 'parutionYear': parutionYear = value;
-      case 'pages': pages = value;
-      case 'dateAdded': dateAdded = value;
-      default: throw ArgumentError('Invalid key: $key');
-    }
   }
 }
 
@@ -217,6 +184,24 @@ class ExtendedBook extends Book {
       dateAdded: DateTime.parse(json['dateAdded']),
       bookboxId: json['bookboxId'],
       bookboxName: json['bookboxName'],
+    );
+  }
+
+  factory ExtendedBook.fromBook(Book book, String bookboxId, String bookboxName) {
+    return ExtendedBook(
+      id: book.id,
+      isbn: book.isbn,
+      title: book.title,
+      authors: List<String>.from(book.authors),
+      description: book.description,
+      coverImage: book.coverImage,
+      publisher: book.publisher,
+      categories: List<String>.from(book.categories),
+      parutionYear: book.parutionYear,
+      pages: book.pages,
+      dateAdded: book.dateAdded,
+      bookboxId: bookboxId,
+      bookboxName: bookboxName,
     );
   }
 }

@@ -6,7 +6,7 @@ import '../utils/constants/api_constants.dart';
 class BookService {
   final String url = baseApiUrl;
   
-  Future<Map<String, dynamic>> getBookInfo(String isbn) async {
+  Future<EditableBook> getBookInfo(String isbn) async {
     // Make a GET request to the server
     // Query the info of the book with the given ISBN
     // If the server returns a 200 status code, the book is found
@@ -21,7 +21,8 @@ class BookService {
     if (r.statusCode != 200) {
       throw Exception(response['error']);
     }
-    return response;
+    
+    return EditableBook.fromJson(response);
   }
 
   Future<ExtendedBook> getBook(String bookId) async {

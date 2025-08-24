@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/vm/books/book_details_view_model.dart';
+import 'package:Lino_app/views/bookboxes/book_box_page.dart';
 import 'package:intl/intl.dart';
 
 class BookDetailsPage extends StatefulWidget {
-  final Book book;
+  final ExtendedBook book;
+  final bool fromBookbox;
 
-  const BookDetailsPage({super.key, required this.book});
+  const BookDetailsPage({super.key, required this.book, this.fromBookbox = false});
 
   @override
   State<BookDetailsPage> createState() => _BookDetailsPageState();
@@ -376,6 +379,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                   
                   if (book.pages != null)
                     _buildInfoRow('Pages', book.pages.toString()),
+                    
                   
                   _buildInfoRow('Added', DateFormat('MMM dd, yyyy').format(book.dateAdded)),
                 ],
@@ -383,6 +387,13 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
             ),
           ),
           const SizedBox(height: 20),
+          
+          // Bookbox location card (only show when not coming from bookbox to prevent loops)
+          if (!widget.fromBookbox)
+            _buildBookboxLocationCard(),
+          
+          if (!widget.fromBookbox)
+            const SizedBox(height: 20),
           
           // Book stats card
           _buildBookStatsCard(viewModel),
@@ -620,6 +631,113 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
             textAlign: TextAlign.center,
             maxLines: 4,
             overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBookboxLocationCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: () {
+          // Navigate to bookbox page, replacing current page to maintain proper navigation flow
+          Get.off(
+            () => const BookBoxPage(),
+            arguments: {
+              'bookboxId': widget.book.bookboxId,
+              'canInteract': false,
+            },
+          );
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: const Color.fromRGBO(250, 250, 240, 1),
+          ),
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.location_on,
+                    color: Color.fromRGBO(101, 67, 33, 1),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Available at BookBox',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Kanit',
+                      color: Color.fromRGBO(101, 67, 33, 1),
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.grey[600],
+                    size: 16,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(242, 226, 196, 1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(101, 67, 33, 1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.library_books,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.book.bookboxName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Kanit',
+                              color: Color.fromRGBO(101, 67, 33, 1),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Tap to view BookBox details',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: 'Kanit',
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

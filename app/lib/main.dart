@@ -6,6 +6,7 @@ import 'package:Lino_app/services/bookbox_state_service.dart';
 import 'package:Lino_app/services/deep_link_service.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
+import 'package:Lino_app/vm/bookboxes/transactions/barcode_scanner_view_model.dart';
 import 'package:Lino_app/vm/home/home_view_model.dart';
 import 'package:Lino_app/vm/layout/appbar_view_model.dart';
 import 'package:Lino_app/vm/search/search_view_model.dart';
@@ -101,6 +102,7 @@ class _MyAppState extends State<MyApp> {
       ChangeNotifierProvider(create: (_) => ForumViewModel()),
       ChangeNotifierProvider(create: (_) => RequestsViewModel()),
       ChangeNotifierProvider(create: (_) => RequestFormViewModel()),
+      ChangeNotifierProvider(create: (_) => BarcodeScannerViewModel())
       ],
       child: GetMaterialApp(
         title: 'Lino',

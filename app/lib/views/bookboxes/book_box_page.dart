@@ -3,6 +3,7 @@ import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/views/bookboxes/book_box_issue_report_page.dart';
 import 'package:Lino_app/services/bookbox_state_service.dart';
+import 'package:Lino_app/views/bookboxes/transactions/barcode_scanner_page.dart';
 import 'package:Lino_app/views/books/book_details_page.dart';
 import 'package:Lino_app/vm/bookboxes/book_box_view_model.dart';
 import 'package:flutter/material.dart';
@@ -397,12 +398,8 @@ class _BookBoxPageState extends State<BookBoxPage> {
   Widget _buildAddBookButton(bool isActive) {
     return ElevatedButton.icon(
       onPressed: isActive ? () {
-        Get.snackbar(
-          'Add Book',
-          'Add book functionality will be implemented',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+        Get.to(
+          () => BarcodeScannerPage(addingBook: true, bookboxId: bookBoxId!),
         );
       } : () {
         Get.snackbar(
@@ -434,12 +431,8 @@ class _BookBoxPageState extends State<BookBoxPage> {
   Widget _buildRemoveBookButton(bool isActive) {
     return ElevatedButton.icon(
       onPressed: isActive ? () {
-        Get.snackbar(
-          'Take Book',
-          'Remove book functionality will be implemented',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+        Get.to(
+          () => BarcodeScannerPage(addingBook: false, bookboxId: bookBoxId!),
         );
       } : () {
         Get.snackbar(
@@ -544,7 +537,9 @@ class _BookBoxPageState extends State<BookBoxPage> {
                 ),
                 itemCount: bookBox.books.length,
                 itemBuilder: (context, index) {
-                  return _buildBookCard(bookBox.books[index]);
+                  Book book = bookBox.books[index];
+                  ExtendedBook extendedBook = ExtendedBook.fromBook(book, bookBox.id, bookBox.name);
+                  return _buildBookCard(extendedBook);
                 },
               ),
           ],
@@ -553,7 +548,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
     );
   }
 
-  Widget _buildBookCard(Book book) {
+  Widget _buildBookCard(ExtendedBook book) {
     String title = book.title;
     List<String> authors = book.authors;
     String authorsString = authors.isNotEmpty ? authors.join(', ') : 'Unknown Author';
@@ -565,7 +560,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
       child: InkWell(
         onTap: () {
           Get.to(
-            () => BookDetailsPage(book: book)
+            () => BookDetailsPage(book: book, fromBookbox: true)
             );
         },
         borderRadius: BorderRadius.circular(8),

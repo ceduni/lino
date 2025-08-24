@@ -101,8 +101,8 @@ class SearchViewModel extends ChangeNotifier {
     );
   }
 
-  void navigateToBookDetailsScreen(Book book) {
-    Get.to(() => BookDetailsPage(book: book),
+  void navigateToBookDetailsScreen(ExtendedBook book) {
+    Get.to(() => BookDetailsPage(book: book, fromBookbox: false),
       arguments: {
         'book': book,
       },
