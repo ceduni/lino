@@ -1,4 +1,5 @@
 // app/lib/pages/bookbox/book_box_page.dart
+import 'dart:io';
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/views/bookboxes/book_box_issue_report_page.dart';
@@ -7,6 +8,7 @@ import 'package:Lino_app/views/bookboxes/transactions/barcode_scanner_page.dart'
 import 'package:Lino_app/views/books/book_details_page.dart';
 import 'package:Lino_app/vm/bookboxes/book_box_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -665,6 +667,82 @@ class _BookBoxPageState extends State<BookBoxPage> {
   }
 
   Future<void> _openGoogleMapsApp(double latitude, double longitude) async {
+    if (Platform.isIOS) {
+      await _showNavigationOptionsIOS(latitude, longitude);
+    } else {
+      await _openGoogleMapsAndroid(latitude, longitude);
+    }
+  }
+
+  Future<void> _showNavigationOptionsIOS(double latitude, double longitude) async {
+    final List<Map<String, dynamic>> navigationApps = [];
+    
+    navigationApps.add({
+      'name': 'Apple Maps',
+      'url': 'maps://?daddr=$latitude,$longitude&dirflg=d',
+      'icon': Icons.map,
+    });
+    
+    final googleMapsUrl = 'comgooglemaps://?daddr=$latitude,$longitude&directionsmode=driving';
+    if (await canLaunchUrlString(googleMapsUrl)) {
+      navigationApps.add({
+        'name': 'Google Maps',
+        'url': googleMapsUrl,
+        'icon': Icons.navigation,
+      });
+    }
+    
+    if (navigationApps.length == 1) {
+      await _launchNavigationApp(navigationApps.first['url'], navigationApps.first['name']);
+    } else {
+      await _showNativeActionSheet(navigationApps);
+    }
+  }
+  
+  Future<void> _showNativeActionSheet(List<Map<String, dynamic>> navigationApps) async {
+    await showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoActionSheet(
+          title: const Text('Choose Navigation App'),
+          actions: navigationApps.map((app) {
+            return CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.pop(context);
+                _launchNavigationApp(app['url'], app['name']);
+              },
+              child: Text(app['name'] as String),
+            );
+          }).toList(),
+          cancelButton: CupertinoActionSheetAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        );
+      },
+    );
+  }
+  
+  Future<void> _launchNavigationApp(String url, String appName) async {
+    try {
+      if (await canLaunchUrlString(url)) {
+        await launchUrlString(url);
+      } else {
+        throw 'Could not open $appName';
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Could not open $appName. Please make sure it\'s installed.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+  
+  Future<void> _openGoogleMapsAndroid(double latitude, double longitude) async {
     final String googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude&travelmode=driving';
 
     try {

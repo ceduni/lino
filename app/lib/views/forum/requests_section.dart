@@ -36,11 +36,6 @@ class _RequestsSectionState extends State<RequestsSection> {
     return Consumer<RequestsViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Book Requests'),
-            backgroundColor: LinoColors.primary,
-            foregroundColor: LinoColors.accent,
-          ),
           body: Container(
             color: LinoColors.primary,
             child: Column(

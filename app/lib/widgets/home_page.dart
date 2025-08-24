@@ -67,9 +67,21 @@ class MergedProfileStatsWidget extends StatelessWidget {
                         color: Colors.grey.shade600,
                       ),
                     ),
+                    
                   ],
                 ),
+                
               ),
+              TextButton(
+                onPressed: () {
+                  print("a faire notis");
+                },
+                child: Icon(
+                  Icons.notifications,
+                  size: 30,
+                  color: Colors.blue.shade600,
+                ),
+              )
             ],
           ),
           const SizedBox(height: 20),
