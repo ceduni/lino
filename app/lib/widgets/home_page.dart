@@ -72,6 +72,7 @@ class MergedProfileStatsWidget extends StatelessWidget {
                 ),
                 
               ),
+              /*
               TextButton(
                 onPressed: () {
                   print("a faire notis");
@@ -81,7 +82,7 @@ class MergedProfileStatsWidget extends StatelessWidget {
                   size: 30,
                   color: Colors.blue.shade600,
                 ),
-              )
+              ) */
             ],
           ),
           const SizedBox(height: 20),
