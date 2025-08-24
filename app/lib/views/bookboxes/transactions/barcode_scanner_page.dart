@@ -1,7 +1,10 @@
+import 'package:Lino_app/models/book_model.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import 'package:Lino_app/vm/bookboxes/transactions/barcode_scanner_view_model.dart';
+import 'package:Lino_app/views/books/book_edition_page.dart';
 
 class BarcodeScannerPage extends StatefulWidget {
   final bool addingBook;
@@ -207,7 +210,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
     );
   }
 
-  Widget _buildBookInfoCard(dynamic book) {
+  Widget _buildBookInfoCard(EditableBook book) {
     return Container(
       margin: const EdgeInsets.all(16),
       child: Card(
@@ -245,15 +248,13 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: book.coverImage != null && book.coverImage!.isNotEmpty
-                      ? Image.network(
-                          book.coverImage!,
+                  child: Image.network(
+                          book.coverImage,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return _buildBookPlaceholder(book.title);
                           },
                         )
-                      : _buildBookPlaceholder(book.title),
                 ),
               ),
               const SizedBox(width: 16),
@@ -363,10 +364,16 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        // TODO: Implement manual entry or book list functionality
-                        widget.addingBook
-                            ? print('Navigate to manual entry form')
-                            : print('Navigate to book list');
+                        if (widget.addingBook) {
+                          // Navigate to manual entry form with empty EditableBook
+                          Get.to(() => BookEditionPage(
+                            bookboxId: widget.bookboxId,
+                            editableBook: EditableBook(isbn: ''),
+                          ));
+                        } else {
+                          // TODO: Navigate to book list for taking books
+                          print('Navigate to book list');
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
@@ -396,56 +403,66 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   }
 
   Widget _buildContinueButton() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                // TODO: Implement continue functionality
-                widget.addingBook
-                    ? print('Add book to BookBox: ${widget.bookboxId}')
-                    : print('Take book from BookBox: ${widget.bookboxId}');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.shade600,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+    return Consumer<BarcodeScannerViewModel>(
+      builder: (context, viewModel, child) {
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (widget.addingBook && viewModel.scannedBook != null) {
+                      // Navigate to book edition page with scanned book
+                      Get.to(() => BookEditionPage(
+                        bookboxId: widget.bookboxId,
+                        editableBook: viewModel.scannedBook!,
+                      ));
+                    } else {
+                      // TODO: Implement take book functionality
+                      print('Take book from BookBox: ${widget.bookboxId}');
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade600,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 4,
+                  ),
+                  child: const Text(
+                    'Continue',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Kanit',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
-                elevation: 4,
               ),
-              child: const Text(
-                'Continue',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Kanit',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () {
+                  context.read<BarcodeScannerViewModel>().resetScanner();
+                },
+                child: const Text(
+                  'Change book',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Kanit',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 8),
-          TextButton(
-            onPressed: () {
-              context.read<BarcodeScannerViewModel>().resetScanner();
-            },
-            child: const Text(
-              'Change book',
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'Kanit',
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 

@@ -4,8 +4,6 @@ import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/services/book_services.dart';
 
 class BarcodeScannerViewModel extends ChangeNotifier {
-  final BookService _bookService = BookService();
-  
   // State variables
   bool _isScanning = true;
   bool _showFallback = false;
@@ -53,7 +51,7 @@ class BarcodeScannerViewModel extends ChangeNotifier {
       notifyListeners();
       
       // Fetch book info
-      final book = await _bookService.getBookInfo(barcode);
+      final book = await BookService().getBookInfo(barcode);
       _scannedBook = book;
       _isScanning = false;
       notifyListeners();

@@ -167,6 +167,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
         children: [
           if (!bookBox.isActive) _buildMaintenanceBanner(),
           _buildBookBoxInfoCard(bookBox, context.read<BookBoxViewModel>()),
+          if (canInteract) const SizedBox(height: 20),
           _buildActionButtons(bookBox),
           if (!canInteract) ...[
             const SizedBox(height: 20),
@@ -590,16 +591,19 @@ class _BookBoxPageState extends State<BookBoxPage> {
                 flex: 2,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Kanit',
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Kanit',
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -612,7 +616,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 4),
                     Text(
                       'Added $timeAgo',
                       style: TextStyle(
