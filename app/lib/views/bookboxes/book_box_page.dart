@@ -10,7 +10,6 @@ import 'package:Lino_app/vm/bookboxes/book_box_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -106,48 +105,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                 icon: const Icon(Icons.report, color: Colors.white),
                 tooltip: 'Report Issue',
               ),
-              if (viewModel.token != null)
-                viewModel.isCheckingFollowStatus
-                    ? const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  ),
-                )
-                    : IconButton(
-                  onPressed: () async {
-                    final success = await viewModel.toggleFollow(bookBoxId!);
-                    if (success) {
-                      Get.snackbar(
-                        viewModel.isFollowed ? 'Following' : 'Unfollowed',
-                        viewModel.isFollowed
-                            ? 'You are now following this BookBox'
-                            : 'You have unfollowed this BookBox',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: viewModel.isFollowed ? Colors.green : Colors.orange,
-                        colorText: Colors.white,
-                      );
-                    } else {
-                      Get.snackbar(
-                        'Error',
-                        'Failed to ${viewModel.isFollowed ? 'unfollow' : 'follow'} BookBox',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.red,
-                        colorText: Colors.white,
-                      );
-                    }
-                  },
-                  icon: Icon(
-                    viewModel.isFollowed ? Icons.favorite : Icons.favorite_border,
-                    color: viewModel.isFollowed ? Colors.red : Colors.white,
-                  ),
-                  tooltip: viewModel.isFollowed ? 'Unfollow BookBox' : 'Follow BookBox',
-                ),
+              
             ],
           ),
           body: SafeArea(
@@ -208,8 +166,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!bookBox.isActive) _buildMaintenanceBanner(),
-          _buildBookBoxInfoCard(bookBox),
-          const SizedBox(height: 20),
+          _buildBookBoxInfoCard(bookBox, context.read<BookBoxViewModel>()),
           _buildActionButtons(bookBox),
           if (!canInteract) ...[
             const SizedBox(height: 20),
@@ -265,7 +222,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
     );
   }
 
-  Widget _buildBookBoxInfoCard(BookBox bookBox) {
+  Widget _buildBookBoxInfoCard(BookBox bookBox, BookBoxViewModel viewModel) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -316,14 +273,77 @@ class _BookBoxPageState extends State<BookBoxPage> {
                     ),
                   ),
                 ),
-              Text(
-                bookBox.name,
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Kanit',
-                  color: Color.fromRGBO(101, 67, 33, 1),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      bookBox.name,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Kanit',
+                        color: Color.fromRGBO(101, 67, 33, 1),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (!canInteract)
+                        IconButton(
+                          onPressed: () => _openGoogleMapsApp(bookBox.latitude, bookBox.longitude),
+                          icon: const Icon(
+                            Icons.directions,
+                            color: Color.fromRGBO(101, 67, 33, 1),
+                          ),
+                          tooltip: 'Get Directions',
+                        ),
+                      if (viewModel.token != null)
+                        viewModel.isCheckingFollowStatus
+                            ? const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(101, 67, 33, 1)),
+                            ),
+                          ),
+                        )
+                            : IconButton(
+                          onPressed: () async {
+                            final success = await viewModel.toggleFollow(bookBoxId!);
+                            if (success) {
+                              Get.snackbar(
+                                viewModel.isFollowed ? 'Following' : 'Unfollowed',
+                                viewModel.isFollowed
+                                    ? 'You are now following this BookBox'
+                                    : 'You have unfollowed this BookBox',
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: viewModel.isFollowed ? Colors.green : Colors.orange,
+                                colorText: Colors.white,
+                              );
+                            } else {
+                              Get.snackbar(
+                                'Error',
+                                'Failed to ${viewModel.isFollowed ? 'unfollow' : 'follow'} BookBox',
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white,
+                              );
+                            }
+                          },
+                          icon: Icon(
+                            viewModel.isFollowed ? Icons.favorite : Icons.favorite_border,
+                            color: viewModel.isFollowed ? Colors.red : Color.fromRGBO(101, 67, 33, 1),
+                          ),
+                          tooltip: viewModel.isFollowed ? 'Unfollow BookBox' : 'Follow BookBox',
+                        ),
+                    ],
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               if (!canInteract && bookBox.infoText != null && bookBox.infoText!.isNotEmpty)
@@ -360,14 +380,6 @@ class _BookBoxPageState extends State<BookBoxPage> {
   Widget _buildActionButtons(BookBox bookBox) {
     List<Widget> buttons = [];
 
-    if (!canInteract) {
-      buttons.add(
-        Expanded(
-          child: _buildDirectionButton(LatLng(bookBox.latitude, bookBox.longitude)),
-        ),
-      );
-    }
-
     if (canInteract) {
       buttons.addAll([
         Expanded(child: _buildAddBookButton(bookBox.isActive)),
@@ -378,23 +390,6 @@ class _BookBoxPageState extends State<BookBoxPage> {
 
     if (buttons.isEmpty) return const SizedBox.shrink();
     return Row(children: buttons);
-  }
-
-  Widget _buildDirectionButton(LatLng location) {
-    return ElevatedButton.icon(
-      onPressed: () => _openGoogleMapsApp(location.latitude, location.longitude),
-      icon: const Icon(Icons.directions, color: Colors.white),
-      label: const Text(
-        'Get Directions',
-        style: TextStyle(color: Colors.white, fontFamily: 'Kanit', fontWeight: FontWeight.w600),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromRGBO(142, 199, 233, 1),
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 3,
-      ),
-    );
   }
 
   Widget _buildAddBookButton(bool isActive) {
