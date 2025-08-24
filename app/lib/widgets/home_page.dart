@@ -61,7 +61,7 @@ class MergedProfileStatsWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'GOAT',
+                      getMatchingDescription(),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade600,
@@ -161,5 +161,27 @@ class MergedProfileStatsWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  static const descriptionList = [
+    'Tree Hugger in Training',
+    'Carbon Crusader',
+    'Eco Warrior',
+    'Planet Protector',
+    'Environmental Champion'
+  ];
+
+  String getMatchingDescription() {
+    if (booksSaved >= 50) {
+      return descriptionList[4];
+    } else if (booksSaved >= 25) {
+      return descriptionList[3];
+    } else if (booksSaved >= 10) {
+      return descriptionList[2];
+    } else if (booksSaved >= 5) {
+      return descriptionList[1];
+    } else {
+      return descriptionList[0];
+    }
   }
 }
