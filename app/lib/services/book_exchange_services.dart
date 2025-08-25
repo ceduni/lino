@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:Lino_app/models/book_model.dart';
+import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/utils/constants/api_constants.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -41,16 +42,23 @@ class BookExchangeService {
     }
   }
 
-  Future<void> getBookFromBB(String bookId, String bookboxId,
+  Future<void> getBookFromBB(String bookboxId, String isbn,
       {String? token}) async {
+    // First, get the books of the bookbox
     final headers = {
       if (token != null) 'Authorization': 'Bearer $token',
       'bm_token': dotenv.env['BOOK_MANIPULATION_TOKEN'] ?? 'not_set',
     };
 
-    // Make a DELETE request to the server
+    final book = await BookboxService()
+        .tryFindBookInBookBox(bookboxId, isbn);
+    if (book == null) {
+      throw Exception('Book not found in bookbox');
+    }
+
+    // Make the request to the server
     final r = await http.delete(
-      Uri.parse('$url/bookboxes/$bookboxId/books/$bookId'),
+      Uri.parse('$url/bookboxes/$bookboxId/books/${book.id}'),
       headers: headers,
     );
 

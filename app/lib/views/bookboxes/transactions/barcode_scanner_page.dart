@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/vm/bookboxes/transactions/barcode_scanner_view_model.dart';
 import 'package:Lino_app/views/books/book_edition_page.dart';
+import 'package:Lino_app/views/bookboxes/transactions/bookbox_book_list_page.dart';
+import 'package:Lino_app/services/book_exchange_services.dart';
 
 class BarcodeScannerPage extends StatefulWidget {
   final bool addingBook;
@@ -30,7 +33,9 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
     
     // Start scanning when page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<BarcodeScannerViewModel>().startScanning();
+      final viewModel = context.read<BarcodeScannerViewModel>();
+      viewModel.setParameters(widget.addingBook, widget.bookboxId);
+      viewModel.startScanning();
     });
   }
 
@@ -38,6 +43,189 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   void dispose() {
     _controller?.dispose();
     super.dispose();
+  }
+
+  Future<void> _showTakeBookConfirmation(EditableBook book) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            'Confirm Book Selection',
+            style: TextStyle(
+              fontFamily: 'Kanit',
+              fontWeight: FontWeight.bold,
+              color: Color.fromRGBO(101, 67, 33, 1),
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Book cover
+              Container(
+                width: 100,
+                height: 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      spreadRadius: 1,
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    book.coverImage,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return _buildBookPlaceholder(book.title);
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                book.title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Kanit',
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                book.authors.isNotEmpty ? book.authors.join(', ') : 'Unknown Author',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  fontFamily: 'Kanit',
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Are you sure you want to take this book?',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Kanit',
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  fontFamily: 'Kanit',
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green.shade600,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Take Book',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Kanit',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      await _takeBook(book);
+    }
+  }
+
+  Future<void> _takeBook(EditableBook book) async {
+    try {
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 16),
+                Text(
+                  'Taking book...',
+                  style: TextStyle(fontFamily: 'Kanit'),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      await BookExchangeService().getBookFromBB(
+        widget.bookboxId,
+        book.isbn,
+        token: token,
+      );
+
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Successfully took "${book.title}"',
+            style: const TextStyle(fontFamily: 'Kanit'),
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Navigate back to previous screen
+      Get.back();
+      Get.back(); // Go back twice to return to the main screen
+    } catch (e) {
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to take book: ${e.toString()}',
+            style: const TextStyle(fontFamily: 'Kanit'),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -62,11 +250,16 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
           return SafeArea(
             child: Column(
               children: [
-                // Top section - Book info card (when book is found)
+                // Top section - Book info card (when book is found) or Error card (when error occurs)
                 if (viewModel.scannedBook != null)
                   Flexible(
                     flex: 0,
                     child: _buildBookInfoCard(viewModel.scannedBook!),
+                  )
+                else if (viewModel.error != null)
+                  Flexible(
+                    flex: 0,
+                    child: _buildErrorCard(viewModel.error!),
                   )
                 else
                   const SizedBox(height: 20), // Small space when no book
@@ -84,13 +277,15 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                   ),
                 ),
                 
-                // Bottom section - Fallback UI or Continue button
-                if (viewModel.showFallback || viewModel.scannedBook != null)
+                // Bottom section - Fallback UI, Continue button, or Error actions
+                if (viewModel.showFallback || viewModel.scannedBook != null || viewModel.error != null)
                   Flexible(
                     flex: 0,
                     child: viewModel.showFallback 
                         ? _buildFallbackUI()
-                        : _buildContinueButton(),
+                        : viewModel.error != null
+                            ? _buildErrorActions()
+                            : _buildContinueButton(),
                   ),
               ],
             ),
@@ -371,8 +566,10 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                             editableBook: EditableBook(isbn: ''),
                           ));
                         } else {
-                          // TODO: Navigate to book list for taking books
-                          print('Navigate to book list');
+                          // Navigate to book list for taking books
+                          Get.to(() => BookboxBookListPage(
+                            bookboxId: widget.bookboxId,
+                          ));
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -420,9 +617,9 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                         bookboxId: widget.bookboxId,
                         editableBook: viewModel.scannedBook!,
                       ));
-                    } else {
-                      // TODO: Implement take book functionality
-                      print('Take book from BookBox: ${widget.bookboxId}');
+                    } else if (!widget.addingBook && viewModel.scannedBook != null) {
+                      // Show confirmation dialog for taking book
+                      _showTakeBookConfirmation(viewModel.scannedBook!);
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -463,6 +660,132 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildErrorCard(String errorMessage) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      child: Card(
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.fromRGBO(255, 235, 235, 1),
+                Color.fromRGBO(255, 220, 220, 1),
+              ],
+            ),
+          ),
+          child: Row(
+            children: [
+              // Error icon
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.red.shade100,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Icon(
+                  Icons.error_outline,
+                  color: Colors.red.shade600,
+                  size: 30,
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Error message
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Book Not Found',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Kanit',
+                        color: Color.fromRGBO(180, 50, 50, 1),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      errorMessage,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.red.shade700,
+                        fontFamily: 'Kanit',
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorActions() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                context.read<BarcodeScannerViewModel>().resetScanner();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange.shade600,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 4,
+              ),
+              child: const Text(
+                'Try Another Book',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Kanit',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          if (!widget.addingBook)
+            TextButton(
+              onPressed: () {
+                // Navigate to book list for taking books
+                Get.to(() => BookboxBookListPage(
+                  bookboxId: widget.bookboxId,
+                ));
+              },
+              child: const Text(
+                'View Available Books',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Kanit',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 

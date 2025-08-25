@@ -147,6 +147,20 @@ class EditableBook {
       categories: (json['categories'] as List).cast<String>(),
     );
   }
+
+  factory EditableBook.fromBook(Book book) {
+    return EditableBook(
+      isbn: book.isbn ?? '',
+      title: book.title,
+      authors: List<String>.from(book.authors),
+      description: book.description ?? 'No description available',
+      coverImage: book.coverImage ?? 'No thumbnail available',
+      publisher: book.publisher ?? 'Unknown publisher',
+      parutionYear: book.parutionYear,
+      pages: book.pages,
+      categories: List<String>.from(book.categories),
+    );
+  }
 }
 
 class ExtendedBook extends Book {

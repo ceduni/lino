@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/services/book_services.dart';
+import 'package:Lino_app/services/bookbox_services.dart';
 
 class BarcodeScannerViewModel extends ChangeNotifier {
   // State variables
@@ -11,11 +12,21 @@ class BarcodeScannerViewModel extends ChangeNotifier {
   String? _error;
   Timer? _timeoutTimer;
   
+  // Parameters for different behavior
+  bool? _addingBook;
+  String? _bookboxId;
+  
   // Getters
   bool get isScanning => _isScanning;
   bool get showFallback => _showFallback;
   EditableBook? get scannedBook => _scannedBook;
   String? get error => _error;
+  
+  // Method to set parameters
+  void setParameters(bool addingBook, String bookboxId) {
+    _addingBook = addingBook;
+    _bookboxId = bookboxId;
+  }
   
   void startScanning() {
     _isScanning = true;
@@ -50,14 +61,33 @@ class BarcodeScannerViewModel extends ChangeNotifier {
       _error = null;
       notifyListeners();
       
-      // Fetch book info
-      final book = await BookService().getBookInfo(barcode);
+      EditableBook? book;
+      
+      // Different behavior based on addingBook parameter
+      if (_addingBook == false && _bookboxId != null) {
+        // When taking a book, first try to find it in the bookbox
+        final foundBook = await BookboxService().tryFindBookInBookBox(_bookboxId!, barcode);
+        if (foundBook != null) {
+          // Convert Book to EditableBook using factory function
+          book = EditableBook.fromBook(foundBook);
+        } else {
+          // If not found in bookbox when taking, show error
+          _error = "This book is not available in this BookBox. Please scan a book that is currently in the BookBox.";
+          _isScanning = false;
+          notifyListeners();
+          return;
+        }
+      } else {
+        // For adding books or when bookboxId is null, use API directly
+        book = await BookService().getBookInfo(barcode);
+      }
+      
       _scannedBook = book;
       _isScanning = false;
       notifyListeners();
       
     } catch (e) {
-      // If book not found, continue scanning (don't show error immediately)
+      // If book not found in API, continue scanning (don't show error immediately)
       _error = null;
       // Don't stop scanning, let the timeout handle showing fallback
     }

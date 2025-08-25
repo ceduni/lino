@@ -145,6 +145,11 @@ class BookEditionViewModel extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
+    if (_editableBook.isbn.trim().isEmpty) {
+      // Give it an UUID if no ISBN
+      _editableBook.isbn = '${DateTime.now().millisecondsSinceEpoch}fakeeeeeeee';
+    }
+
 
     try {
       await _bookExchangeService.addBookToBB(bookboxId, _editableBook, token: token);

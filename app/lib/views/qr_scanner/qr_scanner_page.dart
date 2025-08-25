@@ -44,78 +44,79 @@ class _QRScannerPageState extends State<QRScannerPage> {
           onPressed: () => Get.back(),
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 4,
-            child: Stack(
-              children: [
-                MobileScanner(
-                  controller: cameraController,
-                  onDetect: _foundBarcode,
-                ),
-                // Overlay with scanning frame
-                Container(
-                  decoration: ShapeDecoration(
-                    shape: QrScannerOverlayShape(
-                      borderColor: const Color.fromRGBO(239, 174, 133, 1),
-                      borderRadius: 10,
-                      borderLength: 30,
-                      borderWidth: 10,
-                      cutOutSize: 250,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              flex: 4,
+              child: Stack(
                 children: [
-                  const Text(
-                    'Point your camera at a QR code',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontFamily: 'Kanit',
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
+                  MobileScanner(
+                    controller: cameraController,
+                    onDetect: _foundBarcode,
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'The QR code will be scanned automatically',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Kanit',
-                      color: Colors.grey,
+                  // Overlay with scanning frame
+                  Container(
+                    decoration: ShapeDecoration(
+                      shape: QrScannerOverlayShape(
+                        borderColor: const Color.fromRGBO(239, 174, 133, 1),
+                        borderRadius: 10,
+                        borderLength: 30,
+                        borderWidth: 10,
+                        cutOutSize: 250,
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      IconButton(
-                        onPressed: () => cameraController.toggleTorch(),
-                        icon: const Icon(Icons.flash_on, color: Colors.grey),
-                        tooltip: 'Toggle Flash',
-                      ),
-                      IconButton(
-                        onPressed: () => cameraController.switchCamera(),
-                        icon: const Icon(Icons.camera_rear, color: Colors.grey),
-                        tooltip: 'Switch Camera',
-                      ),
-                    ],
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            Expanded(
+              flex: 1,
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Point your camera at a QR code',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'Kanit',
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const Text(
+                      'The QR code will be scanned automatically',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Kanit',
+                        color: Colors.grey,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        IconButton(
+                          onPressed: () => cameraController.toggleTorch(),
+                          icon: const Icon(Icons.flash_on, color: Colors.grey),
+                          tooltip: 'Toggle Flash',
+                        ),
+                        IconButton(
+                          onPressed: () => cameraController.switchCamera(),
+                          icon: const Icon(Icons.camera_rear, color: Colors.grey),
+                          tooltip: 'Switch Camera',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
