@@ -25,6 +25,11 @@ jobs:
       run: |
         flutter --version
         flutter doctor -v
+
+    - name: Install iOS 18.0 platform
+      run: |
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+        xcodebuild -downloadPlatform iOS
         
     - name: Get Flutter dependencies
       working-directory: ./app
