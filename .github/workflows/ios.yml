@@ -79,7 +79,7 @@ jobs:
     - name: Build iOS release
       working-directory: ./app
       run: |
-        flutter build ios --release --no-codesign --verbose
+        flutter build ios --release --no-codesign
         
     - name: Create IPA
       working-directory: ./app
