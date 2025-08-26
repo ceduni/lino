@@ -200,7 +200,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
         ),
       ),
       title: Text(
-        transaction.action == "added" ? 'Added a new book' : "Took a book",
+        'ISBN : ${transaction.isbn}',
         style: TextStyle(
           fontWeight: FontWeight.w500,
           fontSize: 14,
