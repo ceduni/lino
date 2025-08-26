@@ -134,7 +134,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontStyle: FontStyle.italic,
                 color: Colors.black,
                 fontSize: notification.isRead ? 12.0 : 14.0,
               ),
@@ -187,7 +186,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   Text(
                     content,
                     style: const TextStyle(
-                      fontStyle: FontStyle.italic,
                     ),
                   ),
                   const SizedBox(height: 10.0),

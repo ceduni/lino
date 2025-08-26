@@ -10,6 +10,8 @@ import 'package:Lino_app/widgets/home_page.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:Lino_app/models/notification_model.dart';
+import 'package:Lino_app/views/profile/notifications_page.dart';
+import 'package:Lino_app/vm/profile/notifications_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -464,7 +466,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           tooltip: 'Refresh notifications',
                         ),
                         TextButton(
-                          onPressed: () => (),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChangeNotifierProvider(
+                                create: (context) => NotificationsViewModel(),
+                                child: const NotificationsPage(),
+                              ),
+                            ),
+                          ),
                           child: const Text('View All'),
                         ),
                       ],
