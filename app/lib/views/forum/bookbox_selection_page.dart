@@ -19,6 +19,7 @@ class BookboxSelectionPage extends StatefulWidget {
 
 class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
   late BookboxSelectionViewModel _viewModel;
+  bool _isMapView = true; 
 
   @override
   void initState() {
@@ -58,7 +59,6 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
             ),
             body: Column(
               children: [
-                // Header section with book info and instructions
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16.0),
@@ -115,7 +115,7 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'Select bookboxes where you\'d like this book to be added. Tap on map pins to select/deselect them.',
+                                'Select bookboxes where you\'d like this book to be added. Use the toggle above to switch between map and list views.',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.blue.shade800,
@@ -142,9 +142,88 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
                   ),
                 ),
                 
-                // Map section
+                // View toggle buttons
+                Container(
+                  margin: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => _isMapView = true),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              color: _isMapView 
+                                  ? const Color.fromRGBO(101, 67, 33, 1)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.map,
+                                  color: _isMapView ? Colors.white : Colors.grey.shade600,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Map',
+                                  style: TextStyle(
+                                    color: _isMapView ? Colors.white : Colors.grey.shade600,
+                                    fontWeight: _isMapView ? FontWeight.bold : FontWeight.normal,
+                                    fontFamily: 'Kanit',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => _isMapView = false),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              color: !_isMapView 
+                                  ? const Color.fromRGBO(101, 67, 33, 1)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.list,
+                                  color: !_isMapView ? Colors.white : Colors.grey.shade600,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'List',
+                                  style: TextStyle(
+                                    color: !_isMapView ? Colors.white : Colors.grey.shade600,
+                                    fontWeight: !_isMapView ? FontWeight.bold : FontWeight.normal,
+                                    fontFamily: 'Kanit',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Map or List section
                 Expanded(
-                  flex: 3, // Limit the map to take up less space
+                  flex: 3, 
                   child: viewModel.isLoading
                       ? const Center(
                           child: Column(
@@ -244,14 +323,11 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
                                     ),
                                   ),
                                 )
-                              : BookboxMapWidget(
-                                  bookboxes: viewModel.bookboxes,
-                                  onSelectionChanged: viewModel.onSelectionChanged,
-                                  initialLocation: viewModel.initialLocation,
-                                ),
+                              : _isMapView 
+                                  ? _buildMapView(viewModel)
+                                  : _buildListView(viewModel),
                 ),
                 
-                // Bottom section with error message and create button
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 32.0), // Extra bottom padding
@@ -350,11 +426,156 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
     );
   }
 
+  Widget _buildMapView(BookboxSelectionViewModel viewModel) {
+    return BookboxMapWidget(
+      bookboxes: viewModel.bookboxes,
+      onSelectionChanged: viewModel.onSelectionChanged,
+      initialLocation: viewModel.initialLocation,
+      selectedBookboxIds: viewModel.selectedBookboxIds, 
+    );
+  }
+
+  Widget _buildListView(BookboxSelectionViewModel viewModel) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: ListView.separated(
+        itemCount: viewModel.bookboxes.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 8),
+        itemBuilder: (context, index) {
+          final bookbox = viewModel.bookboxes[index];
+          final isSelected = viewModel.selectedBookboxIds.contains(bookbox.id);
+          
+          return Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: isSelected 
+                    ? const Color.fromRGBO(101, 67, 33, 1)
+                    : Colors.grey.shade300,
+                width: isSelected ? 2 : 1,
+              ),
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () {
+                List<String> updatedSelection = List.from(viewModel.selectedBookboxIds);
+                if (isSelected) {
+                  updatedSelection.remove(bookbox.id);
+                } else {
+                  updatedSelection.add(bookbox.id);
+                }
+                viewModel.onSelectionChanged(updatedSelection);
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    // Selection indicator
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isSelected 
+                            ? const Color.fromRGBO(101, 67, 33, 1)
+                            : Colors.transparent,
+                        border: Border.all(
+                          color: isSelected 
+                              ? const Color.fromRGBO(101, 67, 33, 1)
+                              : Colors.grey.shade400,
+                          width: 2,
+                        ),
+                      ),
+                      child: isSelected
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 16,
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 16),
+                    
+                    // Bookbox info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            bookbox.name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Kanit',
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          
+                          // Distance if available
+                          if (bookbox.distance != null)
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  size: 14,
+                                  color: Colors.grey.shade600,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${bookbox.distance!.toStringAsFixed(1)} km away',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          
+                          // Book count
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.book,
+                                size: 14,
+                                color: Colors.grey.shade600,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${bookbox.booksCount} book${bookbox.booksCount == 1 ? '' : 's'}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Arrow indicator
+                    Icon(
+                      isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+                      color: isSelected 
+                          ? const Color.fromRGBO(101, 67, 33, 1)
+                          : Colors.grey.shade400,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Future<void> _createRequest(BookboxSelectionViewModel viewModel) async {
     final success = await viewModel.createRequest();
     
     if (success && mounted) {
-      // Refresh the requests list if available
       try {
         context.read<RequestsViewModel>().refresh();
       } catch (e) {

@@ -9,12 +9,14 @@ class BookboxMapWidget extends StatefulWidget {
   final List<ShortenedBookBox> bookboxes;
   final Function(List<String>) onSelectionChanged;
   final LatLng? initialLocation;
+  final List<String> selectedBookboxIds; 
 
   const BookboxMapWidget({
     super.key,
     required this.bookboxes,
     required this.onSelectionChanged,
     this.initialLocation,
+    this.selectedBookboxIds = const [], 
   });
 
   @override
@@ -31,6 +33,7 @@ class _BookboxMapWidgetState extends State<BookboxMapWidget> {
   @override
   void initState() {
     super.initState();
+    _selectedBookboxIds = Set<String>.from(widget.selectedBookboxIds);
     _checkLocationPermission();
     _createMarkers();
   }
@@ -38,8 +41,16 @@ class _BookboxMapWidgetState extends State<BookboxMapWidget> {
   @override
   void didUpdateWidget(BookboxMapWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+    
     if (oldWidget.bookboxes != widget.bookboxes) {
       _createMarkers();
+    }
+    
+    if (oldWidget.selectedBookboxIds != widget.selectedBookboxIds) {
+      setState(() {
+        _selectedBookboxIds = Set<String>.from(widget.selectedBookboxIds);
+      });
+      _createMarkers(); 
     }
   }
 
