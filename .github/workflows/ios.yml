@@ -66,20 +66,35 @@ jobs:
         
     - name: Get Flutter dependencies
       working-directory: ./app
-      run: flutter pub get
+      run: |
+        flutter clean
+        flutter pub get
+        flutter pub deps
     
     - name: Install iOS CocoaPods dependencies
       working-directory: ./app/ios
       run: |
+        # Update CocoaPods repo
+        pod repo update
+        # Clean and reinstall
         pod cache clean --all
-        pod deintegrate
+        pod deintegrate || true
+        rm -rf Pods
+        rm -f Podfile.lock
         pod install --repo-update
+        # Verify PhoneNumberKit is installed
+        pod list | grep -i phone || echo "PhoneNumberKit not found in pods"
         
     - name: Clean Flutter build
       working-directory: ./app
       run: |
         flutter clean
         flutter pub get
+        
+    - name: Update iOS toolchain
+      working-directory: ./app
+      run: |
+        flutter precache --ios
         
     - name: Build iOS release
       working-directory: ./app
