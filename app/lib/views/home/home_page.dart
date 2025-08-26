@@ -13,6 +13,7 @@ import 'package:Lino_app/models/notification_model.dart';
 import 'package:Lino_app/views/profile/notifications_page.dart';
 import 'package:Lino_app/vm/profile/notifications_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -604,7 +605,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ],
                         ),
                         onTap: () {
-                          print("notis todo");
+                          _showNotificationDetails(context, notification);
                         },
                       ),
                     );
@@ -615,6 +616,91 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
       ),
     );
+  }
+
+  void _showNotificationDetails(BuildContext context, Notif notification) async {
+    final List<String> reasons = notification.reason;
+
+    String title;
+    if (reasons.contains('book_request')) {
+      title = 'Book Request';
+    } else {
+      title = 'New Book Available';
+    }
+
+    // Create a temporary view model to use its methods
+    final tempViewModel = NotificationsViewModel();
+    
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: FutureBuilder<String>(
+            future: tempViewModel.buildNotificationContent(notification),
+            builder: (context, snapshot) {
+              String content;
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                content = 'Loading...';
+              } else if (snapshot.hasError) {
+                content = tempViewModel.buildNotificationContentSync(notification);
+              } else {
+                content = snapshot.data ?? tempViewModel.buildNotificationContentSync(notification);
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    content,
+                    style: const TextStyle(
+                    ),
+                  ),
+                  const SizedBox(height: 10.0),
+                  Text(
+                    timeago.format(notification.createdAt),
+                    style: const TextStyle(
+                      fontSize: 10.0,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    ).then((_) {
+      // Mark the notification as read after closing the dialog
+      _markNotificationAsRead(notification);
+    });
+  }
+
+  Future<void> _markNotificationAsRead(Notif notification) async {
+    if (!notification.isRead) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('token');
+        
+        if (token != null) {
+          final userService = UserService();
+          await userService.markNotificationAsRead(token, notification.id);
+          // Refresh notifications to update the read status
+          await _loadNotificationsWithRetry();
+        }
+      } catch (e) {
+        print('Error marking notification as read: $e');
+      }
+    }
   }
 
   String _formatNotificationDate(DateTime date) {
