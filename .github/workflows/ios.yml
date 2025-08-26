@@ -33,6 +33,11 @@ jobs:
       run: |
         sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
         xcodebuild -version
+
+    - name: Install iOS Simulator
+      run: |
+        sudo xcodebuild -downloadPlatform iOS
+        xcodebuild -showsdks | grep -i ios
         
     - name: Create environment files
       working-directory: ./app
