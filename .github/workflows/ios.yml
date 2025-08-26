@@ -1,15 +1,18 @@
 name: Build and Release Flutter iOS
 
 on:
-  push:
-    branches:
-      - main
-      - master
-  workflow_dispatch: # Allows manual triggering
+  workflow_dispatch: # Only manual triggering
+    inputs:
+      release_notes:
+        description: 'Release notes for this build'
+        required: false
+        default: 'Manual iOS build'
 
 jobs:
   build-ios:
     runs-on: macos-latest
+    
+    environment: production # Use environment for secrets
     
     steps:
     - name: Checkout repository
@@ -26,29 +29,80 @@ jobs:
         flutter --version
         flutter doctor -v
 
-    - name: Install iOS 18.0 platform
+    - name: Setup Xcode
       run: |
         sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-        xcodebuild -downloadPlatform iOS
+        xcodebuild -version
+        
+    - name: Create environment files
+      working-directory: ./app
+      run: |
+        # Create .env file for Flutter
+        cat > .env << EOF
+        GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+        EOF
+        
+    - name: Create iOS configuration
+      working-directory: ./app/ios
+      run: |
+        # Create iOS secrets plist if needed
+        if [ ! -f Secrets.plist ]; then
+          cat > Secrets.plist << EOF
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>GOOGLE_API_KEY</key>
+            <string>${{ secrets.GOOGLE_API_KEY }}</string>
+        </dict>
+        </plist>
+        EOF
+        fi
         
     - name: Get Flutter dependencies
       working-directory: ./app
       run: flutter pub get
-      
+    
+    - name: Install iOS CocoaPods dependencies
+      working-directory: ./app/ios
+      run: |
+        pod cache clean --all
+        pod deintegrate
+        pod install --repo-update
+        
+    - name: Clean Flutter build
+      working-directory: ./app
+      run: |
+        flutter clean
+        flutter pub get
+        
     - name: Build iOS release
       working-directory: ./app
-      run: flutter build ios --release --no-codesign
-      
-    - name: Create IPA
-      working-directory: ./app/build/ios/iphoneos
       run: |
+        flutter build ios --release --no-codesign --verbose
+        
+    - name: Create IPA
+      working-directory: ./app
+      run: |
+        cd build/ios/iphoneos
         mkdir -p Payload
-        mv Runner.app Payload/
-        zip -qq -r -9 lino.ipa Payload
+        cp -r Runner.app Payload/
+        zip -qq -r -9 lino-ios-${{ github.run_number }}.ipa Payload
         
     - name: Upload IPA as Artifact
       uses: actions/upload-artifact@v4
       with:
         name: lino-ios-${{ github.run_number }}
-        path: ./app/build/ios/iphoneos/lino.ipa
+        path: ./app/build/ios/iphoneos/lino-ios-${{ github.run_number }}.ipa
         retention-days: 30
+        
+    - name: Create Release Summary
+      run: |
+        echo "## iOS Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Build Number**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Flutter Version**: 3.24.3" >> $GITHUB_STEP_SUMMARY
+        echo "- **Build Type**: Release (No Code Sign)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Artifact Name**: lino-ios-${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+        if [ -n "${{ github.event.inputs.release_notes }}" ]; then
+          echo "- **Release Notes**: ${{ github.event.inputs.release_notes }}" >> $GITHUB_STEP_SUMMARY
+        fi
