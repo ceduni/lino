@@ -346,7 +346,7 @@ export const searchTransactionHistorySchema = {
         type: 'object',
         properties: {
             username: { type: 'string' },
-            bookTitle: { type: 'string' },
+            isbn: { type: 'string' },
             bookboxId: { type: 'string' },
             limit: { type: 'number' },
             page: { type: 'number' }
@@ -365,7 +365,7 @@ export const searchTransactionHistorySchema = {
                             _id: { type: 'string' },
                             username: { type: 'string' },
                             action: { type: 'string' },
-                            bookTitle: { type: 'string' },
+                            isbn: { type: 'string' },
                             bookboxId: { type: 'string' },
                             timestamp: { type: 'string' }
                         }
