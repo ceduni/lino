@@ -153,7 +153,6 @@ class _HomePageState extends State<HomePage> {
                       MergedProfileStatsWidget(
                         userName: viewModel.userData!.username,
                         booksSaved: viewModel.userData!.numSavedBooks,
-                        waterSaved: viewModel.userData!.ecologicalImpact.savedWater,
                         treesSaved: viewModel.userData!.ecologicalImpact.savedTrees,
                       ),
                       /*

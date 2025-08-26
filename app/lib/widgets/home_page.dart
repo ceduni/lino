@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 class MergedProfileStatsWidget extends StatelessWidget {
   final String userName;
   final int booksSaved;
-  final double waterSaved;
   final double treesSaved;
 
   const MergedProfileStatsWidget({
     super.key,
     required this.userName,
     required this.booksSaved,
-    required this.waterSaved,
     required this.treesSaved,
   });
 
@@ -100,13 +98,6 @@ class MergedProfileStatsWidget extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                // Water saved
-                _buildStatItem(
-                  icon: Icons.water_drop,
-                  iconColor: Colors.blue.shade600,
-                  value: '${waterSaved.toStringAsFixed(0)}L',
-                  label: 'Water',
-                ),
                 // Trees saved
                 _buildStatItem(
                   icon: Icons.park,
