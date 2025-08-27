@@ -4,6 +4,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vibration/vibration.dart';
 import 'package:Lino_app/vm/bookboxes/transactions/barcode_scanner_view_model.dart';
 import 'package:Lino_app/views/books/book_edition_page.dart';
 import 'package:Lino_app/views/bookboxes/transactions/bookbox_book_list_page.dart';
@@ -296,12 +297,23 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   }
 
   Widget _buildScannerView(BarcodeScannerViewModel viewModel) {
+    var didItVibrate = false;
     return MobileScanner(
       controller: _controller,
-      onDetect: (BarcodeCapture capture) {
+      onDetect: (BarcodeCapture capture) async {
         final List<Barcode> barcodes = capture.barcodes;
         for (final barcode in barcodes) {
           if (barcode.rawValue != null) {
+            try {
+              if (await Vibration.hasVibrator()) {
+                if (!didItVibrate) {
+                  Vibration.vibrate(duration: 250);
+                  didItVibrate = true;
+                }
+              }
+            } catch (e) {
+            }
+            
             viewModel.onBarcodeDetected(barcode.rawValue!);
             break; // Process only the first barcode
           }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
+import 'package:vibration/vibration.dart';
 
 class QRScannerPage extends StatefulWidget {
   const QRScannerPage({super.key});
@@ -134,7 +135,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
     }
   }
 
-  void _handleScannedCode(String code) {
+  void _handleScannedCode(String code) async{
     // Check if the scanned code is a URL that matches the expected pattern
     final RegExp urlPattern = RegExp(
       r'https://ceduni-lino\.netlify\.app/bookbox/([a-fA-F0-9]{24})',
@@ -146,6 +147,13 @@ class _QRScannerPageState extends State<QRScannerPage> {
     if (match != null) {
       // Extract the bookbox ID from the URL
       final String bookboxId = match.group(1)!;
+
+      try {
+        if (await Vibration.hasVibrator()) {
+          Vibration.vibrate(duration: 250);
+        }
+      } catch (e) {
+      }
       
       // Navigate to the bookbox page with the extracted ID
       Get.back(); // Close the scanner page first

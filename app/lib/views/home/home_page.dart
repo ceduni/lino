@@ -14,6 +14,7 @@ import 'package:Lino_app/views/profile/notifications_page.dart';
 import 'package:Lino_app/vm/profile/notifications_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:vibration/vibration.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
