@@ -235,7 +235,6 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
 
   String _buildSubtitleText(Transaction transaction) {
     final parts = <String>[
-      transaction.actionDisplayText,
       transaction.timeAgo,
     ];
     
