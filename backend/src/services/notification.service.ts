@@ -95,6 +95,7 @@ const NotificationService = {
         const matchingRequests = allRequests.filter(request => 
             isFuzzyMatch(request.bookTitle, book.title, 0.8)
         );
+        console.log('Matching requests:', matchingRequests);
 
         // Get all users who upvoted matching requests
         const upvoterUsernames = new Set<string>();
@@ -114,6 +115,8 @@ const NotificationService = {
             username: { $in: Array.from(upvoterUsernames) },
             'notificationSettings.addedBook': true
         });
+
+        console.log('UpvoterUsers:', upvoterUsers);
 
         // Notify each upvoter
         for (const user of upvoterUsers) {
