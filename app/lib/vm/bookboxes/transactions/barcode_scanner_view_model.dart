@@ -84,6 +84,7 @@ class BarcodeScannerViewModel extends ChangeNotifier {
       
       _scannedBook = book;
       _isScanning = false;
+      _showFallback = false;
       notifyListeners();
       
     } catch (e) {
