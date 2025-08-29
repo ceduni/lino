@@ -97,13 +97,7 @@ const RequestService = {
             throw newErr(404, 'Request not found');
         }
 
-        const user = await User.findById(userId);
-        if (!user) {
-            throw newErr(404, 'User not found');
-        }
-
-        const username = user.username;
-        const upvoterIndex = bookRequest.upvoters.indexOf(username);
+        const upvoterIndex = bookRequest.upvoters.indexOf(userId);
         
         let isUpvoted: boolean;
         let message: string;
@@ -115,7 +109,7 @@ const RequestService = {
             message = 'Upvote removed successfully';
         } else {
             // User hasn't upvoted, add the upvote
-            bookRequest.upvoters.push(username);
+            bookRequest.upvoters.push(userId);
             isUpvoted = true;
             message = 'Request upvoted successfully';
         }
