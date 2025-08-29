@@ -264,6 +264,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
                     
                     const SizedBox(height: 4),
                     
+                    /*
                     if (bookbox.infoText != null && bookbox.infoText!.isNotEmpty)
                       Text(
                         bookbox.infoText!,
@@ -277,7 +278,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
                       ),
                     
                     const SizedBox(height: 8),
-                    
+                    */
                     Row(
                       children: [
                         Icon(

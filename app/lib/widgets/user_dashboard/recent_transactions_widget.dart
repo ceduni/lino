@@ -190,15 +190,18 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
     final actionIcon = isAdded ? Icons.add_circle_outline : Icons.remove_circle_outline;
 
     return ListTile(
+      /*
       contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
       leading: CircleAvatar(
         backgroundColor: actionColor.withValues(alpha: 0.1),
+        
         child: Icon(
           actionIcon,
           color: actionColor,
           size: 20,
-        ),
+        ), 
       ),
+      */
       title: Text(
         'ISBN : ${transaction.isbn}',
         style: TextStyle(

@@ -77,8 +77,8 @@ class _BookBoxPageState extends State<BookBoxPage> {
         return Scaffold(
           backgroundColor: const Color.fromRGBO(245, 245, 235, 1),
           appBar: AppBar(
-            title: const Text(
-              'BookBox Details',
+            title: Text(
+              viewModel.bookBox?.name ?? 'BookBox',
               style: TextStyle(
                 fontFamily: 'Kanit',
                 fontWeight: FontWeight.bold,
@@ -277,6 +277,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  /*
                   Expanded(
                     child: Text(
                       bookBox.name,
@@ -288,6 +289,8 @@ class _BookBoxPageState extends State<BookBoxPage> {
                       ),
                     ),
                   ),
+                  
+
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -343,7 +346,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                           tooltip: viewModel.isFollowed ? 'Unfollow BookBox' : 'Follow BookBox',
                         ),
                     ],
-                  ),
+                  ), */
                 ],
               ),
               const SizedBox(height: 12),
