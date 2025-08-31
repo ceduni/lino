@@ -310,18 +310,91 @@ class _BookBoxPageState extends State<BookBoxPage> {
                       ),
                     ],
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      bookBox.image!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey.shade300,
-                          child: const Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
-                        );
-                      },
-                    ),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          bookBox.image!,
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey.shade300,
+                              child: const Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
+                            );
+                          },
+                        ),
+                      ),
+                      // Heart button for follow/unfollow
+                      if (viewModel.token != null)
+                        Positioned(
+                          top: 12,
+                          right: 12,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  spreadRadius: 1,
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: viewModel.isCheckingFollowStatus
+                                ? const Padding(
+                                    padding: EdgeInsets.all(3.0),
+                                    child: SizedBox(
+                                      width: 26,
+                                      height: 26,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(101, 67, 33, 1)),
+                                      ),
+                                    ),
+                                  )
+                                : IconButton(
+                                    onPressed: () async {
+                                      final success = await viewModel.toggleFollow(bookBoxId!);
+                                      if (success) {
+                                        Get.snackbar(
+                                          viewModel.isFollowed ? 'Following' : 'Unfollowed',
+                                          viewModel.isFollowed
+                                              ? 'You are now following this BookBox'
+                                              : 'You have unfollowed this BookBox',
+                                          snackPosition: SnackPosition.BOTTOM,
+                                          backgroundColor: viewModel.isFollowed ? Colors.green : Colors.orange,
+                                          colorText: Colors.white,
+                                        );
+                                      } else {
+                                        Get.snackbar(
+                                          'Error',
+                                          'Failed to ${viewModel.isFollowed ? 'unfollow' : 'follow'} BookBox',
+                                          snackPosition: SnackPosition.BOTTOM,
+                                          backgroundColor: Colors.red,
+                                          colorText: Colors.white,
+                                        );
+                                      }
+                                    },
+                                    icon: Icon(
+                                      viewModel.isFollowed ? Icons.favorite : Icons.favorite_border,
+                                      color: viewModel.isFollowed ? Colors.red : Colors.grey.shade600,
+                                      size: 26,
+                                    ),
+                                    tooltip: viewModel.isFollowed ? 'Unfollow BookBox' : 'Follow BookBox',
+                                    padding: const EdgeInsets.all(2),
+                                    constraints: const BoxConstraints(
+                                      minWidth: 26,
+                                      minHeight: 26,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               Row(
