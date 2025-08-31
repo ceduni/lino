@@ -28,93 +28,77 @@ class MergedProfileStatsWidget extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
+      child: Row(
         children: [
-          // Profile section
-          Row(
-            children: [
-              // Profile picture
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: Colors.blue.shade100,
-                child: Icon(
-                        Icons.person,
-                        size: 35,
-                        color: Colors.blue.shade600,
-                      )
-              ),
-              const SizedBox(width: 16),
-              // Name and title
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      userName,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      getMatchingDescription(),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    
-                  ],
-                ),
-                
-              ),
-              /*
-              TextButton(
-                onPressed: () {
-                  print("a faire notis");
-                },
-                child: Icon(
-                  Icons.notifications,
-                  size: 30,
-                  color: Colors.blue.shade600,
-                ),
-              ) */
-            ],
+          // Profile picture
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.blue.shade100,
+            child: Icon(
+                    Icons.person,
+                    size: 35,
+                    color: Colors.blue.shade600,
+                  )
           ),
-          const SizedBox(height: 20),
-          // Stats section
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.green.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.green.shade200,
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+          const SizedBox(width: 16),
+          // Name and title
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Trees saved
-                _buildStatItem(
-                  icon: Icons.park,
-                  iconColor: Colors.green.shade600,
-                  value: treesSaved.toStringAsFixed(2),
-                  label: 'Trees',
+                Text(
+                  userName,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
-                // Books saved
-                _buildStatItem(
-                  icon: Icons.book,
-                  iconColor: Colors.orange.shade600,
-                  value: booksSaved.toString(),
-                  label: 'Books',
+                const SizedBox(height: 4),
+                Text(
+                  getMatchingDescription(),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                  ),
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 16),
+          // Stats section moved to the right
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Trees saved
+              _buildStatItem(
+                icon: Icons.park,
+                iconColor: Colors.green.shade600,
+                value: treesSaved.toStringAsFixed(2),
+                label: 'Trees',
+              ),
+              const SizedBox(width: 62),
+              // Books saved
+              _buildStatItem(
+                icon: Icons.book,
+                iconColor: Colors.orange.shade600,
+                value: booksSaved.toString(),
+                label: 'Books',
+              ),
+              const SizedBox(width: 10),
+            ],
+          ),
+          /*
+          TextButton(
+            onPressed: () {
+              print("a faire notis");
+            },
+            child: Icon(
+              Icons.notifications,
+              size: 30,
+              color: Colors.blue.shade600,
+            ),
+          ) */
         ],
       ),
     );
