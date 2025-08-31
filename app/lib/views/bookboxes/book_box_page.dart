@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:Lino_app/vm/search/search_page_view_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:geolocator/geolocator.dart';
 
 class BookBoxPage extends StatefulWidget {
   const BookBoxPage({super.key});
@@ -27,6 +28,10 @@ class _BookBoxPageState extends State<BookBoxPage> {
   final BookBoxStateService _stateService = Get.find<BookBoxStateService>();
   String? bookBoxId;
   bool canInteract = false;
+  double? _userLatitude;
+  double? _userLongitude;
+  double? _distanceToBookBox;
+  bool _isGettingLocation = false;
 
   @override
   void initState() {
@@ -509,14 +514,13 @@ class _BookBoxPageState extends State<BookBoxPage> {
                         rotateGesturesEnabled: false,
                         mapToolbarEnabled: false,
                         myLocationButtonEnabled: false,
-                        onTap: (_) => _showLocationPopup(bookBox),
+                        onTap: (_) => _openGoogleMapsApp(bookBox.latitude, bookBox.longitude),
                       ),
                     ],
                   ),
                 ),
               ),
-              /*
-              if (!canInteract && bookBox.infoText != null && bookBox.infoText!.isNotEmpty) ...[
+              if (bookBox.infoText != null && bookBox.infoText!.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -526,7 +530,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.location_on, color: Color.fromRGBO(101, 67, 33, 1), size: 20),
+                      //const Icon(Icons.location_on, color: Color.fromRGBO(101, 67, 33, 1), size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -542,7 +546,6 @@ class _BookBoxPageState extends State<BookBoxPage> {
                   ),
                 ),
               ],
-              */
             ],
           ),
         ),
@@ -834,104 +837,6 @@ class _BookBoxPageState extends State<BookBoxPage> {
           ),
         ),
       ),
-    );
-  }
-
-  void _showLocationPopup(BookBox bookBox) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: Colors.white,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on,
-                      color: Color.fromRGBO(101, 67, 33, 1),
-                      size: 24,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        bookBox.name,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Kanit',
-                          color: Color.fromRGBO(101, 67, 33, 1),
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.close, color: Colors.grey),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ],
-                ),
-                if (bookBox.infoText != null && bookBox.infoText!.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color.fromRGBO(101, 67, 33, 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      bookBox.infoText!,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontFamily: 'Kanit',
-                        color: Color.fromRGBO(101, 67, 33, 1),
-                      ),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _openGoogleMapsApp(bookBox.latitude, bookBox.longitude);
-                    },
-                    icon: const Icon(Icons.directions, color: Colors.white),
-                    label: const Text(
-                      'Get Directions',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Kanit',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 
