@@ -10,8 +10,10 @@ import 'package:Lino_app/vm/bookboxes/book_box_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:Lino_app/vm/search/search_page_view_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class BookBoxPage extends StatefulWidget {
@@ -88,7 +90,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
             backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
             foregroundColor: Colors.white,
             elevation: 2,
-            actions: [
+            /*actions: [
               IconButton(
                 onPressed: () async {
                   final result = await Get.to(() => BookBoxIssueReportPage(bookboxId: bookBoxId!));
@@ -106,7 +108,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                 tooltip: 'Report Issue',
               ),
               
-            ],
+            ], */
           ),
           body: SafeArea(
             child: _buildBody(viewModel),
@@ -159,6 +161,20 @@ class _BookBoxPageState extends State<BookBoxPage> {
     return _buildContent(viewModel.bookBox!);
   }
 
+  Widget _buildMapSection(BookBox bookBox) {
+    return GoogleMap(initialCameraPosition: CameraPosition(
+      target: LatLng(bookBox.latitude, bookBox.longitude),
+      zoom: 15,
+    ),
+    markers: {
+      Marker(
+        markerId: MarkerId(bookBox.id),
+        position: LatLng(bookBox.latitude, bookBox.longitude),
+        infoWindow: InfoWindow(title: bookBox.name),
+      ),
+    },);
+  }
+
   Widget _buildContent(BookBox bookBox) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -173,6 +189,40 @@ class _BookBoxPageState extends State<BookBoxPage> {
             const SizedBox(height: 20),
             _buildBooksSection(bookBox),
           ],
+          const SizedBox(height: 20),
+          TextButton(
+            onPressed: () {
+              final searchViewModel = context.read<SearchPageViewModel>();
+              searchViewModel.createRequest("");
+            },
+            child: const Center(child: Text("Didn't find your book? Create a new request !"))
+          ),
+          Center(
+            child: TextButton.icon(
+              onPressed: () async {
+                  final result = await Get.to(() => BookBoxIssueReportPage(bookboxId: bookBoxId!));
+                  if (result != null && result['success'] == true) {
+                    Get.snackbar(
+                      'Success',
+                      result['message'] ?? 'Issue reported successfully',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.green,
+                      colorText: Colors.white,
+                    );
+                  }
+                },
+              icon: const Icon(Icons.flag),
+              label: const Text("Report issue with this BookBox"),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+                textStyle: const TextStyle(
+                  fontFamily: 'Kanit',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+
         ],
       ),
     );
@@ -349,8 +399,52 @@ class _BookBoxPageState extends State<BookBoxPage> {
                   ), */
                 ],
               ),
-              const SizedBox(height: 12),
-              if (!canInteract && bookBox.infoText != null && bookBox.infoText!.isNotEmpty)
+              const SizedBox(height: 16),
+              Container(
+                height: 120,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      spreadRadius: 1,
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Stack(
+                    children: [
+                      GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(bookBox.latitude, bookBox.longitude),
+                          zoom: 15,
+                        ),
+                        markers: {
+                          Marker(
+                            markerId: MarkerId(bookBox.id),
+                            position: LatLng(bookBox.latitude, bookBox.longitude),
+                            infoWindow: InfoWindow(title: bookBox.name),
+                          ),
+                        },
+                        zoomControlsEnabled: false,
+                        scrollGesturesEnabled: false,
+                        zoomGesturesEnabled: false,
+                        tiltGesturesEnabled: false,
+                        rotateGesturesEnabled: false,
+                        mapToolbarEnabled: false,
+                        myLocationButtonEnabled: false,
+                        onTap: (_) => _showLocationPopup(bookBox),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              /*
+              if (!canInteract && bookBox.infoText != null && bookBox.infoText!.isNotEmpty) ...[
+                const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -374,6 +468,8 @@ class _BookBoxPageState extends State<BookBoxPage> {
                     ],
                   ),
                 ),
+              ],
+              */
             ],
           ),
         ),
@@ -665,6 +761,104 @@ class _BookBoxPageState extends State<BookBoxPage> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showLocationPopup(BookBox bookBox) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Colors.white,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on,
+                      color: Color.fromRGBO(101, 67, 33, 1),
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        bookBox.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Kanit',
+                          color: Color.fromRGBO(101, 67, 33, 1),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+                if (bookBox.infoText != null && bookBox.infoText!.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color.fromRGBO(101, 67, 33, 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      bookBox.infoText!,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Kanit',
+                        color: Color.fromRGBO(101, 67, 33, 1),
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _openGoogleMapsApp(bookBox.latitude, bookBox.longitude);
+                    },
+                    icon: const Icon(Icons.directions, color: Colors.white),
+                    label: const Text(
+                      'Get Directions',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Kanit',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
