@@ -36,16 +36,42 @@ class _RequestsSectionState extends State<RequestsSection> {
     return Consumer<RequestsViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
-          body: Container(
-            color: LinoColors.primary,
-            child: Column(
-              children: [
-                _buildSearchAndFilters(viewModel),
-                if (viewModel.isAuthenticated) _buildCreateRequestButton(),
-                Expanded(child: _buildBody(viewModel)),
-                if (viewModel.pagination != null) _buildPaginationControls(viewModel),
-              ],
-            ),
+          body: Stack(
+            children: [
+              Container(
+                color: LinoColors.primary,
+                child: Column(
+                  children: [
+                    _buildSearchAndFilters(viewModel),
+                    Expanded(child: _buildBody(viewModel)),
+                    if (viewModel.pagination != null) _buildPaginationControls(viewModel),
+                  ],
+                ),
+              ),
+              if (viewModel.isAuthenticated)
+                Positioned(
+                  right: 16,
+                  bottom: viewModel.pagination != null ? 80 : 16,
+                  child: FloatingActionButton.extended(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const RequestFormPage(),
+                        ),
+                      );
+                    },
+                    backgroundColor: LinoColors.accent,
+                    foregroundColor: LinoColors.primary,
+                    icon: const Icon(Icons.add),
+                    label: const Text(
+                      'Create Request',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         );
       },
@@ -144,33 +170,6 @@ class _RequestsSectionState extends State<RequestsSection> {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildCreateRequestButton() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Center(
-        child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const RequestFormPage(),
-              ),
-            );
-          },
-          icon: const Icon(Icons.add, size: 18),
-          label: const Text('Create Request'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: LinoColors.accent,
-            foregroundColor: LinoColors.primary,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-        ),
       ),
     );
   }
