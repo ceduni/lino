@@ -317,6 +317,7 @@ class _RequestsSectionState extends State<RequestsSection> {
             borderRadius: BorderRadius.circular(8.0),
           ),
           child: ListTile(
+            onTap: () => showRequestDetails(request),
             title: Text(
               request.bookTitle,
               style: TextStyle(
@@ -418,6 +419,46 @@ class _RequestsSectionState extends State<RequestsSection> {
           ),
         );
       },
+    );
+  }
+
+  void showRequestDetails(Request request) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(request.bookTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Requested by: ${request.username}'),
+            const SizedBox(height: 8),
+            if (request.customMessage != null && request.customMessage!.isNotEmpty)
+              Text('Message: ${request.customMessage}'),
+            const SizedBox(height: 8),
+            Text('Upvotes: ${request.upvoteCount}'),
+            Text('People Notified: ${request.nbPeopleNotified}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'), 
+          ),
+          if (request.username == context.read<RequestsViewModel>().currentUsername) ...[
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                final confirmed = await _showDeleteDialog(context, context.read<RequestsViewModel>(), request);
+                if (confirmed && context.mounted) {
+                  Navigator.of(context).pop(); 
+                }
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ]
+        ],
+      ),
     );
   }
 
