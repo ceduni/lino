@@ -44,7 +44,7 @@ class _RequestsSectionState extends State<RequestsSection> {
                   children: [
                     _buildSearchAndFilters(viewModel),
                     Expanded(child: _buildBody(viewModel)),
-                    if (viewModel.pagination != null) _buildPaginationControls(viewModel),
+                    if (viewModel.pagination != null && viewModel.requests.isNotEmpty) _buildPaginationControls(viewModel),
                   ],
                 ),
               ),

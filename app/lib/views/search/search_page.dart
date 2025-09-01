@@ -522,7 +522,7 @@ class _SearchPageState extends State<SearchPage> {
                   },
                 ),
         ),
-        if (viewModel.bookPagination != null)
+        if (viewModel.bookPagination != null && viewModel.bookResults.isNotEmpty)
           _buildBookPagination(viewModel),
       ],
     );
