@@ -55,6 +55,10 @@ class _SearchPageState extends State<SearchPage> {
           ),
           filled: true,
           fillColor: Colors.grey[100],
+          suffixIcon: IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: viewModel.searchController.clear
+          )
         ),
       ),
     );
@@ -257,7 +261,7 @@ class _SearchPageState extends State<SearchPage> {
                   },
                 ),
         ),
-        if (viewModel.bookboxPagination != null)
+        if (viewModel.bookboxPagination != null && viewModel.bookboxResults.isNotEmpty)
           _buildBookboxPagination(viewModel),
       ],
     );
