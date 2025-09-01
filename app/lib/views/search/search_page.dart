@@ -55,11 +55,11 @@ class _SearchPageState extends State<SearchPage> {
           ),
           filled: true,
           fillColor: Colors.grey[100],
-          suffixIcon: IconButton(
+          suffixIcon: viewModel.searchController.text.isNotEmpty ? IconButton(
                       icon: Icon(Icons.clear),
                       onPressed: viewModel.searchController.clear
-          )
-        ),
+          ): null
+        ) ,
       ),
     );
   }
