@@ -203,7 +203,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
   Widget _buildBookboxCard(BookBox bookbox) {
     return Card(
       elevation: 2,
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.all(4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -219,94 +219,82 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // BookBox Image
-              Container(
-                width: 60,
-                height: 80,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey[300],
+              Expanded(
+                flex: 3, // Give more space to image
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey[300],
+                  ),
+                  child: bookbox.image != null && bookbox.image!.isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            bookbox.image!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return _buildImagePlaceholder();
+                            },
+                          ),
+                        )
+                      : _buildImagePlaceholder(),
                 ),
-                child: bookbox.image != null && bookbox.image!.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          bookbox.image!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return _buildImagePlaceholder();
-                          },
-                        ),
-                      )
-                    : _buildImagePlaceholder(),
               ),
               
-              const SizedBox(width: 12),
+              const SizedBox(height: 8),
               
               // BookBox Info
               Expanded(
+                flex: 2, // Give less space to text info
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      bookbox.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Kanit',
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    
-                    const SizedBox(height: 4),
-                    
-                    /*
-                    if (bookbox.infoText != null && bookbox.infoText!.isNotEmpty)
-                      Text(
-                        bookbox.infoText!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
+                    Flexible(
+                      child: Text(
+                        bookbox.name,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                           fontFamily: 'Kanit',
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
+                    ),
                     
-                    const SizedBox(height: 8),
-                    */
+                    const SizedBox(height: 4),
+                    
                     Row(
                       children: [
                         Icon(
                           Icons.book,
-                          size: 16,
+                          size: 14,
                           color: Colors.blue[600],
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          '${bookbox.books.length} books',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.blue[600],
-                            fontWeight: FontWeight.w500,
-                            fontFamily: 'Kanit',
+                        Expanded(
+                          child: Text(
+                            '${bookbox.books.length} books',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.blue[600],
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'Kanit',
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ),
-              
-              // Arrow Icon
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: Colors.grey[400],
               ),
             ],
           ),
@@ -326,10 +314,36 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
     
     final hasMoreItems = followedBookboxes!.length > maxInitialItems;
 
+    int getCrossAxisCount() {
+      if (itemsToShow.length == 1) return 1;
+      if (itemsToShow.length == 2) return 2;
+      return 3; 
+    }
+
+    double getAspectRatio() {
+      final columnCount = getCrossAxisCount();
+      if (columnCount == 1) return 2.5; 
+      if (columnCount == 2) return 1.2; 
+      return 0.85; 
+    }
+
     return Column(
       children: [
-        // Display bookboxes
-        ...itemsToShow.map((bookbox) => _buildBookboxCard(bookbox)).toList(),
+        // Display bookboxes in a grid
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: getCrossAxisCount(),
+            childAspectRatio: getAspectRatio(),
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+          ),
+          itemCount: itemsToShow.length,
+          itemBuilder: (context, index) {
+            return _buildBookboxCard(itemsToShow[index]);
+          },
+        ),
         
         // Show More/Show Less button
         if (hasMoreItems)

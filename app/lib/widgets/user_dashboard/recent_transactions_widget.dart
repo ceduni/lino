@@ -4,6 +4,7 @@ import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:flutter/material.dart';
 import '../../models/transaction_model.dart';
 import '../../services/transaction_services.dart';
+import '../../views/profile/transactions_page.dart';
 
 class RecentTransactionsCard extends StatefulWidget {
   final User user;
@@ -92,14 +93,29 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-                  'Your Bookbox Trail',
+            Row(
+              children: [
+                Text(
+                  'Your recent Bookbox Trail',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue[700],
                   ),
                 ),
+                const Spacer(),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => TransactionsPage(user: widget.user),
+                      ),
+                    );
+                  },
+                  child: const Text('View All'),
+                ),
+              ],
+            ),
             SizedBox(height: 16),
             _buildTransactionsList(),
           ],
@@ -173,9 +189,9 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
     }
 
     return ListView.separated(
+      itemCount: 3,
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      itemCount: transactions.length,
       separatorBuilder: (context, index) => Divider(height: 1),
       itemBuilder: (context, index) {
         final transaction = transactions[index];
@@ -187,7 +203,6 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
   Widget _buildTransactionItem(Transaction transaction) {
     final isAdded = transaction.action.toLowerCase() == 'added';
     final actionColor = isAdded ? Colors.green : Colors.orange;
-    final actionIcon = isAdded ? Icons.add_circle_outline : Icons.remove_circle_outline;
 
     return ListTile(
       /*
