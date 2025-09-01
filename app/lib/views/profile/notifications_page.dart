@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/vm/profile/notifications_view_model.dart';
 import 'package:Lino_app/models/notification_model.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -107,49 +106,94 @@ class _NotificationsPageState extends State<NotificationsPage> {
   }
 
   Widget _buildNotificationItem(Notif notification, NotificationsViewModel viewModel) {
-    return GestureDetector(
-      onTap: () => _showNotificationDetails(context, notification, viewModel),
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        padding: const EdgeInsets.all(12.0),
-        decoration: BoxDecoration(
-          color: notification.isRead ? LinoColors.primary : LinoColors.accent,
-          borderRadius: BorderRadius.circular(12.0),
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+      elevation: 1,
+      child: ListTile(
+        leading: Icon(
+          notification.isRead ? Icons.mail_outline : Icons.mail,
+          color: notification.isRead ? Colors.grey : Colors.blue,
         ),
-        child: Column(
+        title: Text(
+          notification.bookTitle,
+          style: TextStyle(
+            fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              viewModel.getNotificationTitle(notification),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
-                color: Colors.black,
+            if (notification.reason.isNotEmpty)
+              Text(
+                _formatNotificationReason(notification.reason),
+                style: const TextStyle(fontSize: 12),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            const SizedBox(height: 4.0),
             Text(
-              viewModel.getNotificationPreview(notification),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: notification.isRead ? 12.0 : 14.0,
-              ),
-            ),
-            const SizedBox(height: 4.0),
-            Text(
-              timeago.format(notification.createdAt),
-              style: const TextStyle(
-                fontSize: 10.0,
-                color: Colors.black,
-              ),
+              _formatNotificationDate(notification.createdAt),
+              style: const TextStyle(fontSize: 11, color: Colors.grey),
             ),
           ],
         ),
+        onTap: () => _showNotificationDetails(context, notification, viewModel),
       ),
     );
+  }
+
+  String _formatNotificationDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+    
+    if (difference.inDays > 0) {
+      return '${difference.inDays}d ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m ago';
+    } else {
+      return 'Just now';
+    }
+  }
+
+  String _formatNotificationReason(List<String> reasons) {
+    if (reasons.isEmpty) {
+      return 'New notification';
+    }
+
+    List<String> formattedReasons = [];
+    
+    for (String reason in reasons) {
+      switch (reason) {
+        case 'book_request':
+          formattedReasons.add('Someone requested this book');
+          break;
+        case 'solved_book_request':
+          formattedReasons.add('Matches your book request');
+          break;
+        case 'fav_bookbox':
+          formattedReasons.add('Added to followed bookbox');
+          break;
+        case 'same_borough':
+          formattedReasons.add('Added near you');
+          break;
+        case 'fav_genre':
+          formattedReasons.add('Matches your favorite genre');
+          break;
+        default:
+          formattedReasons.add(reason); 
+      }
+    }
+
+    if (formattedReasons.length == 1) {
+      return formattedReasons[0];
+    } else if (formattedReasons.length == 2) {
+      return '${formattedReasons[0]} • ${formattedReasons[1]}';
+    } else {
+      return '${formattedReasons[0]} • ${formattedReasons[1]} • +${formattedReasons.length - 2} more';
+    }
   }
 
   void _showNotificationDetails(BuildContext context, Notif notification, NotificationsViewModel viewModel) {
@@ -190,7 +234,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   ),
                   const SizedBox(height: 10.0),
                   Text(
-                    timeago.format(DateTime.parse(notification.createdAt.toIso8601String())),
+                    timeago.format(notification.createdAt),
                     style: const TextStyle(
                       fontSize: 10.0,
                       color: Colors.grey,

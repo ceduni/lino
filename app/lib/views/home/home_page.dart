@@ -445,7 +445,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  const Text( 
                     'Recent Notifications',
                     style: TextStyle(
                       fontSize: 18,
