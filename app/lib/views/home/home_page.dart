@@ -1,5 +1,7 @@
 // app/lib/pages/home/home.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
@@ -14,7 +16,6 @@ import 'package:Lino_app/views/profile/notifications_page.dart';
 import 'package:Lino_app/vm/profile/notifications_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:vibration/vibration.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -408,6 +409,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
             markers: Set<Marker>.of(markers),
+            gestureRecognizers: Set()
+              ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
+              ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()))
+              ..add(Factory<TapGestureRecognizer>(() => TapGestureRecognizer()))
+              ..add(Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer())),
           );
         } catch (e) {
           print('Error building map: $e');
