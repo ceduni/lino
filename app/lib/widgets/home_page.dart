@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:Lino_app/vm/home/home_view_model.dart';
 
 class MergedProfileStatsWidget extends StatelessWidget {
   final String userName;
@@ -14,7 +16,13 @@ class MergedProfileStatsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        final homeViewModel = Provider.of<HomeViewModel>(context, listen: false);
+        homeViewModel.navigateToProfile();
+      },
+      child:
+    Container(
       margin: const EdgeInsets.all(16.0),
       padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
@@ -32,11 +40,11 @@ class MergedProfileStatsWidget extends StatelessWidget {
         children: [
           // Profile picture
           CircleAvatar(
-            radius: 30,
+            radius: 35,
             backgroundColor: Colors.blue.shade100,
             child: Icon(
                     Icons.person,
-                    size: 35,
+                    size: 40,
                     color: Colors.blue.shade600,
                   )
           ),
@@ -101,6 +109,7 @@ class MergedProfileStatsWidget extends StatelessWidget {
           ) */
         ],
       ),
+    )
     );
   }
 

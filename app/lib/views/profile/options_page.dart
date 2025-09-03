@@ -26,7 +26,7 @@ class _OptionsPageState extends State<OptionsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Options'),
+        title: Text('Notification Settings'),
       ),
       body: Consumer<OptionsViewModel>(
         builder: (context, viewModel, child) {
@@ -39,35 +39,44 @@ class _OptionsPageState extends State<OptionsPage> {
               padding: const EdgeInsets.all(8.0),
               child: SingleChildScrollView(
                 child: Column(
-                  children: [
-                    _buildOptionTile(
-                      icon: Icons.person,
-                      title: 'Modify Profile',
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ModifyProfilePage()),
+                    children: [
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Column(
+                      children: [
+                        /*
+                        _buildOptionTile(
+                        icon: Icons.person,
+                        title: 'Modify Profile',
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ModifyProfilePage()),
+                        ),
+                        ),
+                        SizedBox(height: 10),
+                        _buildOptionTile(
+                        icon: Icons.favorite,
+                        title: 'Setup Favourite Genres',
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FavouriteGenresPage()),
+                        ),
+                        ),
+                        SizedBox(height: 10),
+                        _buildOptionTile(
+                        icon: Icons.location_on,
+                        title: 'Favourite Locations',
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FavouriteLocationsPage()),
+                        ),
+                        ),
+                        SizedBox(height: 20),
+                        */
+                        _buildNotificationSection(viewModel),
+                      ],
                       ),
                     ),
-                    SizedBox(height: 10),
-                    _buildOptionTile(
-                      icon: Icons.favorite,
-                      title: 'Setup Favourite Genres',
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => FavouriteGenresPage()),
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    _buildOptionTile(
-                      icon: Icons.location_on,
-                      title: 'Favourite Locations',
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => FavouriteLocationsPage()),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    _buildNotificationSection(viewModel),
                   ],
                 ),
               ),
@@ -99,6 +108,7 @@ class _OptionsPageState extends State<OptionsPage> {
   Widget _buildNotificationSection(OptionsViewModel viewModel) {
     return Column(
       children: [
+        /*
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
@@ -111,6 +121,7 @@ class _OptionsPageState extends State<OptionsPage> {
           ),
         ),
         SizedBox(height: 10),
+        */
         Container(
           decoration: BoxDecoration(
         color: LinoColors.primary,
@@ -150,6 +161,7 @@ class _OptionsPageState extends State<OptionsPage> {
         ],
           ),
         ),
+        /*
         SizedBox(height: 20),
         Container(
           width: 120,
@@ -163,6 +175,7 @@ class _OptionsPageState extends State<OptionsPage> {
           ),
         ),
         
+
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -176,6 +189,7 @@ class _OptionsPageState extends State<OptionsPage> {
         ),
           ),
         ),
+        */
       ],
     );
   }

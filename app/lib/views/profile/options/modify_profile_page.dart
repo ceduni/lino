@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/profile/options/modify_profile_view_model.dart';
+import 'package:Lino_app/vm/profile/profile_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 
 class ModifyProfilePage extends StatefulWidget {
@@ -41,7 +42,22 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Spacer(flex: 1),
-                    Image.asset('assets/logos/logo_without_bird.png', height: 150),
+                    //Image.asset('assets/logos/logo_without_bird.png', height: 150),
+                    GestureDetector(
+                      onTap: () {
+                        // todo faire profile picture change logic
+                      },
+                      child:
+                    CircleAvatar(
+                      radius: 70,
+                      backgroundColor: Colors.lightBlue[100],
+                      child: Icon(
+                        // cest juste un placeholder le temps d'add les icones
+                        Icons.edit,
+                        size: 70,
+                        color: LinoColors.accent,
+                      ),
+                    ),),
                     Spacer(flex: 1),
                     _buildTextField(viewModel.usernameController, 'Username', Icons.person),
                     SizedBox(height: 20),
@@ -75,6 +91,36 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                           ),
                         ),
                       ],
+                    ),
+                    
+                    SizedBox(height: 20),
+                    Container(
+                      width: 120,
+                      height: 40,
+                      child: ElevatedButton(
+                    onPressed: () => context.read<ProfileViewModel>().disconnect(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                    ),
+                    
+
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.logout, color: Colors.white, size: 18),
+                        SizedBox(width: 4),
+                        Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                    
+                      ),
+                    
                     ),
                     Spacer(flex: 2),
                   ],

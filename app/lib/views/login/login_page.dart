@@ -41,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
       top: 50,
       left: 16,
       child: IconButton(
-        onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
+        onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
         icon: const Icon(
           Icons.close,
           color: Colors.white,
@@ -123,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
           : () async {
         final success = await viewModel.login(widget.prefs);
         if (success && mounted) {
-          Navigator.pushReplacementNamed(context, '/home');
+          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
         }
       },
       style: ElevatedButton.styleFrom(
