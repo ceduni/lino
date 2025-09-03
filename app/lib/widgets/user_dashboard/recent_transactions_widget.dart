@@ -96,7 +96,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
             Row(
               children: [
                 Text(
-                  'Your recent Bookbox Trail',
+                  'Your Bookbox Trail',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

@@ -57,7 +57,7 @@ class MergedProfileStatsWidget extends StatelessWidget {
                 Text(
                   userName,
                   style: const TextStyle(
-                    fontSize: 22,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
