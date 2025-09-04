@@ -336,7 +336,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ),
               const SizedBox(height: 8),
               const Text(
-                'You\'re browsing as a guest. Sign in to unlock personalized features and start tracking your reading journey!',
+                'You\'re browsing as a guest. Log in to unlock personalized features and start tracking your reading journey!',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white70,
@@ -346,7 +346,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/login'),
+                onPressed: () => Get.toNamed(AppRoutes.auth.login),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: const Color.fromRGBO(66, 119, 184, 1),
@@ -356,7 +356,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   ),
                 ),
                 child: const Text(
-                  'Sign In',
+                  'Log In',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Kanit',
