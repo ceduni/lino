@@ -15,7 +15,6 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:Lino_app/vm/search/search_page_view_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:geolocator/geolocator.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 
 class BookBoxPage extends StatefulWidget {
@@ -29,10 +28,6 @@ class _BookBoxPageState extends State<BookBoxPage> {
   final BookBoxStateService _stateService = Get.find<BookBoxStateService>();
   String? bookBoxId;
   bool canInteract = false;
-  double? _userLatitude;
-  double? _userLongitude;
-  double? _distanceToBookBox;
-  bool _isGettingLocation = false;
 
   @override
   void initState() {
@@ -61,6 +56,100 @@ class _BookBoxPageState extends State<BookBoxPage> {
 
   String _getTimeAgo(DateTime dateAdded) {
     return timeago.format(dateAdded, locale: 'en');
+  }
+
+  void _showInfoDialog(BookBox bookBox) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on,
+                      color: LinoColors.accent,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        bookBox.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Kanit',
+                          color: LinoColors.accent,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    bookBox.infoText!,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Kanit',
+                      color: LinoColors.textPrimary,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _openGoogleMapsApp(bookBox.latitude, bookBox.longitude);
+                    },
+                    icon: const Icon(Icons.directions, color: Colors.white),
+                    label: const Text(
+                      'Get Directions',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Kanit',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: LinoColors.accent,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -167,20 +256,6 @@ class _BookBoxPageState extends State<BookBoxPage> {
     return _buildContent(viewModel.bookBox!);
   }
 
-  Widget _buildMapSection(BookBox bookBox) {
-    return GoogleMap(initialCameraPosition: CameraPosition(
-      target: LatLng(bookBox.latitude, bookBox.longitude),
-      zoom: 15,
-    ),
-    markers: {
-      Marker(
-        markerId: MarkerId(bookBox.id),
-        position: LatLng(bookBox.latitude, bookBox.longitude),
-        infoWindow: InfoWindow(title: bookBox.name),
-      ),
-    },);
-  }
-
   Widget _buildContent(BookBox bookBox) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -196,6 +271,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
             _buildBooksSection(bookBox),
           ],
           const SizedBox(height: 20),
+          if (!canInteract)
           TextButton(
             onPressed: () {
               final searchViewModel = context.read<SearchPageViewModel>();
@@ -519,38 +595,18 @@ class _BookBoxPageState extends State<BookBoxPage> {
                         rotateGesturesEnabled: false,
                         mapToolbarEnabled: false,
                         myLocationButtonEnabled: false,
-                        onTap: (_) => _openGoogleMapsApp(bookBox.latitude, bookBox.longitude),
+                        onTap: (_) {
+                          if (bookBox.infoText != null && bookBox.infoText!.isNotEmpty) {
+                            _showInfoDialog(bookBox);
+                          } else {
+                            _openGoogleMapsApp(bookBox.latitude, bookBox.longitude);
+                          }
+                        },
                       ),
                     ],
                   ),
                 ),
               ),
-              if (bookBox.infoText != null && bookBox.infoText!.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: LinoColors.accent.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      //const Icon(Icons.location_on, color: Color.fromRGBO(101, 67, 33, 1), size: 20),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          bookBox.infoText!,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'Kanit',
-                            color: LinoColors.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
             ],
           ),
         ),
