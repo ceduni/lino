@@ -1,7 +1,6 @@
 import 'package:Lino_app/models/book_model.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
@@ -9,6 +8,7 @@ import 'package:Lino_app/vm/bookboxes/transactions/barcode_scanner_view_model.da
 import 'package:Lino_app/views/books/book_edition_page.dart';
 import 'package:Lino_app/views/bookboxes/transactions/bookbox_book_list_page.dart';
 import 'package:Lino_app/services/book_exchange_services.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
 
 class BarcodeScannerPage extends StatefulWidget {
   final bool addingBook;
@@ -26,22 +26,57 @@ class BarcodeScannerPage extends StatefulWidget {
 
 class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   MobileScannerController? _controller;
+  late BarcodeScannerViewModel _viewModel; // Local ViewModel instance
 
   @override
   void initState() {
     super.initState();
-    _controller = MobileScannerController();
+    // Create a new ViewModel instance for this page
+    _viewModel = BarcodeScannerViewModel();
+    _initializeController();
     
     // Start scanning when page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final viewModel = context.read<BarcodeScannerViewModel>();
-      viewModel.setParameters(widget.addingBook, widget.bookboxId);
-      viewModel.startScanning();
+      _viewModel.setParameters(widget.addingBook, widget.bookboxId);
+      _viewModel.startScanning();
+      // Listen for reset events
+      _viewModel.addListener(_onViewModelChanged);
     });
+  }
+
+  void _initializeController() {
+    // Dispose existing controller if any
+    _controller?.dispose();
+    _controller = null;
+    
+    // Create new controller with proper configuration
+    _controller = MobileScannerController(
+      autoStart: false,
+    );
+    
+    // Add a small delay for iOS to properly release the camera before starting again
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted && _controller != null) {
+        _controller?.start();
+      }
+    });
+  }
+
+  void _onViewModelChanged() {
+    if (!mounted) return;
+    
+    if (_viewModel.shouldRestartCamera) {
+      // Reinitialize the controller when resetScanner is called
+      _initializeController();
+      _viewModel.onCameraRestarted();
+    }
   }
 
   @override
   void dispose() {
+    _viewModel.removeListener(_onViewModelChanged);
+    _viewModel.fullReset(); // Full reset since this is a local instance
+    _viewModel.dispose(); // Dispose the local ViewModel
     _controller?.dispose();
     super.dispose();
   }
@@ -242,25 +277,26 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+        backgroundColor: LinoColors.accent,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Consumer<BarcodeScannerViewModel>(
-        builder: (context, viewModel, child) {
+      body: ListenableBuilder(
+        listenable: _viewModel,
+        builder: (context, child) {
           return SafeArea(
             child: Column(
               children: [
                 // Top section - Book info card (when book is found) or Error card (when error occurs)
-                if (viewModel.scannedBook != null)
+                if (_viewModel.scannedBook != null)
                   Flexible(
                     flex: 0,
-                    child: _buildBookInfoCard(viewModel.scannedBook!),
+                    child: _buildBookInfoCard(_viewModel.scannedBook!),
                   )
-                else if (viewModel.error != null)
+                else if (_viewModel.error != null)
                   Flexible(
                     flex: 0,
-                    child: _buildErrorCard(viewModel.error!),
+                    child: _buildErrorCard(_viewModel.error!),
                   )
                 else
                   const SizedBox(height: 20), // Small space when no book
@@ -271,7 +307,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                   child: Stack(
                     children: [
                       // Camera scanner view
-                      _buildScannerView(viewModel),
+                      _buildScannerView(_viewModel),
                       // Rectangular barcode scanning overlay
                       _buildScanningOverlay(),
                     ],
@@ -279,12 +315,12 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                 ),
                 
                 // Bottom section - Fallback UI, Continue button, or Error actions
-                if (viewModel.showFallback || viewModel.scannedBook != null || viewModel.error != null)
+                if (_viewModel.showFallback || _viewModel.scannedBook != null || _viewModel.error != null)
                   Flexible(
                     flex: 0,
-                    child: viewModel.showFallback 
+                    child: _viewModel.showFallback 
                         ? _buildFallbackUI()
-                        : viewModel.error != null
+                        : _viewModel.error != null
                             ? _buildErrorActions()
                             : _buildContinueButton(),
                   ),
@@ -298,25 +334,47 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
 
   Widget _buildScannerView(BarcodeScannerViewModel viewModel) {
     var didItVibrate = false;
+    
+    // Return black container if controller is null (during reinitialisation)
+    if (_controller == null) {
+      return Container(
+        color: Colors.black,
+        child: const Center(
+          child: CircularProgressIndicator(
+            color: Colors.white,
+          ),
+        ),
+      );
+    }
+    
     return MobileScanner(
-      controller: _controller,
+      controller: _controller!,
       onDetect: (BarcodeCapture capture) async {
-        final List<Barcode> barcodes = capture.barcodes;
-        for (final barcode in barcodes) {
-          if (barcode.rawValue != null) {
-            try {
-              if (await Vibration.hasVibrator()) {
-                if (!didItVibrate) {
-                  Vibration.vibrate(duration: 250);
-                  didItVibrate = true;
+        try {
+          final List<Barcode> barcodes = capture.barcodes;
+          for (final barcode in barcodes) {
+            if (barcode.rawValue != null && barcode.rawValue!.isNotEmpty) {
+              try {
+                if (await Vibration.hasVibrator()) {
+                  if (!didItVibrate) {
+                    Vibration.vibrate(duration: 250);
+                    didItVibrate = true;
+                  }
                 }
+              } catch (e) {
+                // Ignore vibration errors
               }
-            } catch (e) {
+              
+              // Only process if we're still mounted and scanning
+              if (mounted) {
+                _viewModel.onBarcodeDetected(barcode.rawValue!);
+              }
+              break; // Process only the first barcode
             }
-            
-            viewModel.onBarcodeDetected(barcode.rawValue!);
-            break; // Process only the first barcode
           }
+        } catch (e) {
+          // Handle any errors in barcode processing
+          debugPrint('Error processing barcode: $e');
         }
       },
     );
@@ -544,6 +602,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
               const SizedBox(height: 16),
               Row(
                 children: [
+                  /*
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -568,6 +627,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                     ),
                   ),
                   const SizedBox(width: 12),
+                  */
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -612,66 +672,62 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   }
 
   Widget _buildContinueButton() {
-    return Consumer<BarcodeScannerViewModel>(
-      builder: (context, viewModel, child) {
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (widget.addingBook && viewModel.scannedBook != null) {
-                      // Navigate to book edition page with scanned book
-                      Get.to(() => BookEditionPage(
-                        bookboxId: widget.bookboxId,
-                        editableBook: viewModel.scannedBook!,
-                      ));
-                    } else if (!widget.addingBook && viewModel.scannedBook != null) {
-                      // Show confirmation dialog for taking book
-                      _showTakeBookConfirmation(viewModel.scannedBook!);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade600,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
-                  ),
-                  child: const Text(
-                    'Continue',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Kanit',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                if (widget.addingBook && _viewModel.scannedBook != null) {
+                  // Navigate to book edition page with scanned book
+                  Get.to(() => BookEditionPage(
+                    bookboxId: widget.bookboxId,
+                    editableBook: _viewModel.scannedBook!,
+                  ));
+                } else if (!widget.addingBook && _viewModel.scannedBook != null) {
+                  // Show confirmation dialog for taking book
+                  _showTakeBookConfirmation(_viewModel.scannedBook!);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green.shade600,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 4,
+              ),
+              child: const Text(
+                'Continue',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Kanit',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
                 ),
               ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () {
-                  context.read<BarcodeScannerViewModel>().resetScanner();
-                },
-                child: const Text(
-                  'Change book',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Kanit',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        );
-      },
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () {
+              _viewModel.resetScanner();
+            },
+            child: const Text(
+              'Change book',
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'Kanit',
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -756,7 +812,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                context.read<BarcodeScannerViewModel>().resetScanner();
+                _viewModel.resetScanner();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange.shade600,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/services/book_services.dart';
@@ -11,6 +12,7 @@ class BarcodeScannerViewModel extends ChangeNotifier {
   EditableBook? _scannedBook;
   String? _error;
   Timer? _timeoutTimer;
+  bool _shouldRestartCamera = false;
   
   // Parameters for different behavior
   bool? _addingBook;
@@ -21,11 +23,30 @@ class BarcodeScannerViewModel extends ChangeNotifier {
   bool get showFallback => _showFallback;
   EditableBook? get scannedBook => _scannedBook;
   String? get error => _error;
+  bool get shouldRestartCamera => _shouldRestartCamera;
   
-  // Method to set parameters
+  // Method to set parameters and initialize fresh state
   void setParameters(bool addingBook, String bookboxId) {
+    // Always cancel any existing timer first
+    _timeoutTimer?.cancel();
+    
+    // Set parameters
     _addingBook = addingBook;
     _bookboxId = bookboxId;
+    
+    // Reset all state when parameters are set (new page visit)
+    _resetToInitialState();
+  }
+  
+  void _resetToInitialState() {
+    _timeoutTimer?.cancel();
+    _isScanning = true;
+    _showFallback = false;
+    _scannedBook = null;
+    _error = null;
+    _shouldRestartCamera = false;
+    // Don't reset _addingBook and _bookboxId here as they're set by setParameters
+    notifyListeners();
   }
   
   void startScanning() {
@@ -47,6 +68,12 @@ class BarcodeScannerViewModel extends ChangeNotifier {
   Future<void> onBarcodeDetected(String barcode) async {
     if (!_isScanning || _scannedBook != null) return;
     
+    // Safety check: ensure parameters are set
+    if (_addingBook == null || _bookboxId == null) {
+      debugPrint('Warning: BarcodeScannerViewModel parameters not set properly');
+      return;
+    }
+    
     // Cancel timeout since we got a barcode
     _timeoutTimer?.cancel();
     
@@ -55,6 +82,7 @@ class BarcodeScannerViewModel extends ChangeNotifier {
       final cleanBarcode = barcode.replaceAll(RegExp(r'[^0-9]'), '');
       if (cleanBarcode.length != 10 && cleanBarcode.length != 13) {
         // Invalid ISBN format, continue scanning
+        _restartTimeout();
         return;
       }
       
@@ -91,7 +119,17 @@ class BarcodeScannerViewModel extends ChangeNotifier {
       // If book not found in API, continue scanning (don't show error immediately)
       _error = null;
       // Don't stop scanning, let the timeout handle showing fallback
+      _restartTimeout();
     }
+  }
+  
+  void _restartTimeout() {
+    _timeoutTimer?.cancel();
+    _timeoutTimer = Timer(const Duration(seconds: 5), () {
+      if (_scannedBook == null && _isScanning) {
+        _showFallbackUI();
+      }
+    });
   }
   
   void _showFallbackUI() {
@@ -107,6 +145,9 @@ class BarcodeScannerViewModel extends ChangeNotifier {
     _showFallback = false;
     _scannedBook = null;
     _error = null;
+    
+    // Signal that camera needs to be restarted (iOS fix)
+    _shouldRestartCamera = true;
     notifyListeners();
     
     // Restart timeout
@@ -117,12 +158,19 @@ class BarcodeScannerViewModel extends ChangeNotifier {
     });
   }
   
+  void onCameraRestarted() {
+    _shouldRestartCamera = false;
+  }
+  
   void hideFallbackAndRestart() {
     _timeoutTimer?.cancel();
     _showFallback = false;
     _isScanning = true;
     _scannedBook = null;
     _error = null;
+    
+    // Signal that camera needs to be restarted (iOS fix)
+    _shouldRestartCamera = true;
     notifyListeners();
     
     // Restart timeout
@@ -131,6 +179,31 @@ class BarcodeScannerViewModel extends ChangeNotifier {
         _showFallbackUI();
       }
     });
+  }
+  
+  void cleanup() {
+    // Only clean up timers and temporary state, but preserve parameters
+    _timeoutTimer?.cancel();
+    _isScanning = false;
+    _showFallback = false;
+    _scannedBook = null;
+    _error = null;
+    _shouldRestartCamera = false;
+    // Don't reset _addingBook and _bookboxId as they might be needed for next visit
+    notifyListeners();
+  }
+  
+  void fullReset() {
+    // Complete reset including parameters - only use when truly disposing the ViewModel
+    _timeoutTimer?.cancel();
+    _isScanning = false;
+    _showFallback = false;
+    _scannedBook = null;
+    _error = null;
+    _shouldRestartCamera = false;
+    _addingBook = null;
+    _bookboxId = null;
+    notifyListeners();
   }
   
   @override
