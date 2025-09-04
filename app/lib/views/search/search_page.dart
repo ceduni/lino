@@ -512,7 +512,9 @@ class _SearchPageState extends State<SearchPage> {
                       style: const TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                     TextButton(
-                      onPressed: () => viewModel.createRequest(viewModel.searchQuery), 
+                      onPressed: () {
+                        viewModel.createRequest(viewModel.searchQuery);
+                      }, 
                       child: const Text('Create a new request for this book !', style: TextStyle(
               fontFamily: 'Kanit',
               fontWeight: FontWeight.w600,

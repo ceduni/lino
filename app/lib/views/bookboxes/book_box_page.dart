@@ -14,6 +14,8 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:Lino_app/vm/search/search_page_view_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:Lino_app/utils/constants/colors.dart';
+
 
 class BookBoxPage extends StatefulWidget {
   const BookBoxPage({super.key});
@@ -49,6 +51,101 @@ class _BookBoxPageState extends State<BookBoxPage> {
     return timeago.format(dateAdded, locale: 'en');
   }
 
+
+  void _showInfoDialog(BookBox bookBox) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on,
+                      color: LinoColors.accent,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        bookBox.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Kanit',
+                          color: LinoColors.accent,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    bookBox.infoText!,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Kanit',
+                      color: LinoColors.textPrimary,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _openGoogleMapsApp(bookBox.latitude, bookBox.longitude);
+                    },
+                    icon: const Icon(Icons.directions, color: Colors.white),
+                    label: const Text(
+                      'Get Directions',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Kanit',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: LinoColors.accent,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (bookBoxId == null) {
@@ -79,7 +176,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                 color: Colors.white,
               ),
             ),
-            backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+            backgroundColor: LinoColors.accent,
             foregroundColor: Colors.white,
             elevation: 2,
             /*actions: [
@@ -182,12 +279,19 @@ class _BookBoxPageState extends State<BookBoxPage> {
             _buildBooksSection(bookBox),
           ],
           const SizedBox(height: 20),
+          if (!canInteract)
           TextButton(
             onPressed: () {
               final searchViewModel = context.read<SearchPageViewModel>();
               searchViewModel.createRequest("");
             },
-            child: const Center(child: Text("Didn't find your book? Create a new request !"))
+            
+            child: const Center(child: Text("Didn't find your book? Create a new request !", style: TextStyle(
+              fontFamily: 'Kanit',
+              fontWeight: FontWeight.w600,
+              color: LinoColors.accent,
+            ),)),
+
           ),
           Center(
             child: TextButton.icon(
@@ -389,23 +493,26 @@ class _BookBoxPageState extends State<BookBoxPage> {
                     ],
                   ),
                 ),
+              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   /*
                   Expanded(
-                    child: Text(
-                      bookBox.name,
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Kanit',
-                        color: Color.fromRGBO(101, 67, 33, 1),
+                    child: Center(
+                      child: Text(
+                        "Photo of the ${bookBox.name} bookbox",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Kanit',
+                          color: LinoColors.buttonPrimary,
+                        ),
                       ),
                     ),
                   ),
                   
-
+                  
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -501,38 +608,21 @@ class _BookBoxPageState extends State<BookBoxPage> {
                         rotateGesturesEnabled: false,
                         mapToolbarEnabled: false,
                         myLocationButtonEnabled: false,
-                        onTap: (_) => _openGoogleMapsApp(bookBox.latitude, bookBox.longitude),
+                                                onTap: (_) {
+                          if (bookBox.infoText != null && bookBox.infoText!.isNotEmpty) {
+                            _showInfoDialog(bookBox);
+                          } else {
+                            _openGoogleMapsApp(bookBox.latitude, bookBox.longitude);
+                          }
+                        },
                       ),
+                
+
                     ],
                   ),
                 ),
               ),
-              if (bookBox.infoText != null && bookBox.infoText!.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color.fromRGBO(101, 67, 33, 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      //const Icon(Icons.location_on, color: Color.fromRGBO(101, 67, 33, 1), size: 20),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          bookBox.infoText!,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'Kanit',
-                            color: Color.fromRGBO(101, 67, 33, 1),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              
             ],
           ),
         ),
@@ -628,7 +718,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: const Color.fromRGBO(242, 226, 196, 1),
+          color: LinoColors.lightContainer,
         ),
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -636,7 +726,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
           children: [
             Row(
               children: [
-                const Icon(Icons.library_books, color: Color.fromRGBO(101, 67, 33, 1), size: 24),
+                const Icon(Icons.library_books, color: LinoColors.accent, size: 24),
                 const SizedBox(width: 8),
                 const Text(
                   'Books Available',
@@ -644,14 +734,14 @@ class _BookBoxPageState extends State<BookBoxPage> {
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Kanit',
-                    color: Color.fromRGBO(101, 67, 33, 1),
+                    color: LinoColors.accent,
                   ),
                 ),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color.fromRGBO(101, 67, 33, 1),
+                    color: LinoColors.accent.withAlpha(400),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(

@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/services/search_services.dart';
 import 'package:Lino_app/utils/constants/search_types.dart';
+import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:Lino_app/views/forum/request_form.dart';
 
 enum SortOption {
@@ -95,11 +97,46 @@ class SearchPageViewModel extends ChangeNotifier {
     });
   }
 
-  void createRequest(String book) {
-    // Navigate to the request form page
-    Get.to(() => const RequestFormPage(), arguments: {
-      'title': book
-    });
+  Future<void> createRequest(String book) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      
+      if (token != null && token.isNotEmpty) {
+        Get.to(() => const RequestFormPage(), arguments: {
+          'title': book
+        });
+      } else {
+        // Show a subtle message before redirecting to login
+        Get.snackbar(
+          'Login Required',
+          'You need to be logged in to create a book request',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange.shade100,
+          colorText: Colors.orange.shade800,
+          icon: const Icon(Icons.warning, color: Colors.orange),
+          duration: const Duration(seconds: 3),
+          margin: const EdgeInsets.all(16),
+          borderRadius: 8,
+        );
+        
+          Get.toNamed(AppRoutes.auth.login);
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Login Required',
+        'Please log in to create a book request',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange.shade100,
+        colorText: Colors.orange.shade800,
+        icon: const Icon(Icons.warning, color: Colors.orange),
+        duration: const Duration(seconds: 3),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 8,
+      );
+      
+        Get.toNamed(AppRoutes.auth.login);
+    }
   }
 
   Future<void> _requestLocationPermission() async {
