@@ -53,6 +53,9 @@ class BookboxSelectionViewModel extends ChangeNotifier {
     _title = arguments['title'] ?? '';
     _customMessage = arguments['customMessage'] ?? '';
     _selectedSuggestion = arguments['selectedSuggestion'];
+    if (arguments['preselectedBookboxId'] != null) {
+      _selectedBookboxIds = [arguments['preselectedBookboxId']];
+    }
     
     _checkLocationPermission();
   }

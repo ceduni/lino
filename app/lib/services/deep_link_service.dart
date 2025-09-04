@@ -89,7 +89,7 @@ class DeepLinkService {
           Future.delayed(const Duration(milliseconds: 300), () {
             if (Get.context != null) {
               Get.toNamed(
-                AppRoutes.bookbox, 
+                AppRoutes.bookbox.main,
                 arguments: {
                   'bookboxId': bookboxId, 
                   'canInteract': true

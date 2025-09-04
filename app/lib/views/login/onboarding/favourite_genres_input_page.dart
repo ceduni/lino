@@ -1,15 +1,13 @@
 // app/lib/views/favourite_genres_input_page.dart
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/vm/login/onboarding/favourite_genres_input_view_model.dart';
+import '../../../utils/constants/routes.dart';
 import 'favourite_locations_input_page.dart';
 
 class FavouriteGenresInputPage extends StatefulWidget {
-  final String token;
-  final SharedPreferences prefs;
-
-  const FavouriteGenresInputPage({required this.token, required this.prefs, super.key});
+  const FavouriteGenresInputPage({super.key});
 
   @override
   _FavouriteGenresInputPageState createState() => _FavouriteGenresInputPageState();
@@ -240,7 +238,7 @@ class _FavouriteGenresInputPageState extends State<FavouriteGenresInputPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           TextButton(
-            onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
+            onPressed: () => Get.offNamed(AppRoutes.home),
             child: Text(
               'Skip',
               style: TextStyle(color: Colors.white70, fontSize: 16),
@@ -248,17 +246,9 @@ class _FavouriteGenresInputPageState extends State<FavouriteGenresInputPage> {
           ),
           ElevatedButton(
             onPressed: viewModel.selectedGenres.isEmpty ? null : () async {
-              final success = await viewModel.continueToNext(widget.token);
+              final success = await viewModel.continueToNext();
               if (success) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FavouriteLocationsInputPage(
-                      token: widget.token,
-                      prefs: widget.prefs,
-                    ),
-                  ),
-                );
+                Get.offNamed(AppRoutes.auth.onboarding.favouriteLocations);
               }
             },
             style: ElevatedButton.styleFrom(

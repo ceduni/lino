@@ -158,7 +158,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
       // Navigate to the bookbox page with the extracted ID
       Get.back(); // Close the scanner page first
       Get.toNamed(
-        AppRoutes.bookbox,
+        AppRoutes.bookbox.main,
         arguments: {
           'bookboxId': bookboxId,
           'canInteract': true,

@@ -210,7 +210,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
       child: InkWell(
         onTap: () {
           Get.toNamed(
-            AppRoutes.bookbox,
+            AppRoutes.bookbox.main,
             arguments: {
               'bookboxId': bookbox.id,
               'canInteract': false,

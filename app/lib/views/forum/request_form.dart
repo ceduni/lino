@@ -21,7 +21,9 @@ class _RequestFormPageState extends State<RequestFormPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<RequestFormViewModel>().initialize();
+      final viewModel = context.read<RequestFormViewModel>();
+      viewModel.resetForm();
+      viewModel.initialize();
     });
   }
 
@@ -511,9 +513,8 @@ class _RequestFormPageState extends State<RequestFormPage> {
 
   Future<void> _submitForm(RequestFormViewModel viewModel) async {
     if (_formKey.currentState!.validate()) {
-      // Navigate to bookbox selection page instead of submitting directly
       Get.toNamed(
-        AppRoutes.bookboxSelection,
+        AppRoutes.forum.request.bookboxSelection,
         arguments: {
           'title': viewModel.titleController.text.trim(),
           'customMessage': viewModel.messageController.text.trim(),

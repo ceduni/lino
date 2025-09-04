@@ -1,17 +1,16 @@
 // app/lib/views/login/onboarding/favourite_locations_input_page.dart
+import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/vm/login/onboarding/favourite_locations_input_view_model.dart';
 
 class FavouriteLocationsInputPage extends StatefulWidget {
-  final String token;
-  final SharedPreferences prefs;
 
-  const FavouriteLocationsInputPage({required this.token, required this.prefs, super.key});
+  const FavouriteLocationsInputPage({super.key});
 
   @override
   State<FavouriteLocationsInputPage> createState() => _FavouriteLocationsInputPageState();
@@ -22,7 +21,7 @@ class _FavouriteLocationsInputPageState extends State<FavouriteLocationsInputPag
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<FavouriteLocationsInputViewModel>().initialize(widget.token);
+      context.read<FavouriteLocationsInputViewModel>().initialize();
     });
   }
 
@@ -103,7 +102,7 @@ class _FavouriteLocationsInputPageState extends State<FavouriteLocationsInputPag
         debounceTime: 600,
         isLatLngRequired: true,
         getPlaceDetailWithLatLng: (Prediction prediction) {
-          viewModel.onPlaceSelected(prediction, widget.token);
+          viewModel.onPlaceSelected(prediction);
         },
         itemClick: (Prediction prediction) {
           viewModel.searchController.text = prediction.description!;
@@ -134,7 +133,7 @@ class _FavouriteLocationsInputPageState extends State<FavouriteLocationsInputPag
                 zoom: 12.0,
               ),
               markers: viewModel.markers,
-              onTap: (position) => viewModel.onMapTap(position, widget.token),
+              onTap: (position) => viewModel.onMapTap(position),
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
             ),
@@ -192,7 +191,7 @@ class _FavouriteLocationsInputPageState extends State<FavouriteLocationsInputPag
       padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -218,14 +217,14 @@ class _FavouriteLocationsInputPageState extends State<FavouriteLocationsInputPag
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         TextButton(
-          onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
+          onPressed: () => Get.offNamed(AppRoutes.home),
           child: const Text(
             'Skip',
             style: TextStyle(color: Colors.white70, fontSize: 16),
           ),
         ),
         ElevatedButton(
-          onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
+          onPressed: () => Get.offNamed(AppRoutes.home),
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
             backgroundColor: Colors.white,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:Lino_app/services/user_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FavouriteGenresInputViewModel extends ChangeNotifier {
   final TextEditingController genreController = TextEditingController();
@@ -102,11 +103,13 @@ class FavouriteGenresInputViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> continueToNext(String token) async {
+  Future<bool> continueToNext() async {
     if (_selectedGenres.isEmpty) return false;
 
     try {
       var userService = UserService();
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
       await userService.updateUser(token, favouriteGenres: _selectedGenres);
       showToast('Favourite genres saved successfully!');
       return true;

@@ -213,7 +213,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => Get.toNamed(AppRoutes.qrScanner),
+            onPressed: () => Get.toNamed(AppRoutes.scan.qrScanner),
             backgroundColor: Colors.blue.shade600,
             foregroundColor: Colors.white,
             icon: const Icon(Icons.qr_code_scanner),
@@ -281,7 +281,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ],
           ),
           floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => Get.toNamed(AppRoutes.qrScanner),
+            onPressed: () => Get.toNamed(AppRoutes.scan.qrScanner),
             backgroundColor: Colors.blue.shade600,
             foregroundColor: Colors.white,
             icon: const Icon(Icons.qr_code_scanner),
