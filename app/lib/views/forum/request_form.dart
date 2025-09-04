@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:Lino_app/vm/forum/request_form_view_model.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
 
 class RequestFormPage extends StatefulWidget {
   final VoidCallback? onRequestCreated;
@@ -40,7 +41,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
                 color: Colors.white,
               ),
             ),
-            backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+            backgroundColor: LinoColors.accent,
             foregroundColor: Colors.white,
             elevation: 2,
           ),
@@ -59,7 +60,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Kanit',
-                        color: Color.fromRGBO(101, 67, 33, 1),
+                        color: Colors.blueAccent,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -205,7 +206,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
                           : ElevatedButton(
                               onPressed: () => _submitForm(viewModel),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+                                backgroundColor: LinoColors.accent,
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(

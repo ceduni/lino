@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/home/home_view_model.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
 
 class MergedProfileStatsWidget extends StatelessWidget {
   final String userName;
@@ -85,11 +86,11 @@ class MergedProfileStatsWidget extends StatelessWidget {
                 value: treesSaved.toStringAsFixed(2),
                 label: 'Trees',
               ),
-              const SizedBox(width: 62),
+              const SizedBox(width: 42),
               // Books saved
               _buildStatItem(
                 icon: Icons.book,
-                iconColor: Colors.orange.shade600,
+                iconColor: LinoColors.accent,
                 value: booksSaved.toString(),
                 label: 'Books',
               ),

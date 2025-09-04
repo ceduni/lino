@@ -513,7 +513,11 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                     TextButton(
                       onPressed: () => viewModel.createRequest(viewModel.searchQuery), 
-                      child: const Text('Create a new request for this book !'),
+                      child: const Text('Create a new request for this book !', style: TextStyle(
+              fontFamily: 'Kanit',
+              fontWeight: FontWeight.w600,
+              color: LinoColors.accent,
+            )),
                     ),
                     
                   ],

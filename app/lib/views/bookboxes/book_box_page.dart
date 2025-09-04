@@ -16,6 +16,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:Lino_app/vm/search/search_page_view_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:geolocator/geolocator.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
 
 class BookBoxPage extends StatefulWidget {
   const BookBoxPage({super.key});
@@ -92,7 +93,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                 color: Colors.white,
               ),
             ),
-            backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+            backgroundColor: LinoColors.accent,
             foregroundColor: Colors.white,
             elevation: 2,
             /*actions: [
@@ -200,7 +201,11 @@ class _BookBoxPageState extends State<BookBoxPage> {
               final searchViewModel = context.read<SearchPageViewModel>();
               searchViewModel.createRequest("");
             },
-            child: const Center(child: Text("Didn't find your book? Create a new request !"))
+            child: const Center(child: Text("Didn't find your book? Create a new request !", style: TextStyle(
+              fontFamily: 'Kanit',
+              fontWeight: FontWeight.w600,
+              color: LinoColors.accent,
+            ),)),
           ),
           Center(
             child: TextButton.icon(
@@ -525,7 +530,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color.fromRGBO(101, 67, 33, 0.1),
+                    color: LinoColors.accent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -538,7 +543,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                           style: const TextStyle(
                             fontSize: 14,
                             fontFamily: 'Kanit',
-                            color: Color.fromRGBO(101, 67, 33, 1),
+                            color: LinoColors.textPrimary,
                           ),
                         ),
                       ),
@@ -641,7 +646,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: const Color.fromRGBO(242, 226, 196, 1),
+          color: LinoColors.lightContainer,
         ),
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -649,7 +654,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
           children: [
             Row(
               children: [
-                const Icon(Icons.library_books, color: Color.fromRGBO(101, 67, 33, 1), size: 24),
+                const Icon(Icons.library_books, color: LinoColors.accent, size: 24),
                 const SizedBox(width: 8),
                 const Text(
                   'Books Available',
@@ -657,14 +662,14 @@ class _BookBoxPageState extends State<BookBoxPage> {
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Kanit',
-                    color: Color.fromRGBO(101, 67, 33, 1),
+                    color: LinoColors.accent,
                   ),
                 ),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color.fromRGBO(101, 67, 33, 1),
+                    color: LinoColors.accent.withAlpha(400),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(

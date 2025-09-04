@@ -16,6 +16,7 @@ import 'package:Lino_app/views/profile/notifications_page.dart';
 import 'package:Lino_app/vm/profile/notifications_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:Lino_app/utils/constants/colors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -214,7 +215,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
       floatingActionButton: FloatingActionButton.extended(
             onPressed: () => Get.toNamed(AppRoutes.qrScanner),
-            backgroundColor: Colors.blue.shade600,
+            backgroundColor: LinoColors.accent,
             foregroundColor: Colors.white,
             icon: const Icon(Icons.qr_code_scanner),
             label: const Text(
@@ -282,7 +283,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => Get.toNamed(AppRoutes.qrScanner),
-            backgroundColor: Colors.blue.shade600,
+            backgroundColor: LinoColors.accent,
             foregroundColor: Colors.white,
             icon: const Icon(Icons.qr_code_scanner),
             label: const Text(
