@@ -8,8 +8,7 @@ import 'onboarding/favourite_genres_input_page.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
-  final SharedPreferences prefs;
-  const RegisterPage({required this.prefs, super.key});
+  const RegisterPage({super.key});
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -111,7 +110,7 @@ class _RegisterPageState extends State<RegisterPage> {
       onPressed: viewModel.isLoading
           ? null
           : () async {
-        final token = await viewModel.register(widget.prefs);
+        final token = await viewModel.register();
         if (token != null && mounted) {
           Navigator.pushAndRemoveUntil(
             context,
@@ -119,7 +118,6 @@ class _RegisterPageState extends State<RegisterPage> {
               builder: (context) => WelcomeScreen(
                 username: viewModel.usernameController.text,
                 token: token,
-                prefs: widget.prefs,
               ),
             ),
                 (route) => false,
@@ -144,7 +142,7 @@ class _RegisterPageState extends State<RegisterPage> {
         onTap: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => LoginPage(prefs: widget.prefs)),
+            MaterialPageRoute(builder: (context) => LoginPage()),
           );
         },
         child: RichText(
@@ -170,12 +168,10 @@ class _RegisterPageState extends State<RegisterPage> {
 class WelcomeScreen extends StatefulWidget {
   final String username;
   final String token;
-  final SharedPreferences prefs;
 
   const WelcomeScreen({
     required this.username,
     required this.token,
-    required this.prefs,
     super.key,
   });
 
@@ -192,10 +188,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (context) => FavouriteGenresInputPage(
-              token: widget.token,
-              prefs: widget.prefs,
-            ),
+            builder: (context) => FavouriteGenresInputPage(),
           ),
               (route) => false,
         );

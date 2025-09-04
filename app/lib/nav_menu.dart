@@ -1,3 +1,4 @@
+import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:Lino_app/views/search/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -68,7 +69,7 @@ class _BookNavPageState extends State<BookNavPage> {
                 if (index == 3) { // Profile tab index
                   if (!isLoggedIn) {
                     // User not logged in, redirect to login instead of showing profile tab
-                    Navigator.of(context).pushReplacementNamed('/login');
+                    Get.offNamed(AppRoutes.auth.login);
                   } else {
                     // User logged in, show profile tab like other tabs
                     controller.selectedIndex.value = index;

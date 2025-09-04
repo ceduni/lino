@@ -4,7 +4,7 @@ import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:Lino_app/views/profile/options/modify_profile_page.dart';
 import 'package:Lino_app/views/profile/options/favourite_genres_page.dart';
 import 'package:Lino_app/views/profile/options/favourite_locations_page.dart';
-import 'package:Lino_app/views/profile/options_page.dart';
+import 'package:Lino_app/views/profile/options/notifications_setting_page.dart';
 import 'package:Lino_app/vm/profile/profile_view_model.dart';
 import 'package:provider/provider.dart';
 import 'recent_transactions_widget.dart';
@@ -176,7 +176,7 @@ class _UserDashboardState extends State<UserDashboard> {
             subtitle: 'Manage your notifications',
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => OptionsPage()),
+              MaterialPageRoute(builder: (context) => NotificationSettingPage()),
             ),
           ),
         ],

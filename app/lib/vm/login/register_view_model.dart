@@ -17,7 +17,7 @@ class RegisterViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get obscureText => _obscureText;
 
-  Future<String?> register(SharedPreferences prefs) async {
+  Future<String?> register() async {
     final username = usernameController.text;
     final email = emailController.text;
 
@@ -46,6 +46,7 @@ class RegisterViewModel extends ChangeNotifier {
         passwordController.text,
         phone: phoneController.text,
       );
+      final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
       return token;
     } catch (e) {

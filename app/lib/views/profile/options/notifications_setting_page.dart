@@ -1,19 +1,15 @@
-// app/lib/views/options_page.dart
+// app/lib/views/notifications_setting_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/profile/options_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
-import 'package:Lino_app/views/profile/options/modify_profile_page.dart';
-import 'package:Lino_app/views/profile/options/favourite_genres_page.dart';
-import 'package:Lino_app/views/profile/options/favourite_locations_page.dart';
-import 'package:Lino_app/vm/profile/profile_view_model.dart';
 
-class OptionsPage extends StatefulWidget {
+class NotificationSettingPage extends StatefulWidget {
   @override
-  _OptionsPageState createState() => _OptionsPageState();
+  _NotificationSettingPageState createState() => _NotificationSettingPageState();
 }
 
-class _OptionsPageState extends State<OptionsPage> {
+class _NotificationSettingPageState extends State<NotificationSettingPage> {
   @override
   void initState() {
     super.initState();

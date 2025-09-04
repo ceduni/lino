@@ -6,6 +6,8 @@ import 'package:Lino_app/vm/profile/profile_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 
 class ModifyProfilePage extends StatefulWidget {
+  const ModifyProfilePage({super.key});
+
   @override
   _ModifyProfilePageState createState() => _ModifyProfilePageState();
 }

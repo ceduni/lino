@@ -96,9 +96,10 @@ class SearchPageViewModel extends ChangeNotifier {
   }
 
   void createRequest(String book) {
-
     // Navigate to the request form page
-    Get.to(() => const RequestFormPage());
+    Get.to(() => const RequestFormPage(), arguments: {
+      'title': book
+    });
   }
 
   Future<void> _requestLocationPermission() async {
