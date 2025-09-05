@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:Lino_app/vm/forum/bookbox_selection_view_model.dart';
 import 'package:Lino_app/vm/forum/requests_view_model.dart';
 import 'package:Lino_app/widgets/bookbox_map_widget.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
 
 class BookboxSelectionPage extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -53,7 +54,7 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
                   color: Colors.white,
                 ),
               ),
-              backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+              backgroundColor: LinoColors.accent,
               foregroundColor: Colors.white,
               elevation: 2,
             ),
@@ -158,7 +159,7 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
                               color: _isMapView 
-                                  ? const Color.fromRGBO(101, 67, 33, 1)
+                                  ? LinoColors.accent
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -191,7 +192,7 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
                               color: !_isMapView 
-                                  ? const Color.fromRGBO(101, 67, 33, 1)
+                                  ? LinoColors.accent
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -281,7 +282,7 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
                                       icon: const Icon(Icons.refresh),
                                       label: const Text('Retry'),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+                                        backgroundColor: LinoColors.accent,
                                         foregroundColor: Colors.white,
                                       ),
                                     ),
@@ -383,7 +384,7 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
                             ? const Center(
                                 child: CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                    Color.fromRGBO(101, 67, 33, 1),
+                                    LinoColors.accent,
                                   ),
                                 ),
                               )
@@ -392,7 +393,7 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
                                     ? null
                                     : () => _createRequest(viewModel),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+                                  backgroundColor: LinoColors.accent,
                                   foregroundColor: Colors.white,
                                   disabledBackgroundColor: Colors.grey.shade300,
                                   disabledForegroundColor: Colors.grey.shade600,
@@ -451,7 +452,7 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
                 color: isSelected 
-                    ? const Color.fromRGBO(101, 67, 33, 1)
+                    ? LinoColors.accent
                     : Colors.grey.shade300,
                 width: isSelected ? 2 : 1,
               ),
@@ -478,11 +479,11 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: isSelected 
-                            ? const Color.fromRGBO(101, 67, 33, 1)
+                            ? LinoColors.accent
                             : Colors.transparent,
                         border: Border.all(
                           color: isSelected 
-                              ? const Color.fromRGBO(101, 67, 33, 1)
+                              ? LinoColors.accent
                               : Colors.grey.shade400,
                           width: 2,
                         ),
@@ -559,7 +560,7 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
                     Icon(
                       isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
                       color: isSelected 
-                          ? const Color.fromRGBO(101, 67, 33, 1)
+                          ? LinoColors.accent
                           : Colors.grey.shade400,
                     ),
                   ],

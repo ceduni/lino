@@ -5,6 +5,7 @@ import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/vm/books/book_edition_view_model.dart';
 import 'package:Lino_app/views/books/camera_page.dart';
 import 'package:intl/intl.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
 
 class BookEditionPage extends StatefulWidget {
   final String bookboxId;
@@ -53,7 +54,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
           }
 
           return Scaffold(
-            backgroundColor: const Color.fromRGBO(245, 245, 235, 1),
+            backgroundColor: LinoColors.lightContainer,
             appBar: AppBar(
               title: const Text(
                 'Edit Book Details',
@@ -63,7 +64,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                   color: Colors.white,
                 ),
               ),
-              backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+              backgroundColor: LinoColors.accent,
               foregroundColor: Colors.white,
               elevation: 2,
             ),
@@ -152,8 +153,8 @@ class _BookEditionPageState extends State<BookEditionPage> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color.fromRGBO(250, 250, 240, 1),
-                    Color.fromRGBO(245, 245, 235, 1),
+                    LinoColors.lightContainer,
+                    LinoColors.lightContainer,
                   ],
                 ),
               ),
@@ -245,7 +246,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: const Color.fromRGBO(242, 226, 196, 1),
+                color: LinoColors.lightContainer,
               ),
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -255,7 +256,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                     children: [
                       const Icon(
                         Icons.category,
-                        color: Color.fromRGBO(101, 67, 33, 1),
+                        color: LinoColors.accent,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
@@ -265,7 +266,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Kanit',
-                          color: Color.fromRGBO(101, 67, 33, 1),
+                          color: LinoColors.accent,
                         ),
                       ),
                     ],
@@ -298,7 +299,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: const Color.fromRGBO(250, 250, 240, 1),
+                color: LinoColors.lightContainer,
               ),
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -308,7 +309,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                     children: [
                       const Icon(
                         Icons.description,
-                        color: Color.fromRGBO(101, 67, 33, 1),
+                        color: LinoColors.accent,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
@@ -318,7 +319,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Kanit',
-                          color: Color.fromRGBO(101, 67, 33, 1),
+                          color: LinoColors.accent,
                         ),
                       ),
                     ],
@@ -343,7 +344,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: const Color.fromRGBO(242, 226, 196, 1),
+                color: LinoColors.lightContainer,
               ),
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -353,7 +354,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                     children: [
                       const Icon(
                         Icons.info,
-                        color: Color.fromRGBO(101, 67, 33, 1),
+                        color: LinoColors.accent,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
@@ -363,7 +364,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Kanit',
-                          color: Color.fromRGBO(101, 67, 33, 1),
+                          color: LinoColors.accent,
                         ),
                       ),
                     ],

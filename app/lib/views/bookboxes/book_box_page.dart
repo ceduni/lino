@@ -166,7 +166,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
     return Consumer<BookBoxViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
-          backgroundColor: const Color.fromRGBO(245, 245, 235, 1),
+          backgroundColor: LinoColors.lightContainer,
           appBar: AppBar(
             title: Text(
               viewModel.bookBox?.name ?? 'BookBox',
@@ -211,7 +211,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
     if (viewModel.isLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(101, 67, 33, 1)),
+          valueColor: AlwaysStoppedAnimation<Color>(LinoColors.lightContainer),
         ),
       );
     }
@@ -380,8 +380,8 @@ class _BookBoxPageState extends State<BookBoxPage> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color.fromRGBO(250, 250, 240, 1),
-              Color.fromRGBO(245, 245, 235, 1),
+              LinoColors.lightContainer,
+              LinoColors.lightContainer,
             ],
           ),
         ),
@@ -497,11 +497,11 @@ class _BookBoxPageState extends State<BookBoxPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  /*
+                  
                   Expanded(
                     child: Center(
                       child: Text(
-                        "Photo of the ${bookBox.name} bookbox",
+                        bookBox.name,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -512,7 +512,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                     ),
                   ),
                   
-                  
+                  /*
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
