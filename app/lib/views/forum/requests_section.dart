@@ -1,5 +1,7 @@
 // app/lib/views/forum/requests_section.dart
+import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/forum/requests_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
@@ -248,7 +250,7 @@ class _RequestsSectionState extends State<RequestsSection> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/login');
+                  Get.toNamed(AppRoutes.auth.login);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: LinoColors.accent,
