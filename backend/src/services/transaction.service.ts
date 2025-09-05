@@ -6,12 +6,14 @@ class TransactionService {
         username: string, 
         action: 'added' | 'took', 
         isbn: string, 
+        bookTitle: string,
         bookboxId: string
     ) {
         const transaction = new Transaction({
             username,
             action,
             isbn,
+            bookTitle,
             bookboxId
         });
         await transaction.save();

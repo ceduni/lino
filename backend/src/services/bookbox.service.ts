@@ -76,7 +76,7 @@ const bookboxService = {
 
         // Create transaction record
         const username = userId ? (await User.findById(userId))?.username || 'guest' : 'guest';
-        await TransactionService.createTransaction(username, 'added', isbn ? isbn : '', bookboxId);
+        await TransactionService.createTransaction(username, 'added', isbn ? isbn : '', title, bookboxId);
 
         // Notify users about the new book
         await NotificationService.notifyRelevantUsers(
@@ -129,7 +129,7 @@ const bookboxService = {
 
         // Create transaction record
         const username = userId ? (await User.findById(userId))?.username || 'guest' : 'guest';
-        await TransactionService.createTransaction(username, 'took', book.isbn ? book.isbn : '', bookboxId);
+        await TransactionService.createTransaction(username, 'took', book.isbn ? book.isbn : '', book.title, bookboxId);
 
         // Increment user's saved books count
         if (userId) {
