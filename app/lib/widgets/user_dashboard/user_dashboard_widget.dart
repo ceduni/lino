@@ -39,6 +39,38 @@ class _UserDashboardState extends State<UserDashboard> {
           FollowedBookboxesWidget(user: widget.user),
       
           RecentTransactionsCard(user: widget.user),
+          SizedBox(height: 20),
+          Center( child:
+          Container(
+                      width: 240,
+                      height: 60,
+                      child: ElevatedButton(
+                    onPressed: () => context.read<ProfileViewModel>().disconnect(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                    ),
+                    
+
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.logout, color: Colors.white, size: 18),
+                        SizedBox(width: 4),
+                        Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                    
+                      ),
+                    
+                    ),
+          ),
+          SizedBox(height: 40),
  
         ],
       ),
@@ -179,6 +211,7 @@ class _UserDashboardState extends State<UserDashboard> {
               MaterialPageRoute(builder: (context) => NotificationSettingPage()),
             ),
           ),
+          
         ],
       ),
     );

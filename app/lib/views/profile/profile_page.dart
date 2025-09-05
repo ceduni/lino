@@ -42,7 +42,9 @@ class _ProfilePageState extends State<ProfilePage> {
         }
 
         return Scaffold(
-          body: UserDashboard(user: viewModel.user!),
+          body: UserDashboard(user: viewModel.user!)
+          ,
+          
         );
       },
     );

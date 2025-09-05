@@ -96,34 +96,7 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                     ),
                     
                     SizedBox(height: 20),
-                    Container(
-                      width: 120,
-                      height: 40,
-                      child: ElevatedButton(
-                    onPressed: () => context.read<ProfileViewModel>().disconnect(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                    ),
                     
-
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.logout, color: Colors.white, size: 18),
-                        SizedBox(width: 4),
-                        Text(
-                          'Logout',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                    
-                      ),
-                    
-                    ),
                     Spacer(flex: 2),
                   ],
                 ),
