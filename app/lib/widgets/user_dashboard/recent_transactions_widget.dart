@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../models/transaction_model.dart';
 import '../../services/transaction_services.dart';
 import '../../views/profile/transactions_page.dart';
+import 'dart:math';
 
 class RecentTransactionsCard extends StatefulWidget {
   final User user;
@@ -189,7 +190,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
     }
 
     return ListView.separated(
-      itemCount: 3,
+      itemCount: min(transactions.length, 3), 
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       separatorBuilder: (context, index) => Divider(height: 1),
@@ -204,24 +205,33 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
     final isAdded = transaction.action.toLowerCase() == 'added';
     final actionColor = isAdded ? Colors.green : Colors.orange;
 
-    return ListTile(
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+      border: Border.all(
+        color: Colors.grey[300]!,
+        width: 1,
+      ),
+      borderRadius: BorderRadius.circular(8),
+      ),
+      child: ListTile(
       /*
       contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
       leading: CircleAvatar(
         backgroundColor: actionColor.withValues(alpha: 0.1),
         
         child: Icon(
-          actionIcon,
-          color: actionColor,
-          size: 20,
+        actionIcon,
+        color: actionColor,
+        size: 20,
         ), 
       ),
       */
       title: Text(
-        'ISBN : ${transaction.isbn}',
+        transaction.bookTitle,
         style: TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: 14,
+        fontWeight: FontWeight.w500,
+        fontSize: 14,
         ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
@@ -229,24 +239,25 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
       subtitle: Text(
         _buildSubtitleText(transaction),
         style: TextStyle(
-          color: Colors.grey[600],
-          fontSize: 12,
+        color: Colors.grey[600],
+        fontSize: 12,
         ),
       ),
       trailing: Container(
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: actionColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
+        color: actionColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          transaction.actionDisplayText,
-          style: TextStyle(
-            color: actionColor,
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-          ),
+        transaction.actionDisplayText,
+        style: TextStyle(
+          color: actionColor,
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
         ),
+        ),
+      ),
       ),
     );
   }

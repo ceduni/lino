@@ -160,7 +160,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         title: Text(
-          'ISBN : ${transaction.isbn}',
+          transaction.bookTitle,
           style: const TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 14,
