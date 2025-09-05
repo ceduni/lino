@@ -4,6 +4,7 @@ class Transaction {
   final String action;
   final String isbn;
   final String bookboxId;
+  final String bookTitle;
   final DateTime timestamp;
   final String? bookboxName; // Optional field for bookbox name
 
@@ -13,6 +14,7 @@ class Transaction {
     required this.action,
     required this.isbn,
     required this.bookboxId,
+    required this.bookTitle,
     required this.timestamp,
     this.bookboxName,
   });
@@ -24,6 +26,7 @@ class Transaction {
       action: json['action'] ?? '',
       isbn: json['isbn'] ?? '',
       bookboxId: json['bookboxId'] ?? '',
+      bookTitle: json['bookTitle'] ?? '',
       timestamp: DateTime.parse(json['timestamp'] ?? DateTime.now().toIso8601String()),
     );
   }
@@ -34,6 +37,7 @@ class Transaction {
       'action': action,
       'isbn': isbn,
       'bookboxId': bookboxId,
+
       'timestamp': timestamp.toIso8601String(),
     };
   }
@@ -72,6 +76,7 @@ class Transaction {
       action: action,
       isbn: isbn,
       bookboxId: bookboxId,
+      bookTitle: bookTitle,
       timestamp: timestamp,
       bookboxName: bookboxName ?? this.bookboxName,
     );
