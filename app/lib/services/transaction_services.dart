@@ -13,6 +13,7 @@ class TransactionServices {
     String? username,
     String? isbn, 
     String? bookboxId,
+    String? bookTitle,
     int? limit,
     int? page,
   }) async {
@@ -24,6 +25,7 @@ class TransactionServices {
     if (username != null) queryParameters['username'] = username;
     if (isbn != null) queryParameters['isbn'] = isbn;
     if (bookboxId != null) queryParameters['bookboxId'] = bookboxId;
+    if (bookTitle != null) queryParameters['bookTitle'] = bookTitle;
     if (limit != null) queryParameters['limit'] = limit.toString();
     if (page != null) queryParameters['page'] = page.toString();
     final r = await http.get(

@@ -153,6 +153,7 @@ export const transactionSchema = {
         username: { type: 'string' },
         action: { type: 'string', enum: ['added', 'took'] },
         isbn: { type: 'string' },
+        bookTitle: { type: 'string' },
         bookboxId: { type: 'string' },
         timestamp: { type: 'string', format: 'date-time' }
     }

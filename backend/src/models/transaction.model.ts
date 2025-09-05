@@ -5,6 +5,7 @@ const transactionSchema = new mongoose.Schema({
     action: { type: String, required: true, enum: ['added', 'took'] },
     isbn: { type: String, required: true },
     bookboxId: { type: String, required: true },
+    bookTitle: { type: String, required: true },
     timestamp: { type: Date, default: Date.now }
 }); 
 
