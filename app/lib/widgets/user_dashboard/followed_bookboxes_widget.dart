@@ -5,6 +5,7 @@ import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
+import '../../views/profile/followed_bookboxes_page.dart';
 
 class FollowedBookboxesWidget extends StatefulWidget {
   final User user;
@@ -22,8 +23,6 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
   List<BookBox>? followedBookboxes;
   bool isLoading = true;
   String? error;
-  bool isExpanded = false;
-  static const int maxInitialItems = 3;
 
   @override
   void initState() {
@@ -68,6 +67,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
 
   @override
   Widget build(BuildContext context) {
+    print('Building FollowedBookboxesWidget with ${followedBookboxes?.length ?? 0} bookboxes');
     return Card(
       elevation: 4,
       margin: const EdgeInsets.all(16),
@@ -80,7 +80,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
               children: [
                 const Icon(
                   Icons.favorite,
-                  color: Colors.red,
+                  color: Colors.red, 
                   size: 24,
                 ),
                 const SizedBox(width: 8),
@@ -93,21 +93,19 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
                   ),
                 ),
                 const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade100,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${widget.user.followedBookboxes.length}',
-                    style: TextStyle(
-                      color: Colors.red.shade700,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Kanit',
-                    ),
-                  ),
-                ),
+                if (followedBookboxes != null && followedBookboxes!.isNotEmpty)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => FollowedBookboxesPage(user: widget.user),
+                        ),
+                      );
+                    },
+                    child: const Text('View All'),
+                  )
+                else
+                  const SizedBox.shrink(),
               ],
             ),
             
@@ -308,11 +306,8 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
       return const SizedBox.shrink();
     }
 
-    final itemsToShow = isExpanded 
-        ? followedBookboxes! 
-        : followedBookboxes!.take(maxInitialItems).toList();
-    
-    final hasMoreItems = followedBookboxes!.length > maxInitialItems;
+    // Show only the first 3 bookboxes (or less if there are fewer)
+    final itemsToShow = followedBookboxes!.take(3).toList();
 
     int getCrossAxisCount() {
       if (itemsToShow.length == 1) return 1;
@@ -327,61 +322,19 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
       return 0.85; 
     }
 
-    return Column(
-      children: [
-        // Display bookboxes in a grid
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: getCrossAxisCount(),
-            childAspectRatio: getAspectRatio(),
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-          ),
-          itemCount: itemsToShow.length,
-          itemBuilder: (context, index) {
-            return _buildBookboxCard(itemsToShow[index]);
-          },
-        ),
-        
-        // Show More/Show Less button
-        if (hasMoreItems)
-          Padding(
-            padding: const EdgeInsets.only(top: 12.0),
-            child: Center(
-              child: TextButton.icon(
-                onPressed: () {
-                  setState(() {
-                    isExpanded = !isExpanded;
-                  });
-                },
-                icon: Icon(
-                  isExpanded ? Icons.expand_less : Icons.expand_more,
-                  color: Colors.red.shade700,
-                ),
-                label: Text(
-                  isExpanded 
-                      ? 'Show Less' 
-                      : 'Show ${followedBookboxes!.length - maxInitialItems} More',
-                  style: TextStyle(
-                    color: Colors.red.shade700,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Kanit',
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.red.shade50,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(color: Colors.red.shade200),
-                  ),
-                ),
-              ),
-            ),
-          ),
-      ],
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: getCrossAxisCount(),
+        childAspectRatio: getAspectRatio(),
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+      ),
+      itemCount: itemsToShow.length,
+      itemBuilder: (context, index) {
+        return _buildBookboxCard(itemsToShow[index]);
+      },
     );
   }
 

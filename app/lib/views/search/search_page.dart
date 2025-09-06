@@ -212,7 +212,7 @@ class _SearchPageState extends State<SearchPage> {
             child: viewModel.bookboxResults.isEmpty
                 ? const Center(
                     child: Text(
-                      'No bookboxes found in your area',
+                      'No bookboxes found in your area, try manually searching for one.',
                       style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                   )
@@ -248,7 +248,7 @@ class _SearchPageState extends State<SearchPage> {
               ? Center(
                   child: Text(
                     viewModel.searchQuery.isEmpty 
-                      ? 'No bookboxes found in your area'
+                      ? 'No bookboxes found in your area, try manually searching for one.'
                       : 'No bookboxes found',
                     style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),

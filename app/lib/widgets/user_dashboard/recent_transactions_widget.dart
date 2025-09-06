@@ -105,16 +105,19 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
                   ),
                 ),
                 const Spacer(),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => TransactionsPage(user: widget.user),
-                      ),
-                    );
-                  },
-                  child: const Text('View All'),
-                ),
+                if (transactions.isNotEmpty)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => TransactionsPage(user: widget.user),
+                        ),
+                      );
+                    },
+                    child: const Text('View All'),
+                  )
+                else 
+                  SizedBox.shrink(),
               ],
             ),
             SizedBox(height: 16),
