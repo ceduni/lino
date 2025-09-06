@@ -17,6 +17,7 @@ class RequestsViewModel extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   String? _currentUsername;
+  String? _currentUserId;
   bool _isAuthenticated = false;
   
   // Search and pagination state
@@ -33,6 +34,7 @@ class RequestsViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
   String? get currentUsername => _currentUsername;
+  String? get currentUserId => _currentUserId;
   bool get isAuthenticated => _isAuthenticated;
   String get searchQuery => _searchQuery;
   RequestFilter get currentFilter => _currentFilter;
@@ -67,10 +69,12 @@ class RequestsViewModel extends ChangeNotifier {
       if (token != null) {
         final user = await _userService.getUser(token);
         _currentUsername = user.username;
+        _currentUserId = user.id;
         _isAuthenticated = true;
       } else {
         _isAuthenticated = false;
         _currentUsername = null;
+        _currentUserId = null;
         // Reset filter to 'all' if not authenticated
         if (_currentFilter != RequestFilter.all) {
           _currentFilter = RequestFilter.all;
@@ -81,6 +85,7 @@ class RequestsViewModel extends ChangeNotifier {
       print('Error fetching current user: $e');
       _isAuthenticated = false;
       _currentUsername = null;
+      _currentUserId = null;
       if (_currentFilter != RequestFilter.all) {
         _currentFilter = RequestFilter.all;
       }
@@ -227,7 +232,7 @@ class RequestsViewModel extends ChangeNotifier {
   }
 
   bool isRequestLikedByUser(Request request) {
-    return _isAuthenticated && _currentUsername != null && request.isUpvotedBy(_currentUsername!);
+    return _isAuthenticated && _currentUserId != null && request.upvoters.contains(_currentUserId!);
   }
 
   Future<bool> toggleLike(String requestId) async {

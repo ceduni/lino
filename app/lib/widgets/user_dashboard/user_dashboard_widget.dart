@@ -61,7 +61,8 @@ class _UserDashboardState extends State<UserDashboard> {
                         SizedBox(width: 4),
                         Text(
                           'Logout',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.white, fontSize: 18)
+                          ,
                         ),
                       ],
                     ),

@@ -311,42 +311,52 @@ class _RequestsSectionState extends State<RequestsSection> {
       builder: (context, viewModel, child) {
         final canLike = viewModel.canLikeRequest(request);
         final isLiked = viewModel.isRequestLikedByUser(request);
+
         
         return Card(
-          color: isOwner ? LinoColors.accent : LinoColors.secondary,
-          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
+          margin: const EdgeInsets.all( 5.0),
+          elevation: 1,
+          color: LinoColors.lightContainer,
           child: ListTile(
             onTap: () => showRequestDetails(request),
+            
             title: Text(
               request.bookTitle,
               style: TextStyle(
                 fontSize: 18, 
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                color: isOwner ? LinoColors.accent : Colors.black87,
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 4),
                 Text(
+                  isOwner ? 'Your request' :
                   'Requested by ${request.username}',
-                  style: TextStyle(
-                    color: Colors.white70,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
                   ),
                 ),
+                /** 
                 if (request.customMessage != null && request.customMessage!.isNotEmpty) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     request.customMessage!,
-                    style: TextStyle(
-                      color: Colors.white70,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black54,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
+                */
                 Row(
                   children: [
                     // Like/Upvote button or display
@@ -355,61 +365,73 @@ class _RequestsSectionState extends State<RequestsSection> {
                         onTap: () async {
                           await viewModel.toggleLike(request.id);
                         },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.transparent,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                                size: 20,
+                                color: isLiked ? LinoColors.accent : Colors.grey,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${request.upvoteCount}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isLiked ? LinoColors.accent : Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.thumb_up,
                               size: 20,
-                              color: isLiked ? Colors.green: Colors.white70,
+                              color: Colors.grey,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               '${request.upvoteCount}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 12,
-                                color: isLiked ? Colors.green : Colors.white70,
-                                fontWeight: isLiked ? FontWeight.bold : FontWeight.normal,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
-                      )
-                    else
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.thumb_up,
-                            size: 20,
-                            color: Colors.white70,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${request.upvoteCount}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white70,
-                            ),
-                          ),
-                        ],
                       ),
                     const SizedBox(width: 16),
-                    // Notified count with network/stats icon
+                    // Notified count
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.bar_chart,
-                          size: 18,
-                          color: Colors.white70,
+                          Icons.people_outline,
+                          size: 20,
+                          color: Colors.grey,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           '${request.nbPeopleNotified}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
-                            color: Colors.white70,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
