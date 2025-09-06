@@ -218,7 +218,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Get.back();
                 setState(() {
                   _screenOpened = false; // Allow scanning again
                 });
@@ -230,7 +230,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Get.back();
                 Get.back(); // Close scanner page
               },
               child: const Text(

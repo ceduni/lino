@@ -1,3 +1,4 @@
+import 'package:Lino_app/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,9 +8,7 @@ import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 
 class FollowedBookboxesPage extends StatefulWidget {
-  final User user;
-
-  const FollowedBookboxesPage({super.key, required this.user});
+  const FollowedBookboxesPage({super.key});
 
   @override
   _FollowedBookboxesPageState createState() => _FollowedBookboxesPageState();
@@ -44,9 +43,11 @@ class _FollowedBookboxesPageState extends State<FollowedBookboxesPage> {
         return;
       }
 
+      final user = await UserService().getUser(token);
+
       final bookboxes = await BookboxService().getFollowedBookboxes(
         token,
-        widget.user.followedBookboxes,
+        user.followedBookboxes,
       );
 
       setState(() {

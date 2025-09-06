@@ -1,5 +1,6 @@
 // app/lib/views/forum/requests_section.dart
 import 'package:Lino_app/utils/constants/routes.dart';
+import 'package:Lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -7,7 +8,6 @@ import 'package:Lino_app/vm/forum/requests_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:Lino_app/models/request_model.dart';
 import 'package:Lino_app/models/search_model.dart';
-import 'package:Lino_app/views/forum/request_form.dart';
 
 class RequestsSection extends StatefulWidget {
   const RequestsSection({super.key});
@@ -56,11 +56,7 @@ class _RequestsSectionState extends State<RequestsSection> {
                   bottom: viewModel.pagination != null ? 80 : 16,
                   child: FloatingActionButton.extended(
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const RequestFormPage(),
-                        ),
-                      );
+                      Get.toNamed(AppRoutes.forum.request.form);
                     },
                     backgroundColor: LinoColors.accent,
                     foregroundColor: LinoColors.primary,
@@ -466,16 +462,16 @@ class _RequestsSectionState extends State<RequestsSection> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Get.back(),
             child: const Text('Close'), 
           ),
           if (request.username == context.read<RequestsViewModel>().currentUsername) ...[
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
+                Get.back();
                 final confirmed = await _showDeleteDialog(context, context.read<RequestsViewModel>(), request);
                 if (confirmed && context.mounted) {
-                  Navigator.of(context).pop(); 
+                  Get.back();
                 }
               },
               child: const Text('Delete', style: TextStyle(color: Colors.red)),
@@ -594,11 +590,11 @@ class _RequestsSectionState extends State<RequestsSection> {
             'You won\'t be notified when the book you want will be added to a bookbox.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Get.back(result: false),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Get.back(result: true),
             child: const Text('Delete'),
           ),
         ],
@@ -614,12 +610,14 @@ class _RequestsSectionState extends State<RequestsSection> {
             backgroundColor: Colors.green,
           ),
         );
+        CustomSnackbars.success(
+          'Request Deleted',
+          'Your book request has been deleted successfully.',
+        );
       } else if (!success && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(viewModel.error ?? 'Failed to delete request'),
-            backgroundColor: Colors.red,
-          ),
+        CustomSnackbars.error(
+          'Error',
+          'Failed to delete request: ${viewModel.error}',
         );
       }
     }

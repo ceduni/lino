@@ -217,14 +217,14 @@ class _FavouriteLocationsInputPageState extends State<FavouriteLocationsInputPag
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         TextButton(
-          onPressed: () => Get.offNamed(AppRoutes.home),
+          onPressed: () => Get.offNamed(AppRoutes.home.main),
           child: const Text(
             'Skip',
             style: TextStyle(color: Colors.white70, fontSize: 16),
           ),
         ),
         ElevatedButton(
-          onPressed: () => Get.offNamed(AppRoutes.home),
+          onPressed: () => Get.offNamed(AppRoutes.home.main),
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
             backgroundColor: Colors.white,

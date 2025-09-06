@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        initialRoute: AppRoutes.home,
+        initialRoute: AppRoutes.home.main,
         getPages: AppPages.getPages,
         onReady: () {
           // Initialize deep link handling after GetX is ready

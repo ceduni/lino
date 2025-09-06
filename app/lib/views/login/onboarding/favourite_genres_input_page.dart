@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/login/onboarding/favourite_genres_input_view_model.dart';
 import '../../../utils/constants/routes.dart';
-import 'favourite_locations_input_page.dart';
 
 class FavouriteGenresInputPage extends StatefulWidget {
   const FavouriteGenresInputPage({super.key});
@@ -238,7 +237,7 @@ class _FavouriteGenresInputPageState extends State<FavouriteGenresInputPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           TextButton(
-            onPressed: () => Get.offNamed(AppRoutes.home),
+            onPressed: () => Get.offNamed(AppRoutes.home.main),
             child: Text(
               'Skip',
               style: TextStyle(color: Colors.white70, fontSize: 16),

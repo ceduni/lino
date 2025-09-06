@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
       top: 50,
       left: 16,
       child: IconButton(
-        onPressed: () => Get.offAllNamed(AppRoutes.home),
+        onPressed: () => Get.offAllNamed(AppRoutes.home.main),
         icon: const Icon(
           Icons.close,
           color: Colors.white,
@@ -93,19 +93,19 @@ class _LoginPageState extends State<LoginPage> {
       controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
+        hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.3)),
         filled: true,
         fillColor: const Color(0xFFE0F7FA),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.0),
           borderSide: BorderSide.none,
         ),
-        prefixIcon: Icon(icon, color: Colors.black.withOpacity(0.5)),
+        prefixIcon: Icon(icon, color: Colors.black.withValues(alpha: 0.5)),
         suffixIcon: hintText == 'Password'
             ? IconButton(
           icon: Icon(
             obscureText ? Icons.visibility_off : Icons.visibility,
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
           ),
           onPressed: onToggleVisibility,
         )
@@ -122,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
           : () async {
         final success = await viewModel.login();
         if (success && mounted) {
-          Get.offAllNamed(AppRoutes.home);
+          Get.offAllNamed(AppRoutes.home.main);
         }
       },
       style: ElevatedButton.styleFrom(
@@ -167,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
             onTap: () async {
               await viewModel.openAsGuest();
               if (mounted) {
-                Get.offNamed(AppRoutes.home);
+                Get.offNamed(AppRoutes.home.main);
               }
             },
             child: const Text(

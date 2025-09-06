@@ -1,11 +1,15 @@
+import 'package:Lino_app/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/models/transaction_model.dart';
 import 'package:Lino_app/services/transaction_services.dart';
-import 'package:Lino_app/models/user_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/user_services.dart';
 
 class TransactionsViewModel extends ChangeNotifier {
+  String username = '';
   final TransactionServices _transactionService = TransactionServices();
   final BookboxService _bookboxService = BookboxService();
 
@@ -25,11 +29,24 @@ class TransactionsViewModel extends ChangeNotifier {
   int get pageSize => _pageSize;
 
   // Initialize with user data
-  Future<void> initialize(User user) async {
-    await loadTransactions(user);
+  Future<void> initialize() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      _error = 'No authentication token found';
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
+
+    User user = await UserService().getUser(token);
+    username = user.username;
+
+    await loadTransactions();
   }
 
-  Future<void> loadTransactions(User user, {int page = 1, bool append = false}) async {
+  Future<void> loadTransactions({int page = 1, bool append = false}) async {
     try {
       _setLoading(true, append);
       if (!append) {
@@ -37,7 +54,7 @@ class TransactionsViewModel extends ChangeNotifier {
       }
 
       SearchModel<Transaction> searchResults = await _transactionService.searchTransactions(
-        username: user.username,
+        username: username,
         limit: _pageSize,
         page: page,
       );
@@ -82,29 +99,29 @@ class TransactionsViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> refreshTransactions(User user) async {
+  Future<void> refreshTransactions() async {
     _currentPage = 1;
-    await loadTransactions(user, page: 1, append: false);
+    await loadTransactions(page: 1, append: false);
   }
 
-  Future<void> loadNextPage(User user) async {
+  Future<void> loadNextPage() async {
     if (_pagination != null && _pagination!.hasNextPage && !_isLoading) {
-      await loadTransactions(user, page: _currentPage + 1, append: true);
+      await loadTransactions(page: _currentPage + 1, append: true);
     }
   }
 
-  Future<void> loadPreviousPage(User user) async {
+  Future<void> loadPreviousPage() async {
     if (_pagination != null && _pagination!.hasPrevPage && !_isLoading && _currentPage > 1) {
-      await loadTransactions(user, page: _currentPage - 1, append: false);
+      await loadTransactions(page: _currentPage - 1, append: false);
     }
   }
 
-  Future<void> goToPage(User user, int page) async {
+  Future<void> goToPage(int page) async {
     if (page >= 1 &&
         page <= (_pagination?.totalPages ?? 1) &&
         page != _currentPage &&
         !_isLoading) {
-      await loadTransactions(user, page: page, append: false);
+      await loadTransactions(page: page, append: false);
     }
   }
 

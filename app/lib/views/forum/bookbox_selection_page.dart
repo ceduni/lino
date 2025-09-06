@@ -1,3 +1,4 @@
+import 'package:Lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
@@ -586,36 +587,11 @@ class _BookboxSelectionPageState extends State<BookboxSelectionPage> {
       // Navigate back to the forum screen (pop twice to go back to forum)
       Get.back(); // Pop bookbox selection page
       Get.back(); // Pop request form page
-      
-      Get.snackbar(
+
+      CustomSnackbars.success(
         'Success',
         'Request created successfully! 📚\n${viewModel.selectedBookboxIds.length} bookbox${viewModel.selectedBookboxIds.length == 1 ? '' : 'es'} selected.',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 4),
-        icon: const Icon(Icons.check_circle, color: Colors.white, size: 20),
       );
-      /*ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Request created successfully! 📚\n${viewModel.selectedBookboxIds.length} bookbox${viewModel.selectedBookboxIds.length == 1 ? '' : 'es'} selected.',
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 4),
-        ),
-      );*/
     }
   }
 }

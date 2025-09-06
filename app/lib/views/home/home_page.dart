@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:Lino_app/vm/home/home_view_model.dart';
 import 'package:Lino_app/vm/bookboxes/bookbox_list_view_model.dart';
 import 'package:Lino_app/vm/map/map_view_model.dart';
-import 'package:Lino_app/widgets/home_page.dart';
+import 'package:Lino_app/widgets/profile_stats_widget.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:Lino_app/models/notification_model.dart';
@@ -475,15 +475,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           tooltip: 'Refresh notifications',
                         ),
                         TextButton(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ChangeNotifierProvider(
-                                create: (context) => NotificationsViewModel(),
-                                child: const NotificationsPage(),
-                              ),
-                            ),
-                          ),
+                          onPressed: () => Get.toNamed(AppRoutes.home.notifications),
                           child: const Text('View All'),
                         ),
                       ],
@@ -681,7 +673,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             TextButton(
               child: const Text('Close'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Get.back();
               },
             ),
           ],

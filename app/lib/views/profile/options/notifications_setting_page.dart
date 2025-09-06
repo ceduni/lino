@@ -1,10 +1,13 @@
 // app/lib/views/notifications_setting_page.dart
+import 'package:Lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/profile/options_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 
 class NotificationSettingPage extends StatefulWidget {
+  const NotificationSettingPage({super.key});
+
   @override
   _NotificationSettingPageState createState() => _NotificationSettingPageState();
 }
@@ -133,8 +136,9 @@ class _NotificationSettingPageState extends State<NotificationSettingPage> {
             onChanged: (value) async {
           final success = await viewModel.toggleNotification('addedBook');
           if (!success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to update notification settings')),
+            CustomSnackbars.error(
+              'Error',
+              'Failed to update notification settings',
             );
           }
             },
@@ -148,8 +152,9 @@ class _NotificationSettingPageState extends State<NotificationSettingPage> {
             onChanged: (value) async {
           final success = await viewModel.toggleNotification('bookRequested');
           if (!success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to update notification settings')),
+            CustomSnackbars.error(
+              'Error',
+              'Failed to update notification settings',
             );
           }
             },

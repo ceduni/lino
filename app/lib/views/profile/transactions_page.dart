@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/profile/transactions_view_model.dart';
-import 'package:Lino_app/models/user_model.dart';
 
 import '../../models/transaction_model.dart';
 
 class TransactionsPage extends StatefulWidget {
-  final User user;
-
-  const TransactionsPage({super.key, required this.user});
+  const TransactionsPage({super.key});
 
   @override
   _TransactionsPageState createState() => _TransactionsPageState();
@@ -19,7 +16,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TransactionsViewModel>().initialize(widget.user);
+      context.read<TransactionsViewModel>().initialize();
     });
   }
 
@@ -57,7 +54,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => viewModel.refreshTransactions(widget.user),
+              onPressed: () => viewModel.refreshTransactions(),
               child: const Text('Retry'),
             ),
           ],
@@ -112,7 +109,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
         // Transactions list
         Expanded(
           child: RefreshIndicator(
-            onRefresh: () => viewModel.refreshTransactions(widget.user),
+            onRefresh: () => viewModel.refreshTransactions(),
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: viewModel.transactions.length + (viewModel.showBottomLoading ? 1 : 0),
@@ -163,7 +160,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                 children: [
                   IconButton(
                     onPressed: viewModel.pagination!.hasPrevPage && !viewModel.isLoading
-                        ? () => viewModel.loadPreviousPage(widget.user)
+                        ? () => viewModel.loadPreviousPage()
                         : null,
                     icon: const Icon(Icons.chevron_left),
                     tooltip: 'Previous page',
@@ -171,7 +168,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: viewModel.pagination!.hasNextPage && !viewModel.isLoading
-                        ? () => viewModel.loadNextPage(widget.user)
+                        ? () => viewModel.loadNextPage()
                         : null,
                     icon: const Icon(Icons.chevron_right),
                     tooltip: 'Next page',
@@ -197,7 +194,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                     child: GestureDetector(
                       onTap: isCurrentPage || viewModel.isLoading
                           ? null
-                          : () => viewModel.goToPage(widget.user, pageNumber),
+                          : () => viewModel.goToPage(pageNumber),
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(

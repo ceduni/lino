@@ -1,11 +1,9 @@
+import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
-import 'package:Lino_app/views/profile/options/modify_profile_page.dart';
-import 'package:Lino_app/views/profile/options/favourite_genres_page.dart';
-import 'package:Lino_app/views/profile/options/favourite_locations_page.dart';
-import 'package:Lino_app/views/profile/options/notifications_setting_page.dart';
 import 'package:Lino_app/vm/profile/profile_view_model.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'recent_transactions_widget.dart';
 import 'followed_bookboxes_widget.dart';
@@ -41,7 +39,7 @@ class _UserDashboardState extends State<UserDashboard> {
           RecentTransactionsCard(user: widget.user),
           SizedBox(height: 20),
           Center( child:
-          Container(
+          SizedBox(
                       width: 240,
                       height: 60,
                       child: ElevatedButton(
@@ -82,10 +80,7 @@ class _UserDashboardState extends State<UserDashboard> {
     return Column(
       children: [
         GestureDetector(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ModifyProfilePage()),
-          ),
+          onTap: () => Get.toNamed(AppRoutes.profile.modify),
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -93,7 +88,7 @@ class _UserDashboardState extends State<UserDashboard> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -137,7 +132,7 @@ class _UserDashboardState extends State<UserDashboard> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -165,7 +160,7 @@ class _UserDashboardState extends State<UserDashboard> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -187,30 +182,21 @@ class _UserDashboardState extends State<UserDashboard> {
             icon: Icons.favorite,
             title: 'Favorite Genres',
             subtitle: 'Set up your reading preferences',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => FavouriteGenresPage()),
-            ),
+            onTap: () => Get.toNamed(AppRoutes.profile.favouriteGenres),
           ),
           const SizedBox(height: 8),
           _buildSettingsTile(
             icon: Icons.location_on,
             title: 'Favorite Locations',
             subtitle: 'Manage your preferred locations',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => FavouriteLocationsPage()),
-            ),
+            onTap: () => Get.toNamed(AppRoutes.profile.favouriteLocations),
           ),
           const SizedBox(height: 8),
           _buildSettingsTile(
             icon: Icons.notifications,
             title: 'Notification Settings',
             subtitle: 'Manage your notifications',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => NotificationSettingPage()),
-            ),
+            onTap: () => Get.toNamed(AppRoutes.profile.setupNotifications),
           ),
           
         ],
@@ -230,7 +216,7 @@ class _UserDashboardState extends State<UserDashboard> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

@@ -1,5 +1,6 @@
 // app/lib/views/profile/notifications_page.dart
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/vm/profile/notifications_view_model.dart';
@@ -248,7 +249,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
             TextButton(
               child: const Text('Close'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Get.back();
               },
             ),
           ],

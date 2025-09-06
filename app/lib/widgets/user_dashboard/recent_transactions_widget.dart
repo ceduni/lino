@@ -2,8 +2,10 @@ import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../models/transaction_model.dart';
 import '../../services/transaction_services.dart';
+import '../../utils/constants/routes.dart';
 import '../../views/profile/transactions_page.dart';
 import 'dart:math';
 
@@ -108,11 +110,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
                 if (transactions.isNotEmpty)
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => TransactionsPage(user: widget.user),
-                        ),
-                      );
+                      Get.toNamed(AppRoutes.profile.transactions);
                     },
                     child: const Text('View All'),
                   )

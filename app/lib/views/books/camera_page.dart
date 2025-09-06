@@ -319,7 +319,7 @@ class _CameraPageState extends State<CameraPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Get.back(),
             child: const Text(
               'OK',
               style: TextStyle(fontFamily: 'Kanit'),

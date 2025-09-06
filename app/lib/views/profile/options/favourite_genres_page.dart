@@ -1,10 +1,13 @@
 // app/lib/views/favourite_genres_page.dart
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/profile/options/favourite_genres_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 
 class FavouriteGenresPage extends StatefulWidget {
+  const FavouriteGenresPage({super.key});
+
   @override
   _FavouriteGenresPageState createState() => _FavouriteGenresPageState();
 }
@@ -168,7 +171,7 @@ class _FavouriteGenresPageState extends State<FavouriteGenresPage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Get.back(),
             child: Text(
               'Pass',
               style: TextStyle(color: Colors.white70),
@@ -179,7 +182,7 @@ class _FavouriteGenresPageState extends State<FavouriteGenresPage> {
             onPressed: () async {
               final success = await viewModel.finish();
               if (success) {
-                Navigator.pop(context);
+                Get.back();
               }
             },
             style: ElevatedButton.styleFrom(

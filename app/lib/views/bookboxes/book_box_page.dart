@@ -6,6 +6,7 @@ import 'package:Lino_app/views/bookboxes/book_box_issue_report_page.dart';
 import 'package:Lino_app/views/bookboxes/transactions/barcode_scanner_page.dart';
 import 'package:Lino_app/views/books/book_details_page.dart';
 import 'package:Lino_app/vm/bookboxes/book_box_view_model.dart';
+import 'package:Lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -90,7 +91,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () => Get.back(),
                       icon: const Icon(Icons.close, color: Colors.grey),
                     ),
                   ],
@@ -117,7 +118,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      Get.back();
                       _openGoogleMapsApp(bookBox.latitude, bookBox.longitude);
                     },
                     icon: const Icon(Icons.directions, color: Colors.white),
@@ -179,25 +180,6 @@ class _BookBoxPageState extends State<BookBoxPage> {
             backgroundColor: LinoColors.accent,
             foregroundColor: Colors.white,
             elevation: 2,
-            /*actions: [
-              IconButton(
-                onPressed: () async {
-                  final result = await Get.to(() => BookBoxIssueReportPage(bookboxId: bookBoxId!));
-                  if (result != null && result['success'] == true) {
-                    Get.snackbar(
-                      'Success',
-                      result['message'] ?? 'Issue reported successfully',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white,
-                    );
-                  }
-                },
-                icon: const Icon(Icons.report, color: Colors.white),
-                tooltip: 'Report Issue',
-              ),
-              
-            ], */
           ),
           body: SafeArea(
             child: _buildBody(viewModel),
@@ -298,17 +280,14 @@ class _BookBoxPageState extends State<BookBoxPage> {
               onPressed: () async {
                   final result = await Get.to(() => BookBoxIssueReportPage(bookboxId: bookBoxId!));
                   if (result != null && result['success'] == true) {
-                    Get.snackbar(
+                    CustomSnackbars.success(
                       'Success',
                       result['message'] ?? 'Issue reported successfully',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white,
                     );
                   }
                 },
               icon: const Icon(Icons.flag),
-              label: const Text("Report issue with this BookBox"),
+              label: const Text('Report issue with this BookBox'),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.red,
                 textStyle: const TextStyle(
@@ -457,22 +436,16 @@ class _BookBoxPageState extends State<BookBoxPage> {
                                     onPressed: () async {
                                       final success = await viewModel.toggleFollow(bookBoxId!);
                                       if (success) {
-                                        Get.snackbar(
+                                        CustomSnackbars.success(
                                           viewModel.isFollowed ? 'Following' : 'Unfollowed',
                                           viewModel.isFollowed
                                               ? 'You are now following this BookBox'
                                               : 'You have unfollowed this BookBox',
-                                          snackPosition: SnackPosition.BOTTOM,
-                                          backgroundColor: viewModel.isFollowed ? Colors.green : Colors.orange,
-                                          colorText: Colors.white,
                                         );
                                       } else {
-                                        Get.snackbar(
+                                        CustomSnackbars.error(
                                           'Error',
                                           'Failed to ${viewModel.isFollowed ? 'unfollow' : 'follow'} BookBox',
-                                          snackPosition: SnackPosition.BOTTOM,
-                                          backgroundColor: Colors.red,
-                                          colorText: Colors.white,
                                         );
                                       }
                                     },
@@ -690,12 +663,10 @@ class _BookBoxPageState extends State<BookBoxPage> {
           () => BarcodeScannerPage(addingBook: true, bookboxId: bookBoxId!),
         );
       } : () {
-        Get.snackbar(
+
+        CustomSnackbars.alert(
           'BookBox Under Maintenance',
           'Cannot add books while BookBox is deactivated for maintenance',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
         );
       },
       icon: Icon(Icons.add, color: isActive ? Colors.white : Colors.grey.shade400),
@@ -723,12 +694,9 @@ class _BookBoxPageState extends State<BookBoxPage> {
           () => BarcodeScannerPage(addingBook: false, bookboxId: bookBoxId!),
         );
       } : () {
-        Get.snackbar(
+        CustomSnackbars.alert(
           'BookBox Under Maintenance',
           'Cannot remove books while BookBox is deactivated for maintenance',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
         );
       },
       icon: Icon(Icons.remove, color: isActive ? Colors.white : Colors.grey.shade400),
@@ -997,7 +965,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
           actions: navigationApps.map((app) {
             return CupertinoActionSheetAction(
               onPressed: () {
-                Navigator.pop(context);
+                Get.back();
                 _launchNavigationApp(app['url'], app['name']);
               },
               child: Text(app['name'] as String),
@@ -1005,7 +973,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
           }).toList(),
           cancelButton: CupertinoActionSheetAction(
             isDefaultAction: true,
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Get.back(),
             child: const Text('Cancel'),
           ),
         );
@@ -1021,12 +989,9 @@ class _BookBoxPageState extends State<BookBoxPage> {
         throw 'Could not open $appName';
       }
     } catch (e) {
-      Get.snackbar(
+      CustomSnackbars.error(
         'Error',
         'Could not open $appName. Please make sure it\'s installed.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
       );
     }
   }
@@ -1041,12 +1006,9 @@ class _BookBoxPageState extends State<BookBoxPage> {
         throw 'Could not open the map.';
       }
     } catch (e) {
-      Get.snackbar(
+      CustomSnackbars.error(
         'Error',
-        'Could not open Google Maps',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        'Could not open Google Maps. Please make sure it\'s installed.',
       );
     }
   }

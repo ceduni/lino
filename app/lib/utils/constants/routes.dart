@@ -1,15 +1,24 @@
 class AppRoutes {
   // Root level routes
-  static const String home = '/home';
   static const String search = '/search';
+  static const String welcome = '/welcome';
   static const String splash = '/';
 
   // Feature modules
+  static const HomeRoutes home = HomeRoutes('/home');
   static const AuthRoutes auth = AuthRoutes('/auth');
   static const ForumRoutes forum = ForumRoutes('/forum');
   static const BookboxRoutes bookbox = BookboxRoutes('/bookbox');
   static const ProfileRoutes profile = ProfileRoutes('/profile');
   static const ScanRoutes scan = ScanRoutes('/scan');
+}
+
+class HomeRoutes {
+  final String root;
+  const HomeRoutes(this.root);
+
+  String get main => root;
+  String get notifications => '$root/notifications';
 }
 
 class AuthRoutes {
@@ -71,6 +80,8 @@ class ProfileRoutes {
   String get main => root;
   String get modify => '$root/modify';
   String get favouriteGenres => '$root/favourite-genres';
+  String get followedBookboxes => '$root/followed-bookboxes';
+  String get transactions => '$root/transactions';
   String get favouriteLocations => '$root/favourite-locations';
   String get setupNotifications => '$root/setup-notifications';
 }

@@ -1,3 +1,4 @@
+import 'package:Lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
@@ -638,7 +639,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                 style: TextStyle(fontFamily: 'Kanit'),
               ),
               onTap: () {
-                Navigator.pop(context);
+                Get.back();
                 _takeCoverPhoto(viewModel);
               },
             ),
@@ -648,7 +649,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                 'Cancel',
                 style: TextStyle(fontFamily: 'Kanit'),
               ),
-              onTap: () => Navigator.pop(context),
+              onTap: () => Get.back(),
             ),
           ],
         ),
@@ -666,47 +667,21 @@ class _BookEditionPageState extends State<BookEditionPage> {
   void _confirmAddBook(BookEditionViewModel viewModel) async {
     try {
       await viewModel.addBookToBookBox(widget.bookboxId);
-      
-      // Check if the widget is still mounted before showing UI updates
-      if (!mounted) return;
-      
-      // Show success message using Flutter's native snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-            'Book added to BookBox successfully!',
-            style: TextStyle(
-              fontFamily: 'Kanit',
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      
+
       // Navigate back to previous screens immediately
       Get.back(); // Go back from book edition page
       Get.back(); // Go back from barcode scanner page to main bookbox page
+
+      // Show success message
+      CustomSnackbars.success(
+        'Success',
+        'Book added to BookBox successfully!',
+      );
     } catch (e) {
-      // Check if the widget is still mounted before showing UI updates
-      if (!mounted) return;
-      
-      // Show error message using Flutter's native snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to add book: ${e.toString()}',
-            style: const TextStyle(
-              fontFamily: 'Kanit',
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-          behavior: SnackBarBehavior.floating,
-        ),
+      // Show error message
+      CustomSnackbars.error(
+        'Error',
+        'Failed to add book: ${e.toString()}',
       );
     }
   }

@@ -1,5 +1,6 @@
 // app/lib/pages/bookbox/book_box_issue_report_page.dart
 import 'package:Lino_app/vm/bookboxes/book_box_issue_report_view_model.dart';
+import 'package:Lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -196,12 +197,9 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
             if (result['success']) {
               Get.back(result: result);
             } else {
-              Get.snackbar(
+              CustomSnackbars.error(
                 'Error',
                 'Failed to report issue: ${result['error']}',
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: Colors.red,
-                colorText: Colors.white,
               );
             }
           }

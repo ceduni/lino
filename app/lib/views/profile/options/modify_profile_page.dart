@@ -1,8 +1,8 @@
 // app/lib/views/modify_profile_page.dart
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/profile/options/modify_profile_view_model.dart';
-import 'package:Lino_app/vm/profile/profile_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 
 class ModifyProfilePage extends StatefulWidget {
@@ -80,7 +80,7 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () => Get.back(),
                           style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                           child: Text('Dismiss', style: TextStyle(color: LinoColors.accent)),
                         ),
@@ -152,15 +152,15 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
         content: Text('Are you sure you want to update your profile?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Get.back(result: false),
             child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.of(context).pop(true);
+              Get.back(result: true);
               final success = await viewModel.updateUser();
               if (success) {
-                Navigator.pop(context);
+                Get.back();
               }
             },
             child: Text('Confirm'),

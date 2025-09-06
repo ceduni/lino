@@ -83,7 +83,7 @@ class DeepLinkService {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (Get.context != null) {
           // Navigate to home first, then to bookbox
-          Get.offAllNamed(AppRoutes.home);
+          Get.offAllNamed(AppRoutes.home.main);
           
           // Wait for navigation to complete before navigating to bookbox
           Future.delayed(const Duration(milliseconds: 300), () {
@@ -115,7 +115,7 @@ class DeepLinkService {
     try {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (Get.context != null) {
-          Get.offAllNamed(AppRoutes.home);
+          Get.offAllNamed(AppRoutes.home.main);
         }
       });
     } catch (e) {

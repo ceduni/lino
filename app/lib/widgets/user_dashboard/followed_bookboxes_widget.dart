@@ -5,7 +5,6 @@ import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
-import '../../views/profile/followed_bookboxes_page.dart';
 
 class FollowedBookboxesWidget extends StatefulWidget {
   final User user;
@@ -96,11 +95,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
                 if (followedBookboxes != null && followedBookboxes!.isNotEmpty)
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => FollowedBookboxesPage(user: widget.user),
-                        ),
-                      );
+                      Get.toNamed(AppRoutes.profile.followedBookboxes);
                     },
                     child: const Text('View All'),
                   )

@@ -1,5 +1,5 @@
+import 'package:Lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/models/book_model.dart';
@@ -135,7 +135,7 @@ class _BookboxBookListPageState extends State<BookboxBookListPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
+              onPressed: () => Get.back(result: false),
               child: const Text(
                 'Cancel',
                 style: TextStyle(
@@ -145,7 +145,7 @@ class _BookboxBookListPageState extends State<BookboxBookListPage> {
               ),
             ),
             ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
+              onPressed: () => Get.back(result: true),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green.shade600,
                 shape: RoundedRectangleBorder(
@@ -203,35 +203,25 @@ class _BookboxBookListPageState extends State<BookboxBookListPage> {
       );
 
       // Close loading dialog
-      Navigator.of(context).pop();
-
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Successfully took "${book.title}"',
-            style: const TextStyle(fontFamily: 'Kanit'),
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
+      Get.back();
 
       // Navigate back to previous screen
       Get.back();
       Get.back(); // Go back twice to return to the main screen
+
+      // Show success message
+      CustomSnackbars.success(
+        'Success',
+        'Successfully took "${book.title}"',
+      );
     } catch (e) {
       // Close loading dialog
-      Navigator.of(context).pop();
+      Get.back();
 
       // Show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to take book: ${e.toString()}',
-            style: const TextStyle(fontFamily: 'Kanit'),
-          ),
-          backgroundColor: Colors.red,
-        ),
+      CustomSnackbars.error(
+        'Error',
+        'Failed to take book: ${e.toString()}',
       );
     }
   }
