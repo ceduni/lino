@@ -616,7 +616,45 @@ class _BookBoxPageState extends State<BookBoxPage> {
                           }
                         },
                       ),
-                
+                      // Info button overlay
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                spreadRadius: 1,
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              if (bookBox.infoText != null && bookBox.infoText!.isNotEmpty) {
+                                _showInfoDialog(bookBox);
+                              } else {
+                                _openGoogleMapsApp(bookBox.latitude, bookBox.longitude);
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.directions,
+                              color: LinoColors.accent,
+                              size: 20,
+                            ),
+                            tooltip: 'Map interaction help',
+                            padding: const EdgeInsets.all(4),
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                          ),
+                        ),
+                      ),
 
                     ],
                   ),
