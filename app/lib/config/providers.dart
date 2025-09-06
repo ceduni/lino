@@ -1,3 +1,4 @@
+import 'package:Lino_app/vm/profile/transactions_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:nested/nested.dart';
 import 'package:Lino_app/vm/bookboxes/transactions/barcode_scanner_view_model.dart';
@@ -27,6 +28,7 @@ import 'package:Lino_app/vm/forum/request_form_view_model.dart';
 class AppProviders {
   static List<SingleChildWidget> get providers => [
     ChangeNotifierProvider<ProfileViewModel>(create: (_) => ProfileViewModel()),
+    ChangeNotifierProvider<TransactionsViewModel>(create: (_) => TransactionsViewModel()),
     ChangeNotifierProvider<OptionsViewModel>(create: (_) => OptionsViewModel()),
     ChangeNotifierProvider<ModifyProfileViewModel>(create: (_) => ModifyProfileViewModel()),
     ChangeNotifierProvider<FavouriteGenresViewModel>(create: (_) => FavouriteGenresViewModel()),

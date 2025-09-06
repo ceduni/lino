@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:Lino_app/models/search_model.dart';
-import 'package:Lino_app/services/bookbox_services.dart';
-import 'package:Lino_app/models/transaction_model.dart';
-import 'package:Lino_app/services/transaction_services.dart';
+import 'package:provider/provider.dart';
+import 'package:Lino_app/vm/profile/transactions_view_model.dart';
 import 'package:Lino_app/models/user_model.dart';
+
+import '../../models/transaction_model.dart';
 
 class TransactionsPage extends StatefulWidget {
   final User user;
-  
+
   const TransactionsPage({super.key, required this.user});
 
   @override
@@ -15,82 +15,35 @@ class TransactionsPage extends StatefulWidget {
 }
 
 class _TransactionsPageState extends State<TransactionsPage> {
-  List<Transaction> transactions = [];
-  bool isLoading = true;
-  String? error;
-
   @override
   void initState() {
     super.initState();
-    _loadTransactions();
-  }
-
-  Future<void> _loadTransactions() async {
-    try {
-      setState(() {
-        isLoading = true;
-        error = null;
-      });
-
-      final transactionService = TransactionServices();
-      final bookboxService = BookboxService();
-      
-      SearchModel<Transaction> searchResults = await transactionService.getUserTransactions(
-        widget.user.username,
-        limit: 100, 
-      );
-
-      final fetchedTransactions = searchResults.results;
-
-      final uniqueBookboxIds = fetchedTransactions
-          .map((t) => t.bookboxId)
-          .toSet()
-          .toList();
-
-      final Map<String, String> bookboxNames = {};
-      for (String bookboxId in uniqueBookboxIds) {
-        try {
-          final bookboxData = await bookboxService.getBookBox(bookboxId);
-          bookboxNames[bookboxId] = bookboxData.name;
-        } catch (e) {
-          print('Error fetching bookbox $bookboxId: $e');
-        }
-      }
-
-      final transactionsWithNames = fetchedTransactions.map((transaction) {
-        final bookboxName = bookboxNames[transaction.bookboxId];
-        return transaction.copyWith(bookboxName: bookboxName);
-      }).toList();
-
-      setState(() {
-        transactions = transactionsWithNames;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        error = 'Failed to load transactions';
-        isLoading = false;
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<TransactionsViewModel>().initialize(widget.user);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Transaction History'),
-        foregroundColor: const Color.fromARGB(255, 0, 0, 0),
-      ),
-      body: _buildBody(),
+    return Consumer<TransactionsViewModel>(
+      builder: (context, viewModel, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Transaction History'),
+            foregroundColor: const Color.fromARGB(255, 0, 0, 0),
+          ),
+          body: _buildBody(viewModel),
+        );
+      },
     );
   }
 
-  Widget _buildBody() {
-    if (isLoading && transactions.isEmpty) {
+  Widget _buildBody(TransactionsViewModel viewModel) {
+    if (viewModel.showLoadingIndicator) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (error != null && transactions.isEmpty) {
+    if (viewModel.hasError && !viewModel.hasTransactions) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -98,13 +51,13 @@ class _TransactionsPageState extends State<TransactionsPage> {
             const Icon(Icons.error, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              error!,
+              viewModel.error!,
               style: const TextStyle(color: Colors.red),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _loadTransactions,
+              onPressed: () => viewModel.refreshTransactions(widget.user),
               child: const Text('Retry'),
             ),
           ],
@@ -112,7 +65,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
       );
     }
 
-    if (transactions.isEmpty) {
+    if (!viewModel.hasTransactions) {
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -134,16 +87,141 @@ class _TransactionsPageState extends State<TransactionsPage> {
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: _loadTransactions,
-      child: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: transactions.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 8),
-        itemBuilder: (context, index) {
-          final transaction = transactions[index];
-          return _buildTransactionItem(transaction);
-        },
+    return Column(
+      children: [
+        // Transaction count header
+        if (viewModel.pagination != null)
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Icon(Icons.history, color: Colors.grey[600]),
+                const SizedBox(width: 8),
+                Text(
+                  '${viewModel.pagination!.totalResults} transactions total',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        // Transactions list
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: () => viewModel.refreshTransactions(widget.user),
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: viewModel.transactions.length + (viewModel.showBottomLoading ? 1 : 0),
+              separatorBuilder: (context, index) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                if (index == viewModel.transactions.length) {
+                  // Loading indicator at the bottom when loading more
+                  return const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                final transaction = viewModel.transactions[index];
+                return _buildTransactionItem(transaction);
+              },
+            ),
+          ),
+        ),
+
+        // Pagination controls
+        if (viewModel.hasPagination)
+          _buildPaginationControls(viewModel),
+      ],
+    );
+  }
+
+  Widget _buildPaginationControls(TransactionsViewModel viewModel) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        border: Border(top: BorderSide(color: Colors.grey[300]!)),
+      ),
+      child: Column(
+        children: [
+          // Page info and navigation
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Page ${viewModel.pagination!.currentPage} of ${viewModel.pagination!.totalPages}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: viewModel.pagination!.hasPrevPage && !viewModel.isLoading
+                        ? () => viewModel.loadPreviousPage(widget.user)
+                        : null,
+                    icon: const Icon(Icons.chevron_left),
+                    tooltip: 'Previous page',
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: viewModel.pagination!.hasNextPage && !viewModel.isLoading
+                        ? () => viewModel.loadNextPage(widget.user)
+                        : null,
+                    icon: const Icon(Icons.chevron_right),
+                    tooltip: 'Next page',
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // Page selector for small number of pages
+          if (viewModel.pagination!.totalPages <= 10)
+            const SizedBox(height: 8),
+          if (viewModel.pagination!.totalPages <= 10)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: List.generate(viewModel.pagination!.totalPages, (index) {
+                  final pageNumber = index + 1;
+                  final isCurrentPage = pageNumber == viewModel.pagination!.currentPage;
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: GestureDetector(
+                      onTap: isCurrentPage || viewModel.isLoading
+                          ? null
+                          : () => viewModel.goToPage(widget.user, pageNumber),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isCurrentPage ? Colors.blue : Colors.transparent,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isCurrentPage ? Colors.blue : Colors.grey[300]!,
+                          ),
+                        ),
+                        child: Text(
+                          pageNumber.toString(),
+                          style: TextStyle(
+                            color: isCurrentPage ? Colors.white : Colors.black,
+                            fontWeight: isCurrentPage ? FontWeight.bold : FontWeight.normal,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -201,11 +279,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
     final parts = <String>[
       transaction.timeAgo,
     ];
-    
+
     if (transaction.bookboxName != null && transaction.bookboxName!.isNotEmpty) {
       parts.insert(1, 'at ${transaction.bookboxName}');
     }
-    
+
     return parts.join(' • ');
   }
 }
