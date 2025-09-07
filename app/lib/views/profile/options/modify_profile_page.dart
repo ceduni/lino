@@ -47,19 +47,48 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                     //Image.asset('assets/logos/logo_without_bird.png', height: 150),
                     GestureDetector(
                       onTap: () {
-                        // todo faire profile picture change logic
+                        viewModel.showImagePickerOptions(context);
                       },
-                      child:
-                    CircleAvatar(
-                      radius: 70,
-                      backgroundColor: Colors.lightBlue[100],
-                      child: Icon(
-                        // cest juste un placeholder le temps d'add les icones
-                        Icons.edit,
-                        size: 70,
-                        color: LinoColors.accent,
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 70,
+                            backgroundColor: Colors.lightBlue[100],
+                            backgroundImage: viewModel.profileImage != null
+                                ? FileImage(viewModel.profileImage!)
+                                : null,
+                            child: viewModel.profileImage == null
+                                ? Icon(
+                                    Icons.person,
+                                    size: 70,
+                                    color: LinoColors.accent,
+                                  )
+                                : null,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  width: 4,
+                                  color: Colors.white,
+                                ),
+                                color: LinoColors.accent,
+                              ),
+                              child: Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),),
+                    ),
                     Spacer(flex: 1),
                     _buildTextField(viewModel.usernameController, 'Username', Icons.person),
                     SizedBox(height: 20),
