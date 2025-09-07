@@ -42,6 +42,7 @@ class SearchPageViewModel extends ChangeNotifier {
   // User location
   Position? _userPosition;
   bool _locationPermissionGranted = false;
+  double _maxDistance = 10.0; // Default search radius in km
 
   // Bookboxes results
   List<ShortenedBookBox> _bookboxResults = [];
@@ -63,6 +64,7 @@ class SearchPageViewModel extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  double get maxDistance => _maxDistance;
 
   // Bookboxes getters
   List<ShortenedBookBox> get bookboxResults => _bookboxResults;
@@ -293,6 +295,14 @@ class SearchPageViewModel extends ChangeNotifier {
     }
   }
 
+  // Method to update max distance and reload nearby bookboxes
+  Future<void> updateMaxDistance(double newDistance) async {
+    _maxDistance = newDistance;
+    if (_currentSearchType == SearchType.bookboxes && _searchQuery.isEmpty && _userPosition != null) {
+      await _loadNearbyBookboxes();
+    }
+  }
+
   Future<void> _searchBookboxes() async {
     final response = await _searchService.searchBookboxes(
       q: _searchQuery,
@@ -333,8 +343,8 @@ class SearchPageViewModel extends ChangeNotifier {
       final response = await _searchService.findNearestBookboxes(
         _userPosition!.longitude,
         _userPosition!.latitude,
-        maxDistance: 10.0, // 10km radius
-        limit: 20,
+        maxDistance: _maxDistance,
+        limit: 100,
         page: _bookboxCurrentPage,
       );
 

@@ -210,12 +210,7 @@ class _SearchPageState extends State<SearchPage> {
           ),
           Expanded(
             child: viewModel.bookboxResults.isEmpty
-                ? const Center(
-                    child: Text(
-                      'No bookboxes found in your area, try manually searching for one.',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  )
+                ? _buildNoBookboxesFoundWidget(viewModel)
                 : _buildBookboxResults(viewModel),
           ),
         ],
@@ -245,14 +240,14 @@ class _SearchPageState extends State<SearchPage> {
           _buildBookboxSortingFilter(viewModel),
         Expanded(
           child: viewModel.bookboxResults.isEmpty
-              ? Center(
-                  child: Text(
-                    viewModel.searchQuery.isEmpty 
-                      ? 'No bookboxes found in your area, try manually searching for one.'
-                      : 'No bookboxes found',
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                )
+              ? (viewModel.searchQuery.isEmpty 
+                  ? _buildNoBookboxesFoundWidget(viewModel)
+                  : const Center(
+                      child: Text(
+                        'No bookboxes found',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ))
               : ListView.builder(
                   itemCount: viewModel.bookboxResults.length,
                   itemBuilder: (context, index) {
@@ -743,6 +738,137 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildNoBookboxesFoundWidget(SearchPageViewModel viewModel) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.location_off,
+              size: 64,
+              color: Colors.grey.shade400,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No bookboxes found within ${viewModel.maxDistance.toStringAsFixed(1)} km',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Try expanding your search area or search manually',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () => _showDistanceAdjustmentDialog(context, viewModel),
+              icon: const Icon(Icons.tune),
+              label: const Text('Adjust Search Distance'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: LinoColors.accent,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDistanceAdjustmentDialog(BuildContext context, SearchPageViewModel viewModel) {
+    double tempDistance = viewModel.maxDistance;
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text(
+                'Adjust Search Distance',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Current distance: ${tempDistance.toStringAsFixed(1)} km',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 20),
+                  Slider(
+                    value: tempDistance,
+                    min: 1.0,
+                    max: 100.0,
+                    divisions: 49,
+                    activeColor: LinoColors.accent,
+                    label: '${tempDistance.toStringAsFixed(1)} km',
+                    onChanged: (double value) {
+                      setState(() {
+                        tempDistance = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '1 km',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      Text(
+                        '100 km',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    viewModel.updateMaxDistance(tempDistance);
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: LinoColors.accent,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Apply'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
