@@ -7,12 +7,14 @@ class MergedProfileStatsWidget extends StatelessWidget {
   final String userName;
   final int booksSaved;
   final double treesSaved;
+  final String? profilePictureUrl;
 
   const MergedProfileStatsWidget({
     super.key,
     required this.userName,
     required this.booksSaved,
     required this.treesSaved,
+    this.profilePictureUrl,
   });
 
   @override
@@ -43,11 +45,16 @@ class MergedProfileStatsWidget extends StatelessWidget {
           CircleAvatar(
             radius: 35,
             backgroundColor: Colors.blue.shade100,
-            child: Icon(
+            backgroundImage: profilePictureUrl != null && profilePictureUrl!.isNotEmpty
+                ? NetworkImage(profilePictureUrl!)
+                : null,
+            child: profilePictureUrl == null || profilePictureUrl!.isEmpty
+                ? Icon(
                     Icons.person,
                     size: 40,
                     color: Colors.blue.shade600,
                   )
+                : null,
           ),
           const SizedBox(width: 16),
           // Name and title

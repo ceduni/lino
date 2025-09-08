@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema({
             bookRequested: true
         }
     },
+    profilePictureUrl: { type: String, default: "" },
     numIssuesReported: { type: Number, default: 0 },
     numSavedBooks: { type: Number, default: 0 },
     followedBookboxes: { type: [String], default: [] }, // Array of bookbox IDs

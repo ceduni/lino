@@ -98,6 +98,19 @@ const UserService = {
         return user;
     },
 
+    async addProfilePicture(id: string, profilePictureUrl: string) {
+        console.log(`UserService: Adding profile picture for user ${id}: ${profilePictureUrl}`);
+        const user = await User.findById(id);
+        if (!user) {
+            throw newErr(404, 'User not found');
+        }
+        console.log(`UserService: User found, current profilePictureUrl: ${user.profilePictureUrl}`);
+        user.profilePictureUrl = profilePictureUrl;
+        await user.save();
+        console.log(`UserService: User saved with new profilePictureUrl: ${user.profilePictureUrl}`);
+        return user;
+    },
+
 
     async updateUser(
         id: string,

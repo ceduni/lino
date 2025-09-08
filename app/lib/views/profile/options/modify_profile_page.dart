@@ -13,6 +13,7 @@ class ModifyProfilePage extends StatefulWidget {
 }
 
 class _ModifyProfilePageState extends State<ModifyProfilePage> {
+  
   @override
   void initState() {
     super.initState();
@@ -54,10 +55,8 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                           CircleAvatar(
                             radius: 70,
                             backgroundColor: Colors.lightBlue[100],
-                            backgroundImage: viewModel.profileImage != null
-                                ? FileImage(viewModel.profileImage!)
-                                : null,
-                            child: viewModel.profileImage == null
+                            backgroundImage: _getProfileImage(viewModel),
+                            child: _getProfileImage(viewModel) == null
                                 ? Icon(
                                     Icons.person,
                                     size: 70,
@@ -65,6 +64,20 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                                   )
                                 : null,
                           ),
+                          if (viewModel.isUploadingImage)
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black.withOpacity(0.5),
+                                ),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
                           Positioned(
                             bottom: 0,
                             right: 0,
@@ -135,6 +148,16 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
         },
       ),
     );
+  }
+
+  ImageProvider? _getProfileImage(ModifyProfileViewModel viewModel) {
+    // Priority: local file > network URL > null
+    if (viewModel.profileImage != null) {
+      return FileImage(viewModel.profileImage!);
+    } else if (viewModel.profilePictureUrl != null && viewModel.profilePictureUrl!.isNotEmpty) {
+      return NetworkImage(viewModel.profilePictureUrl!);
+    }
+    return null;
   }
 
   Widget _buildTextField(

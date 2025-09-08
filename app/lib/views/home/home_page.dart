@@ -250,6 +250,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         userName: viewModel.userData!.username,
                         booksSaved: viewModel.userData!.numSavedBooks,
                         treesSaved: viewModel.userData!.ecologicalImpact.savedTrees,
+                        profilePictureUrl: viewModel.userData!.profilePictureUrl,
                       ),
                       /*
                       RecommendationWidget(

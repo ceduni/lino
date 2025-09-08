@@ -3,6 +3,7 @@ class User {
   final String username;
   final String email;
   final String? phone; 
+  final String? profilePictureUrl;
   final List<String> favouriteGenres;
   final int numSavedBooks;
   final List<String> followedBookboxes;
@@ -17,6 +18,7 @@ class User {
     required this.username,
     required this.email,
     this.phone,
+    this.profilePictureUrl,
     required this.favouriteGenres,
     this.numSavedBooks = 0,
     required this.followedBookboxes,
@@ -57,6 +59,7 @@ class User {
       username: json['username'],
       email: json['email'],
       phone: json['phone'],
+      profilePictureUrl: json['profilePictureUrl'],
       favouriteGenres: favouriteGenres,
       numSavedBooks: json['numSavedBooks'] ?? 0,
       followedBookboxes: followedBookboxes,

@@ -99,11 +99,16 @@ class _UserDashboardState extends State<UserDashboard> {
                 CircleAvatar(
                   radius: 35,
                   backgroundColor: Colors.lightBlue[100],
-                  child: Icon(
-                    Icons.person,
-                    size: 40,
-                    color: LinoColors.accent,
-                  ),
+                  backgroundImage: widget.user.profilePictureUrl != null && widget.user.profilePictureUrl!.isNotEmpty
+                      ? NetworkImage(widget.user.profilePictureUrl!)
+                      : null,
+                  child: widget.user.profilePictureUrl == null || widget.user.profilePictureUrl!.isEmpty
+                      ? Icon(
+                          Icons.person,
+                          size: 40,
+                          color: LinoColors.accent,
+                        )
+                      : null,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
