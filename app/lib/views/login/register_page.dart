@@ -111,9 +111,8 @@ class _RegisterPageState extends State<RegisterPage> {
           : () async {
         final token = await viewModel.register();
         if (token != null && mounted) {
-          Get.offAllNamed(AppRoutes.welcome, arguments: {
-            'username': viewModel.usernameController.text,
-          });
+          
+          Get.offAllNamed(AppRoutes.home.main);
         }
       },
       style: ElevatedButton.styleFrom(
