@@ -80,7 +80,14 @@ class _UserDashboardState extends State<UserDashboard> {
     return Column(
       children: [
         GestureDetector(
-          onTap: () => Get.toNamed(AppRoutes.profile.modify),
+          onTap: () async {
+            // Navigate to modify profile page and refresh when returning
+            await Get.toNamed(AppRoutes.profile.modify);
+            // Refresh profile data when returning from modify profile page
+            if (context.mounted) {
+              context.read<ProfileViewModel>().initialize();
+            }
+          },
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
