@@ -2,8 +2,12 @@ import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../models/transaction_model.dart';
 import '../../services/transaction_services.dart';
+import '../../utils/constants/routes.dart';
+import '../../views/profile/transactions_page.dart';
+import 'dart:math';
 
 class RecentTransactionsCard extends StatefulWidget {
   final User user;
@@ -92,14 +96,28 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-                  'Recent Transactions',
+            Row(
+              children: [
+                Text(
+                  'Your Bookbox Trail',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue[700],
                   ),
                 ),
+                const Spacer(),
+                if (transactions.isNotEmpty)
+                  TextButton(
+                    onPressed: () {
+                      Get.toNamed(AppRoutes.profile.transactions);
+                    },
+                    child: const Text('View All'),
+                  )
+                else 
+                  SizedBox.shrink(),
+              ],
+            ),
             SizedBox(height: 16),
             _buildTransactionsList(),
           ],
@@ -173,9 +191,9 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
     }
 
     return ListView.separated(
+      itemCount: min(transactions.length, 3), 
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      itemCount: transactions.length,
       separatorBuilder: (context, index) => Divider(height: 1),
       itemBuilder: (context, index) {
         final transaction = transactions[index];
@@ -187,23 +205,34 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
   Widget _buildTransactionItem(Transaction transaction) {
     final isAdded = transaction.action.toLowerCase() == 'added';
     final actionColor = isAdded ? Colors.green : Colors.orange;
-    final actionIcon = isAdded ? Icons.add_circle_outline : Icons.remove_circle_outline;
 
-    return ListTile(
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+      border: Border.all(
+        color: Colors.grey[300]!,
+        width: 1,
+      ),
+      borderRadius: BorderRadius.circular(8),
+      ),
+      child: ListTile(
+      /*
       contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
       leading: CircleAvatar(
         backgroundColor: actionColor.withValues(alpha: 0.1),
+        
         child: Icon(
-          actionIcon,
-          color: actionColor,
-          size: 20,
-        ),
+        actionIcon,
+        color: actionColor,
+        size: 20,
+        ), 
       ),
+      */
       title: Text(
         transaction.bookTitle,
         style: TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: 14,
+        fontWeight: FontWeight.w500,
+        fontSize: 14,
         ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
@@ -211,31 +240,31 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
       subtitle: Text(
         _buildSubtitleText(transaction),
         style: TextStyle(
-          color: Colors.grey[600],
-          fontSize: 12,
+        color: Colors.grey[600],
+        fontSize: 12,
         ),
       ),
       trailing: Container(
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: actionColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
+        color: actionColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          transaction.actionDisplayText,
-          style: TextStyle(
-            color: actionColor,
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-          ),
+        transaction.actionDisplayText,
+        style: TextStyle(
+          color: actionColor,
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
         ),
+        ),
+      ),
       ),
     );
   }
 
   String _buildSubtitleText(Transaction transaction) {
     final parts = <String>[
-      transaction.actionDisplayText,
       transaction.timeAgo,
     ];
     

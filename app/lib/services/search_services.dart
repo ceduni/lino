@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/models/issue_model.dart';
+import 'package:Lino_app/models/request_model.dart';
 import 'package:Lino_app/models/search_model.dart';
 import 'package:Lino_app/models/thread_model.dart';
 import 'package:Lino_app/utils/constants/api_constants.dart';
@@ -92,8 +93,13 @@ class SearchService {
     );
   }
 
-  Future<SearchModel<ExtendedBook>> searchBooks(
-      {String? q, String? cls, bool? asc, num? limit, num? page}) async {
+  Future<SearchModel<ExtendedBook>> searchBooks({
+    String? q,
+    String? cls,
+    bool? asc,
+    num? limit,
+    num? page
+  }) async {
     // Make a GET request to the server
     // Send the parameters to the server
     // If the server returns a 200 status code, the books are found
@@ -129,7 +135,13 @@ class SearchService {
   }
 
 
-  Future<SearchModel<Thread>> searchThreads({String? q, String? cls, bool? asc, num? limit, num? page}) async {
+  Future<SearchModel<Thread>> searchThreads({
+    String? q,
+    String? cls,
+    bool? asc,
+    num? limit,
+    num? page
+  }) async {
     var queryParams = {
       if (q != null && q.isNotEmpty) 'q': q,
       if (cls != null && cls.isNotEmpty) 'cls': cls,
@@ -155,7 +167,14 @@ class SearchService {
     );
   }
 
-  Future<SearchModel<Issue>> searchIssues({String? username, String? bookboxId, String? status, bool? oldestFirst, num? limit, num? page}) async {
+  Future<SearchModel<Issue>> searchIssues({
+    String? username,
+    String? bookboxId,
+    String? status,
+    bool? oldestFirst,
+    num? limit,
+    num? page
+  }) async {
     var queryParams = {
       if (username != null && username.isNotEmpty) 'username': username,
       if (bookboxId != null && bookboxId.isNotEmpty) 'bookboxId': bookboxId,
@@ -179,6 +198,43 @@ class SearchService {
       response,
       'issues',
       Issue.fromJson,
+    );
+  }
+
+  Future<SearchModel<Request>> searchRequests({
+    String? q,
+    String? token,
+    RequestFilter filter = RequestFilter.all,
+    RequestSortBy sortBy = RequestSortBy.date,
+    SortOrder sortOrder = SortOrder.desc,
+    num? limit,
+    num? page
+  }) async {
+    var queryParams = <String, String>{
+      if (q != null && q.isNotEmpty) 'q': q,
+      'filter': filter.value,
+      'sortBy': sortBy.value,
+      'sortOrder': sortOrder.value,
+      if (limit != null) 'limit': limit.toString(),
+      if (page != null) 'page': page.toString(),
+    };
+
+    final uri = Uri.parse('$url/search/requests').replace(queryParameters: queryParams);
+
+    final r = await http.get(uri, headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      if (token != null) 'Authorization': 'Bearer $token',
+    });
+
+    final response = jsonDecode(r.body);
+    if (r.statusCode != 200) {
+      throw Exception(response['error']);
+    }
+
+    return SearchModel<Request>.fromJson(
+      response,
+      'requests',
+      Request.fromJson,
     );
   }
 }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import mongoose from 'mongoose';
-import { BookBox } from "../models";
+import { BookBox, Transaction } from "../models";
 import { newErr } from "../utilities/utilities";
 
 const bookService = {
@@ -65,6 +65,13 @@ const bookService = {
         return results.length > 0 ? results[0] : null;
     },
  
+    async getBookStats(isbn: string) {
+        // Use transactions to get stats
+        const transactions = await Transaction.find({ isbn });
+        const totalAdded = transactions.filter(t => t.action === 'added').length;
+        const totalTook = transactions.filter(t => t.action === 'took').length;
+        return { totalAdded, totalTook };
+    }
 };
 
 export default bookService;

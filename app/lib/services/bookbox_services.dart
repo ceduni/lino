@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:Lino_app/utils/constants/api_constants.dart';
@@ -19,6 +20,17 @@ class BookboxService {
       throw Exception(response['error']);
     }
     return BookBox.fromJson(response);
+  }
+
+  Future<Book?> tryFindBookInBookBox(String bookBoxId, String isbn) async {
+    final bookbox = await getBookBox(bookBoxId);
+    try {
+      return bookbox.books.firstWhere(
+        (book) => book.isbn == isbn,
+      );
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<void> followBookBox(String token, String bookBoxId) async {

@@ -55,7 +55,11 @@ class _SearchPageState extends State<SearchPage> {
           ),
           filled: true,
           fillColor: Colors.grey[100],
-        ),
+          suffixIcon: viewModel.searchController.text.isNotEmpty ? IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: viewModel.searchController.clear
+          ): null
+        ) ,
       ),
     );
   }
@@ -125,15 +129,6 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildSearchResults(SearchPageViewModel viewModel) {
-    if (viewModel.searchQuery.isEmpty) {
-      return const Center(
-        child: Text(
-          'Enter a search term to find bookboxes or books',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
-        ),
-      );
-    }
-
     if (viewModel.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -186,6 +181,52 @@ class _SearchPageState extends State<SearchPage> {
       );
     }
 
+    // Show nearby bookboxes when search query is empty and we're on bookboxes tab
+    if (viewModel.searchQuery.isEmpty && viewModel.currentSearchType == SearchType.bookboxes) {
+      return Column(
+        children: [
+          // Header for nearby bookboxes
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Icon(Icons.location_on, color: LinoColors.accent),
+                const SizedBox(width: 8),
+                const Text(
+                  'Bookboxes near you',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: viewModel.loadNearbyBookboxes,
+                  icon: const Icon(Icons.refresh),
+                  tooltip: 'Refresh nearby bookboxes',
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: viewModel.bookboxResults.isEmpty
+                ? _buildNoBookboxesFoundWidget(viewModel)
+                : _buildBookboxResults(viewModel),
+          ),
+        ],
+      );
+    }
+
+    // Show empty state for books or when search query is empty for books
+    if (viewModel.searchQuery.isEmpty) {
+      return const Center(
+        child: Text(
+          'Enter a search term to find bookboxes or books',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
     return viewModel.currentSearchType == SearchType.bookboxes
         ? _buildBookboxResults(viewModel)
         : _buildBookResults(viewModel);
@@ -194,15 +235,19 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildBookboxResults(SearchPageViewModel viewModel) {
     return Column(
       children: [
-        _buildBookboxSortingFilter(viewModel),
+        // Only show sorting filter when there's a search query
+        if (viewModel.searchQuery.isNotEmpty)
+          _buildBookboxSortingFilter(viewModel),
         Expanded(
           child: viewModel.bookboxResults.isEmpty
-              ? const Center(
-                  child: Text(
-                    'No bookboxes found',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                )
+              ? (viewModel.searchQuery.isEmpty 
+                  ? _buildNoBookboxesFoundWidget(viewModel)
+                  : const Center(
+                      child: Text(
+                        'No bookboxes found',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ))
               : ListView.builder(
                   itemCount: viewModel.bookboxResults.length,
                   itemBuilder: (context, index) {
@@ -211,7 +256,7 @@ class _SearchPageState extends State<SearchPage> {
                   },
                 ),
         ),
-        if (viewModel.bookboxPagination != null)
+        if (viewModel.bookboxPagination != null && viewModel.bookboxResults.isNotEmpty)
           _buildBookboxPagination(viewModel),
       ],
     );
@@ -452,11 +497,27 @@ class _SearchPageState extends State<SearchPage> {
         _buildBookSortingFilter(viewModel),
         Expanded(
           child: viewModel.bookResults.isEmpty
-              ? const Center(
-                  child: Text(
-                    'No books found',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.book, size: 64, color: Colors.grey),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No books found for "${viewModel.searchQuery}"',
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        viewModel.createRequest(viewModel.searchQuery);
+                      }, 
+                      child: const Text('Create a new request for this book !', style: TextStyle(
+              fontFamily: 'Kanit',
+              fontWeight: FontWeight.w600,
+              color: LinoColors.accent,
+            )),
+                    ),
+                    
+                  ],
                 )
               : ListView.builder(
                   itemCount: viewModel.bookResults.length,
@@ -466,7 +527,7 @@ class _SearchPageState extends State<SearchPage> {
                   },
                 ),
         ),
-        if (viewModel.bookPagination != null)
+        if (viewModel.bookPagination != null && viewModel.bookResults.isNotEmpty)
           _buildBookPagination(viewModel),
       ],
     );
@@ -677,6 +738,137 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildNoBookboxesFoundWidget(SearchPageViewModel viewModel) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.location_off,
+              size: 64,
+              color: Colors.grey.shade400,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No bookboxes found within ${viewModel.maxDistance.toStringAsFixed(1)} km',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Try expanding your search area or search manually',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () => _showDistanceAdjustmentDialog(context, viewModel),
+              icon: const Icon(Icons.tune),
+              label: const Text('Adjust Search Distance'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: LinoColors.accent,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDistanceAdjustmentDialog(BuildContext context, SearchPageViewModel viewModel) {
+    double tempDistance = viewModel.maxDistance;
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text(
+                'Adjust Search Distance',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Current distance: ${tempDistance.toStringAsFixed(1)} km',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 20),
+                  Slider(
+                    value: tempDistance,
+                    min: 1.0,
+                    max: 100.0,
+                    divisions: 49,
+                    activeColor: LinoColors.accent,
+                    label: '${tempDistance.toStringAsFixed(1)} km',
+                    onChanged: (double value) {
+                      setState(() {
+                        tempDistance = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '1 km',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      Text(
+                        '100 km',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    viewModel.updateMaxDistance(tempDistance);
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: LinoColors.accent,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Apply'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

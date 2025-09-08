@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:Lino_app/models/book_model.dart';
+import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/utils/constants/api_constants.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -7,17 +9,8 @@ import 'package:http/http.dart' as http;
 class BookExchangeService {
   final String url = baseApiUrl;
 
-  Future<void> addBookToBB(String bookboxId,
-      {String? token,
-      String? isbn,
-      String? title,
-      List<String>? authors,
-      String? description,
-      String? coverImage,
-      String? publisher,
-      int? parutionYear,
-      int? pages,
-      List<String>? categories}) async {
+  Future<void> addBookToBB(String bookboxId, EditableBook book,
+      {String? token}) async {
     // Make a POST request to the server
     // Send the infos of the book
     // If the server returns a 201 status code, the book is added
@@ -32,16 +25,15 @@ class BookExchangeService {
       Uri.parse('$url/bookboxes/$bookboxId/books/add'),
       headers: headers,
       body: jsonEncode(<String, dynamic>{
-        'isbn': isbn,
-        'title': title,
-        'authors': authors,
-        'description': description,
-        'coverImage': coverImage,
-        'publisher': publisher,
-        'parutionYear': parutionYear,
-        'pages': pages,
-        'categories': categories,
-        'bookboxId': bookboxId,
+        'isbn': book.isbn,
+        'title': book.title,
+        'authors': book.authors,
+        'description': book.description,
+        'coverImage': book.coverImage,
+        'publisher': book.publisher,
+        'parutionYear': book.parutionYear,
+        'pages': book.pages,
+        'categories': book.categories,
       }),
     );
     final response = jsonDecode(r.body);
@@ -50,16 +42,23 @@ class BookExchangeService {
     }
   }
 
-  Future<void> getBookFromBB(String bookId, String bookboxId,
+  Future<void> getBookFromBB(String bookboxId, String isbn,
       {String? token}) async {
+    // First, get the books of the bookbox
     final headers = {
       if (token != null) 'Authorization': 'Bearer $token',
       'bm_token': dotenv.env['BOOK_MANIPULATION_TOKEN'] ?? 'not_set',
     };
 
-    // Make a DELETE request to the server
+    final book = await BookboxService()
+        .tryFindBookInBookBox(bookboxId, isbn);
+    if (book == null) {
+      throw Exception('Book not found in bookbox');
+    }
+
+    // Make the request to the server
     final r = await http.delete(
-      Uri.parse('$url/bookboxes/$bookboxId/books/$bookId'),
+      Uri.parse('$url/bookboxes/$bookboxId/books/${book.id}'),
       headers: headers,
     );
 

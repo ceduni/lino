@@ -25,7 +25,7 @@ const RequestService = {
 
         const userBoroughIds = user.favouriteLocations.map(location => location.boroughId);
 
-        // Find users who share favourite locations (by boroughId) or followed bookboxes
+        // Find users who share favourite locations (by boroughId) or follow chosen bookboxes
         const usersToNotify = await User.find({
             $and: [
                 {
@@ -34,12 +34,13 @@ const RequestService = {
                         ...(userBoroughIds.length > 0 ? [{
                             'favouriteLocations.boroughId': { $in: userBoroughIds }
                         }] : []),
-                        // Users who follow at least one of the same bookboxes
+                        // Users who follow at least one of the specified bookboxes
                         ...(bookboxIds.length > 0 ? [{
                             followedBookboxes: { $in: bookboxIds }
                         }] : [])
                     ]
                 },
+                // Users who have opted in for book request notifications
                 {
                     'notificationSettings.bookRequested': true
                 }
@@ -76,91 +77,6 @@ const RequestService = {
         await requestToDelete.deleteOne();
     },
 
-    async getBookRequests(
-        username?: string,
-        options: {
-            filter?: 'all' | 'notified' | 'upvoted' | 'mine';
-            sortBy?: 'date' | 'upvoters' | 'peopleNotified';
-            sortOrder?: 'asc' | 'desc';
-            userId?: string; // Required for 'notified', 'upvoted', and 'mine' filters
-        } = {}
-    ) {
-        const { filter = 'all', sortBy = 'date', sortOrder = 'desc', userId } = options;
-        
-        let query: any = {};
-        
-        // Apply username filter if provided
-        if (username) {
-            query.username = username;
-        }
-        
-        // Apply specific filters based on user interactions
-        if (filter === 'notified' && userId) {
-            // Get notifications for this user that have 'book_request' in reasons
-            const notifications = await Notification.find({
-                userId: userId,
-                reason: { $in: ['book_request'] },
-                requestId: { $exists: true, $ne: null }
-            });
-            
-            const requestIds = notifications.map(notification => notification.requestId);
-            query._id = { $in: requestIds };
-            
-        } else if (filter === 'upvoted' && userId) {
-            // Find user object to get username
-            const user = await User.findById(userId);
-            if (user) {
-                query.upvoters = { $in: [user.username] };
-            } else {
-                // If user not found, return empty result
-                return [];
-            }
-        } else if (filter === 'mine' && userId) {
-            // Get user's own requests
-            const user = await User.findById(userId);
-            if (user) {
-                query.username = user.username;
-            } else {
-                // If user not found, return empty result
-                return [];
-            }
-        }
-        
-        // Build the base query
-        let requestQuery = Request.find(query);
-        
-        // Apply sorting
-        let sortOptions: any = {};
-        
-        switch (sortBy) {
-            case 'date':
-                sortOptions.timestamp = sortOrder === 'asc' ? 1 : -1;
-                break;
-            case 'upvoters':
-                // Sort by number of upvoters (length of upvoters array)
-                const aggregationPipeline = [
-                    { $match: query },
-                    {
-                        $addFields: {
-                            upvotersCount: { $size: "$upvoters" }
-                        }
-                    },
-                    {
-                        $sort: {
-                            upvotersCount: (sortOrder === 'asc' ? 1 : -1) as 1 | -1
-                        }
-                    }
-                ];
-                return await Request.aggregate(aggregationPipeline);
-            case 'peopleNotified':
-                sortOptions.nbPeopleNotified = sortOrder === 'asc' ? 1 : -1;
-                break;
-            default:
-                sortOptions.timestamp = -1; // Default to newest first
-        }
-        
-        return await requestQuery.sort(sortOptions);
-    },
 
     async toggleSolvedStatus(id: string) {
         const bookRequest = await Request.findById(id);
@@ -181,13 +97,7 @@ const RequestService = {
             throw newErr(404, 'Request not found');
         }
 
-        const user = await User.findById(userId);
-        if (!user) {
-            throw newErr(404, 'User not found');
-        }
-
-        const username = user.username;
-        const upvoterIndex = bookRequest.upvoters.indexOf(username);
+        const upvoterIndex = bookRequest.upvoters.indexOf(userId);
         
         let isUpvoted: boolean;
         let message: string;
@@ -199,7 +109,7 @@ const RequestService = {
             message = 'Upvote removed successfully';
         } else {
             // User hasn't upvoted, add the upvote
-            bookRequest.upvoters.push(username);
+            bookRequest.upvoters.push(userId);
             isUpvoted = true;
             message = 'Request upvoted successfully';
         }

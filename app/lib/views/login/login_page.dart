@@ -1,14 +1,13 @@
 // app/lib/views/login/login_page.dart
+import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/vm/login/login_view_model.dart';
-import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
-  final SharedPreferences prefs;
-  const LoginPage({required this.prefs, super.key});
+  const LoginPage({super.key});
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -41,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
       top: 50,
       left: 16,
       child: IconButton(
-        onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
+        onPressed: () => Get.offAllNamed(AppRoutes.home.main),
         icon: const Icon(
           Icons.close,
           color: Colors.white,
@@ -94,19 +93,19 @@ class _LoginPageState extends State<LoginPage> {
       controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
+        hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.3)),
         filled: true,
         fillColor: const Color(0xFFE0F7FA),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.0),
           borderSide: BorderSide.none,
         ),
-        prefixIcon: Icon(icon, color: Colors.black.withOpacity(0.5)),
+        prefixIcon: Icon(icon, color: Colors.black.withValues(alpha: 0.5)),
         suffixIcon: hintText == 'Password'
             ? IconButton(
           icon: Icon(
             obscureText ? Icons.visibility_off : Icons.visibility,
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
           ),
           onPressed: onToggleVisibility,
         )
@@ -121,9 +120,9 @@ class _LoginPageState extends State<LoginPage> {
       onPressed: viewModel.isLoading
           ? null
           : () async {
-        final success = await viewModel.login(widget.prefs);
+        final success = await viewModel.login();
         if (success && mounted) {
-          Navigator.pushReplacementNamed(context, '/home');
+          Get.offAllNamed(AppRoutes.home.main);
         }
       },
       style: ElevatedButton.styleFrom(
@@ -157,12 +156,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RegisterPage(prefs: widget.prefs),
-                        ),
-                      );
+                      Get.toNamed(AppRoutes.auth.register);
                     },
                 ),
               ],
@@ -171,9 +165,9 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(height: 10),
           GestureDetector(
             onTap: () async {
-              await viewModel.openAsGuest(widget.prefs);
+              await viewModel.openAsGuest();
               if (mounted) {
-                Navigator.pushReplacementNamed(context, '/home');
+                Get.offNamed(AppRoutes.home.main);
               }
             },
             child: const Text(

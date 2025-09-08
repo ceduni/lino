@@ -73,5 +73,12 @@
 	<array>
     	<string>applinks:ceduni-lino.netlify.app</string>
 	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>comgooglemaps</string>
+		<string>googlemaps</string>
+		<string>waze</string>
+		<string>maps</string>
+	</array>
 </dict>
 </plist>

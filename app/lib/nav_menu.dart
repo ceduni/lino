@@ -1,9 +1,9 @@
+import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:Lino_app/views/search/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // import 'package:Lino_app/pages/map/map_screen.dart';
-import 'package:Lino_app/pages/floating_button/floating_action_button.dart';
-import 'package:Lino_app/pages/forum/forum_screen.dart';
+import 'package:Lino_app/views/forum/forum_screen.dart';
 // import 'package:Lino_app/pages/forum/requests_section.dart';
 import 'package:Lino_app/views/layout/appbar.dart';
 import 'package:Lino_app/views/profile/profile_page.dart';
@@ -47,25 +47,6 @@ class _BookNavPageState extends State<BookNavPage> {
 
     return Scaffold(
       appBar: OBxLinoAppBar(controller: controller),
-      floatingActionButton: Obx(() {
-        if (controller.selectedIndex.value == 0 || controller.selectedIndex.value == 3) {
-          // pr cacher
-          return SizedBox.shrink();
-        } else if (controller.selectedIndex.value == 2) {
-          // Requests page is active
-          return LinoFloatingButton(
-            selectedIndex: controller.selectedIndex.value,
-            // onThreadCreated: () => // Commented out - threads functionality removed
-            //     controller.forumScreenKey.currentState?.refreshThreads(),
-            onRequestCreated: () =>
-                controller.forumScreenKey.currentState?.refreshRequests(),
-          );
-        } else {
-          // Default Floating Button
-          return LinoFloatingButton(
-              selectedIndex: controller.selectedIndex.value);
-        }
-      }),
       bottomNavigationBar: _buildNavigationBar(context, controller),
       body: Obx(() => controller.screens[controller.selectedIndex.value]),
     );
@@ -88,7 +69,7 @@ class _BookNavPageState extends State<BookNavPage> {
                 if (index == 3) { // Profile tab index
                   if (!isLoggedIn) {
                     // User not logged in, redirect to login instead of showing profile tab
-                    Navigator.of(context).pushReplacementNamed('/login');
+                    Get.offNamed(AppRoutes.auth.login);
                   } else {
                     // User logged in, show profile tab like other tabs
                     controller.selectedIndex.value = index;
@@ -133,8 +114,6 @@ class _BookNavPageState extends State<BookNavPage> {
 
 class NavigationController extends GetxController {
   late Rx<int> selectedIndex = 0.obs;
-  final GlobalKey<ForumScreenState> forumScreenKey =
-  GlobalKey<ForumScreenState>();
   final RxString sourcePage = ''.obs;
   late String forumQuery;
 
@@ -146,7 +125,7 @@ class NavigationController extends GetxController {
       HomePage(),
       SearchPage(),
       //MapScreen(),
-      ForumScreen(key: forumScreenKey, query: forumQuery),
+      ForumScreen(query: forumQuery),
       ProfilePage()
     ];
   }
@@ -154,9 +133,7 @@ class NavigationController extends GetxController {
   void navigateToForumWithQuery(String query) {
     forumQuery = query;
     selectedIndex.value = 2; // Set to Requests tab
-    screens[2] = ForumScreen(
-        key: forumScreenKey,
-        query: forumQuery); // Update ForumScreen with new query
+    screens[2] = ForumScreen(query: forumQuery); // Update ForumScreen with new query
   }
 }
 

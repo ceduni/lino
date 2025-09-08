@@ -21,6 +21,16 @@ class SearchModel<T> {
   }
 }
 
+
+enum SortOrder {
+  asc('asc'),
+  desc('desc');
+
+  const SortOrder(this.value);
+  final String value;
+}
+
+
 class Pagination {
   final int currentPage;
   final int totalPages;

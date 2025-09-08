@@ -76,3 +76,40 @@ export const getBookSchema = {
         }
     }
 };
+
+
+export const getBookStatsSchema = {
+    description: 'Get book stats',
+    tags: ['books'],
+    params: {
+        type: 'object',
+        properties: {   
+            isbn: { type: 'string' }
+        },
+        required: ['isbn']
+    },
+    response: {
+        200: {
+            description: 'Book stats',
+            type: 'object',
+            properties: {
+                totalAdded: { type: 'number' },
+                totalTook: { type: 'number' }
+            }
+        },
+        404: {
+            description: 'Error message',
+            type: 'object',
+            properties: {
+                error: { type: 'string' }
+            }
+        },
+        500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+                error: {type: 'string'}
+            },
+        }
+    }
+};

@@ -1,8 +1,10 @@
 // app/lib/vm/profile_view_model.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/services/user_services.dart';
+import 'package:Lino_app/utils/constants/routes.dart';
 
 class ProfileViewModel extends ChangeNotifier {
   String? _token;
@@ -60,11 +62,7 @@ class ProfileViewModel extends ChangeNotifier {
     if (confirmed == true) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('token');
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/login',
-            (Route<dynamic> route) => false,
-      );
+      Get.offAllNamed(AppRoutes.auth.login);
     }
   }
 }

@@ -1,15 +1,13 @@
 // app/lib/views/login/register_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Lino_app/vm/login/register_view_model.dart';
-import 'onboarding/favourite_genres_input_page.dart';
-import 'login_page.dart';
+import '../../utils/constants/routes.dart';
 
 class RegisterPage extends StatefulWidget {
-  final SharedPreferences prefs;
-  const RegisterPage({required this.prefs, super.key});
+  const RegisterPage({super.key});
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -82,19 +80,19 @@ class _RegisterPageState extends State<RegisterPage> {
       controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
+        hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.3)),
         filled: true,
         fillColor: const Color(0xFFE0F7FA),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.0),
           borderSide: BorderSide.none,
         ),
-        prefixIcon: Icon(icon, color: Colors.black.withOpacity(0.5)),
+        prefixIcon: Icon(icon, color: Colors.black.withValues(alpha: 0.5)),
         suffixIcon: hintText == 'Password'
             ? IconButton(
           icon: Icon(
             obscureText ? Icons.visibility_off : Icons.visibility,
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
           ),
           onPressed: onToggleVisibility,
         )
@@ -111,19 +109,11 @@ class _RegisterPageState extends State<RegisterPage> {
       onPressed: viewModel.isLoading
           ? null
           : () async {
-        final token = await viewModel.register(widget.prefs);
+        final token = await viewModel.register();
         if (token != null && mounted) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => WelcomeScreen(
-                username: viewModel.usernameController.text,
-                token: token,
-                prefs: widget.prefs,
-              ),
-            ),
-                (route) => false,
-          );
+          Get.offAllNamed(AppRoutes.welcome, arguments: {
+            'username': viewModel.usernameController.text,
+          });
         }
       },
       style: ElevatedButton.styleFrom(
@@ -142,10 +132,7 @@ class _RegisterPageState extends State<RegisterPage> {
       alignment: Alignment.center,
       child: GestureDetector(
         onTap: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => LoginPage(prefs: widget.prefs)),
-          );
+          Get.offNamed(AppRoutes.auth.login);
         },
         child: RichText(
           text: const TextSpan(
@@ -168,14 +155,7 @@ class _RegisterPageState extends State<RegisterPage> {
 }
 
 class WelcomeScreen extends StatefulWidget {
-  final String username;
-  final String token;
-  final SharedPreferences prefs;
-
   const WelcomeScreen({
-    required this.username,
-    required this.token,
-    required this.prefs,
     super.key,
   });
 
@@ -184,21 +164,17 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  late String username;
+
   @override
   void initState() {
     super.initState();
+    final args = Get.arguments as Map<String, dynamic>;
+    username = args['username'] ?? '';
+
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FavouriteGenresInputPage(
-              token: widget.token,
-              prefs: widget.prefs,
-            ),
-          ),
-              (route) => false,
-        );
+        Get.offAllNamed(AppRoutes.auth.onboarding.favouriteGenres);
       }
     });
   }
@@ -209,7 +185,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       backgroundColor: const Color(0xFF4277B8),
       body: Center(
         child: Text(
-          'Welcome, ${widget.username}!',
+          'Welcome, $username!',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 32,

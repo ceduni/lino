@@ -62,6 +62,7 @@ class FavouriteGenresViewModel extends ChangeNotifier {
       final user = await userService.getUser(_token!);
       final favouriteGenres = user.favouriteGenres;
 
+      _selectedGenres.clear();
       for (var item in favouriteGenres) {
         _selectedGenres.add(item);
       }

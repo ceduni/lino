@@ -1,8 +1,10 @@
 // app/lib/pages/bookbox/book_box_issue_report_page.dart
 import 'package:Lino_app/vm/bookboxes/book_box_issue_report_view_model.dart';
+import 'package:Lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
 
 class BookBoxIssueReportPage extends StatefulWidget {
   final String bookboxId;
@@ -39,7 +41,7 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
                 color: Colors.white,
               ),
             ),
-            backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+            backgroundColor: LinoColors.accent,
             foregroundColor: Colors.white,
             elevation: 2,
           ),
@@ -195,18 +197,15 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
             if (result['success']) {
               Get.back(result: result);
             } else {
-              Get.snackbar(
+              CustomSnackbars.error(
                 'Error',
                 'Failed to report issue: ${result['error']}',
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: Colors.red,
-                colorText: Colors.white,
               );
             }
           }
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+          backgroundColor: LinoColors.accent,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 3,

@@ -1,5 +1,7 @@
 // app/lib/views/favourite_locations_page.dart
+import 'package:Lino_app/models/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
@@ -267,7 +269,7 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
     );
   }
 
-  void _showRemoveLocationDialog(location) {
+  void _showRemoveLocationDialog(FavouriteLocation location) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -276,12 +278,12 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
           content: Text('Remove "${location.name}" from your favourite locations?'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Get.back(),
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Get.back();
                 context.read<FavouriteLocationsViewModel>().removeFavouriteLocation(location);
               },
               child: const Text('Remove', style: TextStyle(color: Colors.red)),
@@ -317,7 +319,7 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Get.back(),
               child: const Text('Got it'),
             ),
           ],
@@ -335,12 +337,12 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
           content: const Text('Are you sure you want to remove all favourite locations?'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Get.back(),
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Get.back();
                 viewModel.clearAllLocations();
               },
               child: const Text('Clear All', style: TextStyle(color: Colors.red)),

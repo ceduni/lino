@@ -1,14 +1,22 @@
 // app/lib/pages/bookbox/book_box_page.dart
+import 'dart:io';
+import 'package:Lino_app/models/book_model.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/views/bookboxes/book_box_issue_report_page.dart';
-import 'package:Lino_app/services/bookbox_state_service.dart';
+import 'package:Lino_app/views/bookboxes/transactions/barcode_scanner_page.dart';
+import 'package:Lino_app/views/books/book_details_page.dart';
 import 'package:Lino_app/vm/bookboxes/book_box_view_model.dart';
+import 'package:Lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:Lino_app/vm/search/search_page_view_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:Lino_app/utils/constants/colors.dart';
+
 
 class BookBoxPage extends StatefulWidget {
   const BookBoxPage({super.key});
@@ -18,7 +26,6 @@ class BookBoxPage extends StatefulWidget {
 }
 
 class _BookBoxPageState extends State<BookBoxPage> {
-  final BookBoxStateService _stateService = Get.find<BookBoxStateService>();
   String? bookBoxId;
   bool canInteract = false;
 
@@ -38,17 +45,106 @@ class _BookBoxPageState extends State<BookBoxPage> {
         viewModel.loadBookBoxData(bookBoxId!);
         viewModel.checkAuthAndFollowStatus(bookBoxId!);
       });
-
-      _stateService.listenToRefresh(() {
-        if (mounted) {
-          context.read<BookBoxViewModel>().refreshData(bookBoxId!);
-        }
-      });
     }
   }
 
   String _getTimeAgo(DateTime dateAdded) {
     return timeago.format(dateAdded, locale: 'en');
+  }
+
+
+  void _showInfoDialog(BookBox bookBox) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on,
+                      color: LinoColors.accent,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        bookBox.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Kanit',
+                          color: LinoColors.accent,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    bookBox.infoText!,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Kanit',
+                      color: LinoColors.textPrimary,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Get.back();
+                      _openGoogleMapsApp(bookBox.latitude, bookBox.longitude);
+                    },
+                    icon: const Icon(Icons.directions, color: Colors.white),
+                    label: const Text(
+                      'Get Directions',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Kanit',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: LinoColors.accent,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -71,79 +167,19 @@ class _BookBoxPageState extends State<BookBoxPage> {
     return Consumer<BookBoxViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
-          backgroundColor: const Color.fromRGBO(245, 245, 235, 1),
+          backgroundColor: LinoColors.lightContainer,
           appBar: AppBar(
-            title: const Text(
-              'BookBox Details',
+            title: Text(
+              viewModel.bookBox?.name ?? 'BookBox',
               style: TextStyle(
                 fontFamily: 'Kanit',
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
-            backgroundColor: const Color.fromRGBO(101, 67, 33, 1),
+            backgroundColor: LinoColors.accent,
             foregroundColor: Colors.white,
             elevation: 2,
-            actions: [
-              IconButton(
-                onPressed: () async {
-                  final result = await Get.to(() => BookBoxIssueReportPage(bookboxId: bookBoxId!));
-                  if (result != null && result['success'] == true) {
-                    Get.snackbar(
-                      'Success',
-                      result['message'] ?? 'Issue reported successfully',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white,
-                    );
-                  }
-                },
-                icon: const Icon(Icons.report, color: Colors.white),
-                tooltip: 'Report Issue',
-              ),
-              if (viewModel.token != null)
-                viewModel.isCheckingFollowStatus
-                    ? const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  ),
-                )
-                    : IconButton(
-                  onPressed: () async {
-                    final success = await viewModel.toggleFollow(bookBoxId!);
-                    if (success) {
-                      Get.snackbar(
-                        viewModel.isFollowed ? 'Following' : 'Unfollowed',
-                        viewModel.isFollowed
-                            ? 'You are now following this BookBox'
-                            : 'You have unfollowed this BookBox',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: viewModel.isFollowed ? Colors.green : Colors.orange,
-                        colorText: Colors.white,
-                      );
-                    } else {
-                      Get.snackbar(
-                        'Error',
-                        'Failed to ${viewModel.isFollowed ? 'unfollow' : 'follow'} BookBox',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.red,
-                        colorText: Colors.white,
-                      );
-                    }
-                  },
-                  icon: Icon(
-                    viewModel.isFollowed ? Icons.favorite : Icons.favorite_border,
-                    color: viewModel.isFollowed ? Colors.red : Colors.white,
-                  ),
-                  tooltip: viewModel.isFollowed ? 'Unfollow BookBox' : 'Follow BookBox',
-                ),
-            ],
           ),
           body: SafeArea(
             child: _buildBody(viewModel),
@@ -157,7 +193,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
     if (viewModel.isLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(101, 67, 33, 1)),
+          valueColor: AlwaysStoppedAnimation<Color>(LinoColors.lightContainer),
         ),
       );
     }
@@ -196,6 +232,20 @@ class _BookBoxPageState extends State<BookBoxPage> {
     return _buildContent(viewModel.bookBox!);
   }
 
+  Widget _buildMapSection(BookBox bookBox) {
+    return GoogleMap(initialCameraPosition: CameraPosition(
+      target: LatLng(bookBox.latitude, bookBox.longitude),
+      zoom: 15,
+    ),
+    markers: {
+      Marker(
+        markerId: MarkerId(bookBox.id),
+        position: LatLng(bookBox.latitude, bookBox.longitude),
+        infoWindow: InfoWindow(title: bookBox.name),
+      ),
+    },);
+  }
+
   Widget _buildContent(BookBox bookBox) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -203,11 +253,51 @@ class _BookBoxPageState extends State<BookBoxPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!bookBox.isActive) _buildMaintenanceBanner(),
-          _buildBookBoxInfoCard(bookBox),
-          const SizedBox(height: 20),
+          _buildBookBoxInfoCard(bookBox, context.read<BookBoxViewModel>()),
+          if (canInteract) const SizedBox(height: 20),
           _buildActionButtons(bookBox),
+          if (!canInteract) ...[
+            const SizedBox(height: 20),
+            _buildBooksSection(bookBox),
+          ],
           const SizedBox(height: 20),
-          _buildBooksSection(bookBox),
+          if (!canInteract)
+          TextButton(
+            onPressed: () {
+              final searchViewModel = context.read<SearchPageViewModel>();
+              searchViewModel.createRequest("");
+            },
+            
+            child: const Center(child: Text("Didn't find your book? Create a new request !", style: TextStyle(
+              fontFamily: 'Kanit',
+              fontWeight: FontWeight.w600,
+              color: LinoColors.accent,
+            ),)),
+
+          ),
+          Center(
+            child: TextButton.icon(
+              onPressed: () async {
+                  final result = await Get.to(() => BookBoxIssueReportPage(bookboxId: bookBoxId!));
+                  if (result != null && result['success'] == true) {
+                    CustomSnackbars.success(
+                      'Success',
+                      result['message'] ?? 'Issue reported successfully',
+                    );
+                  }
+                },
+              icon: const Icon(Icons.flag),
+              label: const Text('Report issue with this BookBox'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+                textStyle: const TextStyle(
+                  fontFamily: 'Kanit',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+
         ],
       ),
     );
@@ -258,7 +348,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
     );
   }
 
-  Widget _buildBookBoxInfoCard(BookBox bookBox) {
+  Widget _buildBookBoxInfoCard(BookBox bookBox, BookBoxViewModel viewModel) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -269,8 +359,8 @@ class _BookBoxPageState extends State<BookBoxPage> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color.fromRGBO(250, 250, 240, 1),
-              Color.fromRGBO(245, 245, 235, 1),
+              LinoColors.lightContainer,
+              LinoColors.lightContainer,
             ],
           ),
         ),
@@ -295,54 +385,255 @@ class _BookBoxPageState extends State<BookBoxPage> {
                       ),
                     ],
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      bookBox.image!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey.shade300,
-                          child: const Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              Text(
-                bookBox.name,
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Kanit',
-                  color: Color.fromRGBO(101, 67, 33, 1),
-                ),
-              ),
-              const SizedBox(height: 12),
-              if (bookBox.infoText != null && bookBox.infoText!.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color.fromRGBO(101, 67, 33, 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
+                  child: Stack(
                     children: [
-                      const Icon(Icons.location_on, color: Color.fromRGBO(101, 67, 33, 1), size: 20),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          bookBox.infoText!,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'Kanit',
-                            color: Color.fromRGBO(101, 67, 33, 1),
-                          ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          bookBox.image!,
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey.shade300,
+                              child: const Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
+                            );
+                          },
                         ),
                       ),
+                      // Heart button for follow/unfollow
+                      if (viewModel.token != null)
+                        Positioned(
+                          top: 12,
+                          right: 12,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  spreadRadius: 1,
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: viewModel.isCheckingFollowStatus
+                                ? const Padding(
+                                    padding: EdgeInsets.all(3.0),
+                                    child: SizedBox(
+                                      width: 26,
+                                      height: 26,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(101, 67, 33, 1)),
+                                      ),
+                                    ),
+                                  )
+                                : IconButton(
+                                    onPressed: () async {
+                                      final success = await viewModel.toggleFollow(bookBoxId!);
+                                      if (success) {
+                                        CustomSnackbars.success(
+                                          viewModel.isFollowed ? 'Following' : 'Unfollowed',
+                                          viewModel.isFollowed
+                                              ? 'You are now following this BookBox'
+                                              : 'You have unfollowed this BookBox',
+                                        );
+                                      } else {
+                                        CustomSnackbars.error(
+                                          'Error',
+                                          'Failed to ${viewModel.isFollowed ? 'unfollow' : 'follow'} BookBox',
+                                        );
+                                      }
+                                    },
+                                    icon: Icon(
+                                      viewModel.isFollowed ? Icons.favorite : Icons.favorite_border,
+                                      color: viewModel.isFollowed ? Colors.red : Colors.grey.shade600,
+                                      size: 26,
+                                    ),
+                                    tooltip: viewModel.isFollowed ? 'Unfollow BookBox' : 'Follow BookBox',
+                                    padding: const EdgeInsets.all(2),
+                                    constraints: const BoxConstraints(
+                                      minWidth: 26,
+                                      minHeight: 26,
+                                    ),
+                                  ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
+              
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        bookBox.name,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Kanit',
+                          color: LinoColors.buttonPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  /*
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (!canInteract)
+                        IconButton(
+                          onPressed: () => _openGoogleMapsApp(bookBox.latitude, bookBox.longitude),
+                          icon: const Icon(
+                            Icons.directions,
+                            color: Color.fromRGBO(101, 67, 33, 1),
+                          ),
+                          tooltip: 'Get Directions',
+                        ),
+                      if (viewModel.token != null)
+                        viewModel.isCheckingFollowStatus
+                            ? const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(101, 67, 33, 1)),
+                            ),
+                          ),
+                        )
+                            : IconButton(
+                          onPressed: () async {
+                            final success = await viewModel.toggleFollow(bookBoxId!);
+                            if (success) {
+                              Get.snackbar(
+                                viewModel.isFollowed ? 'Following' : 'Unfollowed',
+                                viewModel.isFollowed
+                                    ? 'You are now following this BookBox'
+                                    : 'You have unfollowed this BookBox',
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: viewModel.isFollowed ? Colors.green : Colors.orange,
+                                colorText: Colors.white,
+                              );
+                            } else {
+                              Get.snackbar(
+                                'Error',
+                                'Failed to ${viewModel.isFollowed ? 'unfollow' : 'follow'} BookBox',
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white,
+                              );
+                            }
+                          },
+                          icon: Icon(
+                            viewModel.isFollowed ? Icons.favorite : Icons.favorite_border,
+                            color: viewModel.isFollowed ? Colors.red : Color.fromRGBO(101, 67, 33, 1),
+                          ),
+                          tooltip: viewModel.isFollowed ? 'Unfollow BookBox' : 'Follow BookBox',
+                        ),
+                    ],
+                  ), */
+                ],
+              ),
+              const SizedBox(height: 16),
+              Container(
+                height: 120,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      spreadRadius: 1,
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Stack(
+                    children: [
+                      GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(bookBox.latitude, bookBox.longitude),
+                          zoom: 15,
+                        ),
+                        markers: {
+                          Marker(
+                            markerId: MarkerId(bookBox.id),
+                            position: LatLng(bookBox.latitude, bookBox.longitude),
+                            infoWindow: InfoWindow(title: bookBox.name),
+                          ),
+                        },
+                        zoomControlsEnabled: false,
+                        scrollGesturesEnabled: false,
+                        zoomGesturesEnabled: false,
+                        tiltGesturesEnabled: false,
+                        rotateGesturesEnabled: false,
+                        mapToolbarEnabled: false,
+                        myLocationButtonEnabled: false,
+                                                onTap: (_) {
+                          if (bookBox.infoText != null && bookBox.infoText!.isNotEmpty) {
+                            _showInfoDialog(bookBox);
+                          } else {
+                            _openGoogleMapsApp(bookBox.latitude, bookBox.longitude);
+                          }
+                        },
+                      ),
+                      // Info button overlay
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                spreadRadius: 1,
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              if (bookBox.infoText != null && bookBox.infoText!.isNotEmpty) {
+                                _showInfoDialog(bookBox);
+                              } else {
+                                _openGoogleMapsApp(bookBox.latitude, bookBox.longitude);
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.directions,
+                              color: LinoColors.accent,
+                              size: 20,
+                            ),
+                            tooltip: 'Map interaction help',
+                            padding: const EdgeInsets.all(4),
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    ],
+                  ),
+                ),
+              ),
+              
             ],
           ),
         ),
@@ -352,14 +643,6 @@ class _BookBoxPageState extends State<BookBoxPage> {
 
   Widget _buildActionButtons(BookBox bookBox) {
     List<Widget> buttons = [];
-
-    if (!canInteract) {
-      buttons.add(
-        Expanded(
-          child: _buildDirectionButton(LatLng(bookBox.latitude, bookBox.longitude)),
-        ),
-      );
-    }
 
     if (canInteract) {
       buttons.addAll([
@@ -373,40 +656,17 @@ class _BookBoxPageState extends State<BookBoxPage> {
     return Row(children: buttons);
   }
 
-  Widget _buildDirectionButton(LatLng location) {
-    return ElevatedButton.icon(
-      onPressed: () => _openGoogleMapsApp(location.latitude, location.longitude),
-      icon: const Icon(Icons.directions, color: Colors.white),
-      label: const Text(
-        'Get Directions',
-        style: TextStyle(color: Colors.white, fontFamily: 'Kanit', fontWeight: FontWeight.w600),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromRGBO(142, 199, 233, 1),
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 3,
-      ),
-    );
-  }
-
   Widget _buildAddBookButton(bool isActive) {
     return ElevatedButton.icon(
       onPressed: isActive ? () {
-        Get.snackbar(
-          'Add Book',
-          'Add book functionality will be implemented',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+        Get.to(
+          () => BarcodeScannerPage(addingBook: true, bookboxId: bookBoxId!),
         );
       } : () {
-        Get.snackbar(
+
+        CustomSnackbars.alert(
           'BookBox Under Maintenance',
           'Cannot add books while BookBox is deactivated for maintenance',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
         );
       },
       icon: Icon(Icons.add, color: isActive ? Colors.white : Colors.grey.shade400),
@@ -430,20 +690,13 @@ class _BookBoxPageState extends State<BookBoxPage> {
   Widget _buildRemoveBookButton(bool isActive) {
     return ElevatedButton.icon(
       onPressed: isActive ? () {
-        Get.snackbar(
-          'Take Book',
-          'Remove book functionality will be implemented',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+        Get.to(
+          () => BarcodeScannerPage(addingBook: false, bookboxId: bookBoxId!),
         );
       } : () {
-        Get.snackbar(
+        CustomSnackbars.alert(
           'BookBox Under Maintenance',
           'Cannot remove books while BookBox is deactivated for maintenance',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
         );
       },
       icon: Icon(Icons.remove, color: isActive ? Colors.white : Colors.grey.shade400),
@@ -471,7 +724,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: const Color.fromRGBO(242, 226, 196, 1),
+          color: LinoColors.lightContainer,
         ),
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -479,7 +732,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
           children: [
             Row(
               children: [
-                const Icon(Icons.library_books, color: Color.fromRGBO(101, 67, 33, 1), size: 24),
+                const Icon(Icons.library_books, color: LinoColors.accent, size: 24),
                 const SizedBox(width: 8),
                 const Text(
                   'Books Available',
@@ -487,14 +740,14 @@ class _BookBoxPageState extends State<BookBoxPage> {
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Kanit',
-                    color: Color.fromRGBO(101, 67, 33, 1),
+                    color: LinoColors.accent,
                   ),
                 ),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color.fromRGBO(101, 67, 33, 1),
+                    color: LinoColors.accent.withAlpha(400),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -540,7 +793,9 @@ class _BookBoxPageState extends State<BookBoxPage> {
                 ),
                 itemCount: bookBox.books.length,
                 itemBuilder: (context, index) {
-                  return _buildBookCard(bookBox.books[index]);
+                  Book book = bookBox.books[index];
+                  ExtendedBook extendedBook = ExtendedBook.fromBook(book, bookBox.id, bookBox.name);
+                  return _buildBookCard(extendedBook);
                 },
               ),
           ],
@@ -549,9 +804,9 @@ class _BookBoxPageState extends State<BookBoxPage> {
     );
   }
 
-  Widget _buildBookCard(book) {
-    String title = book.title ?? 'Unknown Title';
-    List<String> authors = book.authors ?? [];
+  Widget _buildBookCard(ExtendedBook book) {
+    String title = book.title;
+    List<String> authors = book.authors;
     String authorsString = authors.isNotEmpty ? authors.join(', ') : 'Unknown Author';
     String timeAgo = _getTimeAgo(book.dateAdded);
 
@@ -560,11 +815,9 @@ class _BookBoxPageState extends State<BookBoxPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: InkWell(
         onTap: () {
-          Get.snackbar(
-            'Book Details',
-            'Opening details for: $title',
-            snackPosition: SnackPosition.BOTTOM,
-          );
+          Get.to(
+            () => BookDetailsPage(book: book, fromBookbox: true)
+            );
         },
         borderRadius: BorderRadius.circular(8),
         child: Container(
@@ -596,16 +849,19 @@ class _BookBoxPageState extends State<BookBoxPage> {
                 flex: 2,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Kanit',
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Kanit',
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -618,7 +874,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 4),
                     Text(
                       'Added $timeAgo',
                       style: TextStyle(
@@ -668,6 +924,79 @@ class _BookBoxPageState extends State<BookBoxPage> {
   }
 
   Future<void> _openGoogleMapsApp(double latitude, double longitude) async {
+    if (Platform.isIOS) {
+      await _showNavigationOptionsIOS(latitude, longitude);
+    } else {
+      await _openGoogleMapsAndroid(latitude, longitude);
+    }
+  }
+
+  Future<void> _showNavigationOptionsIOS(double latitude, double longitude) async {
+    final List<Map<String, dynamic>> navigationApps = [];
+    
+    navigationApps.add({
+      'name': 'Apple Maps',
+      'url': 'maps://?daddr=$latitude,$longitude&dirflg=d',
+      'icon': Icons.map,
+    });
+    
+    final googleMapsUrl = 'comgooglemaps://?daddr=$latitude,$longitude&directionsmode=driving';
+    if (await canLaunchUrlString(googleMapsUrl)) {
+      navigationApps.add({
+        'name': 'Google Maps',
+        'url': googleMapsUrl,
+        'icon': Icons.navigation,
+      });
+    }
+    
+    if (navigationApps.length == 1) {
+      await _launchNavigationApp(navigationApps.first['url'], navigationApps.first['name']);
+    } else {
+      await _showNativeActionSheet(navigationApps);
+    }
+  }
+  
+  Future<void> _showNativeActionSheet(List<Map<String, dynamic>> navigationApps) async {
+    await showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoActionSheet(
+          title: const Text('Choose Navigation App'),
+          actions: navigationApps.map((app) {
+            return CupertinoActionSheetAction(
+              onPressed: () {
+                Get.back();
+                _launchNavigationApp(app['url'], app['name']);
+              },
+              child: Text(app['name'] as String),
+            );
+          }).toList(),
+          cancelButton: CupertinoActionSheetAction(
+            isDefaultAction: true,
+            onPressed: () => Get.back(),
+            child: const Text('Cancel'),
+          ),
+        );
+      },
+    );
+  }
+  
+  Future<void> _launchNavigationApp(String url, String appName) async {
+    try {
+      if (await canLaunchUrlString(url)) {
+        await launchUrlString(url);
+      } else {
+        throw 'Could not open $appName';
+      }
+    } catch (e) {
+      CustomSnackbars.error(
+        'Error',
+        'Could not open $appName. Please make sure it\'s installed.',
+      );
+    }
+  }
+  
+  Future<void> _openGoogleMapsAndroid(double latitude, double longitude) async {
     final String googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude&travelmode=driving';
 
     try {
@@ -677,12 +1006,9 @@ class _BookBoxPageState extends State<BookBoxPage> {
         throw 'Could not open the map.';
       }
     } catch (e) {
-      Get.snackbar(
+      CustomSnackbars.error(
         'Error',
-        'Could not open Google Maps',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        'Could not open Google Maps. Please make sure it\'s installed.',
       );
     }
   }

@@ -97,21 +97,23 @@ const NotificationService = {
         );
 
         // Get all users who upvoted matching requests
-        const upvoterUsernames = new Set<string>();
+        const upvoterUserIds = new Set<string>();
         const requestIdsByUpvoter = new Map<string, string>();
 
         for (const request of matchingRequests) {
-            for (const upvoterUsername of request.upvoters) {
-                if (upvoterUsername !== excludedUsername) {
-                    upvoterUsernames.add(upvoterUsername);
-                    requestIdsByUpvoter.set(upvoterUsername, request._id.toString());
+            for (const upvoterUserId of request.upvoters) {
+                // Get the user to check if they are the excluded user
+                const upvoterUser = await User.findById(upvoterUserId);
+                if (upvoterUser && upvoterUser.username !== excludedUsername) {
+                    upvoterUserIds.add(upvoterUserId);
+                    requestIdsByUpvoter.set(upvoterUserId, request._id.toString());
                 }
             }
         }
 
         // Get user objects for all upvoters
         const upvoterUsers = await User.find({ 
-            username: { $in: Array.from(upvoterUsernames) },
+            _id: { $in: Array.from(upvoterUserIds) },
             'notificationSettings.addedBook': true
         });
 
@@ -146,7 +148,7 @@ const NotificationService = {
             
             const notificationOptions: any = {
                 bookboxId: bookboxId,
-                requestId: requestIdsByUpvoter.get(user.username)
+                requestId: requestIdsByUpvoter.get(user._id.toString())
             };
             
             // Only include bookId if it exists and is not empty
@@ -163,8 +165,10 @@ const NotificationService = {
         }
 
         // Also notify users based on other criteria (bookbox followers, location, genre) who didn't upvote
+        // First get the usernames of upvoters to exclude them
+        const upvoterUsernames = upvoterUsers.map(user => user.username);
         const users = await User.find({
-            username: { $nin: [excludedUsername, ...Array.from(upvoterUsernames)] },
+            username: { $nin: [excludedUsername, ...upvoterUsernames] },
             'notificationSettings.addedBook': true
         });
         

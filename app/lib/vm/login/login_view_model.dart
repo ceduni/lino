@@ -15,7 +15,7 @@ class LoginViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get obscureText => _obscureText;
 
-  Future<bool> login(SharedPreferences prefs) async {
+  Future<bool> login() async {
     _isLoading = true;
     notifyListeners();
 
@@ -24,6 +24,7 @@ class LoginViewModel extends ChangeNotifier {
         identifierController.text,
         passwordController.text,
       );
+      final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
       return true;
     } catch (e) {
@@ -35,7 +36,8 @@ class LoginViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> openAsGuest(SharedPreferences prefs) async {
+  Future<void> openAsGuest() async {
+    final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
   }
 

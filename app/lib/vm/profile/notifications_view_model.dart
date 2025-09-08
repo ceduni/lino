@@ -46,8 +46,8 @@ class NotificationsViewModel extends ChangeNotifier {
 
     try {
       _notifications = await _userService.getUserNotifications(_token!);
-      // Reverse the list to show newest first
-      _notifications = _notifications.reversed.toList();
+      
+      //_notifications = _notifications.reversed.toList();
     } catch (e) {
       _error = 'Error loading notifications: $e';
       print('Error fetching notifications: $e');

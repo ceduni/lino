@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -42,7 +43,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                 leading: Icon(Icons.camera_alt),
                 title: Text('Camera'),
                 onTap: () {
-                  Navigator.of(context).pop();
+                  Get.back();
                   _pickImage(ImageSource.camera);
                 },
               ),
@@ -50,7 +51,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                 leading: Icon(Icons.photo_library),
                 title: Text('Gallery'),
                 onTap: () {
-                  Navigator.of(context).pop();
+                  Get.back();
                   _pickImage(ImageSource.gallery);
                 },
               ),
@@ -59,7 +60,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                   leading: Icon(Icons.delete, color: Colors.red),
                   title: Text('Remove Image', style: TextStyle(color: Colors.red)),
                   onTap: () {
-                    Navigator.of(context).pop();
+                    Get.back();
                     _removeImage();
                   },
                 ),
@@ -138,12 +139,12 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
           actions: [
             TextButton(
               child: Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Get.back(),
             ),
             TextButton(
               child: Text('Open Settings'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Get.back();
                 openAppSettings();
               },
             ),
@@ -163,7 +164,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
           actions: [
             TextButton(
               child: Text('OK'),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Get.back(),
             ),
           ],
         );

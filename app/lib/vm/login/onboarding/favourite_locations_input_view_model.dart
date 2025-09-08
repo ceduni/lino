@@ -10,6 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/services/user_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FavouriteLocationsInputViewModel extends ChangeNotifier {
   final TextEditingController searchController = TextEditingController();
@@ -33,7 +34,10 @@ class FavouriteLocationsInputViewModel extends ChangeNotifier {
   LatLng get currentLocation => _currentLocation;
   String get googleApiKey => dotenv.env['GOOGLE_API_KEY'] ?? '';
 
-  Future<void> initialize(String token) async {
+  Future<void> initialize() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
     await _getCurrentLocation();
     await _loadFavouriteLocations(token);
     _isLoading = false;
@@ -52,9 +56,7 @@ class FavouriteLocationsInputViewModel extends ChangeNotifier {
       }
 
       if (status.isGranted) {
-        Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
-        );
+        Position position = await Geolocator.getCurrentPosition();
         _currentLocation = LatLng(position.latitude, position.longitude);
         notifyListeners();
       }
@@ -95,7 +97,7 @@ class FavouriteLocationsInputViewModel extends ChangeNotifier {
 
   Function(FavouriteLocation)? onMarkerTap;
 
-  Future<void> onMapTap(LatLng position, String token) async {
+  Future<void> onMapTap(LatLng position) async {
     if (_favouriteLocations.length >= 10) {
       showToast('Maximum 10 favourite locations allowed');
       return;
@@ -116,7 +118,7 @@ class FavouriteLocationsInputViewModel extends ChangeNotifier {
         placeName = _formatPlaceName(placemark);
       }
 
-      await _addFavouriteLocation(position.latitude, position.longitude, placeName, token);
+      await _addFavouriteLocation(position.latitude, position.longitude, placeName);
     } catch (e) {
       showToast('Error adding location: $e');
     } finally {
@@ -141,7 +143,7 @@ class FavouriteLocationsInputViewModel extends ChangeNotifier {
     return parts.isNotEmpty ? parts.join(', ') : 'Unknown Location';
   }
 
-  Future<void> onPlaceSelected(Prediction prediction, String token) async {
+  Future<void> onPlaceSelected(Prediction prediction) async {
     if (_favouriteLocations.length >= 10) {
       showToast('Maximum 10 favourite locations allowed');
       return;
@@ -158,7 +160,6 @@ class FavouriteLocationsInputViewModel extends ChangeNotifier {
           location.latitude,
           location.longitude,
           prediction.description!,
-          token,
         );
 
         _mapController?.animateCamera(
@@ -174,8 +175,10 @@ class FavouriteLocationsInputViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> _addFavouriteLocation(double latitude, double longitude, String name, String token) async {
+  Future<void> _addFavouriteLocation(double latitude, double longitude, String name) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
       await _userService.addUserFavLocation(token, latitude, longitude, name);
       await _loadFavouriteLocations(token);
       showToast('Location added successfully');
@@ -184,8 +187,10 @@ class FavouriteLocationsInputViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> removeFavouriteLocation(FavouriteLocation location, String token) async {
+  Future<void> removeFavouriteLocation(FavouriteLocation location) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
       await _userService.deleteUserFavLocation(token, location.name);
       await _loadFavouriteLocations(token);
       showToast('Location removed successfully');
