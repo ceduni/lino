@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/layout/appbar_view_model.dart';
 
+import '../../widgets/language_selector.dart';
+
 class LinoAppBar extends StatefulWidget implements PreferredSizeWidget {
   final int sourcePage;
 
@@ -30,18 +32,23 @@ class _LinoAppBarState extends State<LinoAppBar> {
     return Consumer<AppBarViewModel>(
       builder: (context, viewModel, child) {
         return AppBar(
+          // TODO: Fix to put it actually at the center
           title: Center(
             child: Image.asset(
               'assets/logos/logo_without_bird.png',
               height: 40,
             ),
-          ), // TODO : update with new logo
+          ),
+          actions: [
+            LanguageSelector()
+          ],
           //backgroundColor: LinoColors.accent,
           flexibleSpace: Padding(
             padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
             //child: _buildAppBarContent(viewModel),
           ),
         );
+
       },
     );
   }

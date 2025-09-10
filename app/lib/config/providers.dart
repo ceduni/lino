@@ -23,6 +23,9 @@ import 'package:Lino_app/vm/bookboxes/bookbox_list_view_model.dart';
 import 'package:Lino_app/vm/forum/forum_view_model.dart';
 import 'package:Lino_app/vm/forum/requests_view_model.dart';
 import 'package:Lino_app/vm/forum/request_form_view_model.dart';
+import 'package:get/get.dart';
+
+import '../controllers/locale_controller.dart';
 
 // In providers.dart
 class AppProviders {
@@ -50,5 +53,8 @@ class AppProviders {
     ChangeNotifierProvider<RequestsViewModel>(create: (_) => RequestsViewModel()),
     ChangeNotifierProvider<RequestFormViewModel>(create: (_) => RequestFormViewModel()),
     ChangeNotifierProvider<BarcodeScannerViewModel>(create: (_) => BarcodeScannerViewModel()),
+    Provider<LocaleController>(
+      create: (_) => Get.put(LocaleController()),
+    ),
   ];
 }

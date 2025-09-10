@@ -12,11 +12,11 @@ import 'package:Lino_app/widgets/profile_stats_widget.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:Lino_app/models/notification_model.dart';
-import 'package:Lino_app/views/profile/notifications_page.dart';
 import 'package:Lino_app/vm/profile/notifications_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -159,6 +159,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     if (!mounted) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -198,7 +200,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           );
         }
         
-        return _buildAuthenticatedView(viewModel);
+        return _buildAuthenticatedView(viewModel, localizations);
       },
     );
   }
@@ -229,7 +231,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildAuthenticatedView(HomeViewModel viewModel) {
+  Widget _buildAuthenticatedView(HomeViewModel viewModel, AppLocalizations localizations) {
     return Consumer<BookboxListViewModel>(
       builder: (context, bookboxViewModel, child) {
         if (!mounted) {
@@ -260,7 +262,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           RecommendedBook(title: "livre", coverImageUrl: "rien"),
                         ],
                       ), */
-                      _buildNotificationsSection(),
+                      _buildNotificationsSection(localizations),
                       Container(
                         height: 300,
                         margin: const EdgeInsets.all(16.0),
@@ -437,7 +439,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildNotificationsSection() {
+  Widget _buildNotificationsSection(AppLocalizations localizations) {
     return Container(
       margin: const EdgeInsets.all(16.0),
       child: Card(
@@ -453,9 +455,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text( 
-                    'Recent Notifications',
-                    style: TextStyle(
+                  Text(
+                    localizations.homeRecentNotifications,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Kanit',
@@ -557,14 +559,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   ),
                 )
               else if (_notifications.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(20.0),
                   child: Column(
                     children: [
                       Icon(Icons.notifications_none, color: Colors.grey, size: 32),
                       SizedBox(height: 8),
                       Text(
-                        'No notifications yet',
+                        localizations.homeNotificationsEmpty,
                         style: TextStyle(color: Colors.grey),
                       ),
                     ],
@@ -730,19 +732,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       switch (reason) {
         case 'book_request':
           formattedReasons.add('Someone requested this book');
-          break;
         case 'solved_book_request':
           formattedReasons.add('Matches your book request');
-          break;
         case 'fav_bookbox':
           formattedReasons.add('Added to followed bookbox');
-          break;
         case 'same_borough':
           formattedReasons.add('Added near you');
-          break;
         case 'fav_genre':
           formattedReasons.add('Matches your favorite genre');
-          break;
         default:
           formattedReasons.add(reason); 
       }

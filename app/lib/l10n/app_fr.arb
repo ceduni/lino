@@ -1,0 +1,14 @@
+{
+  "@_NAV_MENU": {
+    "description": "Navigation menu label"
+  },
+  "navHome": "Accueil",
+  "navSearch": "Rechercher",
+  "navRequests": "Requêtes",
+  "navProfile": "Profil",
+  "navLogIn": "Se connecter",
+
+
+  "homeNotificationsEmpty": "Aucune notification pour le moment",
+  "homeRecentNotifications": "Notifications récentes"
+}

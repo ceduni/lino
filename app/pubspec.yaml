@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   app_links: ^6.4.0
   geolocator: ^14.0.1
   get:
@@ -57,7 +59,8 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
-  
+  generate: true
+
   fonts:
     - family: Kanit
       fonts:
