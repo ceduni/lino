@@ -85,7 +85,7 @@
   "newNotification": "Nouvelle notification",
   "someoneRequestedThisBook": "Quelqu'un a demandé ce livre",
   "matchesYourBookRequest": "Correspond à votre demande de livre",
-  "addedToFollowedBookbox": "Ajouté à la boîte à livres suivie",
+  "addedToFollowedBookboxPreview": "Ajouté à la boîte à livres suivie",
   "addedNearYou": "Ajouté près de chez vous",
   "matchesYourFavoriteGenre": "Correspond à votre genre préféré",
   "andMore": "de plus",
@@ -110,5 +110,32 @@
   "startFollowingBookboxes": "Commencez à suivre des boîtes à livres pour les voir ici !",
 
   "took": "Pris",
-  "added": "Ajouté"
+  "added": "Ajouté",
+
+  "noAuthenticationTokenAvailable": "Aucun jeton d'authentification disponible",
+  "errorLoadingNotifications": "Erreur lors du chargement des notifications",
+  "errorMarkingNotificationAsRead": "Erreur lors du marquage de la notification comme lue",
+  "errorMarkingAllNotificationsAsRead": "Erreur lors du marquage de toutes les notifications comme lues",
+  "notification": "Notification",
+  "bookRequest": "Demande de livre",
+  "newBookAvailable": "Nouveau livre disponible",
+  "noSpecificReasonProvided": "Aucune raison spécifique fournie pour cette notification.",
+  "someoneIsLookingForBook": "Quelqu'un recherche « {bookTitle} »",
+  "bookIsNowAvailable": "« {bookTitle} » est maintenant disponible",
+  "aBookBox": "une boîte à livres",
+  "bookRequestContent": "Quelqu'un recherche « {bookTitle} ». Si vous avez ce livre, veuillez envisager de l'ajouter à la boîte à livres la plus proche pour aider !",
+  "addedToFollowedBookbox": "il a été ajouté à « {bookboxName} », une boîte à livres que vous suivez",
+  "addedToNearbyBookbox": "il a été ajouté à « {bookboxName} », une boîte à livres près de chez vous",
+  "matchesFavoriteGenre": "il correspond à l'un de vos genres préférés",
+  "matchesBookRequest": "il correspond à une demande de livre que vous avez faite",
+  "andConjunction": "et",
+  "goodNewsBookAvailable": "Bonne nouvelle ! « {bookTitle} » est maintenant disponible car {reason}.",
+  "addedToFollowedBookboxSync": "il a été ajouté à une boîte à livres que vous suivez",
+  "addedToNearbyBookboxSync": "il a été ajouté à une boîte à livres près de chez vous",
+
+  "modifyProfile": "Modifier le profil",
+  "submit": "Soumettre",
+  "phone": "Téléphone",
+
+  "markAllAsRead": "Tout lire"
 }

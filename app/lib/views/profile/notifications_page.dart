@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:Lino_app/l10n/app_localizations.dart';
 import 'package:Lino_app/vm/profile/notifications_view_model.dart';
 import 'package:Lino_app/models/notification_model.dart';
 
@@ -18,17 +19,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<NotificationsViewModel>().initialize();
+      final localizations = AppLocalizations.of(context);
+      context.read<NotificationsViewModel>().initialize(localizations);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
     return Consumer<NotificationsViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Notifications'),
+            title: Text(localizations.homeRecentNotifications),
             actions: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
@@ -36,22 +40,22 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   style: ButtonStyle(
                     backgroundColor: WidgetStateProperty.all<Color>(Colors.green),
                   ),
-                  onPressed: viewModel.isLoading ? null : viewModel.markAllAsRead,
-                  child: const Text(
-                    'Read All',
-                    style: TextStyle(color: Colors.white),
+                  onPressed: viewModel.isLoading ? null : () => viewModel.markAllAsRead(localizations),
+                  child: Text(
+                    localizations.markAllAsRead,
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ),
             ],
           ),
-          body: _buildBody(viewModel),
+          body: _buildBody(viewModel, localizations),
         );
       },
     );
   }
 
-  Widget _buildBody(NotificationsViewModel viewModel) {
+  Widget _buildBody(NotificationsViewModel viewModel, AppLocalizations localizations) {
     if (viewModel.isLoading && viewModel.notifications.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -70,8 +74,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: viewModel.fetchNotifications,
-              child: const Text('Retry'),
+              onPressed: () => viewModel.fetchNotifications(localizations),
+              child: Text(localizations.retry),
             ),
           ],
         ),
@@ -79,15 +83,15 @@ class _NotificationsPageState extends State<NotificationsPage> {
     }
 
     if (viewModel.notifications.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.notifications_none, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
+            const Icon(Icons.notifications_none, size: 64, color: Colors.grey),
+            const SizedBox(height: 16),
             Text(
-              'No notifications yet',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
+              localizations.homeNotificationsEmpty,
+              style: const TextStyle(fontSize: 18, color: Colors.grey),
             ),
           ],
         ),
@@ -95,18 +99,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
     }
 
     return RefreshIndicator(
-      onRefresh: viewModel.fetchNotifications,
+      onRefresh: () => viewModel.fetchNotifications(localizations),
       child: ListView.builder(
         itemCount: viewModel.notifications.length,
         itemBuilder: (context, index) {
           final notification = viewModel.notifications[index];
-          return _buildNotificationItem(notification, viewModel);
+          return _buildNotificationItem(notification, viewModel, localizations);
         },
       ),
     );
   }
 
-  Widget _buildNotificationItem(Notif notification, NotificationsViewModel viewModel) {
+  Widget _buildNotificationItem(Notif notification, NotificationsViewModel viewModel, AppLocalizations localizations) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       elevation: 1,
@@ -128,40 +132,40 @@ class _NotificationsPageState extends State<NotificationsPage> {
           children: [
             if (notification.reason.isNotEmpty)
               Text(
-                _formatNotificationReason(notification.reason),
+                _formatNotificationReason(notification.reason, localizations),
                 style: const TextStyle(fontSize: 12),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             Text(
-              _formatNotificationDate(notification.createdAt),
+              _formatNotificationDate(notification.createdAt, localizations),
               style: const TextStyle(fontSize: 11, color: Colors.grey),
             ),
           ],
         ),
-        onTap: () => _showNotificationDetails(context, notification, viewModel),
+        onTap: () => _showNotificationDetails(context, notification, viewModel, localizations),
       ),
     );
   }
 
-  String _formatNotificationDate(DateTime date) {
+  String _formatNotificationDate(DateTime date, AppLocalizations localizations) {
     final now = DateTime.now();
     final difference = now.difference(date);
     
     if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
+      return '${difference.inDays}${localizations.daysAgo}';
     } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
+      return '${difference.inHours}${localizations.hoursAgo}';
     } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
+      return '${difference.inMinutes}${localizations.minutesAgo}';
     } else {
-      return 'Just now';
+      return localizations.justNow;
     }
   }
 
-  String _formatNotificationReason(List<String> reasons) {
+  String _formatNotificationReason(List<String> reasons, AppLocalizations localizations) {
     if (reasons.isEmpty) {
-      return 'New notification';
+      return localizations.newNotification;
     }
 
     List<String> formattedReasons = [];
@@ -169,19 +173,19 @@ class _NotificationsPageState extends State<NotificationsPage> {
     for (String reason in reasons) {
       switch (reason) {
         case 'book_request':
-          formattedReasons.add('Someone requested this book');
+          formattedReasons.add(localizations.someoneRequestedThisBook);
           break;
         case 'solved_book_request':
-          formattedReasons.add('Matches your book request');
+          formattedReasons.add(localizations.matchesYourBookRequest);
           break;
         case 'fav_bookbox':
-          formattedReasons.add('Added to followed bookbox');
+          formattedReasons.add(localizations.addedToFollowedBookboxPreview);
           break;
         case 'same_borough':
-          formattedReasons.add('Added near you');
+          formattedReasons.add(localizations.addedNearYou);
           break;
         case 'fav_genre':
-          formattedReasons.add('Matches your favorite genre');
+          formattedReasons.add(localizations.matchesYourFavoriteGenre);
           break;
         default:
           formattedReasons.add(reason); 
@@ -193,18 +197,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
     } else if (formattedReasons.length == 2) {
       return '${formattedReasons[0]} • ${formattedReasons[1]}';
     } else {
-      return '${formattedReasons[0]} • ${formattedReasons[1]} • +${formattedReasons.length - 2} more';
+      return '${formattedReasons[0]} • ${formattedReasons[1]} • +${formattedReasons.length - 2} ${localizations.andMore}';
     }
   }
 
-  void _showNotificationDetails(BuildContext context, Notif notification, NotificationsViewModel viewModel) {
+  void _showNotificationDetails(BuildContext context, Notif notification, NotificationsViewModel viewModel, AppLocalizations localizations) {
     final List<String> reasons = notification.reason;
 
     String title;
     if (reasons.contains('book_request')) {
-      title = 'Book Request';
+      title = localizations.bookRequest;
     } else {
-      title = 'New Book Available';
+      title = localizations.newBookAvailable;
     }
 
     showDialog(
@@ -213,15 +217,15 @@ class _NotificationsPageState extends State<NotificationsPage> {
         return AlertDialog(
           title: Text(title),
           content: FutureBuilder<String>(
-            future: viewModel.buildNotificationContent(notification),
+            future: viewModel.buildNotificationContent(notification, localizations),
             builder: (context, snapshot) {
               String content;
               if (snapshot.connectionState == ConnectionState.waiting) {
-                content = 'Loading...';
+                content = localizations.loading;
               } else if (snapshot.hasError) {
-                content = viewModel.buildNotificationContentSync(notification);
+                content = viewModel.buildNotificationContentSync(notification, localizations);
               } else {
-                content = snapshot.data ?? viewModel.buildNotificationContentSync(notification);
+                content = snapshot.data ?? viewModel.buildNotificationContentSync(notification, localizations);
               }
 
               return Column(
@@ -247,7 +251,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
           ),
           actions: [
             TextButton(
-              child: const Text('Close'),
+              child: Text(localizations.close),
               onPressed: () {
                 Get.back();
               },
@@ -257,7 +261,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       },
     ).then((_) {
       // Mark the notification as read after closing the dialog
-      viewModel.onNotificationTap(notification);
+      viewModel.onNotificationTap(notification, localizations);
     });
   }
 }

@@ -229,7 +229,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchesYourBookRequest => 'Matches your book request';
 
   @override
-  String get addedToFollowedBookbox => 'Added to followed bookbox';
+  String get addedToFollowedBookboxPreview => 'Added to followed bookbox';
 
   @override
   String get addedNearYou => 'Added near you';
@@ -302,4 +302,87 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get added => 'Added';
+
+  @override
+  String get noAuthenticationTokenAvailable =>
+      'No authentication token available';
+
+  @override
+  String get errorLoadingNotifications => 'Error loading notifications';
+
+  @override
+  String get errorMarkingNotificationAsRead =>
+      'Error marking notification as read';
+
+  @override
+  String get errorMarkingAllNotificationsAsRead =>
+      'Error marking all notifications as read';
+
+  @override
+  String get notification => 'Notification';
+
+  @override
+  String get noSpecificReasonProvided =>
+      'No specific reason provided for this notification.';
+
+  @override
+  String someoneIsLookingForBook(Object bookTitle) {
+    return 'Someone is looking for \"$bookTitle\"';
+  }
+
+  @override
+  String bookIsNowAvailable(Object bookTitle) {
+    return '\"$bookTitle\" is now available';
+  }
+
+  @override
+  String get aBookBox => 'a book box';
+
+  @override
+  String bookRequestContent(Object bookTitle) {
+    return 'Someone is looking for \"$bookTitle\". If you have this book, please consider adding it to the nearest book box to help out!';
+  }
+
+  @override
+  String addedToFollowedBookbox(Object bookboxName) {
+    return 'it was added to \"$bookboxName\", a book box you follow';
+  }
+
+  @override
+  String addedToNearbyBookbox(Object bookboxName) {
+    return 'it was added to \"$bookboxName\", a book box near you';
+  }
+
+  @override
+  String get matchesFavoriteGenre => 'it matches one of your favorite genres';
+
+  @override
+  String get matchesBookRequest => 'it matches a book request you made';
+
+  @override
+  String get andConjunction => 'and';
+
+  @override
+  String goodNewsBookAvailable(Object bookTitle, Object reason) {
+    return 'Good news! \"$bookTitle\" is now available because $reason.';
+  }
+
+  @override
+  String get addedToFollowedBookboxSync =>
+      'it was added to a book box you follow';
+
+  @override
+  String get addedToNearbyBookboxSync => 'it was added to a book box near you';
+
+  @override
+  String get modifyProfile => 'Modify Profile';
+
+  @override
+  String get submit => 'Submit';
+
+  @override
+  String get phone => 'Phone';
+
+  @override
+  String get markAllAsRead => 'Read All';
 }

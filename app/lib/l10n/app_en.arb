@@ -83,7 +83,7 @@
   "newNotification": "New notification",
   "someoneRequestedThisBook": "Someone requested this book",
   "matchesYourBookRequest": "Matches your book request",
-  "addedToFollowedBookbox": "Added to followed bookbox",
+  "addedToFollowedBookboxPreview": "Added to followed bookbox",
   "addedNearYou": "Added near you",
   "matchesYourFavoriteGenre": "Matches your favorite genre",
   "andMore": "more",
@@ -108,5 +108,32 @@
   "startFollowingBookboxes": "Start following bookboxes to see them here!",
 
   "took": "Took",
-  "added": "Added"
+  "added": "Added",
+
+  "noAuthenticationTokenAvailable": "No authentication token available",
+  "errorLoadingNotifications": "Error loading notifications",
+  "errorMarkingNotificationAsRead": "Error marking notification as read",
+  "errorMarkingAllNotificationsAsRead": "Error marking all notifications as read",
+  "notification": "Notification",
+  "bookRequest": "Book Request",
+  "newBookAvailable": "New Book Available",
+  "noSpecificReasonProvided": "No specific reason provided for this notification.",
+  "someoneIsLookingForBook": "Someone is looking for \"{bookTitle}\"",
+  "bookIsNowAvailable": "\"{bookTitle}\" is now available",
+  "aBookBox": "a book box",
+  "bookRequestContent": "Someone is looking for \"{bookTitle}\". If you have this book, please consider adding it to the nearest book box to help out!",
+  "addedToFollowedBookbox": "it was added to \"{bookboxName}\", a book box you follow",
+  "addedToNearbyBookbox": "it was added to \"{bookboxName}\", a book box near you",
+  "matchesFavoriteGenre": "it matches one of your favorite genres",
+  "matchesBookRequest": "it matches a book request you made",
+  "andConjunction": "and",
+  "goodNewsBookAvailable": "Good news! \"{bookTitle}\" is now available because {reason}.",
+  "addedToFollowedBookboxSync": "it was added to a book box you follow",
+  "addedToNearbyBookboxSync": "it was added to a book box near you",
+
+  "modifyProfile": "Modify Profile",
+  "submit": "Submit",
+  "phone": "Phone",
+
+  "markAllAsRead": "Read All"
 }

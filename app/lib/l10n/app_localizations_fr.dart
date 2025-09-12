@@ -232,7 +232,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get matchesYourBookRequest => 'Correspond à votre demande de livre';
 
   @override
-  String get addedToFollowedBookbox => 'Ajouté à la boîte à livres suivie';
+  String get addedToFollowedBookboxPreview =>
+      'Ajouté à la boîte à livres suivie';
 
   @override
   String get addedNearYou => 'Ajouté près de chez vous';
@@ -305,4 +306,91 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get added => 'Ajouté';
+
+  @override
+  String get noAuthenticationTokenAvailable =>
+      'Aucun jeton d\'authentification disponible';
+
+  @override
+  String get errorLoadingNotifications =>
+      'Erreur lors du chargement des notifications';
+
+  @override
+  String get errorMarkingNotificationAsRead =>
+      'Erreur lors du marquage de la notification comme lue';
+
+  @override
+  String get errorMarkingAllNotificationsAsRead =>
+      'Erreur lors du marquage de toutes les notifications comme lues';
+
+  @override
+  String get notification => 'Notification';
+
+  @override
+  String get noSpecificReasonProvided =>
+      'Aucune raison spécifique fournie pour cette notification.';
+
+  @override
+  String someoneIsLookingForBook(Object bookTitle) {
+    return 'Quelqu\'un recherche « $bookTitle »';
+  }
+
+  @override
+  String bookIsNowAvailable(Object bookTitle) {
+    return '« $bookTitle » est maintenant disponible';
+  }
+
+  @override
+  String get aBookBox => 'une boîte à livres';
+
+  @override
+  String bookRequestContent(Object bookTitle) {
+    return 'Quelqu\'un recherche « $bookTitle ». Si vous avez ce livre, veuillez envisager de l\'ajouter à la boîte à livres la plus proche pour aider !';
+  }
+
+  @override
+  String addedToFollowedBookbox(Object bookboxName) {
+    return 'il a été ajouté à « $bookboxName », une boîte à livres que vous suivez';
+  }
+
+  @override
+  String addedToNearbyBookbox(Object bookboxName) {
+    return 'il a été ajouté à « $bookboxName », une boîte à livres près de chez vous';
+  }
+
+  @override
+  String get matchesFavoriteGenre =>
+      'il correspond à l\'un de vos genres préférés';
+
+  @override
+  String get matchesBookRequest =>
+      'il correspond à une demande de livre que vous avez faite';
+
+  @override
+  String get andConjunction => 'et';
+
+  @override
+  String goodNewsBookAvailable(Object bookTitle, Object reason) {
+    return 'Bonne nouvelle ! « $bookTitle » est maintenant disponible car $reason.';
+  }
+
+  @override
+  String get addedToFollowedBookboxSync =>
+      'il a été ajouté à une boîte à livres que vous suivez';
+
+  @override
+  String get addedToNearbyBookboxSync =>
+      'il a été ajouté à une boîte à livres près de chez vous';
+
+  @override
+  String get modifyProfile => 'Modifier le profil';
+
+  @override
+  String get submit => 'Soumettre';
+
+  @override
+  String get phone => 'Téléphone';
+
+  @override
+  String get markAllAsRead => 'Tout lire';
 }

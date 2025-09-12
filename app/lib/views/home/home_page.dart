@@ -641,15 +641,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         return AlertDialog(
           title: Text(title),
           content: FutureBuilder<String>(
-            future: tempViewModel.buildNotificationContent(notification),
+            future: tempViewModel.buildNotificationContent(notification, localizations),
             builder: (context, snapshot) {
               String content;
               if (snapshot.connectionState == ConnectionState.waiting) {
                 content = localizations.loading;
               } else if (snapshot.hasError) {
-                content = tempViewModel.buildNotificationContentSync(notification);
+                content = tempViewModel.buildNotificationContentSync(notification, localizations);
               } else {
-                content = snapshot.data ?? tempViewModel.buildNotificationContentSync(notification);
+                content = snapshot.data ?? tempViewModel.buildNotificationContentSync(notification, localizations);
               }
 
               return Column(
@@ -736,7 +736,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         case 'solved_book_request':
           formattedReasons.add(localizations.matchesYourBookRequest);
         case 'fav_bookbox':
-          formattedReasons.add(localizations.addedToFollowedBookbox);
+          formattedReasons.add(localizations.addedToFollowedBookboxPreview);
         case 'same_borough':
           formattedReasons.add(localizations.addedNearYou);
         case 'fav_genre':

@@ -1,6 +1,7 @@
 // app/lib/vm/profile/notifications_view_model.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 import 'package:Lino_app/models/notification_model.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
@@ -19,23 +20,23 @@ class NotificationsViewModel extends ChangeNotifier {
   String? get error => _error;
 
 
-  Future<void> initialize() async {
-    await _loadToken();
-    await fetchNotifications();
+  Future<void> initialize([AppLocalizations? localizations]) async {
+    await _loadToken(localizations);
+    await fetchNotifications(localizations);
   }
 
-  Future<void> _loadToken() async {
+  Future<void> _loadToken([AppLocalizations? localizations]) async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
     if (_token == null) {
-      _error = 'No authentication token found';
+      _error = localizations?.noAuthenticationToken ?? 'No authentication token found';
       notifyListeners();
     }
   }
 
-  Future<void> fetchNotifications() async {
+  Future<void> fetchNotifications([AppLocalizations? localizations]) async {
     if (_token == null) {
-      _error = 'No authentication token available';
+      _error = localizations?.noAuthenticationTokenAvailable ?? 'No authentication token available';
       notifyListeners();
       return;
     }
@@ -49,7 +50,7 @@ class NotificationsViewModel extends ChangeNotifier {
       
       //_notifications = _notifications.reversed.toList();
     } catch (e) {
-      _error = 'Error loading notifications: $e';
+      _error = localizations?.errorLoadingNotifications ?? 'Error loading notifications: $e';
       print('Error fetching notifications: $e');
     }
 
@@ -57,22 +58,22 @@ class NotificationsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> markAsRead(String id) async {
+  Future<void> markAsRead(String id, [AppLocalizations? localizations]) async {
     if (_token == null) return;
 
     try {
       await _userService.markNotificationAsRead(_token!, id);
       
       // Refresh the entire list to get updated read status
-      await fetchNotifications();
+      await fetchNotifications(localizations);
     } catch (e) {
-      _error = 'Error marking notification as read: $e';
+      _error = localizations?.errorMarkingNotificationAsRead ?? 'Error marking notification as read: $e';
       print('Error marking notification as read: $e');
       notifyListeners();
     }
   }
 
-  Future<void> markAllAsRead() async {
+  Future<void> markAllAsRead([AppLocalizations? localizations]) async {
     if (_token == null) return;
 
     _isLoading = true;
@@ -86,128 +87,140 @@ class NotificationsViewModel extends ChangeNotifier {
       }
       
       // Refresh the notifications list
-      await fetchNotifications();
+      await fetchNotifications(localizations);
     } catch (e) {
-      _error = 'Error marking all notifications as read: $e';
+      _error = localizations?.errorMarkingAllNotificationsAsRead ?? 'Error marking all notifications as read: $e';
       print('Error marking all notifications as read: $e');
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  String getNotificationTitle(Notif notification) {
+  String getNotificationTitle(Notif notification, [AppLocalizations? localizations]) {
     final List<String> reasons = notification.reason;
     if (reasons.isEmpty) {
-      return 'Notification';
+      return localizations?.notification ?? 'Notification';
     }
     if (reasons.contains('book_request')) {
-      return 'Book Request';
+      return localizations?.bookRequest ?? 'Book Request';
     } else {
-      return 'New Book Available';
+      return localizations?.newBookAvailable ?? 'New Book Available';
     }
   }
 
-  String getNotificationPreview(Notif notification) {
+  String getNotificationPreview(Notif notification, [AppLocalizations? localizations]) {
     final List<String> reasons = notification.reason;
     final String bookTitle = notification.bookTitle;
     if (reasons.isEmpty) {
-      return 'No specific reason provided for this notification.';
+      return localizations?.noSpecificReasonProvided ?? 'No specific reason provided for this notification.';
     }
     if (reasons.contains('book_request')) {
-      return 'Someone is looking for "$bookTitle"';
+      return localizations?.someoneIsLookingForBook(bookTitle) ?? 'Someone is looking for "$bookTitle"';
     } else {
-      return '"$bookTitle" is now available';
+      return localizations?.bookIsNowAvailable(bookTitle) ?? '"$bookTitle" is now available';
     }
   }
 
-  Future<String> getBookboxName(String? bookboxId) async {
+  Future<String> getBookboxName(String? bookboxId, [AppLocalizations? localizations]) async {
     if (bookboxId == null || bookboxId.isEmpty) {
-      return 'a book box';
+      return localizations?.aBookBox ?? 'a book box';
     }
     
     try {
       final bookboxData = await _bookboxService.getBookBox(bookboxId);
       return bookboxData.name;
     } catch (e) {
-      return 'a book box';
+      return localizations?.aBookBox ?? 'a book box';
     }
   }
 
-  Future<String> buildNotificationContent(Notif notification) async {
+  Future<String> buildNotificationContent(Notif notification, [AppLocalizations? localizations]) async {
     final List<String> reasons = notification.reason;
     final String bookTitle = notification.bookTitle;
     final String? bookboxId = notification.bookboxId;
     
     if (reasons.contains('book_request')) {
-      return 'Someone is looking for "$bookTitle". If you have this book, please consider adding it to the nearest book box to help out!';
+      return localizations?.bookRequestContent(bookTitle) ?? 
+             'Someone is looking for "$bookTitle". If you have this book, please consider adding it to the nearest book box to help out!';
     } else {
-      final String bookboxName = await getBookboxName(bookboxId);
+      final String bookboxName = await getBookboxName(bookboxId, localizations);
       List<String> reasonMessages = [];
       
       if (reasons.contains('fav_bookbox')) {
-        reasonMessages.add('it was added to "$bookboxName", a book box you follow');
+        final message = localizations?.addedToFollowedBookbox(bookboxName) ??
+                       'it was added to "$bookboxName", a book box you follow';
+        reasonMessages.add(message);
       }
       if (reasons.contains('same_borough')) {
-        reasonMessages.add('it was added to "$bookboxName", a book box near you');
+        final message = localizations?.addedToNearbyBookbox(bookboxName) ??
+                       'it was added to "$bookboxName", a book box near you';
+        reasonMessages.add(message);
       }
       if (reasons.contains('fav_genre')) {
-        reasonMessages.add('it matches one of your favorite genres');
+        reasonMessages.add(localizations?.matchesFavoriteGenre ?? 'it matches one of your favorite genres');
       }
       if (reasons.contains('solved_book_request')) {
-        reasonMessages.add('it matches a book request you made');
+        reasonMessages.add(localizations?.matchesBookRequest ?? 'it matches a book request you made');
       }
       
       String reasonText;
       if (reasonMessages.length == 1) {
         reasonText = reasonMessages[0];
       } else if (reasonMessages.length == 2) {
-        reasonText = '${reasonMessages[0]} and ${reasonMessages[1]}';
+        reasonText = '${reasonMessages[0]} ${localizations?.andConjunction ?? 'and'} ${reasonMessages[1]}';
       } else {
-        reasonText = '${reasonMessages.sublist(0, reasonMessages.length - 1).join(', ')}, and ${reasonMessages.last}';
+        final lastReason = reasonMessages.last;
+        final otherReasons = reasonMessages.sublist(0, reasonMessages.length - 1).join(', ');
+        reasonText = '$otherReasons, ${localizations?.andConjunction ?? 'and'} $lastReason';
       }
       
-      return 'Good news! "$bookTitle" is now available because $reasonText.';
+      return localizations?.goodNewsBookAvailable(bookTitle, reasonText) ??
+             'Good news! "$bookTitle" is now available because $reasonText.';
     }
   }
 
-  String buildNotificationContentSync(Notif notification) {
+  String buildNotificationContentSync(Notif notification, [AppLocalizations? localizations]) {
     final List<String> reasons = notification.reason;
     final String bookTitle = notification.bookTitle;
 
     if (reasons.contains('book_request')) {
-      return 'Someone is looking for "$bookTitle". If you have this book, please consider adding it to the nearest book box to help out!';
+      return localizations?.bookRequestContent(bookTitle) ?? 
+             'Someone is looking for "$bookTitle". If you have this book, please consider adding it to the nearest book box to help out!';
     } else {
       List<String> reasonMessages = [];
       
       if (reasons.contains('fav_bookbox')) {
-        reasonMessages.add('it was added to a book box you follow');
+        reasonMessages.add(localizations?.addedToFollowedBookboxSync ?? 'it was added to a book box you follow');
       }
       if (reasons.contains('same_borough')) {
-        reasonMessages.add('it was added to a book box near you');
+        reasonMessages.add(localizations?.addedToNearbyBookboxSync ?? 'it was added to a book box near you');
       }
       if (reasons.contains('fav_genre')) {
-        reasonMessages.add('it matches one of your favorite genres');
+        reasonMessages.add(localizations?.matchesFavoriteGenre ?? 'it matches one of your favorite genres');
       }
       if (reasons.contains('solved_book_request')) {
-        reasonMessages.add('it matches a book request you made');
+        reasonMessages.add(localizations?.matchesBookRequest ?? 'it matches a book request you made');
       }
       
       String reasonText;
       if (reasonMessages.length == 1) {
         reasonText = reasonMessages[0];
       } else if (reasonMessages.length == 2) {
-        reasonText = '${reasonMessages[0]} and ${reasonMessages[1]}';
+        reasonText = '${reasonMessages[0]} ${localizations?.andConjunction ?? 'and'} ${reasonMessages[1]}';
       } else {
-        reasonText = '${reasonMessages.sublist(0, reasonMessages.length - 1).join(', ')}, and ${reasonMessages.last}';
+        final lastReason = reasonMessages.last;
+        final otherReasons = reasonMessages.sublist(0, reasonMessages.length - 1).join(', ');
+        reasonText = '$otherReasons, ${localizations?.andConjunction ?? 'and'} $lastReason';
       }
       
-      return 'Good news! "$bookTitle" is now available because $reasonText.';
+      return localizations?.goodNewsBookAvailable(bookTitle, reasonText) ??
+             'Good news! "$bookTitle" is now available because $reasonText.';
     }
   }
 
-  Future<void> onNotificationTap(Notif notification) async {
+  Future<void> onNotificationTap(Notif notification, [AppLocalizations? localizations]) async {
     if (!notification.isRead) {
-      await markAsRead(notification.id);
+      await markAsRead(notification.id, localizations);
     }
   }
 }

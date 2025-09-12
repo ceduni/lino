@@ -530,11 +530,11 @@ abstract class AppLocalizations {
   /// **'Matches your book request'**
   String get matchesYourBookRequest;
 
-  /// No description provided for @addedToFollowedBookbox.
+  /// No description provided for @addedToFollowedBookboxPreview.
   ///
   /// In en, this message translates to:
   /// **'Added to followed bookbox'**
-  String get addedToFollowedBookbox;
+  String get addedToFollowedBookboxPreview;
 
   /// No description provided for @addedNearYou.
   ///
@@ -673,6 +673,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Added'**
   String get added;
+
+  /// No description provided for @noAuthenticationTokenAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No authentication token available'**
+  String get noAuthenticationTokenAvailable;
+
+  /// No description provided for @errorLoadingNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading notifications'**
+  String get errorLoadingNotifications;
+
+  /// No description provided for @errorMarkingNotificationAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Error marking notification as read'**
+  String get errorMarkingNotificationAsRead;
+
+  /// No description provided for @errorMarkingAllNotificationsAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Error marking all notifications as read'**
+  String get errorMarkingAllNotificationsAsRead;
+
+  /// No description provided for @notification.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification'**
+  String get notification;
+
+  /// No description provided for @noSpecificReasonProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'No specific reason provided for this notification.'**
+  String get noSpecificReasonProvided;
+
+  /// No description provided for @someoneIsLookingForBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone is looking for \"{bookTitle}\"'**
+  String someoneIsLookingForBook(Object bookTitle);
+
+  /// No description provided for @bookIsNowAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{bookTitle}\" is now available'**
+  String bookIsNowAvailable(Object bookTitle);
+
+  /// No description provided for @aBookBox.
+  ///
+  /// In en, this message translates to:
+  /// **'a book box'**
+  String get aBookBox;
+
+  /// No description provided for @bookRequestContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone is looking for \"{bookTitle}\". If you have this book, please consider adding it to the nearest book box to help out!'**
+  String bookRequestContent(Object bookTitle);
+
+  /// No description provided for @addedToFollowedBookbox.
+  ///
+  /// In en, this message translates to:
+  /// **'it was added to \"{bookboxName}\", a book box you follow'**
+  String addedToFollowedBookbox(Object bookboxName);
+
+  /// No description provided for @addedToNearbyBookbox.
+  ///
+  /// In en, this message translates to:
+  /// **'it was added to \"{bookboxName}\", a book box near you'**
+  String addedToNearbyBookbox(Object bookboxName);
+
+  /// No description provided for @matchesFavoriteGenre.
+  ///
+  /// In en, this message translates to:
+  /// **'it matches one of your favorite genres'**
+  String get matchesFavoriteGenre;
+
+  /// No description provided for @matchesBookRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'it matches a book request you made'**
+  String get matchesBookRequest;
+
+  /// No description provided for @andConjunction.
+  ///
+  /// In en, this message translates to:
+  /// **'and'**
+  String get andConjunction;
+
+  /// No description provided for @goodNewsBookAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Good news! \"{bookTitle}\" is now available because {reason}.'**
+  String goodNewsBookAvailable(Object bookTitle, Object reason);
+
+  /// No description provided for @addedToFollowedBookboxSync.
+  ///
+  /// In en, this message translates to:
+  /// **'it was added to a book box you follow'**
+  String get addedToFollowedBookboxSync;
+
+  /// No description provided for @addedToNearbyBookboxSync.
+  ///
+  /// In en, this message translates to:
+  /// **'it was added to a book box near you'**
+  String get addedToNearbyBookboxSync;
+
+  /// No description provided for @modifyProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Modify Profile'**
+  String get modifyProfile;
+
+  /// No description provided for @submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submit;
+
+  /// No description provided for @phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// No description provided for @markAllAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read All'**
+  String get markAllAsRead;
 }
 
 class _AppLocalizationsDelegate

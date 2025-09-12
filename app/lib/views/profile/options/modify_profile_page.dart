@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/profile/options/modify_profile_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class ModifyProfilePage extends StatefulWidget {
   const ModifyProfilePage({super.key});
@@ -24,9 +25,10 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Modify Profile'),
+        title: Text(localizations.modifyProfile),
       ),
       body: Consumer<ModifyProfileViewModel>(
         builder: (context, viewModel, child) {
@@ -103,11 +105,11 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                       ),
                     ),
                     Spacer(flex: 1),
-                    _buildTextField(viewModel.usernameController, 'Username', Icons.person),
+                    _buildTextField(viewModel.usernameController, localizations.username, Icons.person),
                     SizedBox(height: 20),
                     _buildTextField(
                       viewModel.passwordController,
-                      'Password',
+                      localizations.password,
                       Icons.lock,
                       obscureText: viewModel.obscureText,
                       isPassword: true,
@@ -116,7 +118,7 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                     SizedBox(height: 20),
                     _buildTextField(viewModel.emailController, 'Email', Icons.email),
                     SizedBox(height: 20),
-                    _buildTextField(viewModel.phoneController, 'Phone', Icons.phone, isPhone: true),
+                    _buildTextField(viewModel.phoneController, localizations.phone, Icons.phone, isPhone: true),
                     SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -124,13 +126,13 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                         ElevatedButton(
                           onPressed: () => Get.back(),
                           style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                          child: Text('Dismiss', style: TextStyle(color: LinoColors.accent)),
+                          child: Text(localizations.dismiss, style: TextStyle(color: LinoColors.accent)),
                         ),
                         ElevatedButton(
                           onPressed: () => _showConfirmationDialog(viewModel),
                           style: ElevatedButton.styleFrom(backgroundColor: LinoColors.accent),
                           child: Text(
-                            'Submit',
+                            localizations.submit,
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
