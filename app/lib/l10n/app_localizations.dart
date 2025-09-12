@@ -205,6 +205,354 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Already have an account? '**
   String get alreadyHaveAccount;
+
+  /// No description provided for @books.
+  ///
+  /// In en, this message translates to:
+  /// **'Books'**
+  String get books;
+
+  /// No description provided for @trees.
+  ///
+  /// In en, this message translates to:
+  /// **'Trees'**
+  String get trees;
+
+  /// No description provided for @viewall.
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewall;
+
+  /// No description provided for @bookboxes.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookboxes'**
+  String get bookboxes;
+
+  /// No description provided for @noBookboxesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookboxes found'**
+  String get noBookboxesFound;
+
+  /// No description provided for @noBooksFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No books found'**
+  String get noBooksFound;
+
+  /// No description provided for @sortBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort '**
+  String get sortBy;
+
+  /// No description provided for @relevance.
+  ///
+  /// In en, this message translates to:
+  /// **'Relevance'**
+  String get relevance;
+
+  /// No description provided for @popularity.
+  ///
+  /// In en, this message translates to:
+  /// **'Popularity'**
+  String get popularity;
+
+  /// No description provided for @newest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get newest;
+
+  /// No description provided for @oldest.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest'**
+  String get oldest;
+
+  /// No description provided for @titleAsc.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (A-Z)'**
+  String get titleAsc;
+
+  /// No description provided for @titleDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (Z-A)'**
+  String get titleDesc;
+
+  /// No description provided for @authorAsc.
+  ///
+  /// In en, this message translates to:
+  /// **'Author (A-Z)'**
+  String get authorAsc;
+
+  /// No description provided for @authorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Author (Z-A)'**
+  String get authorDesc;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @previous.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get previous;
+
+  /// No description provided for @bookbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookbox'**
+  String get bookbox;
+
+  /// No description provided for @bookboxesnearyou.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookboxes near you'**
+  String get bookboxesnearyou;
+
+  /// No description provided for @searchBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Search books...'**
+  String get searchBooks;
+
+  /// No description provided for @searchBookboxes.
+  ///
+  /// In en, this message translates to:
+  /// **'Search bookboxes...'**
+  String get searchBookboxes;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @dismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismiss;
+
+  /// No description provided for @refreshNearbyBookboxes.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh nearby bookboxes'**
+  String get refreshNearbyBookboxes;
+
+  /// No description provided for @enterSearchTerm.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a search term to find bookboxes or books'**
+  String get enterSearchTerm;
+
+  /// No description provided for @active.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get active;
+
+  /// No description provided for @inactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get inactive;
+
+  /// No description provided for @kmAway.
+  ///
+  /// In en, this message translates to:
+  /// **'km away'**
+  String get kmAway;
+
+  /// No description provided for @results.
+  ///
+  /// In en, this message translates to:
+  /// **'results'**
+  String get results;
+
+  /// No description provided for @noBooksFoundFor.
+  ///
+  /// In en, this message translates to:
+  /// **'No books found for'**
+  String get noBooksFoundFor;
+
+  /// No description provided for @createNewRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new request for this book !'**
+  String get createNewRequest;
+
+  /// No description provided for @noBookboxesFoundWithin.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookboxes found within'**
+  String get noBookboxesFoundWithin;
+
+  /// No description provided for @km.
+  ///
+  /// In en, this message translates to:
+  /// **'km'**
+  String get km;
+
+  /// No description provided for @tryExpandingSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Try expanding your search area or search manually'**
+  String get tryExpandingSearch;
+
+  /// No description provided for @adjustSearchDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust Search Distance'**
+  String get adjustSearchDistance;
+
+  /// No description provided for @currentDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Current distance'**
+  String get currentDistance;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get apply;
+
+  /// No description provided for @scan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get scan;
+
+  /// No description provided for @mapTemporarilyUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Map temporarily unavailable'**
+  String get mapTemporarilyUnavailable;
+
+  /// No description provided for @refreshNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh notifications'**
+  String get refreshNotifications;
+
+  /// No description provided for @unableToLoadNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load notifications'**
+  String get unableToLoadNotifications;
+
+  /// No description provided for @checkInternetConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your internet connection and try again'**
+  String get checkInternetConnection;
+
+  /// No description provided for @bookRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Request'**
+  String get bookRequest;
+
+  /// No description provided for @newBookAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'New Book Available'**
+  String get newBookAvailable;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @daysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'d ago'**
+  String get daysAgo;
+
+  /// No description provided for @hoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'h ago'**
+  String get hoursAgo;
+
+  /// No description provided for @minutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'m ago'**
+  String get minutesAgo;
+
+  /// No description provided for @justNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get justNow;
+
+  /// No description provided for @newNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'New notification'**
+  String get newNotification;
+
+  /// No description provided for @someoneRequestedThisBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone requested this book'**
+  String get someoneRequestedThisBook;
+
+  /// No description provided for @matchesYourBookRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Matches your book request'**
+  String get matchesYourBookRequest;
+
+  /// No description provided for @addedToFollowedBookbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to followed bookbox'**
+  String get addedToFollowedBookbox;
+
+  /// No description provided for @addedNearYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Added near you'**
+  String get addedNearYou;
+
+  /// No description provided for @matchesYourFavoriteGenre.
+  ///
+  /// In en, this message translates to:
+  /// **'Matches your favorite genre'**
+  String get matchesYourFavoriteGenre;
+
+  /// No description provided for @andMore.
+  ///
+  /// In en, this message translates to:
+  /// **'more'**
+  String get andMore;
 }
 
 class _AppLocalizationsDelegate

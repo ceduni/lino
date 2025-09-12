@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/home/home_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class MergedProfileStatsWidget extends StatelessWidget {
   final String userName;
@@ -19,6 +20,7 @@ class MergedProfileStatsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () {
         final homeViewModel = Provider.of<HomeViewModel>(context, listen: false);
@@ -91,7 +93,7 @@ class MergedProfileStatsWidget extends StatelessWidget {
                 icon: Icons.park,
                 iconColor: Colors.green.shade600,
                 value: treesSaved.toStringAsFixed(2),
-                label: 'Trees',
+                label: localization.trees,
               ),
               const SizedBox(width: 42),
               // Books saved
@@ -99,7 +101,7 @@ class MergedProfileStatsWidget extends StatelessWidget {
                 icon: Icons.book,
                 iconColor: LinoColors.accent,
                 value: booksSaved.toString(),
-                label: 'Books',
+                label: localization.books,
               ),
               const SizedBox(width: 10),
             ],

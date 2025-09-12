@@ -211,7 +211,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         children: [
           _buildGuestMessage(localizations),
           Expanded(
-            child: _buildMapSection(viewModel),
+            child: _buildMapSection(viewModel, localizations),
           ),
         ],
       ),
@@ -220,8 +220,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             backgroundColor: LinoColors.accent,
             foregroundColor: Colors.white,
             icon: const Icon(Icons.qr_code_scanner),
-            label: const Text(
-              'Scan',
+            label: Text(
+              localizations.scan,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -273,7 +273,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
-                            child: _buildMap(viewModel),
+                            child: _buildMap(viewModel, localizations),
                           ),
                         ),
                       ),
@@ -289,8 +289,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             backgroundColor: LinoColors.accent,
             foregroundColor: Colors.white,
             icon: const Icon(Icons.qr_code_scanner),
-            label: const Text(
-              'Scan',
+            label: Text(
+              localizations.scan,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -373,7 +373,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildMapSection(HomeViewModel viewModel) {
+  Widget _buildMapSection(HomeViewModel viewModel, AppLocalizations localizations) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Card(
@@ -383,13 +383,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: _buildMap(viewModel),
+          child: _buildMap(viewModel, localizations),
         ),
       ),
     );
   }
 
-  Widget _buildMap(HomeViewModel viewModel) {
+  Widget _buildMap(HomeViewModel viewModel, AppLocalizations localizations) {
     return Consumer2<BookboxListViewModel, MapViewModel>(
       builder: (context, bookboxViewModel, mapViewModel, child) {
         if (!mounted) {
@@ -421,14 +421,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           );
         } catch (e) {
           print('Error building map: $e');
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.map_outlined, size: 48, color: Colors.grey),
                 SizedBox(height: 8),
                 Text(
-                  'Map temporarily unavailable',
+                  localizations.mapTemporarilyUnavailable,
                   style: TextStyle(color: Colors.grey),
                 ),
               ],
@@ -475,11 +475,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         IconButton(
                           onPressed: () => _loadNotificationsWithRetry(),
                           icon: const Icon(Icons.refresh, size: 20),
-                          tooltip: 'Refresh notifications',
+                          tooltip: localizations.refreshNotifications,
                         ),
                         TextButton(
                           onPressed: () => Get.toNamed(AppRoutes.home.notifications),
-                          child: const Text('View All'),
+                          child: Text(localizations.viewall),
                         ),
                       ],
                     ],
@@ -529,7 +529,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       const Icon(Icons.error, color: Colors.red, size: 32),
                       const SizedBox(height: 8),
                       Text(
-                        'Unable to load notifications',
+                        localizations.unableToLoadNotifications,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -538,7 +538,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Check your internet connection and try again',
+                        localizations.checkInternetConnection,
                         style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 14,
@@ -549,7 +549,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ElevatedButton.icon(
                         onPressed: () => _loadNotificationsWithRetry(),
                         icon: const Icon(Icons.refresh, size: 18),
-                        label: const Text('Retry'),
+                        label: Text(localizations.retry),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue.shade600,
                           foregroundColor: Colors.white,
@@ -596,13 +596,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           children: [
                             if (notification.reason.isNotEmpty)
                               Text(
-                                _formatNotificationReason(notification.reason),
+                                _formatNotificationReason(notification.reason, localizations),
                                 style: const TextStyle(fontSize: 12),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             Text(
-                              _formatNotificationDate(notification.createdAt),
+                              _formatNotificationDate(notification.createdAt, localizations),
                               style: const TextStyle(fontSize: 11, color: Colors.grey),
                             ),
                           ],
@@ -623,12 +623,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _showNotificationDetails(BuildContext context, Notif notification) async {
     final List<String> reasons = notification.reason;
+    final localizations = AppLocalizations.of(context)!;
 
     String title;
     if (reasons.contains('book_request')) {
-      title = 'Book Request';
+      title = localizations.bookRequest;
     } else {
-      title = 'New Book Available';
+      title = localizations.newBookAvailable;
     }
 
     // Create a temporary view model to use its methods
@@ -644,7 +645,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             builder: (context, snapshot) {
               String content;
               if (snapshot.connectionState == ConnectionState.waiting) {
-                content = 'Loading...';
+                content = localizations.loading;
               } else if (snapshot.hasError) {
                 content = tempViewModel.buildNotificationContentSync(notification);
               } else {
@@ -674,7 +675,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
           actions: [
             TextButton(
-              child: const Text('Close'),
+              child: Text(localizations.close),
               onPressed: () {
                 Get.back();
               },
@@ -706,24 +707,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  String _formatNotificationDate(DateTime date) {
+  String _formatNotificationDate(DateTime date, AppLocalizations localizations) {
     final now = DateTime.now();
     final difference = now.difference(date);
     
     if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
+      return '${difference.inDays}${localizations.daysAgo}';
     } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
+      return '${difference.inHours}${localizations.hoursAgo}';
     } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
+      return '${difference.inMinutes}${localizations.minutesAgo}';
     } else {
-      return 'Just now';
+      return localizations.justNow;
     }
   }
 
-  String _formatNotificationReason(List<String> reasons) {
+  String _formatNotificationReason(List<String> reasons, AppLocalizations localizations) {
     if (reasons.isEmpty) {
-      return 'New notification';
+      return localizations.newNotification;
     }
 
     List<String> formattedReasons = [];
@@ -731,15 +732,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     for (String reason in reasons) {
       switch (reason) {
         case 'book_request':
-          formattedReasons.add('Someone requested this book');
+          formattedReasons.add(localizations.someoneRequestedThisBook);
         case 'solved_book_request':
-          formattedReasons.add('Matches your book request');
+          formattedReasons.add(localizations.matchesYourBookRequest);
         case 'fav_bookbox':
-          formattedReasons.add('Added to followed bookbox');
+          formattedReasons.add(localizations.addedToFollowedBookbox);
         case 'same_borough':
-          formattedReasons.add('Added near you');
+          formattedReasons.add(localizations.addedNearYou);
         case 'fav_genre':
-          formattedReasons.add('Matches your favorite genre');
+          formattedReasons.add(localizations.matchesYourFavoriteGenre);
         default:
           formattedReasons.add(reason); 
       }
@@ -750,7 +751,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     } else if (formattedReasons.length == 2) {
       return '${formattedReasons[0]} • ${formattedReasons[1]}';
     } else {
-      return '${formattedReasons[0]} • ${formattedReasons[1]} • +${formattedReasons.length - 2} more';
+      return '${formattedReasons[0]} • ${formattedReasons[1]} • +${formattedReasons.length - 2} ${localizations.andMore}';
     }
   }
 }

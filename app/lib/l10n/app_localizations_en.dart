@@ -62,4 +62,181 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alreadyHaveAccount => 'Already have an account? ';
+
+  @override
+  String get books => 'Books';
+
+  @override
+  String get trees => 'Trees';
+
+  @override
+  String get viewall => 'View All';
+
+  @override
+  String get bookboxes => 'Bookboxes';
+
+  @override
+  String get noBookboxesFound => 'No bookboxes found';
+
+  @override
+  String get noBooksFound => 'No books found';
+
+  @override
+  String get sortBy => 'Sort ';
+
+  @override
+  String get relevance => 'Relevance';
+
+  @override
+  String get popularity => 'Popularity';
+
+  @override
+  String get newest => 'Newest';
+
+  @override
+  String get oldest => 'Oldest';
+
+  @override
+  String get titleAsc => 'Title (A-Z)';
+
+  @override
+  String get titleDesc => 'Title (Z-A)';
+
+  @override
+  String get authorAsc => 'Author (A-Z)';
+
+  @override
+  String get authorDesc => 'Author (Z-A)';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get previous => 'Previous';
+
+  @override
+  String get bookbox => 'Bookbox';
+
+  @override
+  String get bookboxesnearyou => 'Bookboxes near you';
+
+  @override
+  String get searchBooks => 'Search books...';
+
+  @override
+  String get searchBookboxes => 'Search bookboxes...';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get dismiss => 'Dismiss';
+
+  @override
+  String get refreshNearbyBookboxes => 'Refresh nearby bookboxes';
+
+  @override
+  String get enterSearchTerm =>
+      'Enter a search term to find bookboxes or books';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get inactive => 'Inactive';
+
+  @override
+  String get kmAway => 'km away';
+
+  @override
+  String get results => 'results';
+
+  @override
+  String get noBooksFoundFor => 'No books found for';
+
+  @override
+  String get createNewRequest => 'Create a new request for this book !';
+
+  @override
+  String get noBookboxesFoundWithin => 'No bookboxes found within';
+
+  @override
+  String get km => 'km';
+
+  @override
+  String get tryExpandingSearch =>
+      'Try expanding your search area or search manually';
+
+  @override
+  String get adjustSearchDistance => 'Adjust Search Distance';
+
+  @override
+  String get currentDistance => 'Current distance';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get apply => 'Apply';
+
+  @override
+  String get scan => 'Scan';
+
+  @override
+  String get mapTemporarilyUnavailable => 'Map temporarily unavailable';
+
+  @override
+  String get refreshNotifications => 'Refresh notifications';
+
+  @override
+  String get unableToLoadNotifications => 'Unable to load notifications';
+
+  @override
+  String get checkInternetConnection =>
+      'Check your internet connection and try again';
+
+  @override
+  String get bookRequest => 'Book Request';
+
+  @override
+  String get newBookAvailable => 'New Book Available';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get daysAgo => 'd ago';
+
+  @override
+  String get hoursAgo => 'h ago';
+
+  @override
+  String get minutesAgo => 'm ago';
+
+  @override
+  String get justNow => 'Just now';
+
+  @override
+  String get newNotification => 'New notification';
+
+  @override
+  String get someoneRequestedThisBook => 'Someone requested this book';
+
+  @override
+  String get matchesYourBookRequest => 'Matches your book request';
+
+  @override
+  String get addedToFollowedBookbox => 'Added to followed bookbox';
+
+  @override
+  String get addedNearYou => 'Added near you';
+
+  @override
+  String get matchesYourFavoriteGenre => 'Matches your favorite genre';
+
+  @override
+  String get andMore => 'more';
 }

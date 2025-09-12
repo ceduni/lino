@@ -62,4 +62,184 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get alreadyHaveAccount => 'Vous avez déjà un compte ? ';
+
+  @override
+  String get books => 'Livres';
+
+  @override
+  String get trees => 'Arbres';
+
+  @override
+  String get viewall => 'Voir tout';
+
+  @override
+  String get bookboxes => 'Boîtes à livres';
+
+  @override
+  String get noBookboxesFound => 'Aucune boîte à livres trouvée';
+
+  @override
+  String get noBooksFound => 'Aucun livre trouvé';
+
+  @override
+  String get sortBy => 'Trier ';
+
+  @override
+  String get relevance => 'Pertinence';
+
+  @override
+  String get popularity => 'Popularité';
+
+  @override
+  String get newest => 'Les plus récents';
+
+  @override
+  String get oldest => 'Les plus anciens';
+
+  @override
+  String get titleAsc => 'Titre (A-Z)';
+
+  @override
+  String get titleDesc => 'Titre (Z-A)';
+
+  @override
+  String get authorAsc => 'Auteur (A-Z)';
+
+  @override
+  String get authorDesc => 'Auteur (Z-A)';
+
+  @override
+  String get next => 'Suivant';
+
+  @override
+  String get previous => 'Précédent';
+
+  @override
+  String get bookbox => 'Boîte à livres';
+
+  @override
+  String get bookboxesnearyou => 'Boîtes à livres à proximité';
+
+  @override
+  String get searchBooks => 'Rechercher des livres...';
+
+  @override
+  String get searchBookboxes => 'Rechercher des boîtes à livres...';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String get dismiss => 'Ignorer';
+
+  @override
+  String get refreshNearbyBookboxes =>
+      'Actualiser les boîtes à livres à proximité';
+
+  @override
+  String get enterSearchTerm =>
+      'Entrez un terme de recherche pour trouver des boîtes à livres ou des livres';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get inactive => 'Inactive';
+
+  @override
+  String get kmAway => 'km de distance';
+
+  @override
+  String get results => 'résultats';
+
+  @override
+  String get noBooksFoundFor => 'Aucun livre trouvé pour';
+
+  @override
+  String get createNewRequest => 'Créer une nouvelle requête pour ce livre !';
+
+  @override
+  String get noBookboxesFoundWithin =>
+      'Aucune boîte à livres trouvée dans un rayon de';
+
+  @override
+  String get km => 'km';
+
+  @override
+  String get tryExpandingSearch =>
+      'Essayez d\'élargir votre zone de recherche ou de rechercher manuellement';
+
+  @override
+  String get adjustSearchDistance => 'Ajuster la distance de recherche';
+
+  @override
+  String get currentDistance => 'Distance actuelle';
+
+  @override
+  String get cancel => 'Annuler';
+
+  @override
+  String get apply => 'Appliquer';
+
+  @override
+  String get scan => 'Scanner';
+
+  @override
+  String get mapTemporarilyUnavailable => 'Carte temporairement indisponible';
+
+  @override
+  String get refreshNotifications => 'Actualiser les notifications';
+
+  @override
+  String get unableToLoadNotifications =>
+      'Impossible de charger les notifications';
+
+  @override
+  String get checkInternetConnection =>
+      'Vérifiez votre connexion Internet et réessayez';
+
+  @override
+  String get bookRequest => 'Demande de livre';
+
+  @override
+  String get newBookAvailable => 'Nouveau livre disponible';
+
+  @override
+  String get loading => 'Chargement...';
+
+  @override
+  String get close => 'Fermer';
+
+  @override
+  String get daysAgo => 'j';
+
+  @override
+  String get hoursAgo => 'h';
+
+  @override
+  String get minutesAgo => 'min';
+
+  @override
+  String get justNow => 'À l\'instant';
+
+  @override
+  String get newNotification => 'Nouvelle notification';
+
+  @override
+  String get someoneRequestedThisBook => 'Quelqu\'un a demandé ce livre';
+
+  @override
+  String get matchesYourBookRequest => 'Correspond à votre demande de livre';
+
+  @override
+  String get addedToFollowedBookbox => 'Ajouté à la boîte à livres suivie';
+
+  @override
+  String get addedNearYou => 'Ajouté près de chez vous';
+
+  @override
+  String get matchesYourFavoriteGenre => 'Correspond à votre genre préféré';
+
+  @override
+  String get andMore => 'de plus';
 }

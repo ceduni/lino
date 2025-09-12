@@ -6,6 +6,7 @@ import 'package:Lino_app/utils/constants/search_types.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/models/book_model.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -25,15 +26,16 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Consumer<SearchPageViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
           body: Column(
             children: [
-              _buildSearchBar(viewModel),
-              _buildSearchTypeTabs(viewModel),
+              _buildSearchBar(viewModel, localizations),
+              _buildSearchTypeTabs(viewModel, localizations),
               Expanded(
-                child: _buildSearchResults(viewModel),
+                child: _buildSearchResults(viewModel,localizations),
               ),
             ],
           ),
@@ -42,13 +44,15 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildSearchBar(SearchPageViewModel viewModel) {
+  Widget _buildSearchBar(SearchPageViewModel viewModel, AppLocalizations localizations) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: TextField(
         controller: viewModel.searchController,
         decoration: InputDecoration(
-          hintText: 'Search ${viewModel.currentSearchType == SearchType.bookboxes ? 'bookboxes' : 'books'}...',
+          hintText: viewModel.currentSearchType == SearchType.bookboxes 
+              ? localizations.searchBookboxes 
+              : localizations.searchBooks,
           prefixIcon: const Icon(Icons.search),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25.0),
@@ -64,7 +68,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildSearchTypeTabs(SearchPageViewModel viewModel) {
+  Widget _buildSearchTypeTabs(SearchPageViewModel viewModel, AppLocalizations localizations) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
@@ -84,7 +88,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ),
                 child: Text(
-                  'Bookboxes',
+                  localizations.bookboxes,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: viewModel.currentSearchType == SearchType.bookboxes
@@ -111,7 +115,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ),
                 child: Text(
-                  'Books',
+                  localizations.books,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: viewModel.currentSearchType == SearchType.books
@@ -128,7 +132,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildSearchResults(SearchPageViewModel viewModel) {
+  Widget _buildSearchResults(SearchPageViewModel viewModel, AppLocalizations localizations) {
     if (viewModel.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -162,7 +166,7 @@ class _SearchPageState extends State<SearchPage> {
                   ElevatedButton.icon(
                     onPressed: viewModel.retrySearch,
                     icon: const Icon(Icons.refresh),
-                    label: const Text('Retry'),
+                    label: Text(localizations.retry),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: LinoColors.accent,
                       foregroundColor: Colors.white,
@@ -171,7 +175,7 @@ class _SearchPageState extends State<SearchPage> {
                   const SizedBox(width: 12),
                   TextButton(
                     onPressed: viewModel.clearError,
-                    child: const Text('Dismiss'),
+                    child: Text(localizations.dismiss),
                   ),
                 ],
               ),
@@ -192,8 +196,8 @@ class _SearchPageState extends State<SearchPage> {
               children: [
                 Icon(Icons.location_on, color: LinoColors.accent),
                 const SizedBox(width: 8),
-                const Text(
-                  'Bookboxes near you',
+                Text(
+                  localizations.bookboxesnearyou,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -203,15 +207,15 @@ class _SearchPageState extends State<SearchPage> {
                 IconButton(
                   onPressed: viewModel.loadNearbyBookboxes,
                   icon: const Icon(Icons.refresh),
-                  tooltip: 'Refresh nearby bookboxes',
+                  tooltip: localizations.refreshNearbyBookboxes,
                 ),
               ],
             ),
           ),
           Expanded(
             child: viewModel.bookboxResults.isEmpty
-                ? _buildNoBookboxesFoundWidget(viewModel)
-                : _buildBookboxResults(viewModel),
+                ? _buildNoBookboxesFoundWidget(viewModel, localizations)
+                : _buildBookboxResults(viewModel, localizations),
           ),
         ],
       );
@@ -219,32 +223,32 @@ class _SearchPageState extends State<SearchPage> {
 
     // Show empty state for books or when search query is empty for books
     if (viewModel.searchQuery.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'Enter a search term to find bookboxes or books',
+          localizations.enterSearchTerm,
           style: TextStyle(fontSize: 16, color: Colors.grey),
         ),
       );
     }
 
     return viewModel.currentSearchType == SearchType.bookboxes
-        ? _buildBookboxResults(viewModel)
-        : _buildBookResults(viewModel);
+        ? _buildBookboxResults(viewModel, localizations)
+        : _buildBookResults(viewModel, localizations);
   }
 
-  Widget _buildBookboxResults(SearchPageViewModel viewModel) {
+  Widget _buildBookboxResults(SearchPageViewModel viewModel, AppLocalizations localizations) {
     return Column(
       children: [
         // Only show sorting filter when there's a search query
         if (viewModel.searchQuery.isNotEmpty)
-          _buildBookboxSortingFilter(viewModel),
+          _buildBookboxSortingFilter(viewModel, localizations),
         Expanded(
           child: viewModel.bookboxResults.isEmpty
               ? (viewModel.searchQuery.isEmpty 
-                  ? _buildNoBookboxesFoundWidget(viewModel)
-                  : const Center(
+                  ? _buildNoBookboxesFoundWidget(viewModel, localizations)
+                  : Center(
                       child: Text(
-                        'No bookboxes found',
+                        localizations.noBookboxesFound,
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ))
@@ -252,22 +256,22 @@ class _SearchPageState extends State<SearchPage> {
                   itemCount: viewModel.bookboxResults.length,
                   itemBuilder: (context, index) {
                     final bookbox = viewModel.bookboxResults[index];
-                    return _buildBookboxItem(bookbox, viewModel);
+                    return _buildBookboxItem(bookbox, viewModel, localizations);
                   },
                 ),
         ),
         if (viewModel.bookboxPagination != null && viewModel.bookboxResults.isNotEmpty)
-          _buildBookboxPagination(viewModel),
+          _buildBookboxPagination(viewModel, localizations),
       ],
     );
   }
 
-  Widget _buildBookboxSortingFilter(SearchPageViewModel viewModel) {
+  Widget _buildBookboxSortingFilter(SearchPageViewModel viewModel, AppLocalizations localizations) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
-          const Text('Sort by: ', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(localizations.sortBy, style: TextStyle(fontWeight: FontWeight.bold)),
           Expanded(
             child: DropdownButton<SortOption>(
               value: viewModel.bookboxSortOption,
@@ -300,7 +304,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildBookboxItem(ShortenedBookBox bookbox, SearchPageViewModel viewModel) {
+  Widget _buildBookboxItem(ShortenedBookBox bookbox, SearchPageViewModel viewModel, AppLocalizations localizations) {
     // Color scheme based on active status
     final backgroundColor = bookbox.isActive 
         ? Colors.green.shade50 
@@ -427,7 +431,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    bookbox.isActive ? 'Active' : 'Inactive',
+                    bookbox.isActive ? localizations.active : localizations.inactive,
                     style: TextStyle(
                       color: statusColor,
                       fontWeight: FontWeight.w600,
@@ -444,7 +448,7 @@ class _SearchPageState extends State<SearchPage> {
                     Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
                     const SizedBox(width: 4),
                     Text(
-                      '${bookbox.distance!.toStringAsFixed(1)} km away',
+                      '${bookbox.distance!.toStringAsFixed(1)} ${localizations.kmAway}',
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: 13,
@@ -461,14 +465,14 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildBookboxPagination(SearchPageViewModel viewModel) {
+  Widget _buildBookboxPagination(SearchPageViewModel viewModel, AppLocalizations localizations) {
     final pagination = viewModel.bookboxPagination!;
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('${pagination.totalResults} results'),
+          Text('${pagination.totalResults} ${localizations.results}'),
           Row(
             children: [
               IconButton(
@@ -491,10 +495,10 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildBookResults(SearchPageViewModel viewModel) {
+  Widget _buildBookResults(SearchPageViewModel viewModel, AppLocalizations localizations) {
     return Column(
       children: [
-        _buildBookSortingFilter(viewModel),
+        _buildBookSortingFilter(viewModel, localizations),
         Expanded(
           child: viewModel.bookResults.isEmpty
               ? Column(
@@ -503,14 +507,14 @@ class _SearchPageState extends State<SearchPage> {
                     const Icon(Icons.book, size: 64, color: Colors.grey),
                     const SizedBox(height: 16),
                     Text(
-                      'No books found for "${viewModel.searchQuery}"',
+                      '${localizations.noBooksFoundFor} "${viewModel.searchQuery}"',
                       style: const TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                     TextButton(
                       onPressed: () {
                         viewModel.createRequest(viewModel.searchQuery);
                       }, 
-                      child: const Text('Create a new request for this book !', style: TextStyle(
+                      child: Text(localizations.createNewRequest, style: TextStyle(
               fontFamily: 'Kanit',
               fontWeight: FontWeight.w600,
               color: LinoColors.accent,
@@ -523,22 +527,22 @@ class _SearchPageState extends State<SearchPage> {
                   itemCount: viewModel.bookResults.length,
                   itemBuilder: (context, index) {
                     final book = viewModel.bookResults[index];
-                    return _buildBookItem(book, viewModel);
+                    return _buildBookItem(book, viewModel, localizations);
                   },
                 ),
         ),
         if (viewModel.bookPagination != null && viewModel.bookResults.isNotEmpty)
-          _buildBookPagination(viewModel),
+          _buildBookPagination(viewModel, localizations),
       ],
     );
   }
 
-  Widget _buildBookSortingFilter(SearchPageViewModel viewModel) {
+  Widget _buildBookSortingFilter(SearchPageViewModel viewModel, AppLocalizations localizations) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
-          const Text('Sort by: ', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(localizations.sortBy, style: TextStyle(fontWeight: FontWeight.bold)),
           Expanded(
             child: DropdownButton<SortOption>(
               value: viewModel.bookSortOption,
@@ -571,7 +575,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildBookItem(ExtendedBook book, SearchPageViewModel viewModel) {
+  Widget _buildBookItem(ExtendedBook book, SearchPageViewModel viewModel, AppLocalizations localizations) {
     // Gradient colors for book items
     final gradientColors = [
       Colors.blue.shade50,
@@ -711,14 +715,14 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildBookPagination(SearchPageViewModel viewModel) {
+  Widget _buildBookPagination(SearchPageViewModel viewModel, AppLocalizations localizations) {
     final pagination = viewModel.bookPagination!;
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('${pagination.totalResults} results'),
+          Text('${pagination.totalResults} ${localizations.results}'),
           Row(
             children: [
               IconButton(
@@ -741,7 +745,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildNoBookboxesFoundWidget(SearchPageViewModel viewModel) {
+  Widget _buildNoBookboxesFoundWidget(SearchPageViewModel viewModel, AppLocalizations localizations) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -755,7 +759,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No bookboxes found within ${viewModel.maxDistance.toStringAsFixed(1)} km',
+              '${localizations.noBookboxesFoundWithin} ${viewModel.maxDistance.toStringAsFixed(1)} ${localizations.km}',
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
@@ -764,8 +768,8 @@ class _SearchPageState extends State<SearchPage> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Try expanding your search area or search manually',
+            Text(
+              localizations.tryExpandingSearch,
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey,
@@ -774,9 +778,9 @@ class _SearchPageState extends State<SearchPage> {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () => _showDistanceAdjustmentDialog(context, viewModel),
+              onPressed: () => _showDistanceAdjustmentDialog(context, viewModel, localizations),
               icon: const Icon(Icons.tune),
-              label: const Text('Adjust Search Distance'),
+              label: Text(localizations.adjustSearchDistance),
               style: ElevatedButton.styleFrom(
                 backgroundColor: LinoColors.accent,
                 foregroundColor: Colors.white,
@@ -792,7 +796,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  void _showDistanceAdjustmentDialog(BuildContext context, SearchPageViewModel viewModel) {
+  void _showDistanceAdjustmentDialog(BuildContext context, SearchPageViewModel viewModel, AppLocalizations localizations) {
     double tempDistance = viewModel.maxDistance;
     
     showDialog(
@@ -801,15 +805,15 @@ class _SearchPageState extends State<SearchPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text(
-                'Adjust Search Distance',
+              title: Text(
+                localizations.adjustSearchDistance,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Current distance: ${tempDistance.toStringAsFixed(1)} km',
+                    '${localizations.currentDistance}: ${tempDistance.toStringAsFixed(1)} ${localizations.km}',
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 20),
@@ -851,7 +855,7 @@ class _SearchPageState extends State<SearchPage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel'),
+                  child: Text(localizations.cancel),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -862,7 +866,7 @@ class _SearchPageState extends State<SearchPage> {
                     backgroundColor: LinoColors.accent,
                     foregroundColor: Colors.white,
                   ),
-                  child: const Text('Apply'),
+                  child: Text(localizations.apply),
                 ),
               ],
             );
