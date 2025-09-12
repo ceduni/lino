@@ -10,5 +10,8 @@
 
 
   "homeNotificationsEmpty": "Aucune notification pour le moment",
-  "homeRecentNotifications": "Notifications récentes"
+  "homeRecentNotifications": "Notifications récentes",
+
+  "welcomeLoggedOut" : "Bienvenue !",
+  "msgLoggedOut": "Vous naviguez en tant qu'invité. Connectez-vous pour débloquer des fonctionnalités personnalisées et commencer à suivre votre parcours de lecture !"
 }

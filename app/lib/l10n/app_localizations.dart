@@ -139,6 +139,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recent Notifications'**
   String get homeRecentNotifications;
+
+  /// No description provided for @welcomeLoggedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome !'**
+  String get welcomeLoggedOut;
+
+  /// No description provided for @msgLoggedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re browsing as a guest. Log in to unlock personalized features and start tracking your reading journey!'**
+  String get msgLoggedOut;
 }
 
 class _AppLocalizationsDelegate

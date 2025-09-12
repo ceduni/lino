@@ -182,7 +182,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
 
         if (viewModel.isGuest) {
-          return _buildGuestView(viewModel);
+          return _buildGuestView(viewModel,localizations);
         }
 
         if (viewModel.isLoadingUser) {
@@ -205,11 +205,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildGuestView(HomeViewModel viewModel) {
+  Widget _buildGuestView(HomeViewModel viewModel, AppLocalizations localizations) {
     return Scaffold(
       body: Column(
         children: [
-          _buildGuestMessage(),
+          _buildGuestMessage(localizations),
           Expanded(
             child: _buildMapSection(viewModel),
           ),
@@ -302,7 +302,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildGuestMessage() {
+  Widget _buildGuestMessage(AppLocalizations localizations) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Card(
@@ -328,9 +328,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 color: Colors.white,
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Welcome, Guest!',
-                style: TextStyle(
+              Text(
+                localizations.welcomeLoggedOut,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -338,8 +338,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'You\'re browsing as a guest. Log in to unlock personalized features and start tracking your reading journey!',
+              Text(
+                localizations.msgLoggedOut,
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white70,
@@ -358,8 +358,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     borderRadius: BorderRadius.circular(25),
                   ),
                 ),
-                child: const Text(
-                  'Log In',
+                child: Text(
+                  localizations.navLogIn,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Kanit',

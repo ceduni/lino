@@ -10,5 +10,9 @@
   "navLogIn": "Log In",
 
   "homeNotificationsEmpty": "No notifications yet",
-  "homeRecentNotifications": "Recent Notifications"
+  "homeRecentNotifications": "Recent Notifications",
+
+  "welcomeLoggedOut" : "Welcome !",
+  "msgLoggedOut": "You're browsing as a guest. Log in to unlock personalized features and start tracking your reading journey!"
+  
 }

@@ -28,4 +28,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get homeRecentNotifications => 'Notifications récentes';
+
+  @override
+  String get welcomeLoggedOut => 'Bienvenue !';
+
+  @override
+  String get msgLoggedOut =>
+      'Vous naviguez en tant qu\'invité. Connectez-vous pour débloquer des fonctionnalités personnalisées et commencer à suivre votre parcours de lecture !';
 }
