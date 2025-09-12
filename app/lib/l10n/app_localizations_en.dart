@@ -385,4 +385,105 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get markAllAsRead => 'Read All';
+
+  @override
+  String get createRequest => 'Create Request';
+
+  @override
+  String get searchBookTitles => 'Search book titles...';
+
+  @override
+  String get filter => 'Filter ';
+
+  @override
+  String get sort => 'Sort ';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get mine => 'Mine';
+
+  @override
+  String get upvoted => 'Upvoted';
+
+  @override
+  String get notified => 'Notified';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get upvotes => 'Upvotes';
+
+  @override
+  String get yourRequest => 'Your request';
+
+  @override
+  String get requestedBy => 'Requested by';
+
+  @override
+  String get loginToCreateRequests => 'Login to Create Requests';
+
+  @override
+  String get noRequestsFoundFor => 'No requests found for ';
+
+  @override
+  String get tryDifferentSearch =>
+      'Try searching for a different book title or clear your search to see all requests.';
+
+  @override
+  String get noBookRequestsFound => 'No book requests found';
+
+  @override
+  String get beFirstToRequest => 'Be the first to request a book!';
+
+  @override
+  String get youHaveNoRequests => 'You have no requests';
+
+  @override
+  String get startRequestingBooks =>
+      'Start requesting books you\'d like to read';
+
+  @override
+  String get noUpvotedRequests => 'No upvoted requests';
+
+  @override
+  String get haventUpvotedYet => 'You haven\'t upvoted any requests yet';
+
+  @override
+  String get noNotifiedRequests => 'No notified requests';
+
+  @override
+  String get haventBeenNotified =>
+      'You haven\'t been notified about any requests yet';
+
+  @override
+  String get deleteRequestTitle => 'Delete your request for ';
+
+  @override
+  String get deleteRequestContent =>
+      'You won\'t be notified when the book you want will be added to a bookbox.';
+
+  @override
+  String get deleteRequestSuccess => 'Request deleted successfully!';
+
+  @override
+  String get requestDeleted => 'Request Deleted';
+
+  @override
+  String get requestDeletedMessage =>
+      'Your book request has been deleted successfully.';
+
+  @override
+  String get failedToDeleteRequest => 'Failed to delete request';
+
+  @override
+  String get message => 'Message';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get peopleNotified => 'People Notified: ';
 }

@@ -135,5 +135,40 @@
   "submit": "Submit",
   "phone": "Phone",
 
-  "markAllAsRead": "Read All"
+  "markAllAsRead": "Read All",
+
+  "createRequest": "Create Request",
+  "searchBookTitles": "Search book titles...",
+  "filter": "Filter ",
+  "sort": "Sort ",
+  "all": "All",
+  "mine": "Mine",
+  "upvoted": "Upvoted",
+  "notified": "Notified",
+  "date": "Date",
+  "upvotes": "Upvotes",
+  "yourRequest": "Your request",
+  "requestedBy": "Requested by",
+  "loginToCreateRequests": "Login to Create Requests",
+  "noRequestsFoundFor": "No requests found for ",
+  "tryDifferentSearch": "Try searching for a different book title or clear your search to see all requests.",
+  "noBookRequestsFound": "No book requests found",
+  "beFirstToRequest": "Be the first to request a book!",
+  "youHaveNoRequests": "You have no requests",
+  "startRequestingBooks": "Start requesting books you'd like to read",
+  "noUpvotedRequests": "No upvoted requests",
+  "haventUpvotedYet": "You haven't upvoted any requests yet",
+  "noNotifiedRequests": "No notified requests",
+  "haventBeenNotified": "You haven't been notified about any requests yet",
+  "deleteRequestTitle": "Delete your request for ",
+  "deleteRequestContent": "You won't be notified when the book you want will be added to a bookbox.",
+  "deleteRequestSuccess": "Request deleted successfully!",
+  "requestDeleted": "Request Deleted",
+  "requestDeletedMessage": "Your book request has been deleted successfully.",
+  "failedToDeleteRequest": "Failed to delete request",
+  "message": "Message",
+  "delete": "Delete",
+  "peopleNotified": "People Notified: "
+
+
 }

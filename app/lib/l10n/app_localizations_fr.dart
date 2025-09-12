@@ -393,4 +393,105 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get markAllAsRead => 'Tout lire';
+
+  @override
+  String get createRequest => 'Créer une requête';
+
+  @override
+  String get searchBookTitles => 'Rechercher des titres de livres...';
+
+  @override
+  String get filter => 'Filtrer ';
+
+  @override
+  String get sort => 'Trier ';
+
+  @override
+  String get all => 'Tous';
+
+  @override
+  String get mine => 'Mes requêtes';
+
+  @override
+  String get upvoted => 'Approuvées';
+
+  @override
+  String get notified => 'Notifiées';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get upvotes => 'Upvotes';
+
+  @override
+  String get yourRequest => 'Votre requête';
+
+  @override
+  String get requestedBy => 'Demandé par';
+
+  @override
+  String get loginToCreateRequests => 'Connectez-vous pour créer des requêtes';
+
+  @override
+  String get noRequestsFoundFor => 'Aucune requête trouvée pour ';
+
+  @override
+  String get tryDifferentSearch =>
+      'Essayez de rechercher un titre de livre différent ou effacez votre recherche pour voir toutes les requêtes.';
+
+  @override
+  String get noBookRequestsFound => 'Aucune requête de livre trouvée';
+
+  @override
+  String get beFirstToRequest => 'Soyez le premier à demander un livre !';
+
+  @override
+  String get youHaveNoRequests => 'Vous n\'avez aucune requête';
+
+  @override
+  String get startRequestingBooks =>
+      'Commencez à demander des livres que vous aimeriez lire';
+
+  @override
+  String get noUpvotedRequests => 'Aucune requête approuvée';
+
+  @override
+  String get haventUpvotedYet => 'Vous n\'avez encore approuvé aucune requête';
+
+  @override
+  String get noNotifiedRequests => 'Aucune requête notifiée';
+
+  @override
+  String get haventBeenNotified =>
+      'Vous n\'avez encore été notifié d\'aucune requête';
+
+  @override
+  String get deleteRequestTitle => 'Supprimer votre requête pour ';
+
+  @override
+  String get deleteRequestContent =>
+      'Vous ne serez pas notifié lorsque le livre que vous voulez sera ajouté à une boîte à livres.';
+
+  @override
+  String get deleteRequestSuccess => 'Requête supprimée avec succès !';
+
+  @override
+  String get requestDeleted => 'Requête supprimée';
+
+  @override
+  String get requestDeletedMessage =>
+      'Votre requête de livre a été supprimée avec succès.';
+
+  @override
+  String get failedToDeleteRequest => 'Échec de la suppression de la requête';
+
+  @override
+  String get message => 'Message';
+
+  @override
+  String get delete => 'Supprimer';
+
+  @override
+  String get peopleNotified => 'Personnes notifiées : ';
 }

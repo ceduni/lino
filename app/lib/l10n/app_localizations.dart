@@ -805,6 +805,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Read All'**
   String get markAllAsRead;
+
+  /// No description provided for @createRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Request'**
+  String get createRequest;
+
+  /// No description provided for @searchBookTitles.
+  ///
+  /// In en, this message translates to:
+  /// **'Search book titles...'**
+  String get searchBookTitles;
+
+  /// No description provided for @filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter '**
+  String get filter;
+
+  /// No description provided for @sort.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort '**
+  String get sort;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @mine.
+  ///
+  /// In en, this message translates to:
+  /// **'Mine'**
+  String get mine;
+
+  /// No description provided for @upvoted.
+  ///
+  /// In en, this message translates to:
+  /// **'Upvoted'**
+  String get upvoted;
+
+  /// No description provided for @notified.
+  ///
+  /// In en, this message translates to:
+  /// **'Notified'**
+  String get notified;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @upvotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Upvotes'**
+  String get upvotes;
+
+  /// No description provided for @yourRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Your request'**
+  String get yourRequest;
+
+  /// No description provided for @requestedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Requested by'**
+  String get requestedBy;
+
+  /// No description provided for @loginToCreateRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Login to Create Requests'**
+  String get loginToCreateRequests;
+
+  /// No description provided for @noRequestsFoundFor.
+  ///
+  /// In en, this message translates to:
+  /// **'No requests found for '**
+  String get noRequestsFoundFor;
+
+  /// No description provided for @tryDifferentSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Try searching for a different book title or clear your search to see all requests.'**
+  String get tryDifferentSearch;
+
+  /// No description provided for @noBookRequestsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No book requests found'**
+  String get noBookRequestsFound;
+
+  /// No description provided for @beFirstToRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to request a book!'**
+  String get beFirstToRequest;
+
+  /// No description provided for @youHaveNoRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no requests'**
+  String get youHaveNoRequests;
+
+  /// No description provided for @startRequestingBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Start requesting books you\'d like to read'**
+  String get startRequestingBooks;
+
+  /// No description provided for @noUpvotedRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No upvoted requests'**
+  String get noUpvotedRequests;
+
+  /// No description provided for @haventUpvotedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t upvoted any requests yet'**
+  String get haventUpvotedYet;
+
+  /// No description provided for @noNotifiedRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No notified requests'**
+  String get noNotifiedRequests;
+
+  /// No description provided for @haventBeenNotified.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t been notified about any requests yet'**
+  String get haventBeenNotified;
+
+  /// No description provided for @deleteRequestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your request for '**
+  String get deleteRequestTitle;
+
+  /// No description provided for @deleteRequestContent.
+  ///
+  /// In en, this message translates to:
+  /// **'You won\'t be notified when the book you want will be added to a bookbox.'**
+  String get deleteRequestContent;
+
+  /// No description provided for @deleteRequestSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Request deleted successfully!'**
+  String get deleteRequestSuccess;
+
+  /// No description provided for @requestDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Deleted'**
+  String get requestDeleted;
+
+  /// No description provided for @requestDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your book request has been deleted successfully.'**
+  String get requestDeletedMessage;
+
+  /// No description provided for @failedToDeleteRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete request'**
+  String get failedToDeleteRequest;
+
+  /// No description provided for @message.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get message;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @peopleNotified.
+  ///
+  /// In en, this message translates to:
+  /// **'People Notified: '**
+  String get peopleNotified;
 }
 
 class _AppLocalizationsDelegate
