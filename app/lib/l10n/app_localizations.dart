@@ -151,6 +151,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You\'re browsing as a guest. Log in to unlock personalized features and start tracking your reading journey!'**
   String get msgLoggedOut;
+
+  /// No description provided for @emailorusername.
+  ///
+  /// In en, this message translates to:
+  /// **'Email or Username'**
+  String get emailorusername;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @donthaveaccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? '**
+  String get donthaveaccount;
+
+  /// No description provided for @register.
+  ///
+  /// In en, this message translates to:
+  /// **'Register here'**
+  String get register;
+
+  /// No description provided for @continueasguest.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as a guest'**
+  String get continueasguest;
+
+  /// No description provided for @username.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get username;
+
+  /// No description provided for @phoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone (optional)'**
+  String get phoneNumber;
+
+  /// No description provided for @registerbtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get registerbtn;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? '**
+  String get alreadyHaveAccount;
 }
 
 class _AppLocalizationsDelegate

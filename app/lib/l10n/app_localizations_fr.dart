@@ -35,4 +35,31 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get msgLoggedOut =>
       'Vous naviguez en tant qu\'invité. Connectez-vous pour débloquer des fonctionnalités personnalisées et commencer à suivre votre parcours de lecture !';
+
+  @override
+  String get emailorusername => 'Email ou nom d\'utilisateur';
+
+  @override
+  String get password => 'Mot de passe';
+
+  @override
+  String get donthaveaccount => 'Vous n\'avez pas de compte ? ';
+
+  @override
+  String get register => 'Inscrivez-vous ici';
+
+  @override
+  String get continueasguest => 'Continuer en tant qu\'invité';
+
+  @override
+  String get username => 'Nom d\'utilisateur';
+
+  @override
+  String get phoneNumber => 'Téléphone (optionnel)';
+
+  @override
+  String get registerbtn => 'S\'inscrire';
+
+  @override
+  String get alreadyHaveAccount => 'Vous avez déjà un compte ? ';
 }

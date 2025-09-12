@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/login/register_view_model.dart';
 import '../../utils/constants/routes.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -16,6 +17,7 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
+    AppLocalizations localizations = AppLocalizations.of(context)!;
     return Scaffold(
       body: Consumer<RegisterViewModel>(
         builder: (context, viewModel, child) {
@@ -31,13 +33,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   const Spacer(flex: 2),
                   Image.asset('assets/logos/logo_with_bird.png', height: 150),
                   const Spacer(flex: 1),
-                  _buildTextField(viewModel.usernameController, 'Username', Icons.person),
+                  _buildTextField(viewModel.usernameController, localizations.username, Icons.person),
                   const SizedBox(height: 20),
                   _buildTextField(viewModel.emailController, 'Email', Icons.email),
                   const SizedBox(height: 20),
                   _buildTextField(
                     viewModel.passwordController,
-                    'Password',
+                    localizations.password,
                     Icons.lock,
                     obscureText: viewModel.obscureText,
                     onToggleVisibility: viewModel.togglePasswordVisibility,
@@ -45,7 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 20),
                   _buildTextField(
                     viewModel.phoneController,
-                    'Phone (optional)',
+                    localizations.phoneNumber,
                     Icons.phone,
                     inputType: TextInputType.phone,
                     inputFormatters: [
@@ -54,9 +56,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  _buildRegisterButton(viewModel),
+                  _buildRegisterButton(viewModel,localizations),
                   const Spacer(flex: 1),
-                  _buildFooterText(),
+                  _buildFooterText(localizations),
                   const Spacer(flex: 2),
                 ],
               ),
@@ -104,7 +106,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildRegisterButton(RegisterViewModel viewModel) {
+  Widget _buildRegisterButton(RegisterViewModel viewModel, AppLocalizations localizations) {
     return ElevatedButton(
       onPressed: viewModel.isLoading
           ? null
@@ -122,11 +124,11 @@ class _RegisterPageState extends State<RegisterPage> {
           ? const CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
       )
-          : const Text('Register'),
+          :  Text(localizations.registerbtn),
     );
   }
 
-  Widget _buildFooterText() {
+  Widget _buildFooterText(AppLocalizations localizations) {
     return Container(
       alignment: Alignment.center,
       child: GestureDetector(
@@ -134,13 +136,13 @@ class _RegisterPageState extends State<RegisterPage> {
           Get.offNamed(AppRoutes.auth.login);
         },
         child: RichText(
-          text: const TextSpan(
-            text: 'Already have an account? ',
-            style: TextStyle(color: Colors.white),
+          text: TextSpan(
+            text: localizations.alreadyHaveAccount,
+            style: const TextStyle(color: Colors.white),
             children: [
               TextSpan(
-                text: 'Log in',
-                style: TextStyle(
+                text: localizations.navLogIn,
+                style: const TextStyle(
                   color: Color(0xFF063F6A),
                   decoration: TextDecoration.underline,
                 ),

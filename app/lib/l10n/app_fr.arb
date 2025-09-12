@@ -13,5 +13,16 @@
   "homeRecentNotifications": "Notifications récentes",
 
   "welcomeLoggedOut" : "Bienvenue !",
-  "msgLoggedOut": "Vous naviguez en tant qu'invité. Connectez-vous pour débloquer des fonctionnalités personnalisées et commencer à suivre votre parcours de lecture !"
+  "msgLoggedOut": "Vous naviguez en tant qu'invité. Connectez-vous pour débloquer des fonctionnalités personnalisées et commencer à suivre votre parcours de lecture !",
+
+  "emailorusername": "Email ou nom d'utilisateur",
+  "password": "Mot de passe",
+  "donthaveaccount": "Vous n'avez pas de compte ? ",
+  "register": "Inscrivez-vous ici",
+  "continueasguest": "Continuer en tant qu'invité",
+
+  "username": "Nom d'utilisateur",
+  "phoneNumber": "Téléphone (optionnel)",
+  "registerbtn": "S'inscrire",
+  "alreadyHaveAccount": "Vous avez déjà un compte ? "
 }

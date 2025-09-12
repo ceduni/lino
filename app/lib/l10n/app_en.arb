@@ -13,6 +13,16 @@
   "homeRecentNotifications": "Recent Notifications",
 
   "welcomeLoggedOut" : "Welcome !",
-  "msgLoggedOut": "You're browsing as a guest. Log in to unlock personalized features and start tracking your reading journey!"
+  "msgLoggedOut": "You're browsing as a guest. Log in to unlock personalized features and start tracking your reading journey!",
   
+  "emailorusername": "Email or Username",
+  "password": "Password",
+  "donthaveaccount": "Don't have an account? ",
+  "register": "Register here",
+  "continueasguest": "Continue as a guest",
+
+  "username": "Username",
+  "phoneNumber": "Phone (optional)",
+  "registerbtn": "Register",
+  "alreadyHaveAccount": "Already have an account? "
 }

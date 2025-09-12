@@ -35,4 +35,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get msgLoggedOut =>
       'You\'re browsing as a guest. Log in to unlock personalized features and start tracking your reading journey!';
+
+  @override
+  String get emailorusername => 'Email or Username';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get donthaveaccount => 'Don\'t have an account? ';
+
+  @override
+  String get register => 'Register here';
+
+  @override
+  String get continueasguest => 'Continue as a guest';
+
+  @override
+  String get username => 'Username';
+
+  @override
+  String get phoneNumber => 'Phone (optional)';
+
+  @override
+  String get registerbtn => 'Register';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account? ';
 }

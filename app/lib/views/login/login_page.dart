@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/login/login_view_model.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,6 +17,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       body: Consumer<LoginViewModel>(
         builder: (context, viewModel, child) {
@@ -26,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Stack(
               children: [
                 _buildCloseButton(),
-                _buildMainContent(viewModel),
+                _buildMainContent(viewModel, localizations),
               ],
             ),
           );
@@ -50,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildMainContent(LoginViewModel viewModel) {
+  Widget _buildMainContent(LoginViewModel viewModel, AppLocalizations localizations) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -61,21 +63,21 @@ class _LoginPageState extends State<LoginPage> {
           const Spacer(flex: 1),
           _buildTextField(
             viewModel.identifierController,
-            'Username or Email',
+            localizations.emailorusername,
             Icons.person,
           ),
           const SizedBox(height: 20),
           _buildTextField(
             viewModel.passwordController,
-            'Password',
+            localizations.password,
             Icons.lock,
             obscureText: viewModel.obscureText,
             onToggleVisibility: viewModel.togglePasswordVisibility,
           ),
           const SizedBox(height: 20),
-          _buildLoginButton(viewModel),
+          _buildLoginButton(viewModel, localizations),
           const Spacer(flex: 1),
-          _buildFooterText(viewModel),
+          _buildFooterText(viewModel, localizations),
           const Spacer(flex: 2),
         ],
       ),
@@ -115,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildLoginButton(LoginViewModel viewModel) {
+  Widget _buildLoginButton(LoginViewModel viewModel, AppLocalizations localizations) {
     return ElevatedButton(
       onPressed: viewModel.isLoading
           ? null
@@ -132,11 +134,11 @@ class _LoginPageState extends State<LoginPage> {
           ? const CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
       )
-          : const Text('Login'),
+          :  Text(localizations.navLogIn),
     );
   }
 
-  Widget _buildFooterText(LoginViewModel viewModel) {
+  Widget _buildFooterText(LoginViewModel viewModel, AppLocalizations localizations) {
     return Container(
       alignment: Alignment.center,
       child: Column(
@@ -145,11 +147,11 @@ class _LoginPageState extends State<LoginPage> {
           RichText(
             textAlign: TextAlign.center,
             text: TextSpan(
-              text: "Don't have an account? ",
+              text: localizations.donthaveaccount,
               style: const TextStyle(color: Colors.white),
               children: [
                 TextSpan(
-                  text: 'Register here',
+                  text: localizations.register,
                   style: const TextStyle(
                     color: Color(0xFF063F6A),
                     decoration: TextDecoration.underline,
@@ -170,8 +172,8 @@ class _LoginPageState extends State<LoginPage> {
                 Get.offNamed(AppRoutes.home.main);
               }
             },
-            child: const Text(
-              'Open as a guest',
+            child: Text(
+              localizations.continueasguest,
               style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
