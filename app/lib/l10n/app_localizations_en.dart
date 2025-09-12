@@ -239,4 +239,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get andMore => 'more';
+
+  @override
+  String get logout => 'Logout';
+
+  @override
+  String get profileManagement => 'Profile Management';
+
+  @override
+  String get favoriteGenres => 'Favorite Genres';
+
+  @override
+  String get setupReadingPreferences => 'Set up your reading preferences';
+
+  @override
+  String get favoriteLocations => 'Favorite Locations';
+
+  @override
+  String get managePreferredLocations => 'Manage your preferred locations';
+
+  @override
+  String get notificationSettings => 'Notification Settings';
+
+  @override
+  String get manageNotifications => 'Manage your notifications';
+
+  @override
+  String get yourBookboxTrail => 'Your Bookbox Trail';
+
+  @override
+  String get failedToLoadTransactions => 'Failed to load transactions';
+
+  @override
+  String get noTransactionsYet => 'No transactions yet';
+
+  @override
+  String get startAddingBooks =>
+      'Start adding or taking books to see your transaction history!';
+
+  @override
+  String get at => 'at';
+
+  @override
+  String get followedBookBoxes => 'Followed BookBoxes';
+
+  @override
+  String get errorLoadingFollowedBookboxes =>
+      'Error loading followed bookboxes';
+
+  @override
+  String get noAuthenticationToken => 'No authentication token found';
+
+  @override
+  String get noFollowedBookboxes => 'No followed bookboxes';
+
+  @override
+  String get startFollowingBookboxes =>
+      'Start following bookboxes to see them here!';
+
+  @override
+  String get took => 'Took';
+
+  @override
+  String get added => 'Added';
 }

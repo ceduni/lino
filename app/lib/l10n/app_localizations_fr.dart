@@ -242,4 +242,67 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get andMore => 'de plus';
+
+  @override
+  String get logout => 'Déconnexion';
+
+  @override
+  String get profileManagement => 'Gestion du profil';
+
+  @override
+  String get favoriteGenres => 'Genres préférés';
+
+  @override
+  String get setupReadingPreferences => 'Configurez vos préférences de lecture';
+
+  @override
+  String get favoriteLocations => 'Lieux favoris';
+
+  @override
+  String get managePreferredLocations => 'Gérez vos lieux préférés';
+
+  @override
+  String get notificationSettings => 'Paramètres de notification';
+
+  @override
+  String get manageNotifications => 'Gérez vos notifications';
+
+  @override
+  String get yourBookboxTrail => 'Votre historique';
+
+  @override
+  String get failedToLoadTransactions => 'Échec du chargement des transactions';
+
+  @override
+  String get noTransactionsYet => 'Aucune transaction pour le moment';
+
+  @override
+  String get startAddingBooks =>
+      'Commencez à ajouter ou prendre des livres pour voir votre historique de transactions !';
+
+  @override
+  String get at => 'à';
+
+  @override
+  String get followedBookBoxes => 'Boîtes à livres suivies';
+
+  @override
+  String get errorLoadingFollowedBookboxes =>
+      'Erreur lors du chargement des boîtes à livres suivies';
+
+  @override
+  String get noAuthenticationToken => 'Aucun jeton d\'authentification trouvé';
+
+  @override
+  String get noFollowedBookboxes => 'Aucune boîte à livres suivie';
+
+  @override
+  String get startFollowingBookboxes =>
+      'Commencez à suivre des boîtes à livres pour les voir ici !';
+
+  @override
+  String get took => 'Pris';
+
+  @override
+  String get added => 'Ajouté';
 }

@@ -5,6 +5,7 @@ import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:Lino_app/vm/profile/profile_view_model.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 import 'recent_transactions_widget.dart';
 import 'followed_bookboxes_widget.dart';
 
@@ -23,6 +24,8 @@ class UserDashboard extends StatefulWidget {
 class _UserDashboardState extends State<UserDashboard> {
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,7 +35,7 @@ class _UserDashboardState extends State<UserDashboard> {
             child: _buildProfileHeader(),
           ),
           
-          _buildProfileManagementSection(),
+          _buildProfileManagementSection(localizations),
           
           FollowedBookboxesWidget(user: widget.user),
       
@@ -58,7 +61,7 @@ class _UserDashboardState extends State<UserDashboard> {
                         Icon(Icons.logout, color: Colors.white, size: 18),
                         SizedBox(width: 4),
                         Text(
-                          'Logout',
+                          localizations.logout,
                           style: TextStyle(color: Colors.white, fontSize: 18)
                           ,
                         ),
@@ -163,7 +166,7 @@ class _UserDashboardState extends State<UserDashboard> {
     );
   }
 
-  Widget _buildProfileManagementSection() {
+  Widget _buildProfileManagementSection(AppLocalizations localizations) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       padding: const EdgeInsets.all(16.0),
@@ -181,8 +184,8 @@ class _UserDashboardState extends State<UserDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Profile Management',
+          Text(
+            localizations.profileManagement,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -192,22 +195,22 @@ class _UserDashboardState extends State<UserDashboard> {
           const SizedBox(height: 12),
           _buildSettingsTile(
             icon: Icons.favorite,
-            title: 'Favorite Genres',
-            subtitle: 'Set up your reading preferences',
+            title: localizations.favoriteGenres,
+            subtitle: localizations.setupReadingPreferences,
             onTap: () => Get.toNamed(AppRoutes.profile.favouriteGenres),
           ),
           const SizedBox(height: 8),
           _buildSettingsTile(
             icon: Icons.location_on,
-            title: 'Favorite Locations',
-            subtitle: 'Manage your preferred locations',
+            title: localizations.favoriteLocations,
+            subtitle: localizations.managePreferredLocations,
             onTap: () => Get.toNamed(AppRoutes.profile.favouriteLocations),
           ),
           const SizedBox(height: 8),
           _buildSettingsTile(
             icon: Icons.notifications,
-            title: 'Notification Settings',
-            subtitle: 'Manage your notifications',
+            title: localizations.notificationSettings,
+            subtitle: localizations.manageNotifications,
             onTap: () => Get.toNamed(AppRoutes.profile.setupNotifications),
           ),
           

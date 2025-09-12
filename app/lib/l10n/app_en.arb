@@ -86,5 +86,27 @@
   "addedToFollowedBookbox": "Added to followed bookbox",
   "addedNearYou": "Added near you",
   "matchesYourFavoriteGenre": "Matches your favorite genre",
-  "andMore": "more"
+  "andMore": "more",
+
+  "logout": "Logout",
+  "profileManagement": "Profile Management",
+  "favoriteGenres": "Favorite Genres",
+  "setupReadingPreferences": "Set up your reading preferences",
+  "favoriteLocations": "Favorite Locations",
+  "managePreferredLocations": "Manage your preferred locations",
+  "notificationSettings": "Notification Settings",
+  "manageNotifications": "Manage your notifications",
+  "yourBookboxTrail": "Your Bookbox Trail",
+  "failedToLoadTransactions": "Failed to load transactions",
+  "noTransactionsYet": "No transactions yet",
+  "startAddingBooks": "Start adding or taking books to see your transaction history!",
+  "at": "at",
+  "followedBookBoxes": "Followed BookBoxes",
+  "errorLoadingFollowedBookboxes": "Error loading followed bookboxes",
+  "noAuthenticationToken": "No authentication token found",
+  "noFollowedBookboxes": "No followed bookboxes",
+  "startFollowingBookboxes": "Start following bookboxes to see them here!",
+
+  "took": "Took",
+  "added": "Added"
 }

@@ -553,6 +553,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'more'**
   String get andMore;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
+  /// No description provided for @profileManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Management'**
+  String get profileManagement;
+
+  /// No description provided for @favoriteGenres.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite Genres'**
+  String get favoriteGenres;
+
+  /// No description provided for @setupReadingPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up your reading preferences'**
+  String get setupReadingPreferences;
+
+  /// No description provided for @favoriteLocations.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite Locations'**
+  String get favoriteLocations;
+
+  /// No description provided for @managePreferredLocations.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your preferred locations'**
+  String get managePreferredLocations;
+
+  /// No description provided for @notificationSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification Settings'**
+  String get notificationSettings;
+
+  /// No description provided for @manageNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your notifications'**
+  String get manageNotifications;
+
+  /// No description provided for @yourBookboxTrail.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Bookbox Trail'**
+  String get yourBookboxTrail;
+
+  /// No description provided for @failedToLoadTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load transactions'**
+  String get failedToLoadTransactions;
+
+  /// No description provided for @noTransactionsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions yet'**
+  String get noTransactionsYet;
+
+  /// No description provided for @startAddingBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Start adding or taking books to see your transaction history!'**
+  String get startAddingBooks;
+
+  /// No description provided for @at.
+  ///
+  /// In en, this message translates to:
+  /// **'at'**
+  String get at;
+
+  /// No description provided for @followedBookBoxes.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed BookBoxes'**
+  String get followedBookBoxes;
+
+  /// No description provided for @errorLoadingFollowedBookboxes.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading followed bookboxes'**
+  String get errorLoadingFollowedBookboxes;
+
+  /// No description provided for @noAuthenticationToken.
+  ///
+  /// In en, this message translates to:
+  /// **'No authentication token found'**
+  String get noAuthenticationToken;
+
+  /// No description provided for @noFollowedBookboxes.
+  ///
+  /// In en, this message translates to:
+  /// **'No followed bookboxes'**
+  String get noFollowedBookboxes;
+
+  /// No description provided for @startFollowingBookboxes.
+  ///
+  /// In en, this message translates to:
+  /// **'Start following bookboxes to see them here!'**
+  String get startFollowingBookboxes;
+
+  /// No description provided for @took.
+  ///
+  /// In en, this message translates to:
+  /// **'Took'**
+  String get took;
+
+  /// No description provided for @added.
+  ///
+  /// In en, this message translates to:
+  /// **'Added'**
+  String get added;
 }
 
 class _AppLocalizationsDelegate

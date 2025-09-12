@@ -5,6 +5,7 @@ import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class FollowedBookboxesWidget extends StatefulWidget {
   final User user;
@@ -66,6 +67,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     print('Building FollowedBookboxesWidget with ${followedBookboxes?.length ?? 0} bookboxes');
     return Card(
       elevation: 4,
@@ -84,7 +86,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Followed BookBoxes',
+                  localizations.followedBookBoxes,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -97,7 +99,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
                     onPressed: () {
                       Get.toNamed(AppRoutes.profile.followedBookboxes);
                     },
-                    child: const Text('View All'),
+                    child: Text(localizations.viewall),
                   )
                 else
                   const SizedBox.shrink(),
@@ -124,7 +126,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Error loading followed bookboxes',
+                      localizations.errorLoadingFollowedBookboxes,
                       style: TextStyle(
                         color: Colors.red[600],
                         fontWeight: FontWeight.w500,
@@ -143,7 +145,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
                     ElevatedButton.icon(
                       onPressed: _loadFollowedBookboxes,
                       icon: const Icon(Icons.refresh),
-                      label: const Text('Retry'),
+                      label: Text(localizations.retry),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
@@ -165,7 +167,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'No followed bookboxes',
+                      localizations.noFollowedBookboxes,
                       style: TextStyle(
                         fontSize: 18,
                         fontFamily: 'Kanit',
@@ -174,7 +176,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Start following bookboxes to see them here!',
+                      localizations.startFollowingBookboxes,
                       style: TextStyle(
                         fontSize: 14,
                         fontFamily: 'Kanit',
@@ -186,14 +188,14 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
                 ),
               )
             else
-              _buildBookboxesList(),
+              _buildBookboxesList(localizations),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBookboxCard(BookBox bookbox) {
+  Widget _buildBookboxCard(BookBox bookbox, AppLocalizations localization) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.all(4),
@@ -274,7 +276,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            '${bookbox.books.length} books',
+                            '${bookbox.books.length} ${localization.books}',
                             style: TextStyle(
                               fontSize: 11,
                               color: Colors.blue[600],
@@ -296,7 +298,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
     );
   }
 
-  Widget _buildBookboxesList() {
+  Widget _buildBookboxesList(AppLocalizations localizations) {
     if (followedBookboxes == null || followedBookboxes!.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -328,7 +330,7 @@ class _FollowedBookboxesWidgetState extends State<FollowedBookboxesWidget> {
       ),
       itemCount: itemsToShow.length,
       itemBuilder: (context, index) {
-        return _buildBookboxCard(itemsToShow[index]);
+        return _buildBookboxCard(itemsToShow[index], localizations);
       },
     );
   }

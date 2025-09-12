@@ -88,5 +88,27 @@
   "addedToFollowedBookbox": "Ajouté à la boîte à livres suivie",
   "addedNearYou": "Ajouté près de chez vous",
   "matchesYourFavoriteGenre": "Correspond à votre genre préféré",
-  "andMore": "de plus"
+  "andMore": "de plus",
+
+  "logout": "Déconnexion",
+  "profileManagement": "Gestion du profil",
+  "favoriteGenres": "Genres préférés",
+  "setupReadingPreferences": "Configurez vos préférences de lecture",
+  "favoriteLocations": "Lieux favoris",
+  "managePreferredLocations": "Gérez vos lieux préférés",
+  "notificationSettings": "Paramètres de notification",
+  "manageNotifications": "Gérez vos notifications",
+  "yourBookboxTrail": "Votre historique",
+  "failedToLoadTransactions": "Échec du chargement des transactions",
+  "noTransactionsYet": "Aucune transaction pour le moment",
+  "startAddingBooks": "Commencez à ajouter ou prendre des livres pour voir votre historique de transactions !",
+  "at": "à",
+  "followedBookBoxes": "Boîtes à livres suivies",
+  "errorLoadingFollowedBookboxes": "Erreur lors du chargement des boîtes à livres suivies",
+  "noAuthenticationToken": "Aucun jeton d'authentification trouvé",
+  "noFollowedBookboxes": "Aucune boîte à livres suivie",
+  "startFollowingBookboxes": "Commencez à suivre des boîtes à livres pour les voir ici !",
+
+  "took": "Pris",
+  "added": "Ajouté"
 }
