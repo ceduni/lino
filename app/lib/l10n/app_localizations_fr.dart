@@ -1096,4 +1096,19 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tapToAddCover => 'Appuyez pour ajouter une couverture';
+
+  @override
+  String get treeHuggerInTraining => 'Apprenti protecteur d\'arbres';
+
+  @override
+  String get carbonCrusader => 'Croisé du carbone';
+
+  @override
+  String get ecoWarrior => 'Guerrier écologique';
+
+  @override
+  String get planetProtector => 'Protecteur de la planète';
+
+  @override
+  String get environmentalChampion => 'Champion environnemental';
 }

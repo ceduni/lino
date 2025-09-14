@@ -373,5 +373,10 @@
   "english": "Anglais",
   "french": "Français",
   "selectLanguage": "Sélectionner la langue",
-  "tapToAddCover": "Appuyez pour ajouter une couverture"
+  "tapToAddCover": "Appuyez pour ajouter une couverture",
+  "treeHuggerInTraining": "Apprenti protecteur d'arbres",
+  "carbonCrusader": "Croisé du carbone",
+  "ecoWarrior": "Guerrier écologique",
+  "planetProtector": "Protecteur de la planète",
+  "environmentalChampion": "Champion environnemental"
 }

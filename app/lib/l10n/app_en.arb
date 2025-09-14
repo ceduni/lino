@@ -397,7 +397,12 @@
   "english": "English",
   "french": "French",
   "selectLanguage": "Select Language",
-  "tapToAddCover": "Tap to add cover"
+  "tapToAddCover": "Tap to add cover",
+  "treeHuggerInTraining": "Tree Hugger in Training",
+  "carbonCrusader": "Carbon Crusader",
+  "ecoWarrior": "Eco Warrior",
+  "planetProtector": "Planet Protector",
+  "environmentalChampion": "Environmental Champion"
 
 
 } 

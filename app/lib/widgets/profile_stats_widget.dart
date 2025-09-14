@@ -74,7 +74,7 @@ class MergedProfileStatsWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  getMatchingDescription(),
+                  getMatchingDescription(localization),
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade600,
@@ -157,25 +157,17 @@ class MergedProfileStatsWidget extends StatelessWidget {
     );
   }
 
-  static const descriptionList = [
-    'Tree Hugger in Training',
-    'Carbon Crusader',
-    'Eco Warrior',
-    'Planet Protector',
-    'Environmental Champion'
-  ];
-
-  String getMatchingDescription() {
+  String getMatchingDescription(AppLocalizations localization) {
     if (booksSaved >= 50) {
-      return descriptionList[4];
+      return localization.environmentalChampion;
     } else if (booksSaved >= 25) {
-      return descriptionList[3];
+      return localization.planetProtector;
     } else if (booksSaved >= 10) {
-      return descriptionList[2];
+      return localization.ecoWarrior;
     } else if (booksSaved >= 5) {
-      return descriptionList[1];
+      return localization.carbonCrusader;
     } else {
-      return descriptionList[0];
+      return localization.treeHuggerInTraining;
     }
   }
 }

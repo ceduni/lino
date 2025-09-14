@@ -1074,4 +1074,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tapToAddCover => 'Tap to add cover';
+
+  @override
+  String get treeHuggerInTraining => 'Tree Hugger in Training';
+
+  @override
+  String get carbonCrusader => 'Carbon Crusader';
+
+  @override
+  String get ecoWarrior => 'Eco Warrior';
+
+  @override
+  String get planetProtector => 'Planet Protector';
+
+  @override
+  String get environmentalChampion => 'Environmental Champion';
 }

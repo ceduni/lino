@@ -2072,6 +2072,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap to add cover'**
   String get tapToAddCover;
+
+  /// No description provided for @treeHuggerInTraining.
+  ///
+  /// In en, this message translates to:
+  /// **'Tree Hugger in Training'**
+  String get treeHuggerInTraining;
+
+  /// No description provided for @carbonCrusader.
+  ///
+  /// In en, this message translates to:
+  /// **'Carbon Crusader'**
+  String get carbonCrusader;
+
+  /// No description provided for @ecoWarrior.
+  ///
+  /// In en, this message translates to:
+  /// **'Eco Warrior'**
+  String get ecoWarrior;
+
+  /// No description provided for @planetProtector.
+  ///
+  /// In en, this message translates to:
+  /// **'Planet Protector'**
+  String get planetProtector;
+
+  /// No description provided for @environmentalChampion.
+  ///
+  /// In en, this message translates to:
+  /// **'Environmental Champion'**
+  String get environmentalChampion;
 }
 
 class _AppLocalizationsDelegate
