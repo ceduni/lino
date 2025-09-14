@@ -521,4 +521,106 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get startFollowingBookBoxes =>
       'Commencez à suivre des boîtes à livres pour les voir ici!';
+
+  @override
+  String get newbooknotifications => 'Nouvelles notifications de livres';
+
+  @override
+  String get getnotifiedwhenbooksmatchingyourpreferencesareaddedtobookboxesyoufolloworinyourfavoritelocations =>
+      'Soyez notifié lorsque des livres correspondant à vos préférences sont ajoutés aux boîtes à livres que vous suivez ou dans vos lieux favoris';
+
+  @override
+  String get bookRequestnotifications => 'Notifications de demande de livre';
+
+  @override
+  String get getnotifiedwhensomeonerequestsabookfromyou =>
+      'Soyez notifié lorsque quelqu\'un demande un livre dans l\'une des boîtes à livres que vous suivez';
+
+  @override
+  String get setupFavoriteGenres => 'Configurer les genres favoris';
+
+  @override
+  String get tellUsFavoriteGenres => 'Dites-nous vos genres favoris :';
+
+  @override
+  String get selectFavoriteGenresDescription =>
+      'Sélectionnez vos genres de livres favoris pour obtenir des recommandations personnalisées et des notifications';
+
+  @override
+  String get searchOrEnterCustomGenre =>
+      'Rechercher ou saisir un genre personnalisé';
+
+  @override
+  String get pass => 'Passer';
+
+  @override
+  String get finished => 'Terminé !';
+
+  @override
+  String get favouriteLocations => 'Lieux favoris';
+
+  @override
+  String get searchForPlaces => 'Rechercher des lieux...';
+
+  @override
+  String get removeLocation => 'Supprimer le lieu';
+
+  @override
+  String removeLocationConfirm(Object locationName) {
+    return 'Supprimer \"$locationName\" de vos lieux favoris ?';
+  }
+
+  @override
+  String get howToUse => 'Comment utiliser';
+
+  @override
+  String get searchPlacesInstruction =>
+      '• Recherchez des lieux à l\'aide de la barre de recherche';
+
+  @override
+  String get tapMapInstruction =>
+      '• Appuyez n\'importe où sur la carte pour ajouter un lieu';
+
+  @override
+  String get tapMarkersInstruction =>
+      '• Appuyez sur les marqueurs pour supprimer des lieux';
+
+  @override
+  String get dragDividerInstruction =>
+      '• Faites glisser le séparateur entre la carte et la liste pour redimensionner';
+
+  @override
+  String get maxLocationsInstruction => '• Maximum 10 lieux favoris autorisés';
+
+  @override
+  String get tapListItemsInstruction =>
+      '• Appuyez sur les éléments de la liste pour centrer la carte sur le lieu';
+
+  @override
+  String get gotIt => 'Compris';
+
+  @override
+  String favouriteLocationsCount(Object count) {
+    return 'Lieux favoris ($count/10)';
+  }
+
+  @override
+  String get clearAll => 'Tout effacer';
+
+  @override
+  String get noFavouriteLocationsYet => 'Aucun lieu favori pour le moment';
+
+  @override
+  String get tapMapOrSearchToAdd =>
+      'Appuyez sur la carte ou recherchez pour ajouter des lieux';
+
+  @override
+  String get clearAllLocations => 'Effacer tous les lieux';
+
+  @override
+  String get clearAllLocationsConfirm =>
+      'Êtes-vous sûr de vouloir supprimer tous les lieux favoris ?';
+
+  @override
+  String get remove => 'Supprimer';
 }

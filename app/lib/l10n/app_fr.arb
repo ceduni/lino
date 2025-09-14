@@ -181,5 +181,37 @@
   "de": "de",
 
   "followedBookBoxesEmpty": "Aucune boîte à livres suivie",
-  "startFollowingBookBoxes": "Commencez à suivre des boîtes à livres pour les voir ici!"
+  "startFollowingBookBoxes": "Commencez à suivre des boîtes à livres pour les voir ici!",
+
+  "newbooknotifications": "Nouvelles notifications de livres",
+  "getnotifiedwhenbooksmatchingyourpreferencesareaddedtobookboxesyoufolloworinyourfavoritelocations": "Soyez notifié lorsque des livres correspondant à vos préférences sont ajoutés aux boîtes à livres que vous suivez ou dans vos lieux favoris",
+  "bookRequestnotifications": "Notifications de demande de livre",
+  "getnotifiedwhensomeonerequestsabookfromyou": "Soyez notifié lorsque quelqu'un demande un livre dans l'une des boîtes à livres que vous suivez",
+
+  "setupFavoriteGenres": "Configurer les genres favoris",
+  "tellUsFavoriteGenres": "Dites-nous vos genres favoris :",
+  "selectFavoriteGenresDescription": "Sélectionnez vos genres de livres favoris pour obtenir des recommandations personnalisées et des notifications",
+  "searchOrEnterCustomGenre": "Rechercher ou saisir un genre personnalisé",
+  "pass": "Passer",
+  "finished": "Terminé !", 
+
+  "favouriteLocations": "Lieux favoris",
+  "searchForPlaces": "Rechercher des lieux...",
+  "removeLocation": "Supprimer le lieu",
+  "removeLocationConfirm": "Supprimer \"{locationName}\" de vos lieux favoris ?",
+  "howToUse": "Comment utiliser",
+  "searchPlacesInstruction": "• Recherchez des lieux à l'aide de la barre de recherche",
+  "tapMapInstruction": "• Appuyez n'importe où sur la carte pour ajouter un lieu",
+  "tapMarkersInstruction": "• Appuyez sur les marqueurs pour supprimer des lieux",
+  "dragDividerInstruction": "• Faites glisser le séparateur entre la carte et la liste pour redimensionner",
+  "maxLocationsInstruction": "• Maximum 10 lieux favoris autorisés",
+  "tapListItemsInstruction": "• Appuyez sur les éléments de la liste pour centrer la carte sur le lieu",
+  "gotIt": "Compris",
+  "favouriteLocationsCount": "Lieux favoris ({count}/10)",
+  "clearAll": "Tout effacer",
+  "noFavouriteLocationsYet": "Aucun lieu favori pour le moment",
+  "tapMapOrSearchToAdd": "Appuyez sur la carte ou recherchez pour ajouter des lieux",
+  "clearAllLocations": "Effacer tous les lieux",
+  "clearAllLocationsConfirm": "Êtes-vous sûr de vouloir supprimer tous les lieux favoris ?",
+  "remove": "Supprimer"
 }

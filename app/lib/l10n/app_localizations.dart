@@ -1045,6 +1045,181 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start following bookboxes to see them here!'**
   String get startFollowingBookBoxes;
+
+  /// No description provided for @newbooknotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'New Book Notifications'**
+  String get newbooknotifications;
+
+  /// No description provided for @getnotifiedwhenbooksmatchingyourpreferencesareaddedtobookboxesyoufolloworinyourfavoritelocations.
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified when books matching your preferences are added to bookboxes you follow or in your favorite locations'**
+  String
+      get getnotifiedwhenbooksmatchingyourpreferencesareaddedtobookboxesyoufolloworinyourfavoritelocations;
+
+  /// No description provided for @bookRequestnotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Request Notifications'**
+  String get bookRequestnotifications;
+
+  /// No description provided for @getnotifiedwhensomeonerequestsabookfromyou.
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified when someone requests a book from one of the bookboxes you follow'**
+  String get getnotifiedwhensomeonerequestsabookfromyou;
+
+  /// No description provided for @setupFavoriteGenres.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup Favourite Genres'**
+  String get setupFavoriteGenres;
+
+  /// No description provided for @tellUsFavoriteGenres.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us your favourite genres:'**
+  String get tellUsFavoriteGenres;
+
+  /// No description provided for @selectFavoriteGenresDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your favourite book genres to get personalized recommendations and notifications'**
+  String get selectFavoriteGenresDescription;
+
+  /// No description provided for @searchOrEnterCustomGenre.
+  ///
+  /// In en, this message translates to:
+  /// **'Search or enter custom genre'**
+  String get searchOrEnterCustomGenre;
+
+  /// No description provided for @pass.
+  ///
+  /// In en, this message translates to:
+  /// **'Pass'**
+  String get pass;
+
+  /// No description provided for @finished.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished!'**
+  String get finished;
+
+  /// No description provided for @favouriteLocations.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourite Locations'**
+  String get favouriteLocations;
+
+  /// No description provided for @searchForPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for places...'**
+  String get searchForPlaces;
+
+  /// No description provided for @removeLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Location'**
+  String get removeLocation;
+
+  /// No description provided for @removeLocationConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove \"{locationName}\" from your favourite locations?'**
+  String removeLocationConfirm(Object locationName);
+
+  /// No description provided for @howToUse.
+  ///
+  /// In en, this message translates to:
+  /// **'How to use'**
+  String get howToUse;
+
+  /// No description provided for @searchPlacesInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'• Search for places using the search bar'**
+  String get searchPlacesInstruction;
+
+  /// No description provided for @tapMapInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'• Tap anywhere on the map to add a location'**
+  String get tapMapInstruction;
+
+  /// No description provided for @tapMarkersInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'• Tap on markers to remove locations'**
+  String get tapMarkersInstruction;
+
+  /// No description provided for @dragDividerInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'• Drag the divider between map and list to resize'**
+  String get dragDividerInstruction;
+
+  /// No description provided for @maxLocationsInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'• Maximum 10 favourite locations allowed'**
+  String get maxLocationsInstruction;
+
+  /// No description provided for @tapListItemsInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'• Tap on list items to center map on location'**
+  String get tapListItemsInstruction;
+
+  /// No description provided for @gotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get gotIt;
+
+  /// No description provided for @favouriteLocationsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourite Locations ({count}/10)'**
+  String favouriteLocationsCount(Object count);
+
+  /// No description provided for @clearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get clearAll;
+
+  /// No description provided for @noFavouriteLocationsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No favourite locations yet'**
+  String get noFavouriteLocationsYet;
+
+  /// No description provided for @tapMapOrSearchToAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap on the map or search to add locations'**
+  String get tapMapOrSearchToAdd;
+
+  /// No description provided for @clearAllLocations.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All Locations'**
+  String get clearAllLocations;
+
+  /// No description provided for @clearAllLocationsConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove all favourite locations?'**
+  String get clearAllLocationsConfirm;
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
 }
 
 class _AppLocalizationsDelegate

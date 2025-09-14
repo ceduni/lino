@@ -512,4 +512,103 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get startFollowingBookBoxes =>
       'Start following bookboxes to see them here!';
+
+  @override
+  String get newbooknotifications => 'New Book Notifications';
+
+  @override
+  String get getnotifiedwhenbooksmatchingyourpreferencesareaddedtobookboxesyoufolloworinyourfavoritelocations =>
+      'Get notified when books matching your preferences are added to bookboxes you follow or in your favorite locations';
+
+  @override
+  String get bookRequestnotifications => 'Book Request Notifications';
+
+  @override
+  String get getnotifiedwhensomeonerequestsabookfromyou =>
+      'Get notified when someone requests a book from one of the bookboxes you follow';
+
+  @override
+  String get setupFavoriteGenres => 'Setup Favourite Genres';
+
+  @override
+  String get tellUsFavoriteGenres => 'Tell us your favourite genres:';
+
+  @override
+  String get selectFavoriteGenresDescription =>
+      'Select your favourite book genres to get personalized recommendations and notifications';
+
+  @override
+  String get searchOrEnterCustomGenre => 'Search or enter custom genre';
+
+  @override
+  String get pass => 'Pass';
+
+  @override
+  String get finished => 'Finished!';
+
+  @override
+  String get favouriteLocations => 'Favourite Locations';
+
+  @override
+  String get searchForPlaces => 'Search for places...';
+
+  @override
+  String get removeLocation => 'Remove Location';
+
+  @override
+  String removeLocationConfirm(Object locationName) {
+    return 'Remove \"$locationName\" from your favourite locations?';
+  }
+
+  @override
+  String get howToUse => 'How to use';
+
+  @override
+  String get searchPlacesInstruction =>
+      '• Search for places using the search bar';
+
+  @override
+  String get tapMapInstruction => '• Tap anywhere on the map to add a location';
+
+  @override
+  String get tapMarkersInstruction => '• Tap on markers to remove locations';
+
+  @override
+  String get dragDividerInstruction =>
+      '• Drag the divider between map and list to resize';
+
+  @override
+  String get maxLocationsInstruction =>
+      '• Maximum 10 favourite locations allowed';
+
+  @override
+  String get tapListItemsInstruction =>
+      '• Tap on list items to center map on location';
+
+  @override
+  String get gotIt => 'Got it';
+
+  @override
+  String favouriteLocationsCount(Object count) {
+    return 'Favourite Locations ($count/10)';
+  }
+
+  @override
+  String get clearAll => 'Clear All';
+
+  @override
+  String get noFavouriteLocationsYet => 'No favourite locations yet';
+
+  @override
+  String get tapMapOrSearchToAdd => 'Tap on the map or search to add locations';
+
+  @override
+  String get clearAllLocations => 'Clear All Locations';
+
+  @override
+  String get clearAllLocationsConfirm =>
+      'Are you sure you want to remove all favourite locations?';
+
+  @override
+  String get remove => 'Remove';
 }

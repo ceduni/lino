@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/profile/options_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class NotificationSettingPage extends StatefulWidget {
   const NotificationSettingPage({super.key});
@@ -23,9 +24,10 @@ class _NotificationSettingPageState extends State<NotificationSettingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notification Settings'),
+        title: Text(localizations.notificationSettings),
       ),
       body: Consumer<OptionsViewModel>(
         builder: (context, viewModel, child) {
@@ -72,7 +74,7 @@ class _NotificationSettingPageState extends State<NotificationSettingPage> {
                         ),
                         SizedBox(height: 20),
                         */
-                        _buildNotificationSection(viewModel),
+                        _buildNotificationSection(viewModel, localizations),
                       ],
                       ),
                     ),
@@ -104,7 +106,7 @@ class _NotificationSettingPageState extends State<NotificationSettingPage> {
     );
   }
 
-  Widget _buildNotificationSection(OptionsViewModel viewModel) {
+  Widget _buildNotificationSection(OptionsViewModel viewModel, AppLocalizations localizations) {
     return Column(
       children: [
         /*
@@ -130,8 +132,8 @@ class _NotificationSettingPageState extends State<NotificationSettingPage> {
         children: [
           _buildNotificationTile(
             icon: Icons.book_outlined,
-            title: 'New Book Notifications',
-            subtitle: 'Get notified when books matching your preferences are added to bookboxes you follow or in your favorite locations',
+            title: localizations.newbooknotifications,
+            subtitle: localizations.getnotifiedwhenbooksmatchingyourpreferencesareaddedtobookboxesyoufolloworinyourfavoritelocations,
             value: viewModel.addedBookNotifications,
             onChanged: (value) async {
           final success = await viewModel.toggleNotification('addedBook');
@@ -146,8 +148,8 @@ class _NotificationSettingPageState extends State<NotificationSettingPage> {
           Divider(height: 1, color: Colors.black26),
           _buildNotificationTile(
             icon: Icons.request_page_outlined,
-            title: 'Book Request Notifications',
-            subtitle: 'Get notified when someone requests a book from one of the bookboxes you follow',
+            title: localizations.bookRequestnotifications,
+            subtitle: localizations.getnotifiedwhensomeonerequestsabookfromyou,
             value: viewModel.bookRequestedNotifications,
             onChanged: (value) async {
           final success = await viewModel.toggleNotification('bookRequested');
