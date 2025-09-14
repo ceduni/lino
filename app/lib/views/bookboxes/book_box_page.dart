@@ -16,6 +16,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:Lino_app/vm/search/search_page_view_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 
 class BookBoxPage extends StatefulWidget {
@@ -122,8 +123,8 @@ class _BookBoxPageState extends State<BookBoxPage> {
                       _openGoogleMapsApp(bookBox.latitude, bookBox.longitude);
                     },
                     icon: const Icon(Icons.directions, color: Colors.white),
-                    label: const Text(
-                      'Get Directions',
+                    label: Text(
+                      AppLocalizations.of(context)!.getDirections,
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: 'Kanit',
@@ -152,12 +153,12 @@ class _BookBoxPageState extends State<BookBoxPage> {
     if (bookBoxId == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Error'),
+          title: Text(AppLocalizations.of(context)!.errorTitle),
           backgroundColor: Colors.red,
         ),
-        body: const Center(
+        body: Center(
           child: Text(
-            'No bookbox ID provided',
+            AppLocalizations.of(context)!.noBookboxIdProvided,
             style: TextStyle(fontSize: 18, color: Colors.red),
           ),
         ),
@@ -205,8 +206,8 @@ class _BookBoxPageState extends State<BookBoxPage> {
           children: [
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
-            const Text(
-              'Error loading bookbox data',
+            Text(
+              AppLocalizations.of(context)!.errorLoadingBookboxData,
               style: TextStyle(fontSize: 18, fontFamily: 'Kanit', color: Colors.red),
             ),
             const SizedBox(height: 8),
@@ -221,9 +222,9 @@ class _BookBoxPageState extends State<BookBoxPage> {
     }
 
     if (viewModel.bookBox == null) {
-      return const Center(
+      return Center(
         child: Text(
-          'No bookbox data available',
+          AppLocalizations.of(context)!.noBookboxDataAvailable,
           style: TextStyle(fontSize: 18, fontFamily: 'Kanit', color: Colors.grey),
         ),
       );
@@ -268,7 +269,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
               searchViewModel.createRequest("");
             },
             
-            child: const Center(child: Text("Didn't find your book? Create a new request !", style: TextStyle(
+            child: Center(child: Text(AppLocalizations.of(context)!.didntFindBookCreateRequest, style: TextStyle(
               fontFamily: 'Kanit',
               fontWeight: FontWeight.w600,
               color: LinoColors.accent,
@@ -281,13 +282,13 @@ class _BookBoxPageState extends State<BookBoxPage> {
                   final result = await Get.to(() => BookBoxIssueReportPage(bookboxId: bookBoxId!));
                   if (result != null && result['success'] == true) {
                     CustomSnackbars.success(
-                      'Success',
-                      result['message'] ?? 'Issue reported successfully',
+                      AppLocalizations.of(context)!.success,
+                      result['message'] ?? AppLocalizations.of(context)!.issueReportedSuccessfully,
                     );
                   }
                 },
               icon: const Icon(Icons.flag),
-              label: const Text('Report issue with this BookBox'),
+              label: Text(AppLocalizations.of(context)!.reportIssueWithBookBox),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.red,
                 textStyle: const TextStyle(
@@ -323,7 +324,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Under Maintenance',
+                  AppLocalizations.of(context)!.underMaintenance,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -333,7 +334,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'This BookBox is temporarily deactivated for maintenance. You can view the books inside but cannot exchange books from it until it\'s reactivated.',
+                  AppLocalizations.of(context)!.maintenanceMessage,
                   style: TextStyle(
                     fontSize: 14,
                     fontFamily: 'Kanit',
@@ -665,13 +666,13 @@ class _BookBoxPageState extends State<BookBoxPage> {
       } : () {
 
         CustomSnackbars.alert(
-          'BookBox Under Maintenance',
-          'Cannot add books while BookBox is deactivated for maintenance',
+          AppLocalizations.of(context)!.bookBoxUnderMaintenance,
+          AppLocalizations.of(context)!.cannotAddBooksUnderMaintenance,
         );
       },
       icon: Icon(Icons.add, color: isActive ? Colors.white : Colors.grey.shade400),
       label: Text(
-        'Add Book',
+        AppLocalizations.of(context)!.addBook,
         style: TextStyle(
           color: isActive ? Colors.white : Colors.grey.shade400,
           fontFamily: 'Kanit',
@@ -695,13 +696,13 @@ class _BookBoxPageState extends State<BookBoxPage> {
         );
       } : () {
         CustomSnackbars.alert(
-          'BookBox Under Maintenance',
-          'Cannot remove books while BookBox is deactivated for maintenance',
+          AppLocalizations.of(context)!.bookBoxUnderMaintenance,
+          AppLocalizations.of(context)!.cannotRemoveBooksUnderMaintenance,
         );
       },
       icon: Icon(Icons.remove, color: isActive ? Colors.white : Colors.grey.shade400),
       label: Text(
-        'Take Book',
+        AppLocalizations.of(context)!.takeBook,
         style: TextStyle(
           color: isActive ? Colors.white : Colors.grey.shade400,
           fontFamily: 'Kanit',
@@ -734,8 +735,8 @@ class _BookBoxPageState extends State<BookBoxPage> {
               children: [
                 const Icon(Icons.library_books, color: LinoColors.accent, size: 24),
                 const SizedBox(width: 8),
-                const Text(
-                  'Books Available',
+                Text(
+                  AppLocalizations.of(context)!.booksAvailable,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -766,12 +767,12 @@ class _BookBoxPageState extends State<BookBoxPage> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(32),
-                child: const Column(
+                child: Column(
                   children: [
                     Icon(Icons.book_outlined, size: 48, color: Colors.grey),
                     SizedBox(height: 16),
                     Text(
-                      'No books available',
+                      AppLocalizations.of(context)!.noBooksAvailable,
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Kanit',
@@ -876,7 +877,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Added $timeAgo',
+                      AppLocalizations.of(context)!.addedAgo(timeAgo),
                       style: TextStyle(
                         fontSize: 9,
                         color: Colors.grey[500],
@@ -935,7 +936,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
     final List<Map<String, dynamic>> navigationApps = [];
     
     navigationApps.add({
-      'name': 'Apple Maps',
+      'name': AppLocalizations.of(context)!.appleMapss,
       'url': 'maps://?daddr=$latitude,$longitude&dirflg=d',
       'icon': Icons.map,
     });
@@ -943,7 +944,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
     final googleMapsUrl = 'comgooglemaps://?daddr=$latitude,$longitude&directionsmode=driving';
     if (await canLaunchUrlString(googleMapsUrl)) {
       navigationApps.add({
-        'name': 'Google Maps',
+        'name': AppLocalizations.of(context)!.googleMaps,
         'url': googleMapsUrl,
         'icon': Icons.navigation,
       });
@@ -961,7 +962,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoActionSheet(
-          title: const Text('Choose Navigation App'),
+          title: Text(AppLocalizations.of(context)!.chooseNavigationApp),
           actions: navigationApps.map((app) {
             return CupertinoActionSheetAction(
               onPressed: () {
@@ -974,7 +975,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
           cancelButton: CupertinoActionSheetAction(
             isDefaultAction: true,
             onPressed: () => Get.back(),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
         );
       },
@@ -990,8 +991,8 @@ class _BookBoxPageState extends State<BookBoxPage> {
       }
     } catch (e) {
       CustomSnackbars.error(
-        'Error',
-        'Could not open $appName. Please make sure it\'s installed.',
+        AppLocalizations.of(context)!.error,
+        AppLocalizations.of(context)!.couldNotOpenApp(appName),
       );
     }
   }
@@ -1003,12 +1004,12 @@ class _BookBoxPageState extends State<BookBoxPage> {
       if (await canLaunchUrlString(googleMapsUrl)) {
         await launchUrlString(googleMapsUrl);
       } else {
-        throw 'Could not open the map.';
+        throw AppLocalizations.of(context)!.couldNotOpenMap;
       }
     } catch (e) {
       CustomSnackbars.error(
-        'Error',
-        'Could not open Google Maps. Please make sure it\'s installed.',
+        AppLocalizations.of(context)!.error,
+        AppLocalizations.of(context)!.couldNotOpenApp("Google Maps"),
       );
     }
   }

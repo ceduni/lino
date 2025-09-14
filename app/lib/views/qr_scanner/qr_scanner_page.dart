@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:vibration/vibration.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class QRScannerPage extends StatefulWidget {
   const QRScannerPage({super.key});
@@ -31,8 +32,8 @@ class _QRScannerPageState extends State<QRScannerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Scan QR Code',
+        title: Text(
+          AppLocalizations.of(context)!.scanQRCode,
           style: TextStyle(
             fontFamily: 'Kanit',
             fontWeight: FontWeight.bold,
@@ -78,8 +79,8 @@ class _QRScannerPageState extends State<QRScannerPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Point your camera at a QR code',
+                    Text(
+                      AppLocalizations.of(context)!.pointCameraAtQRCode,
                       style: TextStyle(
                         fontSize: 18,
                         fontFamily: 'Kanit',
@@ -87,8 +88,8 @@ class _QRScannerPageState extends State<QRScannerPage> {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const Text(
-                      'The QR code will be scanned automatically',
+                    Text(
+                      AppLocalizations.of(context)!.qrCodeScannedAutomatically,
                       style: TextStyle(
                         fontSize: 14,
                         fontFamily: 'Kanit',
@@ -103,12 +104,12 @@ class _QRScannerPageState extends State<QRScannerPage> {
                         IconButton(
                           onPressed: () => cameraController.toggleTorch(),
                           icon: const Icon(Icons.flash_on, color: Colors.grey),
-                          tooltip: 'Toggle Flash',
+                          tooltip: AppLocalizations.of(context)!.toggleFlash,
                         ),
                         IconButton(
                           onPressed: () => cameraController.switchCamera(),
                           icon: const Icon(Icons.camera_rear, color: Colors.grey),
-                          tooltip: 'Switch Camera',
+                          tooltip: AppLocalizations.of(context)!.switchCamera,
                         ),
                       ],
                     ),
@@ -175,8 +176,8 @@ class _QRScannerPageState extends State<QRScannerPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
-            'Invalid QR Code',
+          title: Text(
+            AppLocalizations.of(context)!.invalidQRCodeTitle,
             style: TextStyle(
               fontFamily: 'Kanit',
               fontWeight: FontWeight.bold,
@@ -186,13 +187,13 @@ class _QRScannerPageState extends State<QRScannerPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'This QR code is not a valid Lino bookbox code.',
+              Text(
+                AppLocalizations.of(context)!.notValidLinoBookboxCode,
                 style: TextStyle(fontFamily: 'Kanit'),
               ),
               const SizedBox(height: 10),
-              const Text(
-                'Scanned content:',
+              Text(
+                AppLocalizations.of(context)!.scannedContent,
                 style: TextStyle(
                   fontFamily: 'Kanit',
                   fontWeight: FontWeight.bold,
@@ -223,8 +224,8 @@ class _QRScannerPageState extends State<QRScannerPage> {
                   _screenOpened = false; // Allow scanning again
                 });
               },
-              child: const Text(
-                'Try Again',
+              child: Text(
+                AppLocalizations.of(context)!.tryAgainButton,
                 style: TextStyle(fontFamily: 'Kanit'),
               ),
             ),
@@ -233,8 +234,8 @@ class _QRScannerPageState extends State<QRScannerPage> {
                 Get.back();
                 Get.back(); // Close scanner page
               },
-              child: const Text(
-                'Cancel',
+              child: Text(
+                AppLocalizations.of(context)!.cancel,
                 style: TextStyle(fontFamily: 'Kanit'),
               ),
             ),

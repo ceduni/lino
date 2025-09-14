@@ -1220,6 +1220,822 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove'**
   String get remove;
+
+  /// No description provided for @createBookRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Book Request'**
+  String get createBookRequest;
+
+  /// No description provided for @whatBookAreYouLookingFor.
+  ///
+  /// In en, this message translates to:
+  /// **'What book are you looking for?'**
+  String get whatBookAreYouLookingFor;
+
+  /// No description provided for @searchForBookOrEnterCustomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for a book or enter a custom title to request it from other users.'**
+  String get searchForBookOrEnterCustomTitle;
+
+  /// No description provided for @searchingForBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching for books...'**
+  String get searchingForBooks;
+
+  /// No description provided for @noSuggestionsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No suggestions found'**
+  String get noSuggestionsFound;
+
+  /// No description provided for @useCustomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use custom title'**
+  String get useCustomTitle;
+
+  /// No description provided for @suggestionsFromGoogleBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestions from Google Books'**
+  String get suggestionsFromGoogleBooks;
+
+  /// No description provided for @useThisTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this title'**
+  String get useThisTitle;
+
+  /// No description provided for @usingCustomTitleWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Using a custom title may reduce your chances of being notified when this book becomes available.'**
+  String get usingCustomTitleWarning;
+
+  /// No description provided for @customMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Message'**
+  String get customMessage;
+
+  /// No description provided for @addPersonalNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a personal note about why you want this book (optional)'**
+  String get addPersonalNote;
+
+  /// No description provided for @checkingSimilarRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for similar requests...'**
+  String get checkingSimilarRequests;
+
+  /// No description provided for @similarRequestExists.
+  ///
+  /// In en, this message translates to:
+  /// **'There are {count} similar request(s) for this book.'**
+  String similarRequestExists(Object count);
+
+  /// No description provided for @bookSelectedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Book selected successfully!'**
+  String get bookSelectedSuccessfully;
+
+  /// No description provided for @selectedBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected book'**
+  String get selectedBook;
+
+  /// No description provided for @scanBookBarcode.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Book Barcode'**
+  String get scanBookBarcode;
+
+  /// No description provided for @scanQRCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR Code'**
+  String get scanQRCode;
+
+  /// No description provided for @invalidQRCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid QR Code'**
+  String get invalidQRCode;
+
+  /// No description provided for @confirmTakeBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Take Book'**
+  String get confirmTakeBook;
+
+  /// No description provided for @takeBookQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to take this book?'**
+  String get takeBookQuestion;
+
+  /// No description provided for @confirmTake.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Take'**
+  String get confirmTake;
+
+  /// No description provided for @takingBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Taking book...'**
+  String get takingBook;
+
+  /// No description provided for @success.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get success;
+
+  /// No description provided for @successfullyTook.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully took \"{title}\"'**
+  String successfullyTook(Object title);
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// No description provided for @failedToTakeBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to take book: {error}'**
+  String failedToTakeBook(Object error);
+
+  /// No description provided for @bookAddedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Book added to BookBox successfully!'**
+  String get bookAddedSuccessfully;
+
+  /// No description provided for @failedToAddBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add book: {error}'**
+  String failedToAddBook(Object error);
+
+  /// No description provided for @reportIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Issue'**
+  String get reportIssue;
+
+  /// No description provided for @reportProblemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a Problem'**
+  String get reportProblemTitle;
+
+  /// No description provided for @reportProblemDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Help us improve by reporting issues with this bookbox. We\'ll investigate and respond as soon as possible.'**
+  String get reportProblemDescription;
+
+  /// No description provided for @subject.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject'**
+  String get subject;
+
+  /// No description provided for @briefDescriptionOfIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Brief description of the issue'**
+  String get briefDescriptionOfIssue;
+
+  /// No description provided for @description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get description;
+
+  /// No description provided for @detailedDescriptionOfIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed description of the issue'**
+  String get detailedDescriptionOfIssue;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @yourAccountEmailLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account email (locked)'**
+  String get yourAccountEmailLocked;
+
+  /// No description provided for @yourEmailAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Your email address'**
+  String get yourEmailAddress;
+
+  /// No description provided for @subjectRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject is required'**
+  String get subjectRequired;
+
+  /// No description provided for @descriptionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Description is required'**
+  String get descriptionRequired;
+
+  /// No description provided for @emailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get emailRequired;
+
+  /// No description provided for @enterValidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address'**
+  String get enterValidEmail;
+
+  /// No description provided for @submitReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Report'**
+  String get submitReport;
+
+  /// No description provided for @failedToReportIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to report issue: {error}'**
+  String failedToReportIssue(Object error);
+
+  /// No description provided for @emailPrefilledInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Your email is pre-filled from your account and cannot be changed.'**
+  String get emailPrefilledInfo;
+
+  /// No description provided for @provideEmailInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide your email so we can contact you about this issue.'**
+  String get provideEmailInfo;
+
+  /// No description provided for @bookTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Title'**
+  String get bookTitle;
+
+  /// No description provided for @bookSelectedDot.
+  ///
+  /// In en, this message translates to:
+  /// **'Book selected.'**
+  String get bookSelectedDot;
+
+  /// No description provided for @customTitleLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom title locked.'**
+  String get customTitleLocked;
+
+  /// No description provided for @startTypingToSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Start typing to search for books...'**
+  String get startTypingToSearch;
+
+  /// No description provided for @changeSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Change selection'**
+  String get changeSelection;
+
+  /// No description provided for @clearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get clearSearch;
+
+  /// No description provided for @pleaseTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the title of the book'**
+  String get pleaseTitleRequired;
+
+  /// No description provided for @selectBookOrUseCustomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a book or use custom title:'**
+  String get selectBookOrUseCustomTitle;
+
+  /// No description provided for @useCustomTitleOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Use custom title'**
+  String get useCustomTitleOption;
+
+  /// No description provided for @continueWithTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with \"{title}\"'**
+  String continueWithTitle(Object title);
+
+  /// No description provided for @byAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'by {author}'**
+  String byAuthor(Object author);
+
+  /// No description provided for @customTitleWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Using a custom title may reduce your chances of being notified when this book becomes available.'**
+  String get customTitleWarning;
+
+  /// No description provided for @checkingForSimilarRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for similar requests...'**
+  String get checkingForSimilarRequests;
+
+  /// No description provided for @noSimilarBookRequestsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No similar book requests found'**
+  String get noSimilarBookRequestsFound;
+
+  /// No description provided for @similarBookRequestsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} book request{plural} with a similar book title {verb} found'**
+  String similarBookRequestsFound(int count, String plural, String verb);
+
+  /// No description provided for @unableToCheckSimilarRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to check for similar requests'**
+  String get unableToCheckSimilarRequests;
+
+  /// No description provided for @selectedBookPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected: {title}'**
+  String selectedBookPrefix(String title);
+
+  /// No description provided for @customMessageOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Message (optional)'**
+  String get customMessageOptional;
+
+  /// No description provided for @dismissError.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismissError;
+
+  /// No description provided for @nextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextButton;
+
+  /// No description provided for @confirmBookSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Book Selection'**
+  String get confirmBookSelection;
+
+  /// No description provided for @unknownAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Author'**
+  String get unknownAuthor;
+
+  /// No description provided for @areYouSureWantToTakeBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to take this book?'**
+  String get areYouSureWantToTakeBook;
+
+  /// No description provided for @takeBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Book'**
+  String get takeBook;
+
+  /// No description provided for @cantFindOrScanISBN.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t find or scan the ISBN?'**
+  String get cantFindOrScanISBN;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get tryAgain;
+
+  /// No description provided for @manualEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Entry'**
+  String get manualEntry;
+
+  /// No description provided for @bookList.
+  ///
+  /// In en, this message translates to:
+  /// **'Book List'**
+  String get bookList;
+
+  /// No description provided for @continueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueButton;
+
+  /// No description provided for @changeBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Change book'**
+  String get changeBook;
+
+  /// No description provided for @bookNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Not Found'**
+  String get bookNotFound;
+
+  /// No description provided for @tryAnotherBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Another Book'**
+  String get tryAnotherBook;
+
+  /// No description provided for @viewAvailableBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'View Available Books'**
+  String get viewAvailableBooks;
+
+  /// No description provided for @editBookDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Book Details'**
+  String get editBookDetails;
+
+  /// No description provided for @titleField.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get titleField;
+
+  /// No description provided for @authorsSeparateCommas.
+  ///
+  /// In en, this message translates to:
+  /// **'Authors (separate with commas)'**
+  String get authorsSeparateCommas;
+
+  /// No description provided for @publicationYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Publication Year'**
+  String get publicationYear;
+
+  /// No description provided for @categories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categories;
+
+  /// No description provided for @categoriesSeparateCommas.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories (separate with commas)'**
+  String get categoriesSeparateCommas;
+
+  /// No description provided for @bookDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Description'**
+  String get bookDescription;
+
+  /// No description provided for @bookInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Information'**
+  String get bookInformation;
+
+  /// No description provided for @publisher.
+  ///
+  /// In en, this message translates to:
+  /// **'Publisher'**
+  String get publisher;
+
+  /// No description provided for @numberOfPages.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of Pages'**
+  String get numberOfPages;
+
+  /// No description provided for @confirmAddToBookBox.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm & Add to BookBox'**
+  String get confirmAddToBookBox;
+
+  /// No description provided for @noThumbnailAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No thumbnail available'**
+  String get noThumbnailAvailable;
+
+  /// No description provided for @noCoverAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No cover available'**
+  String get noCoverAvailable;
+
+  /// No description provided for @addBookCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Book Cover'**
+  String get addBookCover;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get takePhoto;
+
+  /// No description provided for @pointCameraAtQRCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Point your camera at a QR code'**
+  String get pointCameraAtQRCode;
+
+  /// No description provided for @qrCodeScannedAutomatically.
+  ///
+  /// In en, this message translates to:
+  /// **'The QR code will be scanned automatically'**
+  String get qrCodeScannedAutomatically;
+
+  /// No description provided for @toggleFlash.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle Flash'**
+  String get toggleFlash;
+
+  /// No description provided for @switchCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch Camera'**
+  String get switchCamera;
+
+  /// No description provided for @invalidQRCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid QR Code'**
+  String get invalidQRCodeTitle;
+
+  /// No description provided for @notValidLinoBookboxCode.
+  ///
+  /// In en, this message translates to:
+  /// **'This QR code is not a valid Lino bookbox code.'**
+  String get notValidLinoBookboxCode;
+
+  /// No description provided for @scannedContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanned content:'**
+  String get scannedContent;
+
+  /// No description provided for @tryAgainButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get tryAgainButton;
+
+  /// No description provided for @errorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get errorTitle;
+
+  /// No description provided for @noBookboxIdProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookbox ID provided'**
+  String get noBookboxIdProvided;
+
+  /// No description provided for @errorLoadingBookboxData.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading bookbox data'**
+  String get errorLoadingBookboxData;
+
+  /// No description provided for @noBookboxDataAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookbox data available'**
+  String get noBookboxDataAvailable;
+
+  /// No description provided for @getDirections.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Directions'**
+  String get getDirections;
+
+  /// No description provided for @didntFindBookCreateRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Didn\'t find your book? Create a new request !'**
+  String get didntFindBookCreateRequest;
+
+  /// No description provided for @reportIssueWithBookBox.
+  ///
+  /// In en, this message translates to:
+  /// **'Report issue with this BookBox'**
+  String get reportIssueWithBookBox;
+
+  /// No description provided for @issueReportedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue reported successfully'**
+  String get issueReportedSuccessfully;
+
+  /// No description provided for @underMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Under Maintenance'**
+  String get underMaintenance;
+
+  /// No description provided for @maintenanceMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This BookBox is temporarily deactivated for maintenance. You can view the books inside but cannot exchange books from it until it\'s reactivated.'**
+  String get maintenanceMessage;
+
+  /// No description provided for @booksAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Books Available'**
+  String get booksAvailable;
+
+  /// No description provided for @noBooksAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No books available'**
+  String get noBooksAvailable;
+
+  /// No description provided for @addBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Book'**
+  String get addBook;
+
+  /// No description provided for @bookBoxUnderMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'BookBox Under Maintenance'**
+  String get bookBoxUnderMaintenance;
+
+  /// No description provided for @cannotAddBooksUnderMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot add books while BookBox is deactivated for maintenance'**
+  String get cannotAddBooksUnderMaintenance;
+
+  /// No description provided for @cannotRemoveBooksUnderMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot remove books while BookBox is deactivated for maintenance'**
+  String get cannotRemoveBooksUnderMaintenance;
+
+  /// No description provided for @addedAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {timeAgo}'**
+  String addedAgo(String timeAgo);
+
+  /// No description provided for @chooseNavigationApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Navigation App'**
+  String get chooseNavigationApp;
+
+  /// No description provided for @appleMapss.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Maps'**
+  String get appleMapss;
+
+  /// No description provided for @googleMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Maps'**
+  String get googleMaps;
+
+  /// No description provided for @couldNotOpenMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the map.'**
+  String get couldNotOpenMap;
+
+  /// No description provided for @couldNotOpenApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open {appName}. Please make sure it\'s installed.'**
+  String couldNotOpenApp(String appName);
+
+  /// No description provided for @bookDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Details'**
+  String get bookDetails;
+
+  /// No description provided for @swipeForDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe for details'**
+  String get swipeForDetails;
+
+  /// No description provided for @showMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get showMore;
+
+  /// No description provided for @showLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get showLess;
+
+  /// No description provided for @pages.
+  ///
+  /// In en, this message translates to:
+  /// **'Pages'**
+  String get pages;
+
+  /// No description provided for @availableAtBookBox.
+  ///
+  /// In en, this message translates to:
+  /// **'Available at BookBox'**
+  String get availableAtBookBox;
+
+  /// No description provided for @tapToViewBookBoxDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to view BookBox details'**
+  String get tapToViewBookBoxDetails;
+
+  /// No description provided for @bookStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Statistics'**
+  String get bookStatistics;
+
+  /// No description provided for @unableToLoadStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load statistics'**
+  String get unableToLoadStatistics;
+
+  /// No description provided for @noStatisticsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No statistics available'**
+  String get noStatisticsAvailable;
+
+  /// No description provided for @timesAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Times Added'**
+  String get timesAdded;
+
+  /// No description provided for @timesTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Times Taken'**
+  String get timesTaken;
 }
 
 class _AppLocalizationsDelegate

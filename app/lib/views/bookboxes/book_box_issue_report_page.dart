@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class BookBoxIssueReportPage extends StatefulWidget {
   final String bookboxId;
@@ -33,8 +34,8 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
         return Scaffold(
           backgroundColor: const Color.fromRGBO(245, 245, 235, 1),
           appBar: AppBar(
-            title: const Text(
-              'Report Issue',
+            title: Text(
+              AppLocalizations.of(context)!.reportIssue,
               style: TextStyle(
                 fontFamily: 'Kanit',
                 fontWeight: FontWeight.bold,
@@ -89,7 +90,7 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Report an Issue',
+                  AppLocalizations.of(context)!.reportProblemTitle,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -99,7 +100,7 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Please provide details about the issue with this BookBox',
+                  AppLocalizations.of(context)!.reportProblemDescription,
                   style: TextStyle(
                     fontSize: 14,
                     fontFamily: 'Kanit',
@@ -118,8 +119,8 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
     return TextFormField(
       controller: viewModel.subjectController,
       decoration: InputDecoration(
-        labelText: 'Subject',
-        hintText: 'Brief description of the issue',
+        labelText: AppLocalizations.of(context)!.subject,
+        hintText: AppLocalizations.of(context)!.briefDescriptionOfIssue,
         prefixIcon: const Icon(Icons.title),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
@@ -127,7 +128,7 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'Subject is required';
+          return AppLocalizations.of(context)!.subjectRequired;
         }
         return null;
       },
@@ -138,8 +139,8 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
     return TextFormField(
       controller: viewModel.descriptionController,
       decoration: InputDecoration(
-        labelText: 'Description',
-        hintText: 'Detailed description of the issue',
+        labelText: AppLocalizations.of(context)!.description,
+        hintText: AppLocalizations.of(context)!.detailedDescriptionOfIssue,
         prefixIcon: const Icon(Icons.description),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
@@ -148,7 +149,7 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
       maxLines: 5,
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'Description is required';
+          return AppLocalizations.of(context)!.descriptionRequired;
         }
         return null;
       },
@@ -159,10 +160,10 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
     return TextFormField(
       controller: viewModel.emailController,
       decoration: InputDecoration(
-        labelText: 'Email',
+        labelText: AppLocalizations.of(context)!.email,
         hintText: viewModel.isLoggedIn
-            ? 'Your account email (locked)'
-            : 'Your email address',
+            ? AppLocalizations.of(context)!.yourAccountEmailLocked
+            : AppLocalizations.of(context)!.yourEmailAddress,
         prefixIcon: const Icon(Icons.email),
         suffixIcon: viewModel.isLoggedIn
             ? const Icon(Icons.lock, color: Colors.grey)
@@ -174,10 +175,10 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
       enabled: !viewModel.isEmailLocked,
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'Email is required';
+          return AppLocalizations.of(context)!.emailRequired;
         }
         if (!viewModel.isValidEmail(value.trim())) {
-          return 'Please enter a valid email address';
+          return AppLocalizations.of(context)!.enterValidEmail;
         }
         return null;
       },
@@ -198,8 +199,8 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
               Get.back(result: result);
             } else {
               CustomSnackbars.error(
-                'Error',
-                'Failed to report issue: ${result['error']}',
+                AppLocalizations.of(context)!.error,
+                AppLocalizations.of(context)!.failedToReportIssue(result['error']),
               );
             }
           }
@@ -219,8 +220,8 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
           ),
         )
-            : const Text(
-          'Submit Report',
+            : Text(
+          AppLocalizations.of(context)!.submit,
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -247,8 +248,8 @@ class _BookBoxIssueReportPageState extends State<BookBoxIssueReportPage> {
           Expanded(
             child: Text(
               viewModel.isLoggedIn
-                  ? 'Your email is pre-filled from your account and cannot be changed.'
-                  : 'Please provide your email so we can contact you about this issue.',
+                  ? AppLocalizations.of(context)!.emailPrefilledInfo
+                  : AppLocalizations.of(context)!.provideEmailInfo,
               style: TextStyle(
                 fontSize: 12,
                 fontFamily: 'Kanit',

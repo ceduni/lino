@@ -7,6 +7,7 @@ import 'package:Lino_app/vm/books/book_edition_view_model.dart';
 import 'package:Lino_app/views/books/camera_page.dart';
 import 'package:intl/intl.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class BookEditionPage extends StatefulWidget {
   final String bookboxId;
@@ -57,8 +58,8 @@ class _BookEditionPageState extends State<BookEditionPage> {
           return Scaffold(
             backgroundColor: LinoColors.lightContainer,
             appBar: AppBar(
-              title: const Text(
-                'Edit Book Details',
+              title: Text(
+                AppLocalizations.of(context)!.editBookDetails,
                 style: TextStyle(
                   fontFamily: 'Kanit',
                   fontWeight: FontWeight.bold,
@@ -211,7 +212,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                   
                   // Title (editable)
                   _buildEditableTextField(
-                    label: 'Title',
+                    label: AppLocalizations.of(context)!.titleField,
                     value: viewModel.editableBook.title,
                     onChanged: (value) => viewModel.updateTitle(value),
                     maxLines: 2,
@@ -220,7 +221,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                   
                   // Authors (editable)
                   _buildEditableTextField(
-                    label: 'Authors (separate with commas)',
+                    label: AppLocalizations.of(context)!.authorsSeparateCommas,
                     value: viewModel.editableBook.authors.join(', '),
                     onChanged: (value) => viewModel.updateAuthors(value),
                     maxLines: 2,
@@ -229,7 +230,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                   
                   // Publication year (editable)
                   _buildEditableTextField(
-                    label: 'Publication Year',
+                    label: AppLocalizations.of(context)!.publicationYear,
                     value: viewModel.editableBook.parutionYear?.toString() ?? '',
                     onChanged: (value) => viewModel.updateParutionYear(value),
                     keyboardType: TextInputType.number,
@@ -261,8 +262,8 @@ class _BookEditionPageState extends State<BookEditionPage> {
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      const Text(
-                        'Categories',
+                      Text(
+                        AppLocalizations.of(context)!.categories,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -274,7 +275,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                   ),
                   const SizedBox(height: 16),
                   _buildEditableTextField(
-                    label: 'Categories (separate with commas)',
+                    label: AppLocalizations.of(context)!.categoriesSeparateCommas,
                     value: viewModel.editableBook.categories.join(', '),
                     onChanged: (value) => viewModel.updateCategories(value),
                     maxLines: 3,
@@ -314,8 +315,8 @@ class _BookEditionPageState extends State<BookEditionPage> {
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      const Text(
-                        'Description',
+                      Text(
+                        AppLocalizations.of(context)!.description,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -327,7 +328,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                   ),
                   const SizedBox(height: 16),
                   _buildEditableTextField(
-                    label: 'Book Description',
+                    label: AppLocalizations.of(context)!.bookDescription,
                     value: viewModel.editableBook.description,
                     onChanged: (value) => viewModel.updateDescription(value),
                     maxLines: 6,
@@ -359,8 +360,8 @@ class _BookEditionPageState extends State<BookEditionPage> {
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      const Text(
-                        'Book Information',
+                      Text(
+                        AppLocalizations.of(context)!.bookInformation,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -374,7 +375,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                   
                   // Publisher (editable)
                   _buildEditableTextField(
-                    label: 'Publisher',
+                    label: AppLocalizations.of(context)!.publisher,
                     value: viewModel.editableBook.publisher,
                     onChanged: (value) => viewModel.updatePublisher(value),
                   ),
@@ -382,7 +383,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                   
                   // Pages (editable)
                   _buildEditableTextField(
-                    label: 'Number of Pages',
+                    label: AppLocalizations.of(context)!.numberOfPages,
                     value: viewModel.editableBook.pages?.toString() ?? '',
                     onChanged: (value) => viewModel.updatePages(value),
                     keyboardType: TextInputType.number,
@@ -390,7 +391,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                   const SizedBox(height: 16),
                   
                   // Added date (read-only, defaults to today)
-                  _buildInfoRow('Added', DateFormat('MMM dd, yyyy').format(DateTime.now())),
+                  _buildInfoRow(AppLocalizations.of(context)!.added, DateFormat('MMM dd, yyyy').format(DateTime.now())),
                 ],
               ),
             ),
@@ -587,8 +588,8 @@ class _BookEditionPageState extends State<BookEditionPage> {
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
                 )
-              : const Text(
-                  'Confirm & Add to BookBox',
+              : Text(
+                  AppLocalizations.of(context)!.confirmAddToBookBox,
                   style: TextStyle(
                     color: Colors.white,
                     fontFamily: 'Kanit',
@@ -603,8 +604,8 @@ class _BookEditionPageState extends State<BookEditionPage> {
 
   bool _isDefaultPlaceholder(String coverImage) {
     return coverImage.isEmpty || 
-           coverImage == 'No thumbnail available' ||
-           coverImage == 'No cover available';
+           coverImage == AppLocalizations.of(context)!.noThumbnailAvailable ||
+           coverImage == AppLocalizations.of(context)!.noCoverAvailable;
   }
 
   void _showCoverImageOptions(BookEditionViewModel viewModel) {
@@ -622,8 +623,8 @@ class _BookEditionPageState extends State<BookEditionPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Add Book Cover',
+            Text(
+              AppLocalizations.of(context)!.addBookCover,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -634,8 +635,8 @@ class _BookEditionPageState extends State<BookEditionPage> {
             const SizedBox(height: 20),
             ListTile(
               leading: const Icon(Icons.camera_alt, color: Color.fromRGBO(101, 67, 33, 1)),
-              title: const Text(
-                'Take Photo',
+              title: Text(
+                AppLocalizations.of(context)!.takePhoto,
                 style: TextStyle(fontFamily: 'Kanit'),
               ),
               onTap: () {
@@ -645,8 +646,8 @@ class _BookEditionPageState extends State<BookEditionPage> {
             ),
             ListTile(
               leading: const Icon(Icons.close, color: Colors.grey),
-              title: const Text(
-                'Cancel',
+              title: Text(
+                AppLocalizations.of(context)!.cancel,
                 style: TextStyle(fontFamily: 'Kanit'),
               ),
               onTap: () => Get.back(),
@@ -674,14 +675,14 @@ class _BookEditionPageState extends State<BookEditionPage> {
 
       // Show success message
       CustomSnackbars.success(
-        'Success',
-        'Book added to BookBox successfully!',
+        AppLocalizations.of(context)!.success,
+        AppLocalizations.of(context)!.bookAddedSuccessfully,
       );
     } catch (e) {
       // Show error message
       CustomSnackbars.error(
-        'Error',
-        'Failed to add book: ${e.toString()}',
+        AppLocalizations.of(context)!.error,
+        AppLocalizations.of(context)!.failedToAddBook(e.toString()),
       );
     }
   }

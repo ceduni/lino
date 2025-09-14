@@ -6,6 +6,7 @@ import 'package:Lino_app/vm/books/book_details_view_model.dart';
 import 'package:Lino_app/views/bookboxes/book_box_page.dart';
 import 'package:intl/intl.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class BookDetailsPage extends StatefulWidget {
   final ExtendedBook book;
@@ -52,8 +53,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
-              title: const Text(
-                'Book Details',
+              title: Text(
+                AppLocalizations.of(context)!.bookDetails,
                 style: TextStyle(
                   fontFamily: 'Kanit',
                   fontWeight: FontWeight.bold,
@@ -84,7 +85,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Swipe for details',
+                          AppLocalizations.of(context)!.swipeForDetails,
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 12,
@@ -250,8 +251,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                           size: 20,
                         ),
                         const SizedBox(width: 8),
-                        const Text(
-                          'Categories',
+                        Text(
+                          AppLocalizations.of(context)!.categories,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -322,8 +323,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                           size: 20,
                         ),
                         const SizedBox(width: 8),
-                        const Text(
-                          'Description',
+                        Text(
+                          AppLocalizations.of(context)!.description,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -362,8 +363,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      const Text(
-                        'Book Information',
+                      Text(
+                        AppLocalizations.of(context)!.bookInformation,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -376,13 +377,13 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                   const SizedBox(height: 16),
                   
                   if (book.publisher != null && book.publisher!.isNotEmpty)
-                    _buildInfoRow('Publisher', book.publisher!),
+                    _buildInfoRow(AppLocalizations.of(context)!.publisher, book.publisher!),
                   
                   if (book.pages != null)
-                    _buildInfoRow('Pages', book.pages.toString()),
+                    _buildInfoRow(AppLocalizations.of(context)!.pages, book.pages.toString()),
                     
                   
-                  _buildInfoRow('Added', DateFormat('MMM dd, yyyy').format(book.dateAdded)),
+                  _buildInfoRow(AppLocalizations.of(context)!.added, DateFormat('MMM dd, yyyy').format(book.dateAdded)),
                 ],
               ),
             ),
@@ -431,7 +432,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    viewModel.isDescriptionExpanded ? 'Show less' : 'Show more',
+                    viewModel.isDescriptionExpanded ? AppLocalizations.of(context)!.showLess : AppLocalizations.of(context)!.showMore,
                     style: const TextStyle(
                       color: LinoColors.accent,
                       fontWeight: FontWeight.bold,
@@ -508,8 +509,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                   size: 20,
                 ),
                 const SizedBox(width: 8),
-                const Text(
-                  'Book Statistics',
+                Text(
+                  AppLocalizations.of(context)!.bookStatistics,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -529,7 +530,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
               )
             else if (viewModel.statsError != null)
               Text(
-                'Unable to load statistics',
+                AppLocalizations.of(context)!.unableToLoadStatistics,
                 style: TextStyle(
                   fontSize: 14,
                   fontFamily: 'Kanit',
@@ -541,7 +542,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 children: [
                   Expanded(
                     child: _buildStatItem(
-                      'Times Added',
+                      AppLocalizations.of(context)!.timesAdded,
                       viewModel.bookStats!.totalAdded.toString(),
                       Icons.add_circle_outline,
                       Colors.green,
@@ -550,7 +551,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: _buildStatItem(
-                      'Times Taken',
+                      AppLocalizations.of(context)!.timesTaken,
                       viewModel.bookStats!.totalTook.toString(),
                       Icons.remove_circle_outline,
                       Colors.red,
@@ -560,7 +561,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
               )
             else
               Text(
-                'No statistics available',
+                AppLocalizations.of(context)!.noStatisticsAvailable,
                 style: TextStyle(
                   fontSize: 14,
                   fontFamily: 'Kanit',
@@ -671,8 +672,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  const Text(
-                    'Available at BookBox',
+                  Text(
+                    AppLocalizations.of(context)!.availableAtBookBox,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -725,7 +726,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Tap to view BookBox details',
+                            AppLocalizations.of(context)!.tapToViewBookBoxDetails,
                             style: TextStyle(
                               fontSize: 12,
                               fontFamily: 'Kanit',

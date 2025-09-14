@@ -611,4 +611,449 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remove => 'Remove';
+
+  @override
+  String get createBookRequest => 'Create Book Request';
+
+  @override
+  String get whatBookAreYouLookingFor => 'What book are you looking for?';
+
+  @override
+  String get searchForBookOrEnterCustomTitle =>
+      'Search for a book or enter a custom title to request it from other users.';
+
+  @override
+  String get searchingForBooks => 'Searching for books...';
+
+  @override
+  String get noSuggestionsFound => 'No suggestions found';
+
+  @override
+  String get useCustomTitle => 'Use custom title';
+
+  @override
+  String get suggestionsFromGoogleBooks => 'Suggestions from Google Books';
+
+  @override
+  String get useThisTitle => 'Use this title';
+
+  @override
+  String get usingCustomTitleWarning =>
+      'Using a custom title may reduce your chances of being notified when this book becomes available.';
+
+  @override
+  String get customMessage => 'Custom Message';
+
+  @override
+  String get addPersonalNote =>
+      'Add a personal note about why you want this book (optional)';
+
+  @override
+  String get checkingSimilarRequests => 'Checking for similar requests...';
+
+  @override
+  String similarRequestExists(Object count) {
+    return 'There are $count similar request(s) for this book.';
+  }
+
+  @override
+  String get bookSelectedSuccessfully => 'Book selected successfully!';
+
+  @override
+  String get selectedBook => 'Selected book';
+
+  @override
+  String get scanBookBarcode => 'Scan Book Barcode';
+
+  @override
+  String get scanQRCode => 'Scan QR Code';
+
+  @override
+  String get invalidQRCode => 'Invalid QR Code';
+
+  @override
+  String get confirmTakeBook => 'Confirm Take Book';
+
+  @override
+  String get takeBookQuestion => 'Are you sure you want to take this book?';
+
+  @override
+  String get confirmTake => 'Confirm Take';
+
+  @override
+  String get takingBook => 'Taking book...';
+
+  @override
+  String get success => 'Success';
+
+  @override
+  String successfullyTook(Object title) {
+    return 'Successfully took \"$title\"';
+  }
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String failedToTakeBook(Object error) {
+    return 'Failed to take book: $error';
+  }
+
+  @override
+  String get bookAddedSuccessfully => 'Book added to BookBox successfully!';
+
+  @override
+  String failedToAddBook(Object error) {
+    return 'Failed to add book: $error';
+  }
+
+  @override
+  String get reportIssue => 'Report Issue';
+
+  @override
+  String get reportProblemTitle => 'Report a Problem';
+
+  @override
+  String get reportProblemDescription =>
+      'Help us improve by reporting issues with this bookbox. We\'ll investigate and respond as soon as possible.';
+
+  @override
+  String get subject => 'Subject';
+
+  @override
+  String get briefDescriptionOfIssue => 'Brief description of the issue';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get detailedDescriptionOfIssue => 'Detailed description of the issue';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get yourAccountEmailLocked => 'Your account email (locked)';
+
+  @override
+  String get yourEmailAddress => 'Your email address';
+
+  @override
+  String get subjectRequired => 'Subject is required';
+
+  @override
+  String get descriptionRequired => 'Description is required';
+
+  @override
+  String get emailRequired => 'Email is required';
+
+  @override
+  String get enterValidEmail => 'Please enter a valid email address';
+
+  @override
+  String get submitReport => 'Submit Report';
+
+  @override
+  String failedToReportIssue(Object error) {
+    return 'Failed to report issue: $error';
+  }
+
+  @override
+  String get emailPrefilledInfo =>
+      'Your email is pre-filled from your account and cannot be changed.';
+
+  @override
+  String get provideEmailInfo =>
+      'Please provide your email so we can contact you about this issue.';
+
+  @override
+  String get bookTitle => 'Book Title';
+
+  @override
+  String get bookSelectedDot => 'Book selected.';
+
+  @override
+  String get customTitleLocked => 'Custom title locked.';
+
+  @override
+  String get startTypingToSearch => 'Start typing to search for books...';
+
+  @override
+  String get changeSelection => 'Change selection';
+
+  @override
+  String get clearSearch => 'Clear search';
+
+  @override
+  String get pleaseTitleRequired => 'Please enter the title of the book';
+
+  @override
+  String get selectBookOrUseCustomTitle => 'Select a book or use custom title:';
+
+  @override
+  String get useCustomTitleOption => 'Use custom title';
+
+  @override
+  String continueWithTitle(Object title) {
+    return 'Continue with \"$title\"';
+  }
+
+  @override
+  String byAuthor(Object author) {
+    return 'by $author';
+  }
+
+  @override
+  String get customTitleWarning =>
+      'Using a custom title may reduce your chances of being notified when this book becomes available.';
+
+  @override
+  String get checkingForSimilarRequests => 'Checking for similar requests...';
+
+  @override
+  String get noSimilarBookRequestsFound => 'No similar book requests found';
+
+  @override
+  String similarBookRequestsFound(int count, String plural, String verb) {
+    return '$count book request$plural with a similar book title $verb found';
+  }
+
+  @override
+  String get unableToCheckSimilarRequests =>
+      'Unable to check for similar requests';
+
+  @override
+  String selectedBookPrefix(String title) {
+    return 'Selected: $title';
+  }
+
+  @override
+  String get customMessageOptional => 'Custom Message (optional)';
+
+  @override
+  String get dismissError => 'Dismiss';
+
+  @override
+  String get nextButton => 'Next';
+
+  @override
+  String get confirmBookSelection => 'Confirm Book Selection';
+
+  @override
+  String get unknownAuthor => 'Unknown Author';
+
+  @override
+  String get areYouSureWantToTakeBook =>
+      'Are you sure you want to take this book?';
+
+  @override
+  String get takeBook => 'Take Book';
+
+  @override
+  String get cantFindOrScanISBN => 'Can\'t find or scan the ISBN?';
+
+  @override
+  String get tryAgain => 'Try Again';
+
+  @override
+  String get manualEntry => 'Manual Entry';
+
+  @override
+  String get bookList => 'Book List';
+
+  @override
+  String get continueButton => 'Continue';
+
+  @override
+  String get changeBook => 'Change book';
+
+  @override
+  String get bookNotFound => 'Book Not Found';
+
+  @override
+  String get tryAnotherBook => 'Try Another Book';
+
+  @override
+  String get viewAvailableBooks => 'View Available Books';
+
+  @override
+  String get editBookDetails => 'Edit Book Details';
+
+  @override
+  String get titleField => 'Title';
+
+  @override
+  String get authorsSeparateCommas => 'Authors (separate with commas)';
+
+  @override
+  String get publicationYear => 'Publication Year';
+
+  @override
+  String get categories => 'Categories';
+
+  @override
+  String get categoriesSeparateCommas => 'Categories (separate with commas)';
+
+  @override
+  String get bookDescription => 'Book Description';
+
+  @override
+  String get bookInformation => 'Book Information';
+
+  @override
+  String get publisher => 'Publisher';
+
+  @override
+  String get numberOfPages => 'Number of Pages';
+
+  @override
+  String get confirmAddToBookBox => 'Confirm & Add to BookBox';
+
+  @override
+  String get noThumbnailAvailable => 'No thumbnail available';
+
+  @override
+  String get noCoverAvailable => 'No cover available';
+
+  @override
+  String get addBookCover => 'Add Book Cover';
+
+  @override
+  String get takePhoto => 'Take Photo';
+
+  @override
+  String get pointCameraAtQRCode => 'Point your camera at a QR code';
+
+  @override
+  String get qrCodeScannedAutomatically =>
+      'The QR code will be scanned automatically';
+
+  @override
+  String get toggleFlash => 'Toggle Flash';
+
+  @override
+  String get switchCamera => 'Switch Camera';
+
+  @override
+  String get invalidQRCodeTitle => 'Invalid QR Code';
+
+  @override
+  String get notValidLinoBookboxCode =>
+      'This QR code is not a valid Lino bookbox code.';
+
+  @override
+  String get scannedContent => 'Scanned content:';
+
+  @override
+  String get tryAgainButton => 'Try Again';
+
+  @override
+  String get errorTitle => 'Error';
+
+  @override
+  String get noBookboxIdProvided => 'No bookbox ID provided';
+
+  @override
+  String get errorLoadingBookboxData => 'Error loading bookbox data';
+
+  @override
+  String get noBookboxDataAvailable => 'No bookbox data available';
+
+  @override
+  String get getDirections => 'Get Directions';
+
+  @override
+  String get didntFindBookCreateRequest =>
+      'Didn\'t find your book? Create a new request !';
+
+  @override
+  String get reportIssueWithBookBox => 'Report issue with this BookBox';
+
+  @override
+  String get issueReportedSuccessfully => 'Issue reported successfully';
+
+  @override
+  String get underMaintenance => 'Under Maintenance';
+
+  @override
+  String get maintenanceMessage =>
+      'This BookBox is temporarily deactivated for maintenance. You can view the books inside but cannot exchange books from it until it\'s reactivated.';
+
+  @override
+  String get booksAvailable => 'Books Available';
+
+  @override
+  String get noBooksAvailable => 'No books available';
+
+  @override
+  String get addBook => 'Add Book';
+
+  @override
+  String get bookBoxUnderMaintenance => 'BookBox Under Maintenance';
+
+  @override
+  String get cannotAddBooksUnderMaintenance =>
+      'Cannot add books while BookBox is deactivated for maintenance';
+
+  @override
+  String get cannotRemoveBooksUnderMaintenance =>
+      'Cannot remove books while BookBox is deactivated for maintenance';
+
+  @override
+  String addedAgo(String timeAgo) {
+    return 'Added $timeAgo';
+  }
+
+  @override
+  String get chooseNavigationApp => 'Choose Navigation App';
+
+  @override
+  String get appleMapss => 'Apple Maps';
+
+  @override
+  String get googleMaps => 'Google Maps';
+
+  @override
+  String get couldNotOpenMap => 'Could not open the map.';
+
+  @override
+  String couldNotOpenApp(String appName) {
+    return 'Could not open $appName. Please make sure it\'s installed.';
+  }
+
+  @override
+  String get bookDetails => 'Book Details';
+
+  @override
+  String get swipeForDetails => 'Swipe for details';
+
+  @override
+  String get showMore => 'Show more';
+
+  @override
+  String get showLess => 'Show less';
+
+  @override
+  String get pages => 'Pages';
+
+  @override
+  String get availableAtBookBox => 'Available at BookBox';
+
+  @override
+  String get tapToViewBookBoxDetails => 'Tap to view BookBox details';
+
+  @override
+  String get bookStatistics => 'Book Statistics';
+
+  @override
+  String get unableToLoadStatistics => 'Unable to load statistics';
+
+  @override
+  String get noStatisticsAvailable => 'No statistics available';
+
+  @override
+  String get timesAdded => 'Times Added';
+
+  @override
+  String get timesTaken => 'Times Taken';
 }

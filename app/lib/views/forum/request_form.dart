@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:Lino_app/vm/forum/request_form_view_model.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class RequestFormPage extends StatefulWidget {
   final VoidCallback? onRequestCreated;
@@ -35,8 +36,8 @@ class _RequestFormPageState extends State<RequestFormPage> {
         return Scaffold(
           backgroundColor: const Color.fromRGBO(245, 245, 235, 1),
           appBar: AppBar(
-            title: const Text(
-              'Create Book Request',
+            title: Text(
+              AppLocalizations.of(context)!.createBookRequest,
               style: TextStyle(
                 fontFamily: 'Kanit',
                 fontWeight: FontWeight.bold,
@@ -56,8 +57,8 @@ class _RequestFormPageState extends State<RequestFormPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Header text
-                    const Text(
-                      'What book are you looking for?',
+                    Text(
+                      AppLocalizations.of(context)!.whatBookAreYouLookingFor,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -67,7 +68,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Search for a book or enter a custom title to request it from other users.',
+                      AppLocalizations.of(context)!.searchForBookOrEnterCustomTitle,
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Kanit',
@@ -85,12 +86,12 @@ class _RequestFormPageState extends State<RequestFormPage> {
                       controller: viewModel.titleController,
                       focusNode: viewModel.focusNode,
                       decoration: InputDecoration(
-                        labelText: 'Book Title',
+                        labelText: AppLocalizations.of(context)!.bookTitle,
                         helperText: viewModel.isSearchLocked 
                             ? (viewModel.selectedSuggestion != null 
-                                ? 'Book selected.'
-                                : 'Custom title locked.')
-                            : 'Start typing to search for books...',
+                                ? AppLocalizations.of(context)!.bookSelectedDot
+                                : AppLocalizations.of(context)!.customTitleLocked)
+                            : AppLocalizations.of(context)!.startTypingToSearch,
                         helperStyle: TextStyle(
                           color: viewModel.isSearchLocked 
                               ? Colors.green.shade700 
@@ -113,14 +114,14 @@ class _RequestFormPageState extends State<RequestFormPage> {
                                       IconButton(
                                         icon: const Icon(Icons.edit, size: 20, color: Colors.blue),
                                         onPressed: viewModel.unlockSearch,
-                                        tooltip: 'Change selection',
+                                        tooltip: AppLocalizations.of(context)!.changeSelection,
                                         padding: const EdgeInsets.all(8),
                                         constraints: const BoxConstraints(),
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.clear, size: 20, color: Colors.red),
                                         onPressed: viewModel.clearSearch,
-                                        tooltip: 'Clear search',
+                                        tooltip: AppLocalizations.of(context)!.clearSearch,
                                         padding: const EdgeInsets.all(8),
                                         constraints: const BoxConstraints(),
                                       ),
@@ -130,7 +131,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter the title of the book';
+                          return AppLocalizations.of(context)!.pleaseTitleRequired;
                         }
                         return null;
                       },
@@ -155,7 +156,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
                     // Custom Message Field
                     TextFormField(
                       controller: viewModel.messageController,
-                      decoration: const InputDecoration(labelText: 'Custom Message (optional)'),
+                      decoration: InputDecoration(labelText: AppLocalizations.of(context)!.customMessageOptional),
                       maxLines: 3,
                       minLines: 1,
                     ),
@@ -187,7 +188,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
                             ),
                             TextButton(
                               onPressed: viewModel.clearError,
-                              child: const Text('Dismiss'),
+                              child: Text(AppLocalizations.of(context)!.dismissError),
                             ),
                           ],
                         ),
@@ -216,8 +217,8 @@ class _RequestFormPageState extends State<RequestFormPage> {
                                 ),
                                 elevation: 3,
                               ),
-                              child: const Text(
-                                'Next',
+                              child: Text(
+                                AppLocalizations.of(context)!.nextButton,
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -254,7 +255,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
         ],
       ),
       child: viewModel.isLoadingSuggestions
-          ? const Padding(
+          ? Padding(
               padding: EdgeInsets.all(16),
               child: Center(
                 child: Row(
@@ -266,7 +267,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
                     SizedBox(width: 8),
-                    Text('Searching for books...'),
+                    Text(AppLocalizations.of(context)!.searchingForBooks),
                   ],
                 ),
               ),
@@ -280,14 +281,14 @@ class _RequestFormPageState extends State<RequestFormPage> {
                       const Icon(Icons.search_off, color: Colors.grey, size: 32),
                       const SizedBox(height: 8),
                       Text(
-                        'No suggestions found',
+                        AppLocalizations.of(context)!.noSuggestionsFound,
                         style: TextStyle(color: Colors.grey.shade600),
                       ),
                       const SizedBox(height: 8),
                       ElevatedButton.icon(
                         onPressed: viewModel.useCustomTitle,
                         icon: const Icon(Icons.edit, size: 16),
-                        label: const Text('Use custom title'),
+                        label: Text(AppLocalizations.of(context)!.useCustomTitle),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
                           foregroundColor: Colors.white,
@@ -320,7 +321,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
               const Icon(Icons.lightbulb, color: Colors.blue, size: 16),
               const SizedBox(width: 8),
               Text(
-                'Select a book or use custom title:',
+                AppLocalizations.of(context)!.selectBookOrUseCustomTitle,
                 style: TextStyle(
                   color: Colors.blue.shade800,
                   fontWeight: FontWeight.w500,
@@ -350,14 +351,14 @@ class _RequestFormPageState extends State<RequestFormPage> {
                   child: ListTile(
                     leading: const Icon(Icons.edit, color: Colors.orange),
                     title: Text(
-                      'Use custom title',
+                      AppLocalizations.of(context)!.useCustomTitleOption,
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.orange.shade800,
                       ),
                     ),
                     subtitle: Text(
-                      'Continue with "${viewModel.titleController.text}"',
+                      AppLocalizations.of(context)!.continueWithTitle(viewModel.titleController.text),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.orange.shade700,
@@ -379,7 +380,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
                 subtitle: Text(
-                  'by ${suggestion.author}',
+                  AppLocalizations.of(context)!.byAuthor(suggestion.author),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontSize: 12),
@@ -409,7 +410,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Using a custom title may reduce your chances of being notified when this book becomes available.',
+              AppLocalizations.of(context)!.customTitleWarning,
               style: TextStyle(
                 color: Colors.orange.shade800,
                 fontSize: 12,
@@ -442,8 +443,8 @@ class _RequestFormPageState extends State<RequestFormPage> {
           const SizedBox(width: 8),
           Expanded(
             child: viewModel.isLoadingSimilarRequests
-                ? const Text(
-                    'Checking for similar requests...',
+                ? Text(
+                    AppLocalizations.of(context)!.checkingForSimilarRequests,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.blue,
@@ -452,8 +453,12 @@ class _RequestFormPageState extends State<RequestFormPage> {
                 : viewModel.similarRequestsCount != null
                     ? Text(
                         viewModel.similarRequestsCount == 0
-                            ? 'No similar book requests found'
-                            : '${viewModel.similarRequestsCount} book request${viewModel.similarRequestsCount == 1 ? '' : 's'} with a similar book title ${viewModel.similarRequestsCount == 1 ? 'was' : 'were'} found',
+                            ? AppLocalizations.of(context)!.noSimilarBookRequestsFound
+                            : AppLocalizations.of(context)!.similarBookRequestsFound(
+                                viewModel.similarRequestsCount!,
+                                viewModel.similarRequestsCount == 1 ? '' : 's',
+                                viewModel.similarRequestsCount == 1 ? 'was' : 'were'
+                              ),
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.blue.shade800,
@@ -461,7 +466,7 @@ class _RequestFormPageState extends State<RequestFormPage> {
                         ),
                       )
                     : Text(
-                        'Unable to check for similar requests',
+                        AppLocalizations.of(context)!.unableToCheckSimilarRequests,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade600,
@@ -491,14 +496,14 @@ class _RequestFormPageState extends State<RequestFormPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Selected: ${viewModel.selectedSuggestion!.title}',
+                  AppLocalizations.of(context)!.selectedBookPrefix(viewModel.selectedSuggestion!.title),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.green.shade800,
                   ),
                 ),
                 Text(
-                  'by ${viewModel.selectedSuggestion!.author}',
+                  AppLocalizations.of(context)!.byAuthor(viewModel.selectedSuggestion!.author),
                   style: TextStyle(
                     color: Colors.green.shade700,
                     fontSize: 12,
