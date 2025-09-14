@@ -1071,4 +1071,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectLanguage => 'Select Language';
+
+  @override
+  String get tapToAddCover => 'Tap to add cover';
 }

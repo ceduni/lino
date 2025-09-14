@@ -396,7 +396,8 @@
   "chooseLanguage": "Choose your preferred language",
   "english": "English",
   "french": "French",
-  "selectLanguage": "Select Language"
+  "selectLanguage": "Select Language",
+  "tapToAddCover": "Tap to add cover"
 
 
 } 

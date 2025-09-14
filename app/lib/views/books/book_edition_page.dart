@@ -534,8 +534,8 @@ class _BookEditionPageState extends State<BookEditionPage> {
                 size: 40,
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Tap to add cover',
+              Text(
+                AppLocalizations.of(context)!.tapToAddCover,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 12,

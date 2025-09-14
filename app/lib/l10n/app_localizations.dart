@@ -2066,6 +2066,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Language'**
   String get selectLanguage;
+
+  /// No description provided for @tapToAddCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to add cover'**
+  String get tapToAddCover;
 }
 
 class _AppLocalizationsDelegate

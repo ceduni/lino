@@ -372,5 +372,6 @@
   "chooseLanguage": "Choisissez votre langue préférée",
   "english": "Anglais",
   "french": "Français",
-  "selectLanguage": "Sélectionner la langue"
+  "selectLanguage": "Sélectionner la langue",
+  "tapToAddCover": "Appuyez pour ajouter une couverture"
 }

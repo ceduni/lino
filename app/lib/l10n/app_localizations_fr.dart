@@ -1093,4 +1093,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get selectLanguage => 'Sélectionner la langue';
+
+  @override
+  String get tapToAddCover => 'Appuyez pour ajouter une couverture';
 }
