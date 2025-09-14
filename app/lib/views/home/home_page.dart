@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:Lino_app/controllers/locale_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -210,6 +211,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       body: Column(
         children: [
           _buildGuestMessage(localizations),
+          _buildGuestLanguageSelector(localizations),
           Expanded(
             child: _buildMapSection(viewModel, localizations),
           ),
@@ -368,6 +370,143 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGuestLanguageSelector(AppLocalizations localizations) {
+    final localeController = Get.find<LocaleController>();
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: LinoColors.primary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.language,
+                      color: LinoColors.accent,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      localizations.languageSettings,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Kanit',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                localizations.chooseLanguage,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  fontFamily: 'Kanit',
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: GetX<LocaleController>(
+                      builder: (controller) => _buildLanguageOption(
+                        flag: '🇺🇸',
+                        language: localizations.english,
+                        isSelected: controller.locale.value.languageCode == 'en',
+                        onTap: () => localeController.changeLocale(const Locale('en')),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: GetX<LocaleController>(
+                      builder: (controller) => _buildLanguageOption(
+                        flag: '🇫🇷',
+                        language: localizations.french,
+                        isSelected: controller.locale.value.languageCode == 'fr',
+                        onTap: () => localeController.changeLocale(const Locale('fr')),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption({
+    required String flag,
+    required String language,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? LinoColors.accent.withOpacity(0.1) : Colors.grey[50],
+          border: Border.all(
+            color: isSelected ? LinoColors.accent : Colors.grey[300]!,
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              flag,
+              style: const TextStyle(fontSize: 20),
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                language,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? LinoColors.accent : Colors.black87,
+                  fontFamily: 'Kanit',
+                ),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (isSelected) ...[
+              const SizedBox(width: 4),
+              Icon(
+                Icons.check_circle,
+                color: LinoColors.accent,
+                size: 16,
+              ),
+            ],
+          ],
         ),
       ),
     );

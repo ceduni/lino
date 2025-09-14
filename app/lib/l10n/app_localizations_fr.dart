@@ -1078,4 +1078,19 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get timesTaken => 'Fois pris';
+
+  @override
+  String get languageSettings => 'Paramètres de langue';
+
+  @override
+  String get chooseLanguage => 'Choisissez votre langue préférée';
+
+  @override
+  String get english => 'Anglais';
+
+  @override
+  String get french => 'Français';
+
+  @override
+  String get selectLanguage => 'Sélectionner la langue';
 }

@@ -1056,4 +1056,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get timesTaken => 'Times Taken';
+
+  @override
+  String get languageSettings => 'Language Settings';
+
+  @override
+  String get chooseLanguage => 'Choose your preferred language';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get french => 'French';
+
+  @override
+  String get selectLanguage => 'Select Language';
 }

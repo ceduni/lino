@@ -391,7 +391,12 @@
   "unableToLoadStatistics": "Unable to load statistics",
   "noStatisticsAvailable": "No statistics available",
   "timesAdded": "Times Added",
-  "timesTaken": "Times Taken"
+  "timesTaken": "Times Taken",
+  "languageSettings": "Language Settings",
+  "chooseLanguage": "Choose your preferred language",
+  "english": "English",
+  "french": "French",
+  "selectLanguage": "Select Language"
 
 
 } 

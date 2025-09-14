@@ -6,6 +6,7 @@ import 'package:Lino_app/vm/profile/profile_view_model.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:Lino_app/controllers/locale_controller.dart';
 import 'recent_transactions_widget.dart';
 import 'followed_bookboxes_widget.dart';
 
@@ -213,6 +214,8 @@ class _UserDashboardState extends State<UserDashboard> {
             subtitle: localizations.manageNotifications,
             onTap: () => Get.toNamed(AppRoutes.profile.setupNotifications),
           ),
+          const SizedBox(height: 8),
+          _buildLanguageSelectionTile(localizations),
           
         ],
       ),
@@ -267,6 +270,114 @@ class _UserDashboardState extends State<UserDashboard> {
         ),
         onTap: onTap,
       ),
+    );
+  }
+
+  Widget _buildLanguageSelectionTile(AppLocalizations localizations) {
+    final localeController = Get.find<LocaleController>();
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: LinoColors.primary,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(Icons.language, color: LinoColors.accent),
+        ),
+        title: Text(
+          localizations.languageSettings,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+        subtitle: Text(
+          localizations.chooseLanguage,
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 12,
+          ),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GetX<LocaleController>(
+              builder: (controller) => Text(
+                controller.locale.value.languageCode == 'en' 
+                    ? localizations.english 
+                    : localizations.french,
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.grey,
+              size: 16,
+            ),
+          ],
+        ),
+        onTap: () => _showLanguageSelectionDialog(localizations, localeController),
+      ),
+    );
+  }
+
+  void _showLanguageSelectionDialog(AppLocalizations localizations, LocaleController localeController) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(localizations.selectLanguage),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GetX<LocaleController>(
+                builder: (controller) => ListTile(
+                  leading: const Text('🇺🇸', style: TextStyle(fontSize: 24)),
+                  title: Text(localizations.english),
+                  trailing: controller.locale.value.languageCode == 'en'
+                      ? const Icon(Icons.check, color: Colors.green)
+                      : null,
+                  onTap: () {
+                    localeController.changeLocale(const Locale('en'));
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+              GetX<LocaleController>(
+                builder: (controller) => ListTile(
+                  leading: const Text('🇫🇷', style: TextStyle(fontSize: 24)),
+                  title: Text(localizations.french),
+                  trailing: controller.locale.value.languageCode == 'fr'
+                      ? const Icon(Icons.check, color: Colors.green)
+                      : null,
+                  onTap: () {
+                    localeController.changeLocale(const Locale('fr'));
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

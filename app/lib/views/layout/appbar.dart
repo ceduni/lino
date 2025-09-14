@@ -39,9 +39,11 @@ class _LinoAppBarState extends State<LinoAppBar> {
               height: 40,
             ),
           ),
+          /*
           actions: [
             LanguageSelector()
           ],
+          */
           //backgroundColor: LinoColors.accent,
           flexibleSpace: Padding(
             padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),

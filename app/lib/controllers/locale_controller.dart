@@ -23,15 +23,32 @@ class LocaleController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
     final savedLocale = prefs.getString(_localeKey);
 
+    Locale? localeToUse;
+
+    // First, try to use saved locale if it exists
     if (savedLocale != null) {
       final parts = savedLocale.split('_');
       final newLocale = Locale(parts[0], parts.length > 1 ? parts[1] : null);
 
       if (supportedLocales.any((l) => l.languageCode == newLocale.languageCode)) {
-        locale.value = newLocale;
-        Get.updateLocale(newLocale);
+        localeToUse = newLocale;
       }
     }
+
+    // If no saved locale or saved locale is not supported, use device locale
+    if (localeToUse == null) {
+      final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
+      
+      if (supportedLocales.any((l) => l.languageCode == deviceLocale.languageCode)) {
+        localeToUse = Locale(deviceLocale.languageCode);
+      } else {
+        // Fallback to french if device locale is not supported
+        localeToUse = Locale('fr');
+      }
+    }
+
+    locale.value = localeToUse;
+    Get.updateLocale(localeToUse);
   }
 
   Future<void> changeLocale(Locale newLocale) async {

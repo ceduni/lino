@@ -368,7 +368,9 @@
   "noStatisticsAvailable": "Aucune statistique disponible",
   "timesAdded": "Fois ajouté",
   "timesTaken": "Fois pris",
-  "noStatisticsAvailable": "Aucune statistique disponible",
-  "timesAdded": "Fois ajouté",
-  "timesTaken": "Fois pris"
+  "languageSettings": "Paramètres de langue",
+  "chooseLanguage": "Choisissez votre langue préférée",
+  "english": "Anglais",
+  "french": "Français",
+  "selectLanguage": "Sélectionner la langue"
 }
