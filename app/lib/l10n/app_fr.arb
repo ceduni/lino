@@ -170,5 +170,16 @@
   "failedToDeleteRequest": "Échec de la suppression de la requête",
   "message": "Message",
   "delete": "Supprimer",
-  "peopleNotified": "Personnes notifiées : "
+  "peopleNotified": "Personnes notifiées : ",
+
+  "transactionHistory": "Historique des transactions",
+  "errorLoadingTransactions": "Erreur lors du chargement des transactions",
+  "startAddingBooksToSeeHistory": "Commencez à ajouter ou prendre des livres pour voir votre historique de transactions !",
+  "at": "à",
+  "transactiontotal": "transactions au total",
+  "notransactions": "Aucune transaction pour le moment",
+  "de": "de",
+
+  "followedBookBoxesEmpty": "Aucune boîte à livres suivie",
+  "startFollowingBookBoxes": "Commencez à suivre des boîtes à livres pour les voir ici!"
 }

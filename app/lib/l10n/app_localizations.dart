@@ -997,6 +997,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'People Notified: '**
   String get peopleNotified;
+
+  /// No description provided for @transactionHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction History'**
+  String get transactionHistory;
+
+  /// No description provided for @errorLoadingTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading transactions'**
+  String get errorLoadingTransactions;
+
+  /// No description provided for @startAddingBooksToSeeHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Start adding or taking books to see your transaction history!'**
+  String get startAddingBooksToSeeHistory;
+
+  /// No description provided for @transactiontotal.
+  ///
+  /// In en, this message translates to:
+  /// **'transactions total'**
+  String get transactiontotal;
+
+  /// No description provided for @notransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions yet'**
+  String get notransactions;
+
+  /// No description provided for @de.
+  ///
+  /// In en, this message translates to:
+  /// **'of'**
+  String get de;
+
+  /// No description provided for @followedBookBoxesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No followed bookboxes'**
+  String get followedBookBoxesEmpty;
+
+  /// No description provided for @startFollowingBookBoxes.
+  ///
+  /// In en, this message translates to:
+  /// **'Start following bookboxes to see them here!'**
+  String get startFollowingBookBoxes;
 }
 
 class _AppLocalizationsDelegate

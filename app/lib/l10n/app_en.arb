@@ -168,7 +168,18 @@
   "failedToDeleteRequest": "Failed to delete request",
   "message": "Message",
   "delete": "Delete",
-  "peopleNotified": "People Notified: "
+  "peopleNotified": "People Notified: ",
+
+  "transactionHistory": "Transaction History",
+  "errorLoadingTransactions": "Error loading transactions",
+  "startAddingBooksToSeeHistory": "Start adding or taking books to see your transaction history!",
+  "at": "at",
+  "transactiontotal": "transactions total",
+  "notransactions": "No transactions yet",
+  "de": "of",
+
+  "followedBookBoxesEmpty": "No followed bookboxes",
+  "startFollowingBookBoxes": "Start following bookboxes to see them here!"
 
 
 }

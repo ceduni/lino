@@ -494,4 +494,31 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get peopleNotified => 'Personnes notifiées : ';
+
+  @override
+  String get transactionHistory => 'Historique des transactions';
+
+  @override
+  String get errorLoadingTransactions =>
+      'Erreur lors du chargement des transactions';
+
+  @override
+  String get startAddingBooksToSeeHistory =>
+      'Commencez à ajouter ou prendre des livres pour voir votre historique de transactions !';
+
+  @override
+  String get transactiontotal => 'transactions au total';
+
+  @override
+  String get notransactions => 'Aucune transaction pour le moment';
+
+  @override
+  String get de => 'de';
+
+  @override
+  String get followedBookBoxesEmpty => 'Aucune boîte à livres suivie';
+
+  @override
+  String get startFollowingBookBoxes =>
+      'Commencez à suivre des boîtes à livres pour les voir ici!';
 }

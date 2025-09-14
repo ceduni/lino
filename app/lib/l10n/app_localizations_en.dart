@@ -486,4 +486,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get peopleNotified => 'People Notified: ';
+
+  @override
+  String get transactionHistory => 'Transaction History';
+
+  @override
+  String get errorLoadingTransactions => 'Error loading transactions';
+
+  @override
+  String get startAddingBooksToSeeHistory =>
+      'Start adding or taking books to see your transaction history!';
+
+  @override
+  String get transactiontotal => 'transactions total';
+
+  @override
+  String get notransactions => 'No transactions yet';
+
+  @override
+  String get de => 'of';
+
+  @override
+  String get followedBookBoxesEmpty => 'No followed bookboxes';
+
+  @override
+  String get startFollowingBookBoxes =>
+      'Start following bookboxes to see them here!';
 }

@@ -6,6 +6,7 @@ import 'package:Lino_app/models/bookbox_model.dart';
 import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/services/bookbox_services.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class FollowedBookboxesPage extends StatefulWidget {
   const FollowedBookboxesPage({super.key});
@@ -64,16 +65,17 @@ class _FollowedBookboxesPageState extends State<FollowedBookboxesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Followed BookBoxes'),
+        title: Text(localizations.followedBookBoxes),
         foregroundColor: const Color.fromARGB(255, 0, 0, 0),
       ),
-      body: _buildBody(),
+      body: _buildBody(localizations),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody( AppLocalizations localizations) {
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -139,7 +141,7 @@ class _FollowedBookboxesPageState extends State<FollowedBookboxesPage> {
               ),
               const SizedBox(height: 24),
               Text(
-                'No followed bookboxes',
+                localizations.followedBookBoxesEmpty,
                 style: TextStyle(
                   fontSize: 24,
                   fontFamily: 'Kanit',
@@ -148,7 +150,7 @@ class _FollowedBookboxesPageState extends State<FollowedBookboxesPage> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Start following bookboxes to see them here!',
+                localizations.startFollowingBookBoxes,
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Kanit',
@@ -173,13 +175,13 @@ class _FollowedBookboxesPageState extends State<FollowedBookboxesPage> {
         ),
         itemCount: followedBookboxes!.length,
         itemBuilder: (context, index) {
-          return _buildBookboxCard(followedBookboxes![index]);
+          return _buildBookboxCard(followedBookboxes![index],localizations);
         },
       ),
     );
   }
 
-  Widget _buildBookboxCard(BookBox bookbox) {
+  Widget _buildBookboxCard(BookBox bookbox, AppLocalizations localizations) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
@@ -265,7 +267,7 @@ class _FollowedBookboxesPageState extends State<FollowedBookboxesPage> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '${bookbox.books.length} books',
+                            '${bookbox.books.length} ${localizations.books}',
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.blue[600],
