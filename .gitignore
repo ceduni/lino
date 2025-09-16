@@ -19,3 +19,6 @@ app/macos/Flutter/Flutter-Release.xcconfig
 .vscode/settings.json
 app/ios/Secrets.plist
 app/upload-keystore.jks
+/redirect-page/dist/
+/redirect-page/node_modules/
+/redirect-page/.env
