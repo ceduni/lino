@@ -1,8 +1,11 @@
 // src/components/LandingPage.jsx
 import React from 'react';
 import { AppStoreButton, GooglePlayButton } from 'react-mobile-app-button';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const LandingPage = () => {
+  const { t } = useLanguage();
+  
   const handleMoreDetails = () => {
     window.open('https://ceduni.github.io/lino/', '_blank');
   };
@@ -27,7 +30,7 @@ const LandingPage = () => {
 
           {/* Download Buttons */}
           <div className="download-section">
-            <h2>Download the App</h2>
+            <h2>{t('download.title')}</h2>
             <div className="download-buttons">
               <GooglePlayButton
                 url="https://play.google.com/store/apps/details?id=ca.umontreal.ceduni.lino"
@@ -49,7 +52,7 @@ const LandingPage = () => {
               className="info-link"
               onClick={handleMoreDetails}
             >
-              Learn more about Lino →
+              {t('moreInfo.button')} →
             </button>
           </div>
         </main>

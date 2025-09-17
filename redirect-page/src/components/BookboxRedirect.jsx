@@ -1,9 +1,11 @@
 // src/components/BookboxRedirect.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const BookboxRedirect = () => {
   const { id } = useParams();
+  const { t } = useLanguage();
   const [status, setStatus] = useState('detecting');
   const [countdown, setCountdown] = useState(3);
 
@@ -71,8 +73,8 @@ const BookboxRedirect = () => {
       <div className="bookbox-container">
         <div className="bookbox-content">
           <div className="loader">⏳</div>
-          <h2>Getting ready...</h2>
-          <p>Preparing to open bookbox {id}</p>
+          <h2>{t('bookbox.detecting')}</h2>
+          <p>Bookbox ID: <strong>{id}</strong></p>
         </div>
       </div>
     );
@@ -83,9 +85,9 @@ const BookboxRedirect = () => {
       <div className="bookbox-container">
         <div className="bookbox-content">
           <div className="loader spinning">📚</div>
-          <h2>Opening Lino App</h2>
+          <h2>{t('bookbox.trying')}</h2>
           <p>Bookbox ID: <strong>{id}</strong></p>
-          <p className="countdown">Fallback in {countdown}s...</p>
+          <p className="countdown">{t('bookbox.countdown', { count: countdown })}</p>
         </div>
       </div>
     );
@@ -95,22 +97,23 @@ const BookboxRedirect = () => {
     <div className="bookbox-container">
       <div className="bookbox-content">
         <div className="logo">📱</div>
-        <h2>App Not Found</h2>
-        <p>To access bookbox <strong>{id}</strong>, you need the Lino app.</p>
+        <h2>{t('bookbox.fallback.title')}</h2>
+        <p>{t('bookbox.fallback.subtitle')}</p>
+        <p>Bookbox ID: <strong>{id}</strong></p>
         
         <div className="action-buttons">
           <button 
             className="download-btn primary"
             onClick={handleDownloadApp}
           >
-            Download Lino App
+            {t('bookbox.fallback.downloadButton')}
           </button>
           
           <button 
             className="secondary-btn"
             onClick={handleGoToMain}
           >
-            Visit Main Site
+            {t('bookbox.fallback.webButton')}
           </button>
         </div>
       </div>

@@ -291,3 +291,55 @@ body {
     max-width: 85%;
   }
 }
+
+/* Language Toggle Styles */
+.language-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  z-index: 1000;
+}
+
+.language-toggle:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.language-toggle .flag {
+  font-size: 1.2rem;
+}
+
+.language-toggle .lang-code {
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+  .language-toggle {
+    top: 15px;
+    right: 15px;
+    padding: 6px 10px;
+  }
+  
+  .language-toggle .flag {
+    font-size: 1rem;
+  }
+  
+  .language-toggle .lang-code {
+    font-size: 0.7rem;
+  }
+}

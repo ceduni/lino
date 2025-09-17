@@ -1,0 +1,19 @@
+{
+  "download": {
+    "title": "Télécharger l'Application"
+  },
+  "moreInfo": {
+    "button": "En savoir plus sur Lino"
+  },
+  "bookbox": {
+    "detecting": "Préparation en cours...",
+    "trying": "Ouverture de l'app Lino",
+    "countdown": "Redirection dans {count}s...",
+    "fallback": {
+      "title": "Application Non Trouvée",
+      "subtitle": "Pour accéder à cette boîte à livres, vous avez besoin de l'application Lino.",
+      "downloadButton": "Télécharger l'App Lino",
+      "webButton": "Visiter le Site Principal"
+    }
+  }
+}
