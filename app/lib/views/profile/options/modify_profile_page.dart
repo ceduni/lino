@@ -14,6 +14,7 @@ class ModifyProfilePage extends StatefulWidget {
 }
 
 class _ModifyProfilePageState extends State<ModifyProfilePage> {
+  int _visibilityToggleCount = 0;
   
   @override
   void initState() {
@@ -21,6 +22,32 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ModifyProfileViewModel>().loadUserData();
     });
+  }
+
+  void _handlePasswordVisibilityToggle() {
+    _visibilityToggleCount++;
+    context.read<ModifyProfileViewModel>().togglePasswordVisibility();
+    
+    if (_visibilityToggleCount == 5) {
+      _showHiPopup();
+      _visibilityToggleCount = 0; // Reset counter
+    }
+  }
+
+  void _showHiPopup() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Hi!'),
+        content: Text('jalal was here :)'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -113,7 +140,8 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                       Icons.lock,
                       obscureText: viewModel.obscureText,
                       isPassword: true,
-                      onVisibilityToggle: viewModel.togglePasswordVisibility,
+                      onVisibilityToggle: _handlePasswordVisibilityToggle,
+                      
                     ),
                     SizedBox(height: 20),
                     _buildTextField(viewModel.emailController, 'Email', Icons.email),
