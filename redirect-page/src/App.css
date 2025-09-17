@@ -49,8 +49,6 @@ body {
 }
 
 .logo-image {
-  max-width: 120px;
-  max-height: 120px;
   width: auto;
   height: auto;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3)) 
