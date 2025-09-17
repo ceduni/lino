@@ -60,7 +60,7 @@ const LandingPage = () => {
         {/* Footer */}
         <footer className="footer">
           <p>
-            A project by{' '}
+            {t("moreInfo.project")}{' '}
             <a 
               href="https://github.com/ceduni" 
               target="_blank" 

@@ -3,7 +3,8 @@
     "title": "Download the App"
   },
   "moreInfo": {
-    "button": "Learn more about Lino"
+    "button": "Learn more about Lino",
+    "project": "A project by "
   },
   "bookbox": {
     "detecting": "Getting ready...",

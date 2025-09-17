@@ -3,7 +3,8 @@
     "title": "Télécharger l'Application"
   },
   "moreInfo": {
-    "button": "En savoir plus sur Lino"
+    "button": "En savoir plus sur Lino",
+    "project": "Projet réalisé par "
   },
   "bookbox": {
     "detecting": "Préparation en cours...",
