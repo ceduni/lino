@@ -51,6 +51,9 @@ body {
 .logo-image {
   width: auto;
   height: auto;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3)) 
           drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
   transition: filter 0.3s ease;
@@ -256,8 +259,8 @@ body {
   }
   
   .logo-image {
-    max-width: 90px;
-    max-height: 90px;
+    transform: scale(0.9);
+    max-width: 90%;
   }
   
   .download-buttons {
@@ -284,7 +287,7 @@ body {
   }
   
   .logo-image {
-    max-width: 70px;
-    max-height: 70px;
+    transform: scale(0.9);
+    max-width: 85%;
   }
 }
