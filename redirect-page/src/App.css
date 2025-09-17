@@ -16,6 +16,11 @@ body {
   color: white;
 }
 
+.App {
+  min-height: 100vh;
+  width: 100%;
+}
+
 /* Landing Page Styles */
 .landing-container {
   min-height: 100vh;
