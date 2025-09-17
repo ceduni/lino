@@ -269,11 +269,20 @@ class _BookBoxPageState extends State<BookBoxPage> {
               searchViewModel.createRequest("");
             },
             
-            child: Center(child: Text(AppLocalizations.of(context)!.didntFindBookCreateRequest, style: TextStyle(
-              fontFamily: 'Kanit',
-              fontWeight: FontWeight.w600,
-              color: LinoColors.accent,
-            ),)),
+            child: Center(
+              child: Text(
+                AppLocalizations.of(context)!.didntFindBookCreateRequest, 
+                style: TextStyle(
+                  fontFamily: 'Kanit',
+                  fontWeight: FontWeight.w600,
+                  color: LinoColors.accent,
+                  fontSize: Localizations.localeOf(context).languageCode == 'fr' ? 12.0 : 14.0,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
 
           ),
           Center(
