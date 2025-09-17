@@ -151,11 +151,7 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        ElevatedButton(
-                          onPressed: () => Get.back(),
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                          child: Text(localizations.dismiss, style: TextStyle(color: LinoColors.accent)),
-                        ),
+                        
                         ElevatedButton(
                           onPressed: () => _showConfirmationDialog(viewModel),
                           style: ElevatedButton.styleFrom(backgroundColor: LinoColors.accent),
