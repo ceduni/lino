@@ -49,6 +49,10 @@ body {
 }
 
 .logo-image {
+  max-width: 120px;
+  max-height: 120px;
+  width: auto;
+  height: auto;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3)) 
           drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
   transition: filter 0.3s ease;
@@ -253,6 +257,11 @@ body {
     font-size: 4rem;
   }
   
+  .logo-image {
+    max-width: 90px;
+    max-height: 90px;
+  }
+  
   .download-buttons {
     gap: 0.8rem;
   }
@@ -274,5 +283,10 @@ body {
   
   .subtitle {
     font-size: 1rem;
+  }
+  
+  .logo-image {
+    max-width: 70px;
+    max-height: 70px;
   }
 }
