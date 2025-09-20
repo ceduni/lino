@@ -2,14 +2,13 @@ import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:Lino_app/views/search/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// import 'package:Lino_app/pages/map/map_screen.dart';
 import 'package:Lino_app/views/forum/forum_screen.dart';
-// import 'package:Lino_app/pages/forum/requests_section.dart';
 import 'package:Lino_app/views/layout/appbar.dart';
 import 'package:Lino_app/views/profile/profile_page.dart';
 import 'package:Lino_app/views/home/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/user_services.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class BookNavPage extends StatefulWidget {
   const BookNavPage({super.key});
@@ -53,6 +52,8 @@ class _BookNavPageState extends State<BookNavPage> {
   }
 
   Widget _buildNavigationBar(BuildContext context, NavigationController controller) {
+    final localizations = AppLocalizations.of(context)!;
+
     return GetBuilder<NavigationController>(
       builder: (controller) {
         return FutureBuilder<bool>(
@@ -85,11 +86,11 @@ class _BookNavPageState extends State<BookNavPage> {
               destinations: [
                 NavigationDestination(
                   icon: Icon(Icons.home),
-                  label: 'Home',
+                  label: localizations.navHome,
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.search),
-                  label: 'Search',
+                  label: localizations.navSearch,
                 ),
                 /*NavigationDestination(
                   icon: Icon(Icons.map),
@@ -97,11 +98,11 @@ class _BookNavPageState extends State<BookNavPage> {
                 ),*/
                 NavigationDestination(
                   icon: Icon(Icons.chat),
-                  label: 'Requests',
+                  label: localizations.navRequests,
                 ),
                 NavigationDestination(
                   icon: Icon(isLoggedIn ? Icons.person : Icons.login),
-                  label: isLoggedIn ? 'Profile' : 'Log In',
+                  label: isLoggedIn ? localizations.navProfile : localizations.navLogIn,
                 ),
               ],
             );

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/profile/options/modify_profile_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class ModifyProfilePage extends StatefulWidget {
   const ModifyProfilePage({super.key});
@@ -13,6 +14,8 @@ class ModifyProfilePage extends StatefulWidget {
 }
 
 class _ModifyProfilePageState extends State<ModifyProfilePage> {
+  int _visibilityToggleCount = 0;
+  
   @override
   void initState() {
     super.initState();
@@ -21,11 +24,38 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
     });
   }
 
+  void _handlePasswordVisibilityToggle() {
+    _visibilityToggleCount++;
+    context.read<ModifyProfileViewModel>().togglePasswordVisibility();
+    
+    if (_visibilityToggleCount == 5) {
+      _showHiPopup();
+      _visibilityToggleCount = 0; // Reset counter
+    }
+  }
+
+  void _showHiPopup() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Hi!'),
+        content: Text('jalal was here :)'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    AppLocalizations localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Modify Profile'),
+        title: Text(localizations.modifyProfile),
       ),
       body: Consumer<ModifyProfileViewModel>(
         builder: (context, viewModel, child) {
@@ -54,10 +84,8 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                           CircleAvatar(
                             radius: 70,
                             backgroundColor: Colors.lightBlue[100],
-                            backgroundImage: viewModel.profileImage != null
-                                ? FileImage(viewModel.profileImage!)
-                                : null,
-                            child: viewModel.profileImage == null
+                            backgroundImage: _getProfileImage(viewModel),
+                            child: _getProfileImage(viewModel) == null
                                 ? Icon(
                                     Icons.person,
                                     size: 70,
@@ -65,6 +93,20 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                                   )
                                 : null,
                           ),
+                          if (viewModel.isUploadingImage)
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black.withOpacity(0.5),
+                                ),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
                           Positioned(
                             bottom: 0,
                             right: 0,
@@ -90,34 +132,31 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                       ),
                     ),
                     Spacer(flex: 1),
-                    _buildTextField(viewModel.usernameController, 'Username', Icons.person),
+                    _buildTextField(viewModel.usernameController, localizations.username, Icons.person),
                     SizedBox(height: 20),
                     _buildTextField(
                       viewModel.passwordController,
-                      'Password',
+                      localizations.password,
                       Icons.lock,
                       obscureText: viewModel.obscureText,
                       isPassword: true,
-                      onVisibilityToggle: viewModel.togglePasswordVisibility,
+                      onVisibilityToggle: _handlePasswordVisibilityToggle,
+                      
                     ),
                     SizedBox(height: 20),
                     _buildTextField(viewModel.emailController, 'Email', Icons.email),
                     SizedBox(height: 20),
-                    _buildTextField(viewModel.phoneController, 'Phone', Icons.phone, isPhone: true),
+                    _buildTextField(viewModel.phoneController, localizations.phone, Icons.phone, isPhone: true),
                     SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        ElevatedButton(
-                          onPressed: () => Get.back(),
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                          child: Text('Dismiss', style: TextStyle(color: LinoColors.accent)),
-                        ),
+                        
                         ElevatedButton(
                           onPressed: () => _showConfirmationDialog(viewModel),
                           style: ElevatedButton.styleFrom(backgroundColor: LinoColors.accent),
                           child: Text(
-                            'Submit',
+                            localizations.submit,
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
@@ -135,6 +174,16 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
         },
       ),
     );
+  }
+
+  ImageProvider? _getProfileImage(ModifyProfileViewModel viewModel) {
+    // Priority: local file > network URL > null
+    if (viewModel.profileImage != null) {
+      return FileImage(viewModel.profileImage!);
+    } else if (viewModel.profilePictureUrl != null && viewModel.profilePictureUrl!.isNotEmpty) {
+      return NetworkImage(viewModel.profilePictureUrl!);
+    }
+    return null;
   }
 
   Widget _buildTextField(

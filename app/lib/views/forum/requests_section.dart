@@ -1,6 +1,7 @@
 // app/lib/views/forum/requests_section.dart
 import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:Lino_app/widgets/custom_snackbar.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +36,8 @@ class _RequestsSectionState extends State<RequestsSection> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
     return Consumer<RequestsViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
@@ -44,9 +47,9 @@ class _RequestsSectionState extends State<RequestsSection> {
                 color: LinoColors.primary,
                 child: Column(
                   children: [
-                    _buildSearchAndFilters(viewModel),
-                    Expanded(child: _buildBody(viewModel)),
-                    if (viewModel.pagination != null && viewModel.requests.isNotEmpty) _buildPaginationControls(viewModel),
+                    _buildSearchAndFilters(viewModel, localizations),
+                    Expanded(child: _buildBody(viewModel, localizations)),
+                    if (viewModel.pagination != null && viewModel.requests.isNotEmpty) _buildPaginationControls(viewModel, localizations),
                   ],
                 ),
               ),
@@ -61,9 +64,9 @@ class _RequestsSectionState extends State<RequestsSection> {
                     backgroundColor: LinoColors.accent,
                     foregroundColor: LinoColors.primary,
                     icon: const Icon(Icons.add),
-                    label: const Text(
-                      'Create Request',
-                      style: TextStyle(
+                    label: Text(
+                      localizations.createRequest,
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -76,7 +79,7 @@ class _RequestsSectionState extends State<RequestsSection> {
     );
   }
 
-  Widget _buildSearchAndFilters(RequestsViewModel viewModel) {
+  Widget _buildSearchAndFilters(RequestsViewModel viewModel, AppLocalizations localizations) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -85,7 +88,7 @@ class _RequestsSectionState extends State<RequestsSection> {
           TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: 'Search book titles...',
+              hintText: localizations.searchBookTitles,
               prefixIcon: const Icon(Icons.search),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
@@ -115,10 +118,12 @@ class _RequestsSectionState extends State<RequestsSection> {
           // Filter and sort controls
           Row(
             children: [
-              const Text('Filter: ', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('${localizations.filter}: ', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
               Expanded(
+                flex: 2,
                 child: DropdownButton<RequestFilter>(
                   value: viewModel.currentFilter,
+                  isExpanded: true,
                   onChanged: (filter) {
                     if (filter != null) {
                       viewModel.setFilter(filter);
@@ -127,16 +132,18 @@ class _RequestsSectionState extends State<RequestsSection> {
                   items: viewModel.availableFilters.map((filter) {
                     return DropdownMenuItem(
                       value: filter,
-                      child: Text(_getShortFilterText(filter)),
+                      child: Text(_getShortFilterText(filter, localizations)),
                     );
                   }).toList(),
                 ),
               ),
-              const SizedBox(width: 16),
-              const Text('Sort: ', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(width: 8),
+              Text('${localizations.sort}: ', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
               Expanded(
+                flex: 2,
                 child: DropdownButton<RequestSortBy>(
                   value: viewModel.sortBy,
+                  isExpanded: true,
                   onChanged: (sortBy) {
                     if (sortBy != null) {
                       viewModel.setSorting(sortBy, viewModel.sortOrder);
@@ -145,12 +152,12 @@ class _RequestsSectionState extends State<RequestsSection> {
                   items: RequestSortBy.values.map((sortBy) {
                     return DropdownMenuItem(
                       value: sortBy,
-                      child: Text(_getShortSortText(sortBy)),
+                      child: Text(_getShortSortText(sortBy, localizations)),
                     );
                   }).toList(),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 4),
               GestureDetector(
                 onTap: () {
                   final newOrder = viewModel.sortOrder == SortOrder.asc 
@@ -172,7 +179,7 @@ class _RequestsSectionState extends State<RequestsSection> {
     );
   }
 
-  Widget _buildBody(RequestsViewModel viewModel) {
+  Widget _buildBody(RequestsViewModel viewModel, AppLocalizations localizations) {
     if (viewModel.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -200,7 +207,7 @@ class _RequestsSectionState extends State<RequestsSection> {
                 ElevatedButton.icon(
                   onPressed: viewModel.refresh,
                   icon: const Icon(Icons.refresh),
-                  label: const Text('Retry'),
+                  label: Text(localizations.retry),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: LinoColors.accent,
                     foregroundColor: Colors.white,
@@ -209,7 +216,7 @@ class _RequestsSectionState extends State<RequestsSection> {
                 const SizedBox(width: 12),
                 TextButton(
                   onPressed: viewModel.clearError,
-                  child: const Text('Dismiss'),
+                  child: Text(localizations.dismiss),
                 ),
               ],
             ),
@@ -226,7 +233,7 @@ class _RequestsSectionState extends State<RequestsSection> {
             Icon(Icons.book_outlined, size: 64, color: LinoColors.accent),
             const SizedBox(height: 16),
             Text(
-              _getEmptyStateTitle(viewModel),
+              _getEmptyStateTitle(viewModel, localizations),
               style: TextStyle(
                 fontSize: 18,
                 color: LinoColors.accent,
@@ -234,13 +241,16 @@ class _RequestsSectionState extends State<RequestsSection> {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              _getEmptyStateSubtitle(viewModel),
-              style: TextStyle(
-                fontSize: 14,
-                color: LinoColors.accent.withValues(alpha: 0.7),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Text(
+                _getEmptyStateSubtitle(viewModel, localizations),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: LinoColors.accent.withValues(alpha: 0.7),
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
             if (!viewModel.isAuthenticated) ...[
               const SizedBox(height: 16),
@@ -252,7 +262,7 @@ class _RequestsSectionState extends State<RequestsSection> {
                   backgroundColor: LinoColors.accent,
                   foregroundColor: LinoColors.primary,
                 ),
-                child: const Text('Login to Create Requests'),
+                child: Text(localizations.loginToCreateRequests),
               ),
             ],
           ],
@@ -271,7 +281,7 @@ class _RequestsSectionState extends State<RequestsSection> {
 
           return GestureDetector(
             onLongPress: isOwner
-                ? () => _showDeleteDialog(context, viewModel, request)
+                ? () => _showDeleteDialog(context, viewModel, request, localizations)
                 : null,
             child: isOwner
                 ? Dismissible(
@@ -289,20 +299,20 @@ class _RequestsSectionState extends State<RequestsSection> {
                     ),
                     confirmDismiss: (direction) async {
                       if (isOwner) {
-                        return await _showDeleteDialog(context, viewModel, request);
+                        return await _showDeleteDialog(context, viewModel, request, localizations);
                       }
                       return false;
                     },
-                    child: _buildRequestCard(request, isOwner),
+                    child: _buildRequestCard(request, isOwner, localizations),
                   )
-                : _buildRequestCard(request, isOwner),
+                : _buildRequestCard(request, isOwner, localizations),
           );
         },
       ),
     );
   }
 
-  Widget _buildRequestCard(Request request, bool isOwner) {
+  Widget _buildRequestCard(Request request, bool isOwner, AppLocalizations localizations) {
     return Consumer<RequestsViewModel>(
       builder: (context, viewModel, child) {
         final canLike = viewModel.canLikeRequest(request);
@@ -331,8 +341,8 @@ class _RequestsSectionState extends State<RequestsSection> {
               children: [
                 const SizedBox(height: 4),
                 Text(
-                  isOwner ? 'Your request' :
-                  'Requested by ${request.username}',
+                  isOwner ? localizations.yourRequest :
+                  '${localizations.requestedBy} ${request.username}',
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
@@ -443,6 +453,7 @@ class _RequestsSectionState extends State<RequestsSection> {
   }
 
   void showRequestDetails(Request request) {
+    final localizations = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -451,30 +462,31 @@ class _RequestsSectionState extends State<RequestsSection> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Requested by: ${request.username}'),
+            Text('${localizations.requestedBy}: ${request.username}'),
             const SizedBox(height: 8),
             if (request.customMessage != null && request.customMessage!.isNotEmpty)
-              Text('Message: ${request.customMessage}'),
+              Text('${localizations.message}: ${request.customMessage}'),
             const SizedBox(height: 8),
-            Text('Upvotes: ${request.upvoteCount}'),
-            Text('People Notified: ${request.nbPeopleNotified}'),
+            Text('${localizations.upvotes}: ${request.upvoteCount}'),
+            const SizedBox(height: 8),
+            Text('${localizations.peopleNotified} ${request.nbPeopleNotified}'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Close'), 
+            child: Text(localizations.close),
           ),
           if (request.username == context.read<RequestsViewModel>().currentUsername) ...[
             TextButton(
               onPressed: () async {
                 Get.back();
-                final confirmed = await _showDeleteDialog(context, context.read<RequestsViewModel>(), request);
+                final confirmed = await _showDeleteDialog(context, context.read<RequestsViewModel>(), request, localizations);
                 if (confirmed && context.mounted) {
                   Get.back();
                 }
               },
-              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+              child: Text(localizations.delete, style: TextStyle(color: Colors.red)),
             ),
           ]
         ],
@@ -482,7 +494,7 @@ class _RequestsSectionState extends State<RequestsSection> {
     );
   }
 
-  Widget _buildPaginationControls(RequestsViewModel viewModel) {
+  Widget _buildPaginationControls(RequestsViewModel viewModel, AppLocalizations localizations) {
     final pagination = viewModel.pagination!;
     
     return Container(
@@ -491,7 +503,7 @@ class _RequestsSectionState extends State<RequestsSection> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            '${pagination.totalResults} results',
+            '${pagination.totalResults} ${localizations.results}',
             style: TextStyle(
               color: LinoColors.accent,
               fontWeight: FontWeight.w500,
@@ -523,79 +535,78 @@ class _RequestsSectionState extends State<RequestsSection> {
     );
   }
 
-  String _getShortFilterText(RequestFilter filter) {
+  String _getShortFilterText(RequestFilter filter, AppLocalizations localizations) {
     switch (filter) {
       case RequestFilter.all:
-        return 'All';
+        return localizations.all;
       case RequestFilter.mine:
-        return 'Mine';
+        return localizations.mine;
       case RequestFilter.upvoted:
-        return 'Upvoted';
+        return localizations.upvoted;
       case RequestFilter.notified:
-        return 'Notified';
+        return localizations.notified;
     }
   }
 
-  String _getShortSortText(RequestSortBy sortBy) {
+  String _getShortSortText(RequestSortBy sortBy, AppLocalizations localizations) {
     switch (sortBy) {
       case RequestSortBy.date:
-        return 'Date';
+        return localizations.date;
       case RequestSortBy.upvoters:
-        return 'Upvotes';
+        return localizations.upvotes;
       case RequestSortBy.peopleNotified:
-        return 'Notified';
+        return localizations.notified;
     }
   }
 
-  String _getEmptyStateTitle(RequestsViewModel viewModel) {
+  String _getEmptyStateTitle(RequestsViewModel viewModel, AppLocalizations localizations) {
     if (viewModel.searchQuery.isNotEmpty) {
-      return 'No requests found for "${viewModel.searchQuery}"';
+      return '${localizations.noRequestsFoundFor} "${viewModel.searchQuery}"';
     }
     
     switch (viewModel.currentFilter) {
       case RequestFilter.all:
-        return 'No book requests found';
+        return localizations.noBookRequestsFound;
       case RequestFilter.mine:
-        return 'You have no requests';
+        return localizations.youHaveNoRequests;
       case RequestFilter.upvoted:
-        return 'No upvoted requests';
+        return localizations.noUpvotedRequests;
       case RequestFilter.notified:
-        return 'No notified requests';
+        return localizations.noNotifiedRequests;
     }
   }
 
-  String _getEmptyStateSubtitle(RequestsViewModel viewModel) {
+  String _getEmptyStateSubtitle(RequestsViewModel viewModel, AppLocalizations localizations) {
     if (viewModel.searchQuery.isNotEmpty) {
-      return 'Try searching for a different book title or clear your search to see all requests.';
+      return localizations.tryDifferentSearch;
     }
     
     switch (viewModel.currentFilter) {
       case RequestFilter.all:
-        return 'Be the first to request a book!';
+        return localizations.beFirstToRequest;
       case RequestFilter.mine:
-        return 'Start requesting books you\'d like to read';
+        return localizations.startRequestingBooks;
       case RequestFilter.upvoted:
-        return 'You haven\'t upvoted any requests yet';
+        return localizations.haventUpvotedYet;
       case RequestFilter.notified:
-        return 'You haven\'t been notified about any requests yet';
+        return localizations.haventBeenNotified;
     }
   }
 
-  Future<bool> _showDeleteDialog(BuildContext context, RequestsViewModel viewModel, Request request) async {
+  Future<bool> _showDeleteDialog(BuildContext context, RequestsViewModel viewModel, Request request, AppLocalizations localizations) async {
     final deleteConfirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete your request for "${request.bookTitle}"?'),
-        content: const Text(
-            'You won\'t be notified when the book you want will be added to a bookbox.'),
+        title: Text('${localizations.deleteRequestTitle}"${request.bookTitle}"?'),
+        content: Text(localizations.deleteRequestContent),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text('Cancel'),
+            child: Text(localizations.cancel),
           ),
           TextButton(
             onPressed: () => Get.back(result: true),
-            child: const Text('Delete'),
+            child: Text(localizations.delete, style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -605,19 +616,19 @@ class _RequestsSectionState extends State<RequestsSection> {
       final success = await viewModel.deleteRequest(request.id);
       if (success && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Request deleted successfully!'),
+          SnackBar(
+            content: Text(localizations.deleteRequestSuccess),
             backgroundColor: Colors.green,
           ),
         );
         CustomSnackbars.success(
-          'Request Deleted',
-          'Your book request has been deleted successfully.',
+          localizations.requestDeleted,
+          localizations.requestDeletedMessage,
         );
       } else if (!success && context.mounted) {
         CustomSnackbars.error(
           'Error',
-          'Failed to delete request: ${viewModel.error}',
+          localizations.failedToDeleteRequest,
         );
       }
     }

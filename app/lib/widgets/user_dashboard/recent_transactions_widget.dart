@@ -8,6 +8,7 @@ import '../../services/transaction_services.dart';
 import '../../utils/constants/routes.dart';
 import '../../views/profile/transactions_page.dart';
 import 'dart:math';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class RecentTransactionsCard extends StatefulWidget {
   final User user;
@@ -88,6 +89,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Card(
       elevation: 4,
       margin: EdgeInsets.all(16),
@@ -99,7 +101,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
             Row(
               children: [
                 Text(
-                  'Your Bookbox Trail',
+                  localizations.yourBookboxTrail,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -112,21 +114,21 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
                     onPressed: () {
                       Get.toNamed(AppRoutes.profile.transactions);
                     },
-                    child: const Text('View All'),
+                    child: Text(localizations.viewall),
                   )
                 else 
                   SizedBox.shrink(),
               ],
             ),
             SizedBox(height: 16),
-            _buildTransactionsList(),
+            _buildTransactionsList(localizations),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTransactionsList() {
+  Widget _buildTransactionsList(AppLocalizations localizations) {
     if (isLoading) {
       return Center(
         child: Padding(
@@ -152,7 +154,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
               SizedBox(height: 8),
               ElevatedButton(
                 onPressed: _loadTransactions,
-                child: Text('Retry'),
+                child: Text(localizations.retry),
               ),
             ],
           ),
@@ -169,7 +171,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
               Icon(Icons.history, color: Colors.grey, size: 48),
               SizedBox(height: 8),
               Text(
-                'No transactions yet',
+                localizations.noTransactionsYet,
                 style: TextStyle(
                   color: Colors.grey[600],
                   fontSize: 16,
@@ -177,7 +179,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
               ),
               SizedBox(height: 4),
               Text(
-                'Start adding or taking books to see your transaction history!',
+                localizations.startAddingBooks,
                 style: TextStyle(
                   color: Colors.grey[500],
                   fontSize: 14,
@@ -197,12 +199,12 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
       separatorBuilder: (context, index) => Divider(height: 1),
       itemBuilder: (context, index) {
         final transaction = transactions[index];
-        return _buildTransactionItem(transaction);
+        return _buildTransactionItem(transaction, localizations);
       },
     );
   }
 
-  Widget _buildTransactionItem(Transaction transaction) {
+  Widget _buildTransactionItem(Transaction transaction, AppLocalizations localizations) {
     final isAdded = transaction.action.toLowerCase() == 'added';
     final actionColor = isAdded ? Colors.green : Colors.orange;
 
@@ -238,7 +240,7 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
-        _buildSubtitleText(transaction),
+        _buildSubtitleText(transaction, localizations),
         style: TextStyle(
         color: Colors.grey[600],
         fontSize: 12,
@@ -263,13 +265,13 @@ class _RecentTransactionsCardState extends State<RecentTransactionsCard> {
     );
   }
 
-  String _buildSubtitleText(Transaction transaction) {
+  String _buildSubtitleText(Transaction transaction, AppLocalizations localizations) {
     final parts = <String>[
       transaction.timeAgo,
     ];
     
     if (transaction.bookboxName != null && transaction.bookboxName!.isNotEmpty) {
-      parts.insert(1, 'at ${transaction.bookboxName}');
+      parts.insert(1, '${localizations.at} ${transaction.bookboxName}');
     }
     
     return parts.join(' • ');

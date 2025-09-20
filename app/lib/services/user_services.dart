@@ -187,5 +187,23 @@ class UserService {
       throw Exception(data['error']);
     }
   }
+
+  Future<User> addProfilePicture(String token, String profilePictureUrl) async {
+    final response = await http.post(
+      Uri.parse('$url/users/profile-picture'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'profilePictureUrl': profilePictureUrl,
+      }),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception(data['error']);
+    }
+    return User.fromJson(data['user']);
+  }
 }
  

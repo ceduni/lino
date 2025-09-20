@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/profile/options/favourite_genres_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class FavouriteGenresPage extends StatefulWidget {
   const FavouriteGenresPage({super.key});
@@ -27,7 +28,7 @@ class _FavouriteGenresPageState extends State<FavouriteGenresPage> {
       backgroundColor: Color(0xFF4277B8),
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text('Setup Favourite Genres'),
+        title: Text(AppLocalizations.of(context)!.setupFavoriteGenres),
         backgroundColor: Color(0xFF4277B8),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -64,12 +65,12 @@ class _FavouriteGenresPageState extends State<FavouriteGenresPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Tell us your favourite genres:',
+            AppLocalizations.of(context)!.tellUsFavoriteGenres,
             style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10),
           Text(
-            'Select your favourite book genres to get personalized recommendations and notifications',
+            AppLocalizations.of(context)!.selectFavoriteGenresDescription,
             style: TextStyle(color: Colors.white70, fontSize: 16),
             textAlign: TextAlign.center,
           ),
@@ -88,7 +89,7 @@ class _FavouriteGenresPageState extends State<FavouriteGenresPage> {
                 controller: viewModel.genreController,
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  hintText: 'Search or enter custom genre',
+                  hintText: AppLocalizations.of(context)!.searchOrEnterCustomGenre,
                   hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.3)),
                   filled: true,
                   fillColor: Color(0xFFE0F7FA),
@@ -173,7 +174,7 @@ class _FavouriteGenresPageState extends State<FavouriteGenresPage> {
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
-              'Pass',
+              AppLocalizations.of(context)!.pass,
               style: TextStyle(color: Colors.white70),
             ),
           ),
@@ -190,7 +191,7 @@ class _FavouriteGenresPageState extends State<FavouriteGenresPage> {
               backgroundColor: LinoColors.buttonPrimary,
             ),
             child: Text(
-              'Finished!',
+              AppLocalizations.of(context)!.finished,
               style: TextStyle(color: Colors.white),
             ),
           ),

@@ -12,11 +12,12 @@ import 'package:Lino_app/widgets/profile_stats_widget.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:Lino_app/models/notification_model.dart';
-import 'package:Lino_app/views/profile/notifications_page.dart';
 import 'package:Lino_app/vm/profile/notifications_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:Lino_app/controllers/locale_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -159,6 +160,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     if (!mounted) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -180,7 +183,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
 
         if (viewModel.isGuest) {
-          return _buildGuestView(viewModel);
+          return _buildGuestView(viewModel,localizations);
         }
 
         if (viewModel.isLoadingUser) {
@@ -198,18 +201,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           );
         }
         
-        return _buildAuthenticatedView(viewModel);
+        return _buildAuthenticatedView(viewModel, localizations);
       },
     );
   }
 
-  Widget _buildGuestView(HomeViewModel viewModel) {
+  Widget _buildGuestView(HomeViewModel viewModel, AppLocalizations localizations) {
     return Scaffold(
       body: Column(
         children: [
-          _buildGuestMessage(),
+          _buildGuestMessage(localizations),
+          _buildGuestLanguageSelector(localizations),
           Expanded(
-            child: _buildMapSection(viewModel),
+            child: _buildMapSection(viewModel, localizations),
           ),
         ],
       ),
@@ -218,8 +222,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             backgroundColor: LinoColors.accent,
             foregroundColor: Colors.white,
             icon: const Icon(Icons.qr_code_scanner),
-            label: const Text(
-              'Scan',
+            label: Text(
+              localizations.scan,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -229,7 +233,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildAuthenticatedView(HomeViewModel viewModel) {
+  Widget _buildAuthenticatedView(HomeViewModel viewModel, AppLocalizations localizations) {
     return Consumer<BookboxListViewModel>(
       builder: (context, bookboxViewModel, child) {
         if (!mounted) {
@@ -250,6 +254,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         userName: viewModel.userData!.username,
                         booksSaved: viewModel.userData!.numSavedBooks,
                         treesSaved: viewModel.userData!.ecologicalImpact.savedTrees,
+                        profilePictureUrl: viewModel.userData!.profilePictureUrl,
                       ),
                       /*
                       RecommendationWidget(
@@ -259,7 +264,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           RecommendedBook(title: "livre", coverImageUrl: "rien"),
                         ],
                       ), */
-                      _buildNotificationsSection(),
+                      _buildNotificationsSection(localizations),
                       Container(
                         height: 300,
                         margin: const EdgeInsets.all(16.0),
@@ -270,7 +275,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
-                            child: _buildMap(viewModel),
+                            child: _buildMap(viewModel, localizations),
                           ),
                         ),
                       ),
@@ -286,8 +291,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             backgroundColor: LinoColors.accent,
             foregroundColor: Colors.white,
             icon: const Icon(Icons.qr_code_scanner),
-            label: const Text(
-              'Scan',
+            label: Text(
+              localizations.scan,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -299,7 +304,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildGuestMessage() {
+  Widget _buildGuestMessage(AppLocalizations localizations) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Card(
@@ -325,9 +330,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 color: Colors.white,
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Welcome, Guest!',
-                style: TextStyle(
+              Text(
+                localizations.welcomeLoggedOut,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -335,8 +340,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'You\'re browsing as a guest. Log in to unlock personalized features and start tracking your reading journey!',
+              Text(
+                localizations.msgLoggedOut,
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white70,
@@ -355,8 +360,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     borderRadius: BorderRadius.circular(25),
                   ),
                 ),
-                child: const Text(
-                  'Log In',
+                child: Text(
+                  localizations.navLogIn,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Kanit',
@@ -370,7 +375,144 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildMapSection(HomeViewModel viewModel) {
+  Widget _buildGuestLanguageSelector(AppLocalizations localizations) {
+    final localeController = Get.find<LocaleController>();
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: LinoColors.primary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.language,
+                      color: LinoColors.accent,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      localizations.languageSettings,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Kanit',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                localizations.chooseLanguage,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  fontFamily: 'Kanit',
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: GetX<LocaleController>(
+                      builder: (controller) => _buildLanguageOption(
+                        flag: '🇺🇸',
+                        language: localizations.english,
+                        isSelected: controller.locale.value.languageCode == 'en',
+                        onTap: () => localeController.changeLocale(const Locale('en')),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: GetX<LocaleController>(
+                      builder: (controller) => _buildLanguageOption(
+                        flag: '🇫🇷',
+                        language: localizations.french,
+                        isSelected: controller.locale.value.languageCode == 'fr',
+                        onTap: () => localeController.changeLocale(const Locale('fr')),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption({
+    required String flag,
+    required String language,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? LinoColors.accent.withOpacity(0.1) : Colors.grey[50],
+          border: Border.all(
+            color: isSelected ? LinoColors.accent : Colors.grey[300]!,
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              flag,
+              style: const TextStyle(fontSize: 20),
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                language,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? LinoColors.accent : Colors.black87,
+                  fontFamily: 'Kanit',
+                ),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (isSelected) ...[
+              const SizedBox(width: 4),
+              Icon(
+                Icons.check_circle,
+                color: LinoColors.accent,
+                size: 16,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMapSection(HomeViewModel viewModel, AppLocalizations localizations) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Card(
@@ -380,13 +522,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: _buildMap(viewModel),
+          child: _buildMap(viewModel, localizations),
         ),
       ),
     );
   }
 
-  Widget _buildMap(HomeViewModel viewModel) {
+  Widget _buildMap(HomeViewModel viewModel, AppLocalizations localizations) {
     return Consumer2<BookboxListViewModel, MapViewModel>(
       builder: (context, bookboxViewModel, mapViewModel, child) {
         if (!mounted) {
@@ -396,36 +538,67 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         try {
           final markers = viewModel.getMarkers();
 
-          return GoogleMap(
-            onMapCreated: (GoogleMapController controller) {
-              if (mounted) {
-                try {
-                  mapViewModel.onMapCreated(controller);
-                } catch (e) {
-                  print('Error creating map: $e');
-                }
-              }
-            },
-            initialCameraPosition: mapViewModel.cameraPosition,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-            markers: Set<Marker>.of(markers),
-            gestureRecognizers: Set()
-              ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
-              ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()))
-              ..add(Factory<TapGestureRecognizer>(() => TapGestureRecognizer()))
-              ..add(Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer())),
+          return Stack(
+            children: [
+              GoogleMap(
+                onMapCreated: (GoogleMapController controller) {
+                  if (mounted) {
+                    try {
+                      mapViewModel.onMapCreated(controller);
+                    } catch (e) {
+                      print('Error creating map: $e');
+                    }
+                  }
+                },
+                initialCameraPosition: mapViewModel.cameraPosition,
+                myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                markers: Set<Marker>.of(markers),
+                gestureRecognizers: Set()
+                  ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
+                  ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()))
+                  ..add(Factory<TapGestureRecognizer>(() => TapGestureRecognizer()))
+                  ..add(Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer())),
+              ),
+              Positioned(
+                top: 16,
+                left: 16,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    localizations.bookboxmap,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                      fontFamily: 'Kanit',
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
         } catch (e) {
           print('Error building map: $e');
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.map_outlined, size: 48, color: Colors.grey),
                 SizedBox(height: 8),
                 Text(
-                  'Map temporarily unavailable',
+                  localizations.mapTemporarilyUnavailable,
                   style: TextStyle(color: Colors.grey),
                 ),
               ],
@@ -436,7 +609,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildNotificationsSection() {
+  Widget _buildNotificationsSection(AppLocalizations localizations) {
     return Container(
       margin: const EdgeInsets.all(16.0),
       child: Card(
@@ -452,9 +625,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text( 
-                    'Recent Notifications',
-                    style: TextStyle(
+                  Text(
+                    localizations.homeRecentNotifications,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Kanit',
@@ -472,11 +645,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         IconButton(
                           onPressed: () => _loadNotificationsWithRetry(),
                           icon: const Icon(Icons.refresh, size: 20),
-                          tooltip: 'Refresh notifications',
+                          tooltip: localizations.refreshNotifications,
                         ),
                         TextButton(
                           onPressed: () => Get.toNamed(AppRoutes.home.notifications),
-                          child: const Text('View All'),
+                          child: Text(localizations.viewall),
                         ),
                       ],
                     ],
@@ -526,7 +699,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       const Icon(Icons.error, color: Colors.red, size: 32),
                       const SizedBox(height: 8),
                       Text(
-                        'Unable to load notifications',
+                        localizations.unableToLoadNotifications,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -535,7 +708,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Check your internet connection and try again',
+                        localizations.checkInternetConnection,
                         style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 14,
@@ -546,7 +719,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ElevatedButton.icon(
                         onPressed: () => _loadNotificationsWithRetry(),
                         icon: const Icon(Icons.refresh, size: 18),
-                        label: const Text('Retry'),
+                        label: Text(localizations.retry),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue.shade600,
                           foregroundColor: Colors.white,
@@ -556,14 +729,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   ),
                 )
               else if (_notifications.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(20.0),
                   child: Column(
                     children: [
                       Icon(Icons.notifications_none, color: Colors.grey, size: 32),
                       SizedBox(height: 8),
                       Text(
-                        'No notifications yet',
+                        localizations.homeNotificationsEmpty,
                         style: TextStyle(color: Colors.grey),
                       ),
                     ],
@@ -593,13 +766,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           children: [
                             if (notification.reason.isNotEmpty)
                               Text(
-                                _formatNotificationReason(notification.reason),
+                                _formatNotificationReason(notification.reason, localizations),
                                 style: const TextStyle(fontSize: 12),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             Text(
-                              _formatNotificationDate(notification.createdAt),
+                              _formatNotificationDate(notification.createdAt, localizations),
                               style: const TextStyle(fontSize: 11, color: Colors.grey),
                             ),
                           ],
@@ -620,12 +793,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _showNotificationDetails(BuildContext context, Notif notification) async {
     final List<String> reasons = notification.reason;
+    final localizations = AppLocalizations.of(context)!;
 
     String title;
     if (reasons.contains('book_request')) {
-      title = 'Book Request';
+      title = localizations.bookRequest;
     } else {
-      title = 'New Book Available';
+      title = localizations.newBookAvailable;
     }
 
     // Create a temporary view model to use its methods
@@ -637,15 +811,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         return AlertDialog(
           title: Text(title),
           content: FutureBuilder<String>(
-            future: tempViewModel.buildNotificationContent(notification),
+            future: tempViewModel.buildNotificationContent(notification, localizations),
             builder: (context, snapshot) {
               String content;
               if (snapshot.connectionState == ConnectionState.waiting) {
-                content = 'Loading...';
+                content = localizations.loading;
               } else if (snapshot.hasError) {
-                content = tempViewModel.buildNotificationContentSync(notification);
+                content = tempViewModel.buildNotificationContentSync(notification, localizations);
               } else {
-                content = snapshot.data ?? tempViewModel.buildNotificationContentSync(notification);
+                content = snapshot.data ?? tempViewModel.buildNotificationContentSync(notification, localizations);
               }
 
               return Column(
@@ -671,7 +845,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
           actions: [
             TextButton(
-              child: const Text('Close'),
+              child: Text(localizations.close),
               onPressed: () {
                 Get.back();
               },
@@ -703,24 +877,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  String _formatNotificationDate(DateTime date) {
+  String _formatNotificationDate(DateTime date, AppLocalizations localizations) {
     final now = DateTime.now();
     final difference = now.difference(date);
     
     if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
+      return '${difference.inDays}${localizations.daysAgo}';
     } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
+      return '${difference.inHours}${localizations.hoursAgo}';
     } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
+      return '${difference.inMinutes}${localizations.minutesAgo}';
     } else {
-      return 'Just now';
+      return localizations.justNow;
     }
   }
 
-  String _formatNotificationReason(List<String> reasons) {
+  String _formatNotificationReason(List<String> reasons, AppLocalizations localizations) {
     if (reasons.isEmpty) {
-      return 'New notification';
+      return localizations.newNotification;
     }
 
     List<String> formattedReasons = [];
@@ -728,20 +902,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     for (String reason in reasons) {
       switch (reason) {
         case 'book_request':
-          formattedReasons.add('Someone requested this book');
-          break;
+          formattedReasons.add(localizations.someoneRequestedThisBook);
         case 'solved_book_request':
-          formattedReasons.add('Matches your book request');
-          break;
+          formattedReasons.add(localizations.matchesYourBookRequest);
         case 'fav_bookbox':
-          formattedReasons.add('Added to followed bookbox');
-          break;
+          formattedReasons.add(localizations.addedToFollowedBookboxPreview);
         case 'same_borough':
-          formattedReasons.add('Added near you');
-          break;
+          formattedReasons.add(localizations.addedNearYou);
         case 'fav_genre':
-          formattedReasons.add('Matches your favorite genre');
-          break;
+          formattedReasons.add(localizations.matchesYourFavoriteGenre);
         default:
           formattedReasons.add(reason); 
       }
@@ -752,7 +921,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     } else if (formattedReasons.length == 2) {
       return '${formattedReasons[0]} • ${formattedReasons[1]}';
     } else {
-      return '${formattedReasons[0]} • ${formattedReasons[1]} • +${formattedReasons.length - 2} more';
+      return '${formattedReasons[0]} • ${formattedReasons[1]} • +${formattedReasons.length - 2} ${localizations.andMore}';
     }
   }
 }

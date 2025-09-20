@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["883MZ7323G.ca.umontreal.ceduni.lino"],
+        "components": [
+          {
+            "/": "/bookbox/*",
+            "comment": "Matches any bookbox path"
+          }
+        ]
+      }
+    ]
+  }
+}

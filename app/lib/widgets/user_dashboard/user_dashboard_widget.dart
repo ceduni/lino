@@ -5,6 +5,8 @@ import 'package:Lino_app/utils/constants/colors.dart';
 import 'package:Lino_app/vm/profile/profile_view_model.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:Lino_app/controllers/locale_controller.dart';
 import 'recent_transactions_widget.dart';
 import 'followed_bookboxes_widget.dart';
 
@@ -23,6 +25,8 @@ class UserDashboard extends StatefulWidget {
 class _UserDashboardState extends State<UserDashboard> {
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,7 +36,7 @@ class _UserDashboardState extends State<UserDashboard> {
             child: _buildProfileHeader(),
           ),
           
-          _buildProfileManagementSection(),
+          _buildProfileManagementSection(localizations),
           
           FollowedBookboxesWidget(user: widget.user),
       
@@ -58,7 +62,7 @@ class _UserDashboardState extends State<UserDashboard> {
                         Icon(Icons.logout, color: Colors.white, size: 18),
                         SizedBox(width: 4),
                         Text(
-                          'Logout',
+                          localizations.logout,
                           style: TextStyle(color: Colors.white, fontSize: 18)
                           ,
                         ),
@@ -80,7 +84,14 @@ class _UserDashboardState extends State<UserDashboard> {
     return Column(
       children: [
         GestureDetector(
-          onTap: () => Get.toNamed(AppRoutes.profile.modify),
+          onTap: () async {
+            // Navigate to modify profile page and refresh when returning
+            await Get.toNamed(AppRoutes.profile.modify);
+            // Refresh profile data when returning from modify profile page
+            if (context.mounted) {
+              context.read<ProfileViewModel>().initialize();
+            }
+          },
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -99,11 +110,16 @@ class _UserDashboardState extends State<UserDashboard> {
                 CircleAvatar(
                   radius: 35,
                   backgroundColor: Colors.lightBlue[100],
-                  child: Icon(
-                    Icons.person,
-                    size: 40,
-                    color: LinoColors.accent,
-                  ),
+                  backgroundImage: widget.user.profilePictureUrl != null && widget.user.profilePictureUrl!.isNotEmpty
+                      ? NetworkImage(widget.user.profilePictureUrl!)
+                      : null,
+                  child: widget.user.profilePictureUrl == null || widget.user.profilePictureUrl!.isEmpty
+                      ? Icon(
+                          Icons.person,
+                          size: 40,
+                          color: LinoColors.accent,
+                        )
+                      : null,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -151,7 +167,7 @@ class _UserDashboardState extends State<UserDashboard> {
     );
   }
 
-  Widget _buildProfileManagementSection() {
+  Widget _buildProfileManagementSection(AppLocalizations localizations) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       padding: const EdgeInsets.all(16.0),
@@ -169,8 +185,8 @@ class _UserDashboardState extends State<UserDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Profile Management',
+          Text(
+            localizations.profileManagement,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -180,24 +196,26 @@ class _UserDashboardState extends State<UserDashboard> {
           const SizedBox(height: 12),
           _buildSettingsTile(
             icon: Icons.favorite,
-            title: 'Favorite Genres',
-            subtitle: 'Set up your reading preferences',
+            title: localizations.favoriteGenres,
+            subtitle: localizations.setupReadingPreferences,
             onTap: () => Get.toNamed(AppRoutes.profile.favouriteGenres),
           ),
           const SizedBox(height: 8),
           _buildSettingsTile(
             icon: Icons.location_on,
-            title: 'Favorite Locations',
-            subtitle: 'Manage your preferred locations',
+            title: localizations.favoriteLocations,
+            subtitle: localizations.managePreferredLocations,
             onTap: () => Get.toNamed(AppRoutes.profile.favouriteLocations),
           ),
           const SizedBox(height: 8),
           _buildSettingsTile(
             icon: Icons.notifications,
-            title: 'Notification Settings',
-            subtitle: 'Manage your notifications',
+            title: localizations.notificationSettings,
+            subtitle: localizations.manageNotifications,
             onTap: () => Get.toNamed(AppRoutes.profile.setupNotifications),
           ),
+          const SizedBox(height: 8),
+          _buildLanguageSelectionTile(localizations),
           
         ],
       ),
@@ -252,6 +270,114 @@ class _UserDashboardState extends State<UserDashboard> {
         ),
         onTap: onTap,
       ),
+    );
+  }
+
+  Widget _buildLanguageSelectionTile(AppLocalizations localizations) {
+    final localeController = Get.find<LocaleController>();
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: LinoColors.primary,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(Icons.language, color: LinoColors.accent),
+        ),
+        title: Text(
+          localizations.languageSettings,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+        subtitle: Text(
+          localizations.chooseLanguage,
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 12,
+          ),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GetX<LocaleController>(
+              builder: (controller) => Text(
+                controller.locale.value.languageCode == 'en' 
+                    ? localizations.english 
+                    : localizations.french,
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.grey,
+              size: 16,
+            ),
+          ],
+        ),
+        onTap: () => _showLanguageSelectionDialog(localizations, localeController),
+      ),
+    );
+  }
+
+  void _showLanguageSelectionDialog(AppLocalizations localizations, LocaleController localeController) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(localizations.selectLanguage),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GetX<LocaleController>(
+                builder: (controller) => ListTile(
+                  leading: const Text('🇺🇸', style: TextStyle(fontSize: 24)),
+                  title: Text(localizations.english),
+                  trailing: controller.locale.value.languageCode == 'en'
+                      ? const Icon(Icons.check, color: Colors.green)
+                      : null,
+                  onTap: () {
+                    localeController.changeLocale(const Locale('en'));
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+              GetX<LocaleController>(
+                builder: (controller) => ListTile(
+                  leading: const Text('🇫🇷', style: TextStyle(fontSize: 24)),
+                  title: Text(localizations.french),
+                  trailing: controller.locale.value.languageCode == 'fr'
+                      ? const Icon(Icons.check, color: Colors.green)
+                      : null,
+                  onTap: () {
+                    localeController.changeLocale(const Locale('fr'));
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

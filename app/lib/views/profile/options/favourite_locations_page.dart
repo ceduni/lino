@@ -8,6 +8,7 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:Lino_app/vm/profile/options/favourite_locations_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class FavouriteLocationsPage extends StatefulWidget {
   const FavouriteLocationsPage({super.key});
@@ -31,7 +32,7 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Favourite Locations'),
+        title: Text(AppLocalizations.of(context)!.favouriteLocations),
         backgroundColor: LinoColors.secondary,
         foregroundColor: Colors.white,
         actions: [
@@ -70,7 +71,7 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
         textEditingController: viewModel.searchController,
         googleAPIKey: viewModel.googleApiKey,
         inputDecoration: InputDecoration(
-          hintText: 'Search for places...',
+          hintText: AppLocalizations.of(context)!.searchForPlaces,
           prefixIcon: const Icon(Icons.search),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
@@ -187,7 +188,7 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Favourite Locations (${viewModel.favouriteLocations.length}/10)',
+            AppLocalizations.of(context)!.favouriteLocationsCount(viewModel.favouriteLocations.length),
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -196,8 +197,8 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
           if (viewModel.favouriteLocations.isNotEmpty)
             TextButton(
               onPressed: () => _showClearAllDialog(viewModel),
-              child: const Text(
-                'Clear All',
+              child: Text(
+                AppLocalizations.of(context)!.clearAll,
                 style: TextStyle(color: Colors.red),
               ),
             ),
@@ -209,7 +210,7 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
   Widget _buildLocationItems(FavouriteLocationsViewModel viewModel) {
     return Expanded(
       child: viewModel.favouriteLocations.isEmpty
-          ? const Center(
+          ? Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -220,7 +221,7 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
             ),
             SizedBox(height: 16),
             Text(
-              'No favourite locations yet',
+              AppLocalizations.of(context)!.noFavouriteLocationsYet,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -229,7 +230,7 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
             ),
             SizedBox(height: 8),
             Text(
-              'Tap on the map or search to add locations',
+              AppLocalizations.of(context)!.tapMapOrSearchToAdd,
               style: TextStyle(color: Colors.grey),
             ),
           ],
@@ -274,19 +275,19 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Remove Location'),
-          content: Text('Remove "${location.name}" from your favourite locations?'),
+          title: Text(AppLocalizations.of(context)!.removeLocation),
+          content: Text(AppLocalizations.of(context)!.removeLocationConfirm(location.name)),
           actions: [
             TextButton(
               onPressed: () => Get.back(),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () {
                 Get.back();
                 context.read<FavouriteLocationsViewModel>().removeFavouriteLocation(location);
               },
-              child: const Text('Remove', style: TextStyle(color: Colors.red)),
+              child: Text(AppLocalizations.of(context)!.remove, style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -299,28 +300,28 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('How to use'),
-          content: const Column(
+          title: Text(AppLocalizations.of(context)!.howToUse),
+          content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('• Search for places using the search bar'),
+              Text(AppLocalizations.of(context)!.searchPlacesInstruction),
               SizedBox(height: 8),
-              Text('• Tap anywhere on the map to add a location'),
+              Text(AppLocalizations.of(context)!.tapMapInstruction),
               SizedBox(height: 8),
-              Text('• Tap on markers to remove locations'),
+              Text(AppLocalizations.of(context)!.tapMarkersInstruction),
               SizedBox(height: 8),
-              Text('• Drag the divider between map and list to resize'),
+              Text(AppLocalizations.of(context)!.dragDividerInstruction),
               SizedBox(height: 8),
-              Text('• Maximum 10 favourite locations allowed'),
+              Text(AppLocalizations.of(context)!.maxLocationsInstruction),
               SizedBox(height: 8),
-              Text('• Tap on list items to center map on location'),
+              Text(AppLocalizations.of(context)!.tapListItemsInstruction),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Get.back(),
-              child: const Text('Got it'),
+              child: Text(AppLocalizations.of(context)!.gotIt),
             ),
           ],
         );
@@ -333,19 +334,19 @@ class _FavouriteLocationsPageState extends State<FavouriteLocationsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Clear All Locations'),
-          content: const Text('Are you sure you want to remove all favourite locations?'),
+          title: Text(AppLocalizations.of(context)!.clearAllLocations),
+          content: Text(AppLocalizations.of(context)!.clearAllLocationsConfirm),
           actions: [
             TextButton(
               onPressed: () => Get.back(),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () {
                 Get.back();
                 viewModel.clearAllLocations();
               },
-              child: const Text('Clear All', style: TextStyle(color: Colors.red)),
+              child: Text(AppLocalizations.of(context)!.clearAll, style: TextStyle(color: Colors.red)),
             ),
           ],
         );

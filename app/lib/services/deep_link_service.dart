@@ -58,10 +58,17 @@ class DeepLinkService {
       final host = uri.host;
       final segments = uri.pathSegments;
       
+      // Handle custom scheme: lino://bookbox/{id}
       if (host == 'bookbox' && segments.isNotEmpty) {
         final bookboxId = segments[0];
         _navigateToBookbox(bookboxId);
-      } else {
+      } 
+      // Handle website URLs: https://ceduni-lino.netlify.app/bookbox/{id}
+      else if (host == 'ceduni-lino.netlify.app' && segments.length >= 2 && segments[0] == 'bookbox') {
+        final bookboxId = segments[1];
+        _navigateToBookbox(bookboxId);
+      } 
+      else {
         // Default to home page
         _navigateToHome();
       }

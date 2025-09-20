@@ -1,3 +1,6 @@
+import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:get/get.dart';
+
 class Transaction {
   final String id;
   final String username;
@@ -43,28 +46,30 @@ class Transaction {
   }
 
   String get actionDisplayText {
+    final localizations = AppLocalizations.of(Get.context!);
     switch (action.toLowerCase()) {
       case 'added':
-        return 'Added';
+        return localizations!.added;
       case 'took':
-        return 'Took';
+        return localizations!.took;
       default:
         return action;
     }
   }
 
   String get timeAgo {
+    final localizations = AppLocalizations.of(Get.context!);
     final now = DateTime.now();
     final difference = now.difference(timestamp);
     
     if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
+      return '${difference.inDays}${localizations!.daysAgo}';
     } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
+      return '${difference.inHours}${localizations!.hoursAgo}';
     } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
+      return '${difference.inMinutes}${localizations!.minutesAgo}';
     } else {
-      return 'Just now';
+      return localizations!.justNow;
     }
   }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/profile/transactions_view_model.dart';
-
+import 'package:Lino_app/l10n/app_localizations.dart';
 import '../../models/transaction_model.dart';
 
 class TransactionsPage extends StatefulWidget {
@@ -22,20 +22,21 @@ class _TransactionsPageState extends State<TransactionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations localizations = AppLocalizations.of(context)!;
     return Consumer<TransactionsViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Transaction History'),
+            title: Text(localizations.transactionHistory),
             foregroundColor: const Color.fromARGB(255, 0, 0, 0),
           ),
-          body: _buildBody(viewModel),
+          body: _buildBody(viewModel,localizations),
         );
       },
     );
   }
 
-  Widget _buildBody(TransactionsViewModel viewModel) {
+  Widget _buildBody(TransactionsViewModel viewModel, AppLocalizations localizations) {
     if (viewModel.showLoadingIndicator) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -63,20 +64,20 @@ class _TransactionsPageState extends State<TransactionsPage> {
     }
 
     if (!viewModel.hasTransactions) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.history, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
+            const Icon(Icons.history, size: 64, color: Colors.grey),
+            const SizedBox(height: 16),
             Text(
-              'No transactions yet',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
+              localizations.notransactions,
+              style: const TextStyle(fontSize: 18, color: Colors.grey),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
-              'Start adding or taking books to see your transaction history!',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              localizations.startAddingBooksToSeeHistory,
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
           ],
@@ -95,7 +96,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                 Icon(Icons.history, color: Colors.grey[600]),
                 const SizedBox(width: 8),
                 Text(
-                  '${viewModel.pagination!.totalResults} transactions total',
+                  '${viewModel.pagination!.totalResults} ${localizations.transactiontotal}',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -123,7 +124,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                   );
                 }
                 final transaction = viewModel.transactions[index];
-                return _buildTransactionItem(transaction);
+                return _buildTransactionItem(transaction,localizations);
               },
             ),
           ),
@@ -131,12 +132,12 @@ class _TransactionsPageState extends State<TransactionsPage> {
 
         // Pagination controls
         if (viewModel.hasPagination)
-          _buildPaginationControls(viewModel),
+          _buildPaginationControls(viewModel, localizations),
       ],
     );
   }
 
-  Widget _buildPaginationControls(TransactionsViewModel viewModel) {
+  Widget _buildPaginationControls(TransactionsViewModel viewModel, AppLocalizations localizations) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -150,7 +151,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Page ${viewModel.pagination!.currentPage} of ${viewModel.pagination!.totalPages}',
+                'Page ${viewModel.pagination!.currentPage} ${localizations.de} ${viewModel.pagination!.totalPages}',
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
@@ -223,7 +224,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
     );
   }
 
-  Widget _buildTransactionItem(Transaction transaction) {
+  Widget _buildTransactionItem(Transaction transaction, AppLocalizations localizations) {
     final isAdded = transaction.action.toLowerCase() == 'added';
     final actionColor = isAdded ? Colors.green : Colors.orange;
 
@@ -246,7 +247,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 4),
           child: Text(
-            _buildSubtitleText(transaction),
+            _buildSubtitleText(transaction, localizations),
             style: TextStyle(
               color: Colors.grey[600],
               fontSize: 12,
@@ -272,13 +273,13 @@ class _TransactionsPageState extends State<TransactionsPage> {
     );
   }
 
-  String _buildSubtitleText(Transaction transaction) {
+  String _buildSubtitleText(Transaction transaction, AppLocalizations localizations) {
     final parts = <String>[
       transaction.timeAgo,
     ];
 
     if (transaction.bookboxName != null && transaction.bookboxName!.isNotEmpty) {
-      parts.insert(1, 'at ${transaction.bookboxName}');
+      parts.insert(1, '${localizations.at} ${transaction.bookboxName}');
     }
 
     return parts.join(' • ');

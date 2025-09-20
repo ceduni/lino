@@ -50,13 +50,31 @@ async function loginUser(request : FastifyRequest, reply : FastifyReply) {
     }
 }
 
+async function addProfilePicture(request : FastifyRequest, reply : FastifyReply) {
+    try {
+        const userId = (request as AuthenticatedRequest).user.id;
+        const { profilePictureUrl } = request.body as { profilePictureUrl: string };
+        console.log(`Adding profile picture for user ${userId}: ${profilePictureUrl}`);
+        
+        const user = await UserService.addProfilePicture(userId, profilePictureUrl);
+        console.log(`Profile picture updated successfully for user ${userId}`);
+        
+        reply.send({ user });
+    } catch (error : unknown) {
+        console.error('Error adding profile picture:', error);
+        const statusCode = (error as any).statusCode || 500;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        reply.code(statusCode).send({ error: message });
+    }
+}
+
 async function getUser(request : FastifyRequest, reply : FastifyReply) {
     try {
-        const authRequest = request as AuthenticatedRequest;
-        const userId = authRequest.user.id;  // Extract user ID from JWT token
+        const userId = (request as AuthenticatedRequest).user.id;
         const user = await User.findById(userId);
-        reply.send({ user: user });
+        reply.code(200).send({ user: user?.toObject() });
     } catch (error : unknown) {
+        console.error('Error getting user:', error);
         const statusCode = (error as any).statusCode || 500;
         const message = error instanceof Error ? error.message : 'Unknown error';
         reply.code(statusCode).send({ error: message });
@@ -172,6 +190,7 @@ export default async function userRoutes(server: MyFastifyInstance) {
     server.post('/users/notifications/read', { preValidation: [server.authenticate], schema : readNotificationSchema }, readNotification);
     server.post('/users/register', { schema : registerUserSchema }, registerUser);
     server.post('/users/login', { schema : loginUserSchema }, loginUser);
+    server.post('/users/profile-picture', { preValidation: [server.authenticate] }, addProfilePicture);
     server.post('/users/update', { preValidation: [server.authenticate], schema : updateUserSchema }, updateUser);
     server.post('/users/location', { preValidation: [server.authenticate], schema : addUserFavLocationSchema }, addUserFavLocation);
     server.delete('/users/location', { preValidation: [server.authenticate], schema : deleteUserFavLocationSchema }, deleteUserFavLocation);

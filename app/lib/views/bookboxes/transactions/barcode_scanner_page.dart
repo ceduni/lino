@@ -10,6 +10,7 @@ import 'package:Lino_app/views/books/book_edition_page.dart';
 import 'package:Lino_app/views/bookboxes/transactions/bookbox_book_list_page.dart';
 import 'package:Lino_app/services/book_exchange_services.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class BarcodeScannerPage extends StatefulWidget {
   final bool addingBook;
@@ -90,8 +91,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: const Text(
-            'Confirm Book Selection',
+          title: Text(
+            AppLocalizations.of(context)!.confirmBookSelection,
             style: TextStyle(
               fontFamily: 'Kanit',
               fontWeight: FontWeight.bold,
@@ -141,7 +142,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                book.authors.isNotEmpty ? book.authors.join(', ') : 'Unknown Author',
+                book.authors.isNotEmpty ? book.authors.join(', ') : AppLocalizations.of(context)!.unknownAuthor,
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[600],
@@ -152,8 +153,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Are you sure you want to take this book?',
+              Text(
+                AppLocalizations.of(context)!.areYouSureWantToTakeBook,
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Kanit',
@@ -165,8 +166,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
           actions: [
             TextButton(
               onPressed: () => Get.back(result: false),
-              child: const Text(
-                'Cancel',
+              child: Text(
+                AppLocalizations.of(context)!.cancel,
                 style: TextStyle(
                   fontFamily: 'Kanit',
                   color: Colors.grey,
@@ -181,8 +182,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text(
-                'Take Book',
+              child: Text(
+                AppLocalizations.of(context)!.takeBook,
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: 'Kanit',
@@ -207,13 +208,13 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return const AlertDialog(
+          return AlertDialog(
             content: Row(
               children: [
                 CircularProgressIndicator(),
                 SizedBox(width: 16),
                 Text(
-                  'Taking book...',
+                  AppLocalizations.of(context)!.takingBook,
                   style: TextStyle(fontFamily: 'Kanit'),
                 ),
               ],
@@ -261,8 +262,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text(
-          'Scan Book Barcode',
+        title: Text(
+          AppLocalizations.of(context)!.scanBookBarcode,
           style: TextStyle(
             fontFamily: 'Kanit',
             fontWeight: FontWeight.bold,
@@ -533,7 +534,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      book.authors.isNotEmpty ? book.authors.join(', ') : 'Unknown Author',
+                      book.authors.isNotEmpty ? book.authors.join(', ') : AppLocalizations.of(context)!.unknownAuthor,
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -578,9 +579,9 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                     color: Colors.white,
                   ),
                   const SizedBox(width: 8),
-                  const Flexible(
+                  Flexible(
                     child: Text(
-                      "Can't find or scan the ISBN?",
+                      AppLocalizations.of(context)!.cantFindOrScanISBN,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -644,7 +645,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                         ),
                       ),
                       child: Text(
-                        widget.addingBook ? 'Manual Entry' : 'Book List',
+                        widget.addingBook ? AppLocalizations.of(context)!.manualEntry : AppLocalizations.of(context)!.bookList,
                         style: const TextStyle(
                           color: Colors.white,
                           fontFamily: 'Kanit',
@@ -692,8 +693,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                 ),
                 elevation: 4,
               ),
-              child: const Text(
-                'Continue',
+              child: Text(
+                AppLocalizations.of(context)!.continueButton,
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: 'Kanit',
@@ -708,8 +709,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
             onPressed: () {
               _viewModel.resetScanner();
             },
-            child: const Text(
-              'Change book',
+            child: Text(
+              AppLocalizations.of(context)!.changeBook,
               style: TextStyle(
                 color: Colors.white,
                 fontFamily: 'Kanit',
@@ -764,8 +765,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Book Not Found',
+                    Text(
+                      AppLocalizations.of(context)!.bookNotFound,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -814,8 +815,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                 ),
                 elevation: 4,
               ),
-              child: const Text(
-                'Try Another Book',
+              child: Text(
+                AppLocalizations.of(context)!.tryAnotherBook,
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: 'Kanit',
@@ -834,8 +835,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                   bookboxId: widget.bookboxId,
                 ));
               },
-              child: const Text(
-                'View Available Books',
+              child: Text(
+                AppLocalizations.of(context)!.viewAvailableBooks,
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: 'Kanit',

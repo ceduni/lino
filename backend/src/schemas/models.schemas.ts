@@ -28,6 +28,7 @@ export function createUserSchema() {
             username: { type: 'string' },
             email: { type: 'string' },
             phone: { type: 'string' },
+            profilePictureUrl: { type: 'string' },
             favouriteGenres: { type: 'array', items: { type: 'string' } },
             favouriteLocations: { 
                 type: 'array',

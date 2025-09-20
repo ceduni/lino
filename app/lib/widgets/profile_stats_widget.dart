@@ -2,21 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/home/home_view_model.dart';
 import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class MergedProfileStatsWidget extends StatelessWidget {
   final String userName;
   final int booksSaved;
   final double treesSaved;
+  final String? profilePictureUrl;
 
   const MergedProfileStatsWidget({
     super.key,
     required this.userName,
     required this.booksSaved,
     required this.treesSaved,
+    this.profilePictureUrl,
   });
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () {
         final homeViewModel = Provider.of<HomeViewModel>(context, listen: false);
@@ -43,11 +47,16 @@ class MergedProfileStatsWidget extends StatelessWidget {
           CircleAvatar(
             radius: 35,
             backgroundColor: Colors.blue.shade100,
-            child: Icon(
+            backgroundImage: profilePictureUrl != null && profilePictureUrl!.isNotEmpty
+                ? NetworkImage(profilePictureUrl!)
+                : null,
+            child: profilePictureUrl == null || profilePictureUrl!.isEmpty
+                ? Icon(
                     Icons.person,
                     size: 40,
                     color: Colors.blue.shade600,
                   )
+                : null,
           ),
           const SizedBox(width: 16),
           // Name and title
@@ -65,7 +74,7 @@ class MergedProfileStatsWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  getMatchingDescription(),
+                  getMatchingDescription(localization),
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade600,
@@ -84,7 +93,7 @@ class MergedProfileStatsWidget extends StatelessWidget {
                 icon: Icons.park,
                 iconColor: Colors.green.shade600,
                 value: treesSaved.toStringAsFixed(2),
-                label: 'Trees',
+                label: localization.trees,
               ),
               const SizedBox(width: 42),
               // Books saved
@@ -92,7 +101,7 @@ class MergedProfileStatsWidget extends StatelessWidget {
                 icon: Icons.book,
                 iconColor: LinoColors.accent,
                 value: booksSaved.toString(),
-                label: 'Books',
+                label: localization.books,
               ),
               const SizedBox(width: 10),
             ],
@@ -148,25 +157,17 @@ class MergedProfileStatsWidget extends StatelessWidget {
     );
   }
 
-  static const descriptionList = [
-    'Tree Hugger in Training',
-    'Carbon Crusader',
-    'Eco Warrior',
-    'Planet Protector',
-    'Environmental Champion'
-  ];
-
-  String getMatchingDescription() {
+  String getMatchingDescription(AppLocalizations localization) {
     if (booksSaved >= 50) {
-      return descriptionList[4];
+      return localization.environmentalChampion;
     } else if (booksSaved >= 25) {
-      return descriptionList[3];
+      return localization.planetProtector;
     } else if (booksSaved >= 10) {
-      return descriptionList[2];
+      return localization.ecoWarrior;
     } else if (booksSaved >= 5) {
-      return descriptionList[1];
+      return localization.carbonCrusader;
     } else {
-      return descriptionList[0];
+      return localization.treeHuggerInTraining;
     }
   }
 }
