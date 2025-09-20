@@ -1,6 +1,7 @@
 import 'package:Lino_app/config/pages.dart';
 import 'package:Lino_app/config/providers.dart';
 import 'package:Lino_app/services/deep_link_service.dart';
+import 'package:Lino_app/services/first_launch_service.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -34,6 +35,28 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  String? initialRoute;
+
+  @override
+  void initState() {
+    super.initState();
+    _determineInitialRoute();
+  }
+
+  Future<void> _determineInitialRoute() async {
+    final isFirstLaunch = await FirstLaunchService.isFirstLaunch();
+    
+    setState(() {
+      if (isFirstLaunch) {
+        initialRoute = AppRoutes.auth.login;
+        // Mark app as launched after setting the route
+        FirstLaunchService.markAppAsLaunched();
+      } else {
+        initialRoute = AppRoutes.home.main;
+      }
+    });
+  }
+
   @override
   void dispose() {
     DeepLinkService.dispose();
@@ -42,6 +65,17 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Show loading screen while determining initial route
+    if (initialRoute == null) {
+      return MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+
     return MultiProvider(
       providers: AppProviders.providers,
       child: GetX<LocaleController>(
@@ -61,7 +95,7 @@ class _MyAppState extends State<MyApp> {
           ],
           supportedLocales: localeController.supportedLocales,
 
-          initialRoute: AppRoutes.home.main,
+          initialRoute: initialRoute,
           getPages: AppPages.getPages,
           onReady: () {
             // Initialize deep link handling after GetX is ready
