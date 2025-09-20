@@ -402,7 +402,9 @@
   "carbonCrusader": "Carbon Crusader",
   "ecoWarrior": "Eco Warrior",
   "planetProtector": "Planet Protector",
-  "environmentalChampion": "Environmental Champion"
+  "environmentalChampion": "Environmental Champion",
+
+  "bookboxmap": "Bookbox Map"
 
 
 } 

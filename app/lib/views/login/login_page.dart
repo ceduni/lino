@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:Lino_app/vm/login/login_view_model.dart';
 import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:Lino_app/utils/constants/colors.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,10 +26,10 @@ class _LoginPageState extends State<LoginPage> {
           return Container(
             width: double.infinity,
             height: double.infinity,
-            color: const Color(0xFF4277B8),
+            color: Colors.white,
             child: Stack(
               children: [
-                _buildCloseButton(),
+                //_buildCloseButton(),
                 _buildMainContent(viewModel, localizations),
               ],
             ),
@@ -45,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
         onPressed: () => Get.offAllNamed(AppRoutes.home.main),
         icon: const Icon(
           Icons.close,
-          color: Colors.white,
+          color: Colors.black,
           size: 30,
         ),
       ),
@@ -97,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
         hintText: hintText,
         hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.3)),
         filled: true,
-        fillColor: const Color(0xFFE0F7FA),
+        fillColor: Color.fromARGB(240, 240, 240, 255),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.0),
           borderSide: BorderSide.none,
@@ -129,12 +131,13 @@ class _LoginPageState extends State<LoginPage> {
       },
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+        backgroundColor: LinoColors.accent
       ),
       child: viewModel.isLoading
           ? const CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
       )
-          :  Text(localizations.navLogIn),
+          :  Text(localizations.navLogIn, style: const TextStyle(color: Colors.white),),
     );
   }
 
@@ -148,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
             textAlign: TextAlign.center,
             text: TextSpan(
               text: localizations.donthaveaccount,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.black),
               children: [
                 TextSpan(
                   text: localizations.register,
@@ -164,14 +167,9 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 50),
           GestureDetector(
-            onTap: () async {
-              await viewModel.openAsGuest();
-              if (mounted) {
-                Get.offNamed(AppRoutes.home.main);
-              }
-            },
+            onTap: () => Get.offAllNamed(AppRoutes.home.main),
             child: Text(
               localizations.continueasguest,
               style: TextStyle(

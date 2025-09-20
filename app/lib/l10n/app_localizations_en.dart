@@ -1089,4 +1089,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get environmentalChampion => 'Environmental Champion';
+
+  @override
+  String get bookboxmap => 'Bookbox Map';
 }

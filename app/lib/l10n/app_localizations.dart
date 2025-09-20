@@ -2102,6 +2102,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Environmental Champion'**
   String get environmentalChampion;
+
+  /// No description provided for @bookboxmap.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookbox Map'**
+  String get bookboxmap;
 }
 
 class _AppLocalizationsDelegate

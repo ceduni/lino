@@ -1111,4 +1111,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get environmentalChampion => 'Champion environnemental';
+
+  @override
+  String get bookboxmap => 'Carte des boîtes à livres';
 }

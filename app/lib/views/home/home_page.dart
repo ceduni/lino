@@ -538,25 +538,56 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         try {
           final markers = viewModel.getMarkers();
 
-          return GoogleMap(
-            onMapCreated: (GoogleMapController controller) {
-              if (mounted) {
-                try {
-                  mapViewModel.onMapCreated(controller);
-                } catch (e) {
-                  print('Error creating map: $e');
-                }
-              }
-            },
-            initialCameraPosition: mapViewModel.cameraPosition,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-            markers: Set<Marker>.of(markers),
-            gestureRecognizers: Set()
-              ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
-              ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()))
-              ..add(Factory<TapGestureRecognizer>(() => TapGestureRecognizer()))
-              ..add(Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer())),
+          return Stack(
+            children: [
+              GoogleMap(
+                onMapCreated: (GoogleMapController controller) {
+                  if (mounted) {
+                    try {
+                      mapViewModel.onMapCreated(controller);
+                    } catch (e) {
+                      print('Error creating map: $e');
+                    }
+                  }
+                },
+                initialCameraPosition: mapViewModel.cameraPosition,
+                myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                markers: Set<Marker>.of(markers),
+                gestureRecognizers: Set()
+                  ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
+                  ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()))
+                  ..add(Factory<TapGestureRecognizer>(() => TapGestureRecognizer()))
+                  ..add(Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer())),
+              ),
+              Positioned(
+                top: 16,
+                left: 16,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    localizations.bookboxmap,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                      fontFamily: 'Kanit',
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
         } catch (e) {
           print('Error building map: $e');
