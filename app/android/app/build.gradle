@@ -38,7 +38,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "ca.umontreal.ceduni.lino"
+    namespace "org.ceduni.app.lino"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -70,7 +70,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "ca.umontreal.ceduni.lino"
+        applicationId "org.ceduni.app.lino"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion

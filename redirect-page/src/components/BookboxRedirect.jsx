@@ -55,12 +55,12 @@ const BookboxRedirect = () => {
     // Detect platform and redirect appropriately
     const userAgent = navigator.userAgent.toLowerCase();
     if (/android/.test(userAgent)) {
-      window.open('https://play.google.com/store/apps/details?id=ca.umontreal.ceduni.lino', '_blank');
+      window.open('https://play.google.com/store/apps/details?id=org.ceduni.app.lino', '_blank');
     } else if (/iphone|ipad|ipod/.test(userAgent)) {
       window.open('https://apps.apple.com/app/lino/id123456789', '_blank');
     } else {
       // Desktop - show both options
-      window.open('https://play.google.com/store/apps/details?id=ca.umontreal.ceduni.lino', '_blank');
+      window.open('https://play.google.com/store/apps/details?id=org.ceduni.app.lino', '_blank');
     }
   };
 

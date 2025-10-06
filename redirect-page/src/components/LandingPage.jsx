@@ -33,7 +33,7 @@ const LandingPage = () => {
             <h2>{t('download.title')}</h2>
             <div className="download-buttons">
               <GooglePlayButton
-                url="https://play.google.com/store/apps/details?id=ca.umontreal.ceduni.lino"
+                url="https://play.google.com/store/apps/details?id=org.ceduni.app.lino"
                 theme="dark"
                 className="download-btn"
               />

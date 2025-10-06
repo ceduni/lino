@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": ["883MZ7323G.ca.umontreal.ceduni.lino"],
+        "appIDs": ["883MZ7323G.org.ceduni.app.lino"],
         "components": [
           {
             "/": "/bookbox/*",

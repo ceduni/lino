@@ -2,7 +2,7 @@
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "ca.umontreal.ceduni.lino",
+    "package_name": "org.ceduni.app.lino",
     "sha256_cert_fingerprints": ["119F6C43DFC5DF0861D74C8D6922FEAEDA24220043AB5A4227D396DB5CFEC1AE"]
   }
 }]
