@@ -1127,4 +1127,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get youhaveloggedout => 'Vous vous êtes déconnecté avec succès.';
+
+  @override
+  String get swipetoeditmore => 'Glissez pour modifier plus';
 }

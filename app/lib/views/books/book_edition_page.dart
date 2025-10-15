@@ -90,7 +90,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Swipe to edit details',
+                          AppLocalizations.of(context)!.swipetoeditmore,
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 12,

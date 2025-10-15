@@ -409,7 +409,9 @@
   "confirmlogout": "Confirm Logout",
   "areyousureyouwantologout": "Are you sure you want to logout?",
   "logoutsuccess": "Logout Successful",
-  "youhaveloggedout": "You have logged out successfully."
+  "youhaveloggedout": "You have logged out successfully.",
+
+  "swipetoeditmore": "Swipe to edit more"
 
 
 } 

@@ -385,5 +385,6 @@
   "logoutsuccess": "Déconnexion réussie",
   "youhaveloggedout": "Vous vous êtes déconnecté avec succès.",
 
-  "bookboxmap": "Carte des boîtes à livres"
+  "bookboxmap": "Carte des boîtes à livres",
+  "swipetoeditmore": "Glissez pour modifier plus"
 }

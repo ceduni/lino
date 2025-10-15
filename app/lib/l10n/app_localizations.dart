@@ -2132,6 +2132,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You have logged out successfully.'**
   String get youhaveloggedout;
+
+  /// No description provided for @swipetoeditmore.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe to edit more'**
+  String get swipetoeditmore;
 }
 
 class _AppLocalizationsDelegate

@@ -1104,4 +1104,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get youhaveloggedout => 'You have logged out successfully.';
+
+  @override
+  String get swipetoeditmore => 'Swipe to edit more';
 }
