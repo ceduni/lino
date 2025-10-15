@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:Lino_app/models/user_model.dart';
 import 'package:Lino_app/services/user_services.dart';
 import 'package:Lino_app/utils/constants/routes.dart';
+import 'package:Lino_app/l10n/app_localizations.dart';
 
 class ProfileViewModel extends ChangeNotifier {
   String? _token;
@@ -39,20 +40,21 @@ class ProfileViewModel extends ChangeNotifier {
   }
 
   Future<void> disconnect(BuildContext context) async {
+    final localizations = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Confirm Logout'),
-          content: Text('Are you sure you want to logout?'),
+          title: Text(localizations.confirmlogout),
+          content: Text(localizations.areyousureyouwantologout),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text('Cancel'),
+              child: Text(localizations.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text('Logout'),
+              child: Text(localizations.logout),
             ),
           ],
         );

@@ -2108,6 +2108,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bookbox Map'**
   String get bookboxmap;
+
+  /// No description provided for @confirmlogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Logout'**
+  String get confirmlogout;
+
+  /// No description provided for @areyousureyouwantologout.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to logout?'**
+  String get areyousureyouwantologout;
+
+  /// No description provided for @logoutsuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout Successful'**
+  String get logoutsuccess;
+
+  /// No description provided for @youhaveloggedout.
+  ///
+  /// In en, this message translates to:
+  /// **'You have logged out successfully.'**
+  String get youhaveloggedout;
 }
 
 class _AppLocalizationsDelegate

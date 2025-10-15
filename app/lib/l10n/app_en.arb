@@ -404,7 +404,12 @@
   "planetProtector": "Planet Protector",
   "environmentalChampion": "Environmental Champion",
 
-  "bookboxmap": "Bookbox Map"
+  "bookboxmap": "Bookbox Map",
+
+  "confirmlogout": "Confirm Logout",
+  "areyousureyouwantologout": "Are you sure you want to logout?",
+  "logoutsuccess": "Logout Successful",
+  "youhaveloggedout": "You have logged out successfully."
 
 
 } 

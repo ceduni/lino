@@ -1092,4 +1092,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookboxmap => 'Bookbox Map';
+
+  @override
+  String get confirmlogout => 'Confirm Logout';
+
+  @override
+  String get areyousureyouwantologout => 'Are you sure you want to logout?';
+
+  @override
+  String get logoutsuccess => 'Logout Successful';
+
+  @override
+  String get youhaveloggedout => 'You have logged out successfully.';
 }

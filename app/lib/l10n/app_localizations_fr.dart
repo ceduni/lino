@@ -1114,4 +1114,17 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get bookboxmap => 'Carte des boîtes à livres';
+
+  @override
+  String get confirmlogout => 'Confirmer la déconnexion';
+
+  @override
+  String get areyousureyouwantologout =>
+      'Êtes-vous sûr de vouloir vous déconnecter ?';
+
+  @override
+  String get logoutsuccess => 'Déconnexion réussie';
+
+  @override
+  String get youhaveloggedout => 'Vous vous êtes déconnecté avec succès.';
 }
