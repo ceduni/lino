@@ -125,7 +125,7 @@ class _NotificationSettingPageState extends State<NotificationSettingPage> {
         */
         Container(
           decoration: BoxDecoration(
-        color: LinoColors.primary,
+        color: LinoColors.accent,
         borderRadius: BorderRadius.circular(8.0),
           ),
           child: Column(
@@ -217,7 +217,7 @@ class _NotificationSettingPageState extends State<NotificationSettingPage> {
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: Colors.green,
+        activeColor: Colors.white,
       ),
     );
   }
