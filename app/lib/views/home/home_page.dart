@@ -38,18 +38,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Future.delayed(const Duration(milliseconds: 100));
-      
+
       if (!mounted) return;
-      
+
       try {
         final viewModel = context.read<HomeViewModel>();
         viewModel.setContext(context);
         viewModel.initialize();
         viewModel.checkLocationPermission();
-        
+
         final bookboxViewModel = context.read<BookboxListViewModel>();
         await bookboxViewModel.initialize();
-        
+
         if (mounted) {
           _hasInitialized = true;
           await _loadNotificationsWithRetry();
@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    
+
     if (state == AppLifecycleState.resumed && _hasInitialized && mounted) {
       _loadNotificationsWithRetry();
     }
@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       try {
         await _loadNotifications();
         if (_notificationError == null) {
-          break; 
+          break;
         }
       } catch (e) {
         print('Notification loading attempt $attempt failed: $e');
@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> _loadNotifications() async {
     if (!mounted) return;
-    
+
     setState(() {
       _loadingNotifications = true;
       _notificationError = null;
@@ -118,25 +118,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      
+
       if (token != null) {
         final userService = UserService();
-        
-        final notifications = await userService.getUserNotifications(token)
-            .timeout(
-              const Duration(seconds: 15),
-              onTimeout: () {
-                throw Exception('Request timed out. Please check your connection.');
-              },
-            );
-        
+
+        final notifications =
+            await userService.getUserNotifications(token).timeout(
+          const Duration(seconds: 15),
+          onTimeout: () {
+            throw Exception('Request timed out. Please check your connection.');
+          },
+        );
+
         if (mounted) {
           setState(() {
-            _notifications = notifications.take(3).toList(); 
+            _notifications = notifications.take(3).toList();
             _loadingNotifications = false;
             _notificationError = null;
           });
-          print('Notifications loaded successfully: ${notifications.length} notifications');
+          print(
+              'Notifications loaded successfully: ${notifications.length} notifications');
         }
       } else {
         if (mounted) {
@@ -183,7 +184,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
 
         if (viewModel.isGuest) {
-          return _buildGuestView(viewModel,localizations);
+          return _buildGuestView(viewModel, localizations);
         }
 
         if (viewModel.isLoadingUser) {
@@ -193,47 +194,47 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
 
         if (viewModel.error != null || viewModel.userData == null) {
-          
           return Scaffold(
             body: Center(
               child: Text('Error loading user data: ${viewModel.error}'),
             ),
           );
         }
-        
+
         return _buildAuthenticatedView(viewModel, localizations);
       },
     );
   }
 
-  Widget _buildGuestView(HomeViewModel viewModel, AppLocalizations localizations) {
+  Widget _buildGuestView(
+      HomeViewModel viewModel, AppLocalizations localizations) {
     return Scaffold(
       body: Column(
         children: [
           _buildGuestMessage(localizations),
-          _buildGuestLanguageSelector(localizations),
           Expanded(
             child: _buildMapSection(viewModel, localizations),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => Get.toNamed(AppRoutes.scan.qrScanner),
-            backgroundColor: LinoColors.accent,
-            foregroundColor: Colors.white,
-            icon: const Icon(Icons.qr_code_scanner),
-            label: Text(
-              localizations.scan,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+        onPressed: () => Get.toNamed(AppRoutes.scan.qrScanner),
+        backgroundColor: LinoColors.accent,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.qr_code_scanner),
+        label: Text(
+          localizations.scan,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
           ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-  Widget _buildAuthenticatedView(HomeViewModel viewModel, AppLocalizations localizations) {
+  Widget _buildAuthenticatedView(
+      HomeViewModel viewModel, AppLocalizations localizations) {
     return Consumer<BookboxListViewModel>(
       builder: (context, bookboxViewModel, child) {
         if (!mounted) {
@@ -241,7 +242,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        
+
         return Scaffold(
           body: Column(
             children: [
@@ -249,12 +250,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      
                       MergedProfileStatsWidget(
                         userName: viewModel.userData!.username,
                         booksSaved: viewModel.userData!.numSavedBooks,
-                        treesSaved: viewModel.userData!.ecologicalImpact.savedTrees,
-                        profilePictureUrl: viewModel.userData!.profilePictureUrl,
+                        treesSaved:
+                            viewModel.userData!.ecologicalImpact.savedTrees,
+                        profilePictureUrl:
+                            viewModel.userData!.profilePictureUrl,
                       ),
                       /*
                       RecommendationWidget(
@@ -265,21 +267,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         ],
                       ), */
                       _buildNotificationsSection(localizations),
-                      Container(
-                        height: 300,
-                        margin: const EdgeInsets.all(16.0),
-                        child: Card(
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: _buildMap(viewModel, localizations),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
+                      _buildMapSection(viewModel, localizations),
                     ],
                   ),
                 ),
@@ -308,65 +297,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Card(
-        elevation: 4,
+        elevation: 3,
         child: Container(
           padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color.fromRGBO(66, 119, 184, 1),
-                Color.fromRGBO(52, 95, 147, 1),
-              ],
-            ),
-          ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                Icons.person_outline,
-                size: 48,
-                color: Colors.white,
-              ),
-              const SizedBox(height: 12),
               Text(
                 localizations.welcomeLoggedOut,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.black,
                   fontFamily: 'Kanit',
                 ),
+                textAlign: TextAlign.left,
               ),
               const SizedBox(height: 8),
               Text(
                 localizations.msgLoggedOut,
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white70,
+                  color: Colors.black87,
                   fontFamily: 'Kanit',
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => Get.toNamed(AppRoutes.auth.login),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: const Color.fromRGBO(66, 119, 184, 1),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                child: Text(
-                  localizations.navLogIn,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Kanit',
-                  ),
-                ),
+                textAlign: TextAlign.left,
               ),
             ],
           ),
@@ -377,7 +332,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Widget _buildGuestLanguageSelector(AppLocalizations localizations) {
     final localeController = Get.find<LocaleController>();
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Card(
@@ -434,8 +389,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       builder: (controller) => _buildLanguageOption(
                         flag: '🇺🇸',
                         language: localizations.english,
-                        isSelected: controller.locale.value.languageCode == 'en',
-                        onTap: () => localeController.changeLocale(const Locale('en')),
+                        isSelected:
+                            controller.locale.value.languageCode == 'en',
+                        onTap: () =>
+                            localeController.changeLocale(const Locale('en')),
                       ),
                     ),
                   ),
@@ -445,8 +402,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       builder: (controller) => _buildLanguageOption(
                         flag: '🇫🇷',
                         language: localizations.french,
-                        isSelected: controller.locale.value.languageCode == 'fr',
-                        onTap: () => localeController.changeLocale(const Locale('fr')),
+                        isSelected:
+                            controller.locale.value.languageCode == 'fr',
+                        onTap: () =>
+                            localeController.changeLocale(const Locale('fr')),
                       ),
                     ),
                   ),
@@ -470,7 +429,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: isSelected ? LinoColors.accent.withOpacity(0.1) : Colors.grey[50],
+          color:
+              isSelected ? LinoColors.accent.withOpacity(0.1) : Colors.grey[50],
           border: Border.all(
             color: isSelected ? LinoColors.accent : Colors.grey[300]!,
             width: isSelected ? 2 : 1,
@@ -512,16 +472,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildMapSection(HomeViewModel viewModel, AppLocalizations localizations) {
+  Widget _buildMapSection(
+      HomeViewModel viewModel, AppLocalizations localizations) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
+      padding: const EdgeInsets.only(
+        left: 24,
+        right: 24,
+        bottom: 80,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: SizedBox(
+          height: 300,
           child: _buildMap(viewModel, localizations),
         ),
       ),
@@ -553,18 +515,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 initialCameraPosition: mapViewModel.cameraPosition,
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,
+                padding: const EdgeInsets.only(bottom: 12, right: 12),
                 markers: Set<Marker>.of(markers),
                 gestureRecognizers: Set()
-                  ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
-                  ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()))
-                  ..add(Factory<TapGestureRecognizer>(() => TapGestureRecognizer()))
-                  ..add(Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer())),
+                  ..add(Factory<PanGestureRecognizer>(
+                      () => PanGestureRecognizer()))
+                  ..add(Factory<ScaleGestureRecognizer>(
+                      () => ScaleGestureRecognizer()))
+                  ..add(Factory<TapGestureRecognizer>(
+                      () => TapGestureRecognizer()))
+                  ..add(Factory<VerticalDragGestureRecognizer>(
+                      () => VerticalDragGestureRecognizer())),
               ),
               Positioned(
                 top: 16,
                 left: 16,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(20),
@@ -648,7 +616,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           tooltip: localizations.refreshNotifications,
                         ),
                         TextButton(
-                          onPressed: () => Get.toNamed(AppRoutes.home.notifications),
+                          onPressed: () =>
+                              Get.toNamed(AppRoutes.home.notifications),
                           child: Text(localizations.viewall),
                         ),
                       ],
@@ -659,37 +628,37 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               const SizedBox(height: 12),
               if (_loadingNotifications)
                 Column(
-                  children: List.generate(3, (index) => 
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      elevation: 1,
-                      child: ListTile(
-                        leading: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        title: Container(
-                          height: 16,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        subtitle: Container(
-                          height: 12,
-                          margin: const EdgeInsets.only(top: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                    )
-                  ),
+                  children: List.generate(
+                      3,
+                      (index) => Card(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            elevation: 1,
+                            child: ListTile(
+                              leading: Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              title: Container(
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              subtitle: Container(
+                                height: 12,
+                                margin: const EdgeInsets.only(top: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                          )),
                 )
               else if (_notificationError != null)
                 Padding(
@@ -733,7 +702,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   padding: EdgeInsets.all(20.0),
                   child: Column(
                     children: [
-                      Icon(Icons.notifications_none, color: Colors.grey, size: 32),
+                      Icon(Icons.notifications_none,
+                          color: Colors.grey, size: 32),
                       SizedBox(height: 8),
                       Text(
                         localizations.homeNotificationsEmpty,
@@ -751,12 +721,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       child: ListTile(
                         leading: Icon(
                           notification.isRead ? Icons.mail_outline : Icons.mail,
-                          color: notification.isRead ? Colors.grey : Colors.blue,
+                          color:
+                              notification.isRead ? Colors.grey : Colors.blue,
                         ),
                         title: Text(
                           notification.bookTitle,
                           style: TextStyle(
-                            fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
+                            fontWeight: notification.isRead
+                                ? FontWeight.normal
+                                : FontWeight.bold,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -766,14 +739,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           children: [
                             if (notification.reason.isNotEmpty)
                               Text(
-                                _formatNotificationReason(notification.reason, localizations),
+                                _formatNotificationReason(
+                                    notification.reason, localizations),
                                 style: const TextStyle(fontSize: 12),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             Text(
-                              _formatNotificationDate(notification.createdAt, localizations),
-                              style: const TextStyle(fontSize: 11, color: Colors.grey),
+                              _formatNotificationDate(
+                                  notification.createdAt, localizations),
+                              style: const TextStyle(
+                                  fontSize: 11, color: Colors.grey),
                             ),
                           ],
                         ),
@@ -791,7 +767,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  void _showNotificationDetails(BuildContext context, Notif notification) async {
+  void _showNotificationDetails(
+      BuildContext context, Notif notification) async {
     final List<String> reasons = notification.reason;
     final localizations = AppLocalizations.of(context)!;
 
@@ -804,22 +781,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     // Create a temporary view model to use its methods
     final tempViewModel = NotificationsViewModel();
-    
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text(title),
           content: FutureBuilder<String>(
-            future: tempViewModel.buildNotificationContent(notification, localizations),
+            future: tempViewModel.buildNotificationContent(
+                notification, localizations),
             builder: (context, snapshot) {
               String content;
               if (snapshot.connectionState == ConnectionState.waiting) {
                 content = localizations.loading;
               } else if (snapshot.hasError) {
-                content = tempViewModel.buildNotificationContentSync(notification, localizations);
+                content = tempViewModel.buildNotificationContentSync(
+                    notification, localizations);
               } else {
-                content = snapshot.data ?? tempViewModel.buildNotificationContentSync(notification, localizations);
+                content = snapshot.data ??
+                    tempViewModel.buildNotificationContentSync(
+                        notification, localizations);
               }
 
               return Column(
@@ -828,8 +809,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 children: [
                   Text(
                     content,
-                    style: const TextStyle(
-                    ),
+                    style: const TextStyle(),
                   ),
                   const SizedBox(height: 10.0),
                   Text(
@@ -864,7 +844,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       try {
         final prefs = await SharedPreferences.getInstance();
         final token = prefs.getString('token');
-        
+
         if (token != null) {
           final userService = UserService();
           await userService.markNotificationAsRead(token, notification.id);
@@ -877,10 +857,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  String _formatNotificationDate(DateTime date, AppLocalizations localizations) {
+  String _formatNotificationDate(
+      DateTime date, AppLocalizations localizations) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}${localizations.daysAgo}';
     } else if (difference.inHours > 0) {
@@ -892,13 +873,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  String _formatNotificationReason(List<String> reasons, AppLocalizations localizations) {
+  String _formatNotificationReason(
+      List<String> reasons, AppLocalizations localizations) {
     if (reasons.isEmpty) {
       return localizations.newNotification;
     }
 
     List<String> formattedReasons = [];
-    
+
     for (String reason in reasons) {
       switch (reason) {
         case 'book_request':
@@ -912,7 +894,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         case 'fav_genre':
           formattedReasons.add(localizations.matchesYourFavoriteGenre);
         default:
-          formattedReasons.add(reason); 
+          formattedReasons.add(reason);
       }
     }
 
