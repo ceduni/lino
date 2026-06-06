@@ -1,7 +1,7 @@
 /* -- LIST OF Constants used in APIs -- */
 
 // Base API URL - Change this to switch between production and development
-const String baseApiUrl = 'https://lino-1.onrender.com';
+const String baseApiUrl = 'https://lino-bxw0.onrender.com';
 
 // For local development, uncomment the line below and comment the line above
 //const String baseApiUrl = 'http://10.0.2.2:3000';
@@ -14,7 +14,6 @@ String get webSocketUrl {
   } else if (baseApiUrl.startsWith('http://')) {
     return '${baseApiUrl.replaceFirst('http://', 'ws://')}/ws';
   } else {
-    throw Exception('Invalid base API URL format'); 
+    throw Exception('Invalid base API URL format');
   }
 }
-

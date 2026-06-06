@@ -55,7 +55,7 @@ server.setErrorHandler((error: any, request: FastifyRequest, reply: FastifyReply
             const field = err.instancePath ? err.instancePath.replace('/', '') : err.schemaPath;
             return `${field}: ${err.message}`;
         });
-        
+
         reply.code(400).send({
             error: 'Validation failed',
             details: validationErrors,
@@ -63,27 +63,27 @@ server.setErrorHandler((error: any, request: FastifyRequest, reply: FastifyReply
         });
         return;
     }
-    
+
     // Handle JWT errors
     if (error.code === 'FST_JWT_NO_AUTHORIZATION_IN_HEADER') {
         reply.code(401).send({ error: 'Missing authorization header' });
         return;
     }
-    
+
     if (error.code === 'FST_JWT_AUTHORIZATION_TOKEN_INVALID') {
         reply.code(401).send({ error: 'Invalid or expired token' });
         return;
     }
-    
+
     // Handle other known error codes
     const statusCode = (error as any).statusCode || 500;
     const message = error instanceof Error ? error.message : 'Internal server error';
-    
+
     // Log server errors but not client errors
     if (statusCode >= 500) {
         console.error('Server Error:', error);
     }
-    
+
     reply.code(statusCode).send({ error: message });
 });
 
@@ -230,7 +230,6 @@ const start = async () => {
     try {
         console.log('Starting server initialization...');
         const dbUri = process.env.NODE_ENV === 'test' ? process.env.TEST_MONGODB_URI : process.env.MONGODB_URI;
-        console.log(dbUri);
         await mongoose.connect(dbUri);
         console.log(`MongoDB connected to ${mongoose.connection.db.databaseName}...`);
 
