@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/Users/jalalfatouaki/Documents/github/lino/app/linux"
+    "cmake.sourceDirectory": "/Users/jalalfatouaki/Documents/github/lino/app/linux",
+    "dart.flutterHotReloadOnSave": "all"
 }

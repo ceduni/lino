@@ -1,12 +1,12 @@
-import 'package:Lino_app/models/thread_model.dart';
+import 'package:lino/models/thread_model.dart';
 import 'package:flutter/material.dart';
-import 'package:Lino_app/services/thread_services.dart';
-import 'package:Lino_app/services/user_services.dart';
+import 'package:lino/services/thread_services.dart';
+import 'package:lino/services/user_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
-import 'package:Lino_app/utils/constants/api_constants.dart';
+import 'package:lino/utils/constants/colors.dart';
+import 'package:lino/utils/constants/api_constants.dart';
 import 'message_tile.dart';
-import 'package:Lino_app/services/websocket_service.dart';
+import 'package:lino/services/websocket_service.dart';
 
 class ThreadMessagesScreen extends StatefulWidget {
   final String threadId;

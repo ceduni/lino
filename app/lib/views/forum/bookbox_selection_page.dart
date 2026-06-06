@@ -1,11 +1,11 @@
-import 'package:Lino_app/widgets/custom_snackbar.dart';
+import 'package:lino/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
-import 'package:Lino_app/vm/forum/bookbox_selection_view_model.dart';
-import 'package:Lino_app/vm/forum/requests_view_model.dart';
-import 'package:Lino_app/widgets/bookbox_map_widget.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:lino/vm/forum/bookbox_selection_view_model.dart';
+import 'package:lino/vm/forum/requests_view_model.dart';
+import 'package:lino/widgets/bookbox_map_widget.dart';
+import 'package:lino/utils/constants/colors.dart';
 
 class BookboxSelectionPage extends StatefulWidget {
   final Map<String, dynamic> arguments;

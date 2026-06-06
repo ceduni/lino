@@ -1,4 +1,4 @@
-import 'package:Lino_app/models/search_model.dart';
+import 'package:lino/models/search_model.dart';
 
 import '../utils/constants/api_constants.dart';
 import '../models/transaction_model.dart';

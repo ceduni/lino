@@ -9,8 +9,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:Lino_app/models/user_model.dart';
-import 'package:Lino_app/services/user_services.dart';
+import 'package:lino/models/user_model.dart';
+import 'package:lino/services/user_services.dart';
 
 class FavouriteLocationsViewModel extends ChangeNotifier {
   final TextEditingController searchController = TextEditingController();

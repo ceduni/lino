@@ -1,13 +1,13 @@
 // app/lib/vm/search_view_model.dart
-import 'package:Lino_app/views/books/book_details_page.dart';
+import 'package:lino/views/books/book_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:Lino_app/models/book_model.dart';
-import 'package:Lino_app/models/bookbox_model.dart';
-import 'package:Lino_app/models/search_model.dart';
-import 'package:Lino_app/services/bookbox_services.dart';
-import 'package:Lino_app/services/search_services.dart';
-import 'package:Lino_app/controllers/global_state_controller.dart';
+import 'package:lino/models/book_model.dart';
+import 'package:lino/models/bookbox_model.dart';
+import 'package:lino/models/search_model.dart';
+import 'package:lino/services/bookbox_services.dart';
+import 'package:lino/services/search_services.dart';
+import 'package:lino/controllers/global_state_controller.dart';
 
 import '../../views/bookboxes/book_box_page.dart';
 

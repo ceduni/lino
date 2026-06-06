@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:Lino_app/models/book_model.dart';
-import 'package:Lino_app/services/book_services.dart';
-import 'package:Lino_app/services/bookbox_services.dart';
+import 'package:lino/models/book_model.dart';
+import 'package:lino/services/book_services.dart';
+import 'package:lino/services/bookbox_services.dart';
 
 class BarcodeScannerViewModel extends ChangeNotifier {
   // State variables

@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:Lino_app/vm/login/onboarding/favourite_genres_input_view_model.dart';
+import 'package:lino/vm/login/onboarding/favourite_genres_input_view_model.dart';
 import '../../../utils/constants/routes.dart';
 
 class FavouriteGenresInputPage extends StatefulWidget {

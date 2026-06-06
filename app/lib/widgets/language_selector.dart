@@ -1,7 +1,7 @@
-import 'package:Lino_app/widgets/custom_snackbar.dart';
+import 'package:lino/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:Lino_app/controllers/locale_controller.dart';
+import 'package:lino/controllers/locale_controller.dart';
 
 class LanguageSelector extends StatefulWidget {
   final LanguageSelectorStyle style;

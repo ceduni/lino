@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:Lino_app/models/notification_model.dart';
-import 'package:Lino_app/models/user_model.dart';
+import 'package:lino/models/notification_model.dart';
+import 'package:lino/models/user_model.dart';
 import 'package:http/http.dart' as http;
 import '../utils/constants/api_constants.dart';
 

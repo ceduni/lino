@@ -1,22 +1,22 @@
 // app/lib/pages/bookbox/book_box_page.dart
 import 'dart:io';
-import 'package:Lino_app/models/book_model.dart';
-import 'package:Lino_app/models/bookbox_model.dart';
-import 'package:Lino_app/views/bookboxes/book_box_issue_report_page.dart';
-import 'package:Lino_app/views/bookboxes/transactions/barcode_scanner_page.dart';
-import 'package:Lino_app/views/books/book_details_page.dart';
-import 'package:Lino_app/vm/bookboxes/book_box_view_model.dart';
-import 'package:Lino_app/widgets/custom_snackbar.dart';
+import 'package:lino/models/book_model.dart';
+import 'package:lino/models/bookbox_model.dart';
+import 'package:lino/views/bookboxes/book_box_issue_report_page.dart';
+import 'package:lino/views/bookboxes/transactions/barcode_scanner_page.dart';
+import 'package:lino/views/books/book_details_page.dart';
+import 'package:lino/vm/bookboxes/book_box_view_model.dart';
+import 'package:lino/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:Lino_app/vm/search/search_page_view_model.dart';
+import 'package:lino/vm/search/search_page_view_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:Lino_app/utils/constants/colors.dart';
-import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:lino/utils/constants/colors.dart';
+import 'package:lino/l10n/app_localizations.dart';
 
 
 class BookBoxPage extends StatefulWidget {

@@ -1,14 +1,14 @@
 // app/lib/views/forum/requests_section.dart
-import 'package:Lino_app/utils/constants/routes.dart';
-import 'package:Lino_app/widgets/custom_snackbar.dart';
-import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:lino/utils/constants/routes.dart';
+import 'package:lino/widgets/custom_snackbar.dart';
+import 'package:lino/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:Lino_app/vm/forum/requests_view_model.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
-import 'package:Lino_app/models/request_model.dart';
-import 'package:Lino_app/models/search_model.dart';
+import 'package:lino/vm/forum/requests_view_model.dart';
+import 'package:lino/utils/constants/colors.dart';
+import 'package:lino/models/request_model.dart';
+import 'package:lino/models/search_model.dart';
 
 class RequestsSection extends StatefulWidget {
   const RequestsSection({super.key});

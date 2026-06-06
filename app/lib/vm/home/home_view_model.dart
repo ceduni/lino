@@ -1,4 +1,3 @@
-// app/lib/vm/home_view_model.dart
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -7,12 +6,30 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:provider/provider.dart';
-import 'package:Lino_app/models/bookbox_model.dart';
-import 'package:Lino_app/models/user_model.dart';
-import 'package:Lino_app/services/user_services.dart';
-import 'package:Lino_app/vm/bookboxes/bookbox_list_view_model.dart';
-import 'package:Lino_app/vm/map/map_view_model.dart';
-import 'package:Lino_app/nav_menu.dart';
+import 'package:lino/models/bookbox_model.dart';
+import 'package:lino/models/user_model.dart';
+import 'package:lino/services/user_services.dart';
+import 'package:lino/vm/bookboxes/bookbox_list_view_model.dart';
+import 'package:lino/vm/map/map_view_model.dart';
+import 'package:lino/nav_menu.dart';
+import 'package:http/http.dart' as http;
+import 'package:html/parser.dart' as html_parser;
+import 'package:html/dom.dart' as dom;
+
+// Model class
+class NewsArticle {
+  final String title;
+  final String imageUrl;
+  final String date;
+  final String url;
+
+  NewsArticle({
+    required this.title,
+    required this.imageUrl,
+    required this.date,
+    required this.url,
+  });
+}
 
 class HomeViewModel extends ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -32,6 +49,14 @@ class HomeViewModel extends ChangeNotifier {
   User? get userData => _userData;
   bool get isLoadingUser => _isLoadingUser;
   String? get error => _error;
+
+  List<NewsArticle> _montrealNews = [];
+  bool _isLoadingNews = false;
+  String? _newsError;
+
+  List<NewsArticle> get montrealNews => _montrealNews;
+  bool get isLoadingNews => _isLoadingNews;
+  String? get newsError => _newsError;
 
   void setContext(BuildContext context) {
     _context = context;
@@ -53,12 +78,144 @@ class HomeViewModel extends ChangeNotifier {
       if (_token != null && _token!.isNotEmpty) {
         await loadUserData();
       }
+
+      await fetchMontrealNews();
     } catch (e) {
       _error = e.toString();
       _isInitialized = true;
       notifyListeners();
     }
   }
+
+
+
+Future<void> fetchMontrealNews() async {
+  _isLoadingNews = true;
+  _newsError = null;
+  notifyListeners();
+  
+  try {
+    print('🔍 Fetching Montreal news about books...');
+    
+    final List<NewsArticle> allArticles = [];
+    
+    // Fetch multiple pages (up to 3 pages to get ~30 articles)
+    for (int page = 1; page <= 3; page++) {
+      final response = await http.get(
+        Uri.parse('https://montreal.ca/nouvelles?q=livre&page=$page'),
+      );
+
+      print('📡 Page $page - Response status: ${response.statusCode}');
+      
+      if (response.statusCode != 200) {
+        print('❌ Bad response status on page $page');
+        break;
+      }
+
+      final document = html_parser.parse(response.body);
+      
+      // Sélectionner les articles de la liste
+      final articleElements = document.querySelectorAll('li.list-group-item.list-element');
+      
+      print('📰 Page $page: Found ${articleElements.length} articles');
+      
+      if (articleElements.isEmpty) {
+        print('No more articles found, stopping pagination');
+        break;
+      }
+      
+      for (var i = 0; i < articleElements.length; i++) {
+        var element = articleElements[i];
+        try {
+          // Extract title
+          final titleElement = element.querySelector('.list-group-item-title');
+          final title = titleElement?.text.trim() ?? '';
+          
+          if (title.isEmpty) continue;
+          
+          print('  Article ${allArticles.length + 1}: ${title.length > 50 ? title.substring(0, 50) : title}...');
+          
+          // Extract image URL
+          final imgElement = element.querySelector('.list-group-thumb img');
+          String imageUrl = imgElement?.attributes['src'] ?? '';
+          
+          if (imageUrl.isNotEmpty && !imageUrl.startsWith('http')) {
+            // Keep cloudinary URL as is
+            if (!imageUrl.startsWith('https://')) {
+              imageUrl = 'https://res.cloudinary.com$imageUrl';
+            }
+          }
+          
+          if (imageUrl.isEmpty) {
+            imageUrl = 'https://picsum.photos/280/140?random=${allArticles.length}';
+          }
+          
+          // Extract date
+          final dateElements = element.querySelectorAll('.list-group-info-item');
+          String dateStr = '';
+          if (dateElements.isNotEmpty) {
+            dateStr = dateElements.first.text.trim();
+          }
+          
+          if (dateStr.isEmpty) {
+            dateStr = _formatDate(DateTime.now());
+          }
+          
+          // Extract article URL
+          final linkElement = element.querySelector('a');
+          String articleUrl = linkElement?.attributes['href'] ?? '';
+          
+          if (articleUrl.isNotEmpty && !articleUrl.startsWith('http')) {
+            articleUrl = 'https://montreal.ca$articleUrl';
+          }
+          
+          allArticles.add(NewsArticle(
+            title: title,
+            imageUrl: imageUrl,
+            date: dateStr,
+            url: articleUrl.isNotEmpty ? articleUrl : 'https://montreal.ca/nouvelles?q=livre',
+          ));
+          
+        } catch (e) {
+          print('❌ Error parsing article: $e');
+          continue;
+        }
+      }
+      
+      // Stop if we have enough articles
+      if (allArticles.length >= 10) break;
+      
+      // Add a small delay between requests to be polite
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+    
+    // Limit to 10 articles for display
+    _montrealNews = allArticles.take(10).toList();
+    
+    print('✅ Total articles fetched: ${_montrealNews.length}');
+    
+    _isLoadingNews = false;
+    notifyListeners();
+    
+  } catch (e) {
+    print('❌ Error fetching Montreal news: $e');
+    _newsError = e.toString();
+    _montrealNews = [];
+    _isLoadingNews = false;
+    notifyListeners();
+  }
+}
+
+String _formatDate(DateTime date) {
+  final months = [
+    'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
+    'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'
+  ];
+  return '${months[date.month - 1]} ${date.day}, ${date.year}';
+}
+
+
+
 
   Future<void> loadUserData() async {
     if (_token == null) return;
@@ -81,7 +238,7 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<void> checkLocationPermission() async {
     if (_context == null) return;
-    
+
     PermissionStatus status = await Permission.locationWhenInUse.status;
     if (status.isDenied) {
       status = await Permission.locationWhenInUse.request();
@@ -101,11 +258,12 @@ class HomeViewModel extends ChangeNotifier {
       final bookboxViewModel = Provider.of<BookboxListViewModel>(_context!, listen: false);
       if (bookboxViewModel.userPosition != null) {
         final distance = Geolocator.distanceBetween(
-          bookboxViewModel.userPosition!.latitude,
-          bookboxViewModel.userPosition!.longitude,
-          bbox.latitude,
-          bbox.longitude,
-        ) / 1000;
+              bookboxViewModel.userPosition!.latitude,
+              bookboxViewModel.userPosition!.longitude,
+              bbox.latitude,
+              bbox.longitude,
+            ) /
+            1000;
         return 'Distance: ${distance.toStringAsFixed(2)} km';
       }
     }
@@ -115,24 +273,26 @@ class HomeViewModel extends ChangeNotifier {
 
   List<Marker> getMarkers() {
     if (_context == null) return [];
-    
+
     final bookboxViewModel = Provider.of<BookboxListViewModel>(_context!, listen: false);
     final bboxes = bookboxViewModel.bookboxes;
 
-    return bboxes.map((bbox) => Marker(
-      markerId: MarkerId(bbox.id),
-      position: LatLng(bbox.latitude, bbox.longitude),
-      infoWindow: InfoWindow(
-        title: bbox.name,
-        snippet: getSnippet(bbox),
-      ),
-      icon: bbox.isActive
-          ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
-          : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      onTap: () {
-        bookboxViewModel.highlightBookbox(bbox.id);
-      },
-    )).toList();
+    return bboxes
+        .map((bbox) => Marker(
+              markerId: MarkerId(bbox.id),
+              position: LatLng(bbox.latitude, bbox.longitude),
+              infoWindow: InfoWindow(
+                title: bbox.name,
+                snippet: getSnippet(bbox),
+              ),
+              icon: bbox.isActive
+                  ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
+                  : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+              onTap: () {
+                bookboxViewModel.highlightBookbox(bbox.id);
+              },
+            ))
+        .toList();
   }
 
   // Helper methods for accessing ViewModels

@@ -1,14 +1,14 @@
 // app/lib/views/favourite_locations_page.dart
-import 'package:Lino_app/models/user_model.dart';
+import 'package:lino/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
-import 'package:Lino_app/vm/profile/options/favourite_locations_view_model.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
-import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:lino/vm/profile/options/favourite_locations_view_model.dart';
+import 'package:lino/utils/constants/colors.dart';
+import 'package:lino/l10n/app_localizations.dart';
 
 class FavouriteLocationsPage extends StatefulWidget {
   const FavouriteLocationsPage({super.key});

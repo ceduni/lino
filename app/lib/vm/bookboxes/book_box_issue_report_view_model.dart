@@ -1,8 +1,8 @@
 // app/lib/vm/book_box_issue_report_view_model.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Lino_app/services/issue_services.dart';
-import 'package:Lino_app/services/user_services.dart';
+import 'package:lino/services/issue_services.dart';
+import 'package:lino/services/user_services.dart';
 
 class BookBoxIssueReportViewModel extends ChangeNotifier {
   final TextEditingController _subjectController = TextEditingController();

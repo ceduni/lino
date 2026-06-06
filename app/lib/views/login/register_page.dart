@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:Lino_app/vm/login/register_view_model.dart';
+import 'package:lino/vm/login/register_view_model.dart';
 import '../../utils/constants/routes.dart';
-import 'package:Lino_app/l10n/app_localizations.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino/utils/constants/colors.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});

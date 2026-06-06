@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:Lino_app/utils/constants/routes.dart';
+import 'package:lino/utils/constants/routes.dart';
 import 'package:vibration/vibration.dart';
-import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:lino/l10n/app_localizations.dart';
 
 class QRScannerPage extends StatefulWidget {
   const QRScannerPage({super.key});

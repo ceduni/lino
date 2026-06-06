@@ -1,8 +1,8 @@
 // app/lib/vm/bookboxes/bookbox_list_view_model.dart
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:Lino_app/models/bookbox_model.dart';
-import 'package:Lino_app/services/search_services.dart';
+import 'package:lino/models/bookbox_model.dart';
+import 'package:lino/services/search_services.dart';
 
 enum BookboxSortOption {
   byName('by name'),

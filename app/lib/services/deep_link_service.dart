@@ -1,6 +1,6 @@
 import 'package:app_links/app_links.dart';
 import 'package:get/get.dart';
-import 'package:Lino_app/utils/constants/routes.dart';
+import 'package:lino/utils/constants/routes.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';

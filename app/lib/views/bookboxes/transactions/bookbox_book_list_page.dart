@@ -1,11 +1,11 @@
-import 'package:Lino_app/widgets/custom_snackbar.dart';
+import 'package:lino/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Lino_app/models/book_model.dart';
-import 'package:Lino_app/models/bookbox_model.dart';
-import 'package:Lino_app/services/bookbox_services.dart';
-import 'package:Lino_app/services/book_exchange_services.dart';
+import 'package:lino/models/book_model.dart';
+import 'package:lino/models/bookbox_model.dart';
+import 'package:lino/services/bookbox_services.dart';
+import 'package:lino/services/book_exchange_services.dart';
 
 class BookboxBookListPage extends StatefulWidget {
   final String bookboxId;

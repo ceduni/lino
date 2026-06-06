@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
-import 'package:Lino_app/config/image_config.dart';
+import 'package:lino/config/image_config.dart';
 
 class ImageUploadService {
   static String get _baseUrl =>
@@ -52,7 +52,7 @@ class ImageUploadService {
       // Add metadata (optional)
       request.fields['metadata'] = json.encode({
         'uploaded_at': DateTime.now().toIso8601String(),
-        'app': 'Lino_app',
+        'app': 'lino',
       });
 
       // Set requireSignedURLs to false for public access

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:Lino_app/models/book_suggestion.dart';
-import 'package:Lino_app/models/request_model.dart';
-import 'package:Lino_app/utils/constants/api_constants.dart';
+import 'package:lino/models/book_suggestion.dart';
+import 'package:lino/models/request_model.dart';
+import 'package:lino/utils/constants/api_constants.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 

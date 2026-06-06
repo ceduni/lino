@@ -1,14 +1,14 @@
-import 'package:Lino_app/models/search_model.dart';
-import 'package:Lino_app/models/thread_model.dart';
-import 'package:Lino_app/services/search_services.dart';
+import 'package:lino/models/search_model.dart';
+import 'package:lino/models/thread_model.dart';
+import 'package:lino/services/search_services.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:Lino_app/services/thread_services.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:lino/services/thread_services.dart';
+import 'package:lino/utils/constants/colors.dart';
 import './thread_message_screen.dart';
-import 'package:Lino_app/services/user_services.dart';
+import 'package:lino/services/user_services.dart';
 
 class ThreadsSection extends StatefulWidget {
   final String? query;

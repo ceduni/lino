@@ -4,8 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:Lino_app/services/user_services.dart';
-import 'package:Lino_app/services/image_upload_service.dart';
+import 'package:lino/services/user_services.dart';
+import 'package:lino/services/image_upload_service.dart';
 
 class ModifyProfileViewModel extends ChangeNotifier {
   late TextEditingController usernameController;
