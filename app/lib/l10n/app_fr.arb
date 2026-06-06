@@ -380,5 +380,11 @@
   "planetProtector": "Protecteur de la planète",
   "environmentalChampion": "Champion environnemental",
 
-  "bookboxmap": "Carte des boîtes à livres"
+  "confirmlogout": "Confirmer la déconnexion",
+  "areyousureyouwantologout": "Êtes-vous sûr de vouloir vous déconnecter ?",
+  "logoutsuccess": "Déconnexion réussie",
+  "youhaveloggedout": "Vous vous êtes déconnecté avec succès.",
+
+  "bookboxmap": "Carte des boîtes à livres",
+  "swipetoeditmore": "Glissez pour modifier plus"
 }

@@ -1,13 +1,13 @@
-import 'package:lino/widgets/custom_snackbar.dart';
+import 'package:lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
-import 'package:lino/models/book_model.dart';
-import 'package:lino/vm/books/book_edition_view_model.dart';
-import 'package:lino/views/books/camera_page.dart';
+import 'package:lino_app/models/book_model.dart';
+import 'package:lino_app/vm/books/book_edition_view_model.dart';
+import 'package:lino_app/views/books/camera_page.dart';
 import 'package:intl/intl.dart';
-import 'package:lino/utils/constants/colors.dart';
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/utils/constants/colors.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 
 class BookEditionPage extends StatefulWidget {
   final String bookboxId;
@@ -90,7 +90,7 @@ class _BookEditionPageState extends State<BookEditionPage> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Swipe to edit details',
+                          AppLocalizations.of(context)!.swipetoeditmore,
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 12,

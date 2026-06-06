@@ -1,11 +1,11 @@
 // app/lib/pages/bookbox/book_box_issue_report_page.dart
-import 'package:lino/vm/bookboxes/book_box_issue_report_view_model.dart';
-import 'package:lino/widgets/custom_snackbar.dart';
+import 'package:lino_app/vm/bookboxes/book_box_issue_report_view_model.dart';
+import 'package:lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:lino/utils/constants/colors.dart';
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/utils/constants/colors.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 
 class BookBoxIssueReportPage extends StatefulWidget {
   final String bookboxId;

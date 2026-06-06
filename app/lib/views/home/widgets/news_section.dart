@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lino/vm/home/home_view_model.dart';
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/vm/home/home_view_model.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NewsSectionWidget extends StatelessWidget {

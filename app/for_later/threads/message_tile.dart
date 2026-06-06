@@ -1,4 +1,4 @@
-import 'package:lino/models/thread_model.dart';
+import 'package:lino_app/models/thread_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 

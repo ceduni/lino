@@ -1,10 +1,10 @@
 // app/lib/views/notifications_setting_page.dart
-import 'package:lino/widgets/custom_snackbar.dart';
+import 'package:lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:lino/vm/profile/options_view_model.dart';
-import 'package:lino/utils/constants/colors.dart';
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/vm/profile/options_view_model.dart';
+import 'package:lino_app/utils/constants/colors.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 
 class NotificationSettingPage extends StatefulWidget {
   const NotificationSettingPage({super.key});
@@ -125,7 +125,7 @@ class _NotificationSettingPageState extends State<NotificationSettingPage> {
         */
         Container(
           decoration: BoxDecoration(
-        color: LinoColors.primary,
+        color: LinoColors.accent,
         borderRadius: BorderRadius.circular(8.0),
           ),
           child: Column(
@@ -217,7 +217,7 @@ class _NotificationSettingPageState extends State<NotificationSettingPage> {
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: Colors.green,
+        activeColor: Colors.white,
       ),
     );
   }

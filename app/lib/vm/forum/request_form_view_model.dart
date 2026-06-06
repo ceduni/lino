@@ -1,12 +1,12 @@
 // app/lib/vm/forum/request_form_view_model.dart
 import 'dart:async';
-import 'package:lino/models/book_suggestion.dart';
-import 'package:lino/models/request_model.dart';
-import 'package:lino/models/search_model.dart';
+import 'package:lino_app/models/book_suggestion.dart';
+import 'package:lino_app/models/request_model.dart';
+import 'package:lino_app/models/search_model.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:lino/services/book_request_services.dart';
-import 'package:lino/services/search_services.dart';
+import 'package:lino_app/services/book_request_services.dart';
+import 'package:lino_app/services/search_services.dart';
 
 class RequestFormViewModel extends ChangeNotifier {
   final BookRequestService _bookRequestService = BookRequestService();

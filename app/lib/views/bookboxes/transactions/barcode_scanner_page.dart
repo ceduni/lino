@@ -1,16 +1,16 @@
-import 'package:lino/models/book_model.dart';
-import 'package:lino/widgets/custom_snackbar.dart';
+import 'package:lino_app/models/book_model.dart';
+import 'package:lino_app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
-import 'package:lino/vm/bookboxes/transactions/barcode_scanner_view_model.dart';
-import 'package:lino/views/books/book_edition_page.dart';
-import 'package:lino/views/bookboxes/transactions/bookbox_book_list_page.dart';
-import 'package:lino/services/book_exchange_services.dart';
-import 'package:lino/utils/constants/colors.dart';
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/vm/bookboxes/transactions/barcode_scanner_view_model.dart';
+import 'package:lino_app/views/books/book_edition_page.dart';
+import 'package:lino_app/views/bookboxes/transactions/bookbox_book_list_page.dart';
+import 'package:lino_app/services/book_exchange_services.dart';
+import 'package:lino_app/utils/constants/colors.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 
 class BarcodeScannerPage extends StatefulWidget {
   final bool addingBook;

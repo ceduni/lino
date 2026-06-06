@@ -1,4 +1,4 @@
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 import 'package:get/get.dart';
 
 class Transaction {

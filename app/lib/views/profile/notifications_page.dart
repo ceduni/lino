@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:lino/l10n/app_localizations.dart';
-import 'package:lino/vm/profile/notifications_view_model.dart';
-import 'package:lino/models/notification_model.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
+import 'package:lino_app/vm/profile/notifications_view_model.dart';
+import 'package:lino_app/models/notification_model.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});

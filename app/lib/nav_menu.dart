@@ -1,15 +1,15 @@
-import 'package:lino/utils/constants/colors.dart';
-import 'package:lino/utils/constants/routes.dart';
-import 'package:lino/views/search/search_page.dart';
+import 'package:lino_app/utils/constants/colors.dart';
+import 'package:lino_app/utils/constants/routes.dart';
+import 'package:lino_app/views/search/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lino/views/forum/forum_screen.dart';
-import 'package:lino/views/layout/appbar.dart';
-import 'package:lino/views/profile/profile_page.dart';
-import 'package:lino/views/home/home_page.dart';
+import 'package:lino_app/views/forum/forum_screen.dart';
+import 'package:lino_app/views/layout/appbar.dart';
+import 'package:lino_app/views/profile/profile_page.dart';
+import 'package:lino_app/views/home/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/user_services.dart';
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 
 class BookNavPage extends StatefulWidget {
   const BookNavPage({super.key});

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:lino/models/book_model.dart';
-import 'package:lino/services/bookbox_services.dart';
-import 'package:lino/utils/constants/api_constants.dart';
+import 'package:lino_app/models/book_model.dart';
+import 'package:lino_app/services/bookbox_services.dart';
+import 'package:lino_app/utils/constants/api_constants.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 

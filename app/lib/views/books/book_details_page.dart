@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
-import 'package:lino/models/book_model.dart';
-import 'package:lino/vm/books/book_details_view_model.dart';
-import 'package:lino/views/bookboxes/book_box_page.dart';
+import 'package:lino_app/models/book_model.dart';
+import 'package:lino_app/vm/books/book_details_view_model.dart';
+import 'package:lino_app/views/bookboxes/book_box_page.dart';
 import 'package:intl/intl.dart';
-import 'package:lino/utils/constants/colors.dart';
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/utils/constants/colors.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 
 class BookDetailsPage extends StatefulWidget {
   final ExtendedBook book;

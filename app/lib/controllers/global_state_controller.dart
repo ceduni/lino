@@ -1,4 +1,4 @@
-import 'package:lino/models/bookbox_model.dart';
+import 'package:lino_app/models/bookbox_model.dart';
 import 'package:get/get.dart';
 
 class GlobalStateController extends GetxController {

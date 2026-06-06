@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lino/models/book_model.dart';
-import 'package:lino/services/book_services.dart';
+import 'package:lino_app/models/book_model.dart';
+import 'package:lino_app/services/book_services.dart';
 
 class BookDetailsViewModel extends ChangeNotifier {
   final BookService _bookService = BookService();

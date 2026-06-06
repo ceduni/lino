@@ -1,4 +1,4 @@
-import 'package:lino/models/user_model.dart';
+import 'package:lino_app/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 class EcologicalImpactCard extends StatelessWidget {

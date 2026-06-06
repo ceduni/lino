@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:lino/vm/profile/transactions_view_model.dart';
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/vm/profile/transactions_view_model.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 import '../../models/transaction_model.dart';
 
 class TransactionsPage extends StatefulWidget {

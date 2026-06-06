@@ -2,11 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:lino/models/user_model.dart';
-import 'package:lino/services/user_services.dart';
-import 'package:lino/services/websocket_service.dart';
-import 'package:lino/utils/constants/api_constants.dart';
-import 'package:lino/views/profile/notifications_page.dart';
+import 'package:lino_app/models/user_model.dart';
+import 'package:lino_app/services/user_services.dart';
+import 'package:lino_app/services/websocket_service.dart';
+import 'package:lino_app/utils/constants/api_constants.dart';
+import 'package:lino_app/views/profile/notifications_page.dart';
 
 class AppBarViewModel extends ChangeNotifier {
   final WebSocketService _webSocketService = WebSocketService();

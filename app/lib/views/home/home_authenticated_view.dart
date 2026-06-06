@@ -2,15 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
-import 'package:lino/vm/home/home_view_model.dart';
-import 'package:lino/vm/bookboxes/bookbox_list_view_model.dart';
-import 'package:lino/widgets/profile_stats_widget.dart';
-import 'package:lino/views/home/widgets/notifications_section.dart';
-import 'package:lino/views/home/widgets/map_section.dart';
-import 'package:lino/utils/constants/routes.dart';
-import 'package:lino/utils/constants/colors.dart';
-import 'package:lino/models/notification_model.dart';
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/vm/home/home_view_model.dart';
+import 'package:lino_app/vm/bookboxes/bookbox_list_view_model.dart';
+import 'package:lino_app/widgets/profile_stats_widget.dart';
+import 'package:lino_app/views/home/widgets/notifications_section.dart';
+import 'package:lino_app/views/home/widgets/map_section.dart';
+import 'package:lino_app/utils/constants/routes.dart';
+import 'package:lino_app/utils/constants/colors.dart';
+import 'package:lino_app/models/notification_model.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 
 class HomeAuthenticatedView extends StatelessWidget {
   final HomeViewModel viewModel;

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:lino/models/book_model.dart';
+import 'package:lino_app/models/book_model.dart';
 import 'package:http/http.dart' as http;
 import '../utils/constants/api_constants.dart';
 

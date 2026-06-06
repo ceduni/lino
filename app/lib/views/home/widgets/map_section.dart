@@ -4,10 +4,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:lino/vm/home/home_view_model.dart';
-import 'package:lino/vm/bookboxes/bookbox_list_view_model.dart';
-import 'package:lino/vm/map/map_view_model.dart';
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/vm/home/home_view_model.dart';
+import 'package:lino_app/vm/bookboxes/bookbox_list_view_model.dart';
+import 'package:lino_app/vm/map/map_view_model.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 
 class MapWidget extends StatelessWidget {
   final HomeViewModel viewModel;

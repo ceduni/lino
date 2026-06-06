@@ -1,8 +1,8 @@
-import 'package:lino/config/pages.dart';
-import 'package:lino/config/providers.dart';
-import 'package:lino/services/deep_link_service.dart';
-import 'package:lino/services/first_launch_service.dart';
-import 'package:lino/utils/constants/routes.dart';
+import 'package:lino_app/config/pages.dart';
+import 'package:lino_app/config/providers.dart';
+import 'package:lino_app/services/deep_link_service.dart';
+import 'package:lino_app/services/first_launch_service.dart';
+import 'package:lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';

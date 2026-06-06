@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
-import 'package:lino/services/image_upload_service.dart';
+import 'package:lino_app/services/image_upload_service.dart';
 import 'dart:io';
 
 class CameraPage extends StatefulWidget {

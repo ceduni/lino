@@ -1,8 +1,8 @@
 // app/lib/views/forum/forum_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:lino/vm/forum/forum_view_model.dart';
-import 'package:lino/views/forum/requests_section.dart';
+import 'package:lino_app/vm/forum/forum_view_model.dart';
+import 'package:lino_app/views/forum/requests_section.dart';
 
 class ForumScreen extends StatefulWidget {
   final String? query;

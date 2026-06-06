@@ -1,14 +1,14 @@
 // app/lib/pages/home/home_guest_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lino/vm/home/home_view_model.dart';
-import 'package:lino/views/home/widgets/news_section.dart';
-import 'package:lino/views/home/widgets/community_stats.dart';
-import 'package:lino/views/home/widgets/map_section.dart';
-import 'package:lino/utils/constants/routes.dart';
-import 'package:lino/utils/constants/colors.dart';
-import 'package:lino/l10n/app_localizations.dart';
-import 'package:lino/controllers/locale_controller.dart';
+import 'package:lino_app/vm/home/home_view_model.dart';
+import 'package:lino_app/views/home/widgets/news_section.dart';
+import 'package:lino_app/views/home/widgets/community_stats.dart';
+import 'package:lino_app/views/home/widgets/map_section.dart';
+import 'package:lino_app/utils/constants/routes.dart';
+import 'package:lino_app/utils/constants/colors.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
+import 'package:lino_app/controllers/locale_controller.dart';
 
 class HomeGuestView extends StatefulWidget {
   final HomeViewModel viewModel;

@@ -1,8 +1,8 @@
 // app/lib/views/profile_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:lino/vm/profile/profile_view_model.dart';
-import 'package:lino/widgets/user_dashboard/user_dashboard_widget.dart';
+import 'package:lino_app/vm/profile/profile_view_model.dart';
+import 'package:lino_app/widgets/user_dashboard/user_dashboard_widget.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

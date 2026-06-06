@@ -1,12 +1,12 @@
-import 'package:lino/utils/constants/routes.dart';
+import 'package:lino_app/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
-import 'package:lino/models/user_model.dart';
-import 'package:lino/utils/constants/colors.dart';
-import 'package:lino/vm/profile/profile_view_model.dart';
+import 'package:lino_app/models/user_model.dart';
+import 'package:lino_app/utils/constants/colors.dart';
+import 'package:lino_app/vm/profile/profile_view_model.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:lino/l10n/app_localizations.dart';
-import 'package:lino/controllers/locale_controller.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
+import 'package:lino_app/controllers/locale_controller.dart';
 import 'recent_transactions_widget.dart';
 import 'followed_bookboxes_widget.dart';
 

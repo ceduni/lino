@@ -1,12 +1,12 @@
-import 'package:lino/services/user_services.dart';
+import 'package:lino_app/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:lino/models/bookbox_model.dart';
-import 'package:lino/models/user_model.dart';
-import 'package:lino/services/bookbox_services.dart';
-import 'package:lino/utils/constants/routes.dart';
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/models/bookbox_model.dart';
+import 'package:lino_app/models/user_model.dart';
+import 'package:lino_app/services/bookbox_services.dart';
+import 'package:lino_app/utils/constants/routes.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 
 class FollowedBookboxesPage extends StatefulWidget {
   const FollowedBookboxesPage({super.key});

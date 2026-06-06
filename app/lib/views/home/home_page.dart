@@ -1,12 +1,12 @@
 // app/lib/pages/home/home.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:lino/vm/home/home_view_model.dart';
-import 'package:lino/vm/bookboxes/bookbox_list_view_model.dart';
-import 'package:lino/views/home/home_guest_view.dart';
-import 'package:lino/views/home/home_authenticated_view.dart';
-import 'package:lino/services/user_services.dart';
-import 'package:lino/models/notification_model.dart';
+import 'package:lino_app/vm/home/home_view_model.dart';
+import 'package:lino_app/vm/bookboxes/bookbox_list_view_model.dart';
+import 'package:lino_app/views/home/home_guest_view.dart';
+import 'package:lino_app/views/home/home_authenticated_view.dart';
+import 'package:lino_app/services/user_services.dart';
+import 'package:lino_app/models/notification_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {

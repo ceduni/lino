@@ -1,10 +1,10 @@
 // app/lib/vm/profile/notifications_view_model.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:lino/l10n/app_localizations.dart';
-import 'package:lino/models/notification_model.dart';
-import 'package:lino/services/user_services.dart';
-import 'package:lino/services/bookbox_services.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
+import 'package:lino_app/models/notification_model.dart';
+import 'package:lino_app/services/user_services.dart';
+import 'package:lino_app/services/bookbox_services.dart';
 
 class NotificationsViewModel extends ChangeNotifier {
   final UserService _userService = UserService();

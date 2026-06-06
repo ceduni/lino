@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:lino/services/user_services.dart';
+import 'package:lino_app/services/user_services.dart';
 
 class LoginViewModel extends ChangeNotifier {
   final TextEditingController identifierController = TextEditingController();

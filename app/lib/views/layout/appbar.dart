@@ -1,8 +1,8 @@
 // app/lib/pages/appbar/appbar_view_model.dart
-import 'package:lino/utils/constants/colors.dart';
+import 'package:lino_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:lino/vm/layout/appbar_view_model.dart';
+import 'package:lino_app/vm/layout/appbar_view_model.dart';
 
 import '../../widgets/language_selector.dart';
 

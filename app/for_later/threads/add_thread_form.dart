@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:lino/models/book_model.dart';
-import 'package:lino/services/search_services.dart';
+import 'package:lino_app/models/book_model.dart';
+import 'package:lino_app/services/search_services.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:lino/services/thread_services.dart';
+import 'package:lino_app/services/thread_services.dart';
 
 class AddThreadForm extends StatefulWidget {
   final VoidCallback onThreadCreated;

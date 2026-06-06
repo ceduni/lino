@@ -1,6 +1,6 @@
-import 'package:lino/models/search_model.dart';
-import 'package:lino/models/user_model.dart';
-import 'package:lino/services/bookbox_services.dart';
+import 'package:lino_app/models/search_model.dart';
+import 'package:lino_app/models/user_model.dart';
+import 'package:lino_app/services/bookbox_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../models/transaction_model.dart';
@@ -8,7 +8,7 @@ import '../../services/transaction_services.dart';
 import '../../utils/constants/routes.dart';
 import '../../views/profile/transactions_page.dart';
 import 'dart:math';
-import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino_app/l10n/app_localizations.dart';
 
 class RecentTransactionsCard extends StatefulWidget {
   final User user;

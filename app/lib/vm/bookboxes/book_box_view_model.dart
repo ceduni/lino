@@ -1,8 +1,8 @@
 // app/lib/vm/book_box_view_model.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:lino/models/bookbox_model.dart';
-import 'package:lino/services/bookbox_services.dart';
+import 'package:lino_app/models/bookbox_model.dart';
+import 'package:lino_app/services/bookbox_services.dart';
 
 class BookBoxViewModel extends ChangeNotifier {
   BookBox? _bookBox;
