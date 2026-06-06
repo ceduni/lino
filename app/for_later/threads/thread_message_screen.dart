@@ -12,7 +12,7 @@ class ThreadMessagesScreen extends StatefulWidget {
   final String threadId;
   final String title;
 
-  ThreadMessagesScreen({required this.threadId, required this.title});
+  const ThreadMessagesScreen({required this.threadId, required this.title});
 
   @override
   _ThreadMessagesScreenState createState() => _ThreadMessagesScreenState();
@@ -25,8 +25,8 @@ class _ThreadMessagesScreenState extends State<ThreadMessagesScreen> {
   String token = '';
   String? respondsTo;
   Message? respondingToMessage;
-  TextEditingController _controller = TextEditingController();
-  ScrollController _scrollController = ScrollController();
+  final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   String? currentUsername;
   WebSocketService webSocketService = WebSocketService();
 

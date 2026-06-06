@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import '../../models/transaction_model.dart';
 import '../../services/transaction_services.dart';
 import '../../utils/constants/routes.dart';
-import '../../views/profile/transactions_page.dart';
 import 'dart:math';
 import 'package:lino_app/l10n/app_localizations.dart';
 

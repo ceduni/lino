@@ -36,10 +36,6 @@ class BookboxListViewModel extends ChangeNotifier {
   String? get error => _error;
   bool get locationPermissionGranted => _locationPermissionGranted;
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   Future<void> initialize() async {
     await _requestLocationPermission();

@@ -217,7 +217,7 @@ class _NotificationSettingPageState extends State<NotificationSettingPage> {
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: Colors.white,
+        activeThumbColor: Colors.white,
       ),
     );
   }

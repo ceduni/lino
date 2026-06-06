@@ -11,7 +11,7 @@ import 'package:lino_app/services/thread_services.dart';
 class AddThreadForm extends StatefulWidget {
   final VoidCallback onThreadCreated;
 
-  const AddThreadForm({required this.onThreadCreated, Key? key}) : super(key: key);
+  const AddThreadForm({required this.onThreadCreated, super.key});
 
   @override
   _AddThreadFormState createState() => _AddThreadFormState();
@@ -116,7 +116,7 @@ class _AddThreadFormState extends State<AddThreadForm> {
               decoration: InputDecoration(labelText: 'Search for a book'),
             ),
             if (books.isNotEmpty)
-              Container(
+              SizedBox(
                 height: 120,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,

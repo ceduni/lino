@@ -10,7 +10,7 @@ class MessageTile extends StatefulWidget {
   final Color backgroundColor;
   final String? currentUsername;
 
-  MessageTile({
+  const MessageTile({
     required this.message,
     required this.allMessages,
     required this.onReact,

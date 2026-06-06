@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:lino_app/vm/layout/appbar_view_model.dart';
 
-import '../../widgets/language_selector.dart';
 
 class LinoAppBar extends StatefulWidget implements PreferredSizeWidget {
   final int sourcePage;

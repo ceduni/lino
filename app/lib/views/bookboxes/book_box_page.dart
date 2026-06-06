@@ -266,7 +266,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
           TextButton(
             onPressed: () {
               final searchViewModel = context.read<SearchPageViewModel>();
-              searchViewModel.createRequest("");
+              searchViewModel.createRequest('');
             },
             
             child: Center(
@@ -1018,7 +1018,7 @@ class _BookBoxPageState extends State<BookBoxPage> {
     } catch (e) {
       CustomSnackbars.error(
         AppLocalizations.of(context)!.error,
-        AppLocalizations.of(context)!.couldNotOpenApp("Google Maps"),
+        AppLocalizations.of(context)!.couldNotOpenApp('Google Maps'),
       );
     }
   }

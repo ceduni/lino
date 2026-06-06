@@ -14,7 +14,6 @@ import 'package:lino_app/vm/map/map_view_model.dart';
 import 'package:lino_app/nav_menu.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
-import 'package:html/dom.dart' as dom;
 
 // Model class
 class NewsArticle {

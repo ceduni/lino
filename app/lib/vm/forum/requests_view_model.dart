@@ -52,10 +52,6 @@ class RequestsViewModel extends ChangeNotifier {
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   Future<void> initialize() async {
     await _fetchCurrentUser();

@@ -12,10 +12,6 @@ class ForumViewModel extends ChangeNotifier {
   bool get isConnected => _isConnected;
   String? get error => _error;
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   Future<void> initialize() async {
     await checkConnection();

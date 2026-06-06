@@ -20,9 +20,9 @@ class SearchViewModel extends ChangeNotifier {
   bool _isGridMode = false;
 
   // Track expanded bookboxes and their loaded books
-  Map<String, bool> _expandedBookBoxes = {};
-  Map<String, List<Book>> _loadedBooks = {};
-  Map<String, bool> _loadingBooks = {};
+  final Map<String, bool> _expandedBookBoxes = {};
+  final Map<String, List<Book>> _loadedBooks = {};
+  final Map<String, bool> _loadingBooks = {};
 
   List<ShortenedBookBox> get bookBoxes => _bookBoxes;
   bool get isLoading => _isLoading;

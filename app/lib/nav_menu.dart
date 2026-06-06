@@ -313,7 +313,7 @@ class NavigationController extends GetxController {
 class OBxLinoAppBar extends StatelessWidget implements PreferredSizeWidget {
   final NavigationController controller;
 
-  const OBxLinoAppBar({Key? key, required this.controller}) : super(key: key);
+  const OBxLinoAppBar({super.key, required this.controller});
 
   @override
   Size get preferredSize => const Size.fromHeight(60);

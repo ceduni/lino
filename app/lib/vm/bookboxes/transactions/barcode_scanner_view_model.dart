@@ -100,7 +100,7 @@ class BarcodeScannerViewModel extends ChangeNotifier {
           book = EditableBook.fromBook(foundBook);
         } else {
           // If not found in bookbox when taking, show error
-          _error = "This book is not available in this BookBox. Please scan a book that is currently in the BookBox.";
+          _error = 'This book is not available in this BookBox. Please scan a book that is currently in the BookBox.';
           _isScanning = false;
           notifyListeners();
           return;

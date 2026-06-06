@@ -190,8 +190,4 @@ class BookboxSelectionViewModel extends ChangeNotifier {
     _loadBookboxes();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }

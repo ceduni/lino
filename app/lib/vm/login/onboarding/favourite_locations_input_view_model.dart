@@ -18,7 +18,7 @@ class FavouriteLocationsInputViewModel extends ChangeNotifier {
 
   GoogleMapController? _mapController;
   List<FavouriteLocation> _favouriteLocations = [];
-  Set<Marker> _markers = {};
+  final Set<Marker> _markers = {};
   bool _isLoading = true;
   bool _isAddingLocation = false;
 

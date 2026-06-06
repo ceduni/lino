@@ -174,19 +174,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
       switch (reason) {
         case 'book_request':
           formattedReasons.add(localizations.someoneRequestedThisBook);
-          break;
         case 'solved_book_request':
           formattedReasons.add(localizations.matchesYourBookRequest);
-          break;
         case 'fav_bookbox':
           formattedReasons.add(localizations.addedToFollowedBookboxPreview);
-          break;
         case 'same_borough':
           formattedReasons.add(localizations.addedNearYou);
-          break;
         case 'fav_genre':
           formattedReasons.add(localizations.matchesYourFavoriteGenre);
-          break;
         default:
           formattedReasons.add(reason); 
       }
