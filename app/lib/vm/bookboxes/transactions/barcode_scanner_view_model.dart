@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:Lino_app/models/book_model.dart';
-import 'package:Lino_app/services/book_services.dart';
-import 'package:Lino_app/services/bookbox_services.dart';
+import 'package:lino/models/book_model.dart';
+import 'package:lino/services/book_services.dart';
+import 'package:lino/services/bookbox_services.dart';
 
 class BarcodeScannerViewModel extends ChangeNotifier {
   // State variables
@@ -100,7 +100,7 @@ class BarcodeScannerViewModel extends ChangeNotifier {
           book = EditableBook.fromBook(foundBook);
         } else {
           // If not found in bookbox when taking, show error
-          _error = "This book is not available in this BookBox. Please scan a book that is currently in the BookBox.";
+          _error = 'This book is not available in this BookBox. Please scan a book that is currently in the BookBox.';
           _isScanning = false;
           notifyListeners();
           return;

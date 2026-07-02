@@ -1,12 +1,12 @@
 // app/lib/views/search/search_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:Lino_app/vm/search/search_page_view_model.dart';
-import 'package:Lino_app/utils/constants/search_types.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
-import 'package:Lino_app/models/bookbox_model.dart';
-import 'package:Lino_app/models/book_model.dart';
-import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:lino/vm/search/search_page_view_model.dart';
+import 'package:lino/utils/constants/search_types.dart';
+import 'package:lino/utils/constants/colors.dart';
+import 'package:lino/models/bookbox_model.dart';
+import 'package:lino/models/book_model.dart';
+import 'package:lino/l10n/app_localizations.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:Lino_app/models/issue_model.dart';
-import 'package:Lino_app/utils/constants/api_constants.dart';
+import 'package:lino/models/issue_model.dart';
+import 'package:lino/utils/constants/api_constants.dart';
 import 'package:http/http.dart' as http;
 
 class IssueServices {

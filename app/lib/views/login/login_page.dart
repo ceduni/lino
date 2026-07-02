@@ -1,12 +1,12 @@
 // app/lib/views/login/login_page.dart
-import 'package:Lino_app/utils/constants/routes.dart';
+import 'package:lino/utils/constants/routes.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:Lino_app/vm/login/login_view_model.dart';
-import 'package:Lino_app/l10n/app_localizations.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
+import 'package:lino/vm/login/login_view_model.dart';
+import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino/utils/constants/colors.dart';
 
 
 class LoginPage extends StatefulWidget {

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Lino_app/models/bookbox_model.dart';
-import 'package:Lino_app/models/book_suggestion.dart';
-import 'package:Lino_app/models/search_model.dart';
-import 'package:Lino_app/services/search_services.dart';
-import 'package:Lino_app/services/book_request_services.dart';
+import 'package:lino/models/bookbox_model.dart';
+import 'package:lino/models/book_suggestion.dart';
+import 'package:lino/models/search_model.dart';
+import 'package:lino/services/search_services.dart';
+import 'package:lino/services/book_request_services.dart';
 
 class BookboxSelectionViewModel extends ChangeNotifier {
   final SearchService _searchService = SearchService();
@@ -190,8 +190,4 @@ class BookboxSelectionViewModel extends ChangeNotifier {
     _loadBookboxes();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }

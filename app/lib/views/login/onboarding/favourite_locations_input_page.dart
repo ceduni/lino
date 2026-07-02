@@ -1,12 +1,12 @@
 // app/lib/views/login/onboarding/favourite_locations_input_page.dart
-import 'package:Lino_app/utils/constants/routes.dart';
+import 'package:lino/utils/constants/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:provider/provider.dart';
-import 'package:Lino_app/vm/login/onboarding/favourite_locations_input_view_model.dart';
+import 'package:lino/vm/login/onboarding/favourite_locations_input_view_model.dart';
 
 class FavouriteLocationsInputPage extends StatefulWidget {
 

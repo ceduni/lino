@@ -1,14 +1,14 @@
-import 'package:Lino_app/utils/constants/routes.dart';
-import 'package:Lino_app/views/search/search_page.dart';
+import 'package:lino/utils/constants/routes.dart';
+import 'package:lino/views/search/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:Lino_app/views/forum/forum_screen.dart';
-import 'package:Lino_app/views/layout/appbar.dart';
-import 'package:Lino_app/views/profile/profile_page.dart';
-import 'package:Lino_app/views/home/home_page.dart';
+import 'package:lino/views/forum/forum_screen.dart';
+import 'package:lino/views/layout/appbar.dart';
+import 'package:lino/views/profile/profile_page.dart';
+import 'package:lino/views/home/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/user_services.dart';
-import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:lino/l10n/app_localizations.dart';
 
 class BookNavPage extends StatefulWidget {
   const BookNavPage({super.key});
@@ -141,7 +141,7 @@ class NavigationController extends GetxController {
 class OBxLinoAppBar extends StatelessWidget implements PreferredSizeWidget {
   final NavigationController controller;
   
-  const OBxLinoAppBar({Key? key, required this.controller}) : super(key: key);
+  const OBxLinoAppBar({super.key, required this.controller});
 
   @override
   Size get preferredSize => const Size.fromHeight(60);

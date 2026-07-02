@@ -2,9 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:Lino_app/vm/profile/options/modify_profile_view_model.dart';
-import 'package:Lino_app/utils/constants/colors.dart';
-import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:lino/vm/profile/options/modify_profile_view_model.dart';
+import 'package:lino/utils/constants/colors.dart';
+import 'package:lino/l10n/app_localizations.dart';
 
 class ModifyProfilePage extends StatefulWidget {
   const ModifyProfilePage({super.key});
@@ -98,7 +98,7 @@ class _ModifyProfilePageState extends State<ModifyProfilePage> {
                               child: Container(
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.black.withOpacity(0.5),
+                                  color: Colors.black.withValues(alpha: 0.5),
                                 ),
                                 child: Center(
                                   child: CircularProgressIndicator(

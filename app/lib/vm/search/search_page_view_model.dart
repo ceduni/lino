@@ -1,16 +1,16 @@
-import 'package:Lino_app/vm/search/search_view_model.dart';
+import 'package:lino/vm/search/search_view_model.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Lino_app/models/book_model.dart';
-import 'package:Lino_app/models/bookbox_model.dart';
-import 'package:Lino_app/models/search_model.dart';
-import 'package:Lino_app/services/search_services.dart';
-import 'package:Lino_app/utils/constants/search_types.dart';
-import 'package:Lino_app/utils/constants/routes.dart';
-import 'package:Lino_app/views/forum/request_form.dart';
+import 'package:lino/models/book_model.dart';
+import 'package:lino/models/bookbox_model.dart';
+import 'package:lino/models/search_model.dart';
+import 'package:lino/services/search_services.dart';
+import 'package:lino/utils/constants/search_types.dart';
+import 'package:lino/utils/constants/routes.dart';
+import 'package:lino/views/forum/request_form.dart';
 
 enum SortOption {
   byName('by name'),

@@ -7,12 +7,12 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:provider/provider.dart';
-import 'package:Lino_app/models/bookbox_model.dart';
-import 'package:Lino_app/models/user_model.dart';
-import 'package:Lino_app/services/user_services.dart';
-import 'package:Lino_app/vm/bookboxes/bookbox_list_view_model.dart';
-import 'package:Lino_app/vm/map/map_view_model.dart';
-import 'package:Lino_app/nav_menu.dart';
+import 'package:lino/models/bookbox_model.dart';
+import 'package:lino/models/user_model.dart';
+import 'package:lino/services/user_services.dart';
+import 'package:lino/vm/bookboxes/bookbox_list_view_model.dart';
+import 'package:lino/vm/map/map_view_model.dart';
+import 'package:lino/nav_menu.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();

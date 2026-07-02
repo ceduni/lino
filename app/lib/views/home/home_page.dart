@@ -5,19 +5,19 @@ import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
-import 'package:Lino_app/vm/home/home_view_model.dart';
-import 'package:Lino_app/vm/bookboxes/bookbox_list_view_model.dart';
-import 'package:Lino_app/vm/map/map_view_model.dart';
-import 'package:Lino_app/widgets/profile_stats_widget.dart';
-import 'package:Lino_app/utils/constants/routes.dart';
-import 'package:Lino_app/services/user_services.dart';
-import 'package:Lino_app/models/notification_model.dart';
-import 'package:Lino_app/vm/profile/notifications_view_model.dart';
+import 'package:lino/vm/home/home_view_model.dart';
+import 'package:lino/vm/bookboxes/bookbox_list_view_model.dart';
+import 'package:lino/vm/map/map_view_model.dart';
+import 'package:lino/widgets/profile_stats_widget.dart';
+import 'package:lino/utils/constants/routes.dart';
+import 'package:lino/services/user_services.dart';
+import 'package:lino/models/notification_model.dart';
+import 'package:lino/vm/profile/notifications_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:Lino_app/utils/constants/colors.dart';
-import 'package:Lino_app/l10n/app_localizations.dart';
-import 'package:Lino_app/controllers/locale_controller.dart';
+import 'package:lino/utils/constants/colors.dart';
+import 'package:lino/l10n/app_localizations.dart';
+import 'package:lino/controllers/locale_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -470,7 +470,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: isSelected ? LinoColors.accent.withOpacity(0.1) : Colors.grey[50],
+          color: isSelected ? LinoColors.accent.withValues(alpha: 0.1) : Colors.grey[50],
           border: Border.all(
             color: isSelected ? LinoColors.accent : Colors.grey[300]!,
             width: isSelected ? 2 : 1,
@@ -554,7 +554,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,
                 markers: Set<Marker>.of(markers),
-                gestureRecognizers: Set()
+                gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{}
                   ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
                   ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()))
                   ..add(Factory<TapGestureRecognizer>(() => TapGestureRecognizer()))
@@ -566,11 +566,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),

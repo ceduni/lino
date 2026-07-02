@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:Lino_app/models/book_model.dart';
-import 'package:Lino_app/models/bookbox_model.dart';
-import 'package:Lino_app/models/issue_model.dart';
-import 'package:Lino_app/models/request_model.dart';
-import 'package:Lino_app/models/search_model.dart';
-import 'package:Lino_app/models/thread_model.dart';
-import 'package:Lino_app/utils/constants/api_constants.dart';
+import 'package:lino/models/book_model.dart';
+import 'package:lino/models/bookbox_model.dart';
+import 'package:lino/models/issue_model.dart';
+import 'package:lino/models/request_model.dart';
+import 'package:lino/models/search_model.dart';
+import 'package:lino/models/thread_model.dart';
+import 'package:lino/utils/constants/api_constants.dart';
 import 'package:http/http.dart' as http;
 
 class SearchService {

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ExpandableText extends StatefulWidget {
   final String text;
 
-  ExpandableText(this.text);
+  const ExpandableText(this.text);
 
   @override
   _ExpandableTextState createState() => _ExpandableTextState();
@@ -25,7 +25,7 @@ class _ExpandableTextState extends State<ExpandableText> {
       secondHalf = widget.text.substring(FIRST_HALF_CHARACTERS, widget.text.length);
     } else {
       firstHalf = widget.text;
-      secondHalf = "";
+      secondHalf = '';
     }
   }
 
@@ -43,7 +43,7 @@ class _ExpandableTextState extends State<ExpandableText> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            flag ? (firstHalf + "...") : (firstHalf + secondHalf),
+            flag ? ('$firstHalf...') : (firstHalf + secondHalf),
             textAlign: TextAlign.start,
             style: TextStyle(fontFamily: 'Kanit'),
           ),

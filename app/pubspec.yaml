@@ -1,4 +1,4 @@
-name: Lino_app
+name: lino
 description: "Lino"
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -23,7 +23,7 @@ dependencies:
   http: ^1.2.1
   google_maps_flutter: ^2.7.0
   google_places_flutter: ^2.0.9
-  geocoding: ^3.0.0
+  geocoding: ^4.0.0
   dotenv: ^4.2.0
   flutter_dotenv: ^5.1.0
   flutter_speed_dial: ^7.0.0
@@ -38,7 +38,7 @@ dependencies:
   intl_phone_number_input: ^0.7.0
   nfc_manager: ^4.0.2
   web_socket_channel: ^3.0.3
-  fluttertoast: ^8.0.8
+  fluttertoast: ^9.1.0
   go_router: ^15.1.3
   image_picker: ^1.0.4
   image: ^4.1.3

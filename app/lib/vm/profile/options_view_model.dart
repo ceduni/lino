@@ -1,7 +1,7 @@
 // app/lib/vm/options_view_model.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Lino_app/services/user_services.dart';
+import 'package:lino/services/user_services.dart';
 
 class OptionsViewModel extends ChangeNotifier {
   bool _isLoading = true;

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:Lino_app/services/user_services.dart';
+import 'package:lino/services/user_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FavouriteGenresInputViewModel extends ChangeNotifier {

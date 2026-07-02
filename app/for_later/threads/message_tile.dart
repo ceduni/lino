@@ -1,4 +1,4 @@
-import 'package:Lino_app/models/thread_model.dart';
+import 'package:lino/models/thread_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -10,7 +10,7 @@ class MessageTile extends StatefulWidget {
   final Color backgroundColor;
   final String? currentUsername;
 
-  MessageTile({
+  const MessageTile({
     required this.message,
     required this.allMessages,
     required this.onReact,

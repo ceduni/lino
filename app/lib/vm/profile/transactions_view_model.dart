@@ -1,9 +1,9 @@
-import 'package:Lino_app/models/user_model.dart';
+import 'package:lino/models/user_model.dart';
 import 'package:flutter/material.dart';
-import 'package:Lino_app/models/search_model.dart';
-import 'package:Lino_app/services/bookbox_services.dart';
-import 'package:Lino_app/models/transaction_model.dart';
-import 'package:Lino_app/services/transaction_services.dart';
+import 'package:lino/models/search_model.dart';
+import 'package:lino/services/bookbox_services.dart';
+import 'package:lino/models/transaction_model.dart';
+import 'package:lino/services/transaction_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/user_services.dart';

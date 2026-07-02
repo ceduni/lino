@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:Lino_app/utils/constants/routes.dart';
+import 'package:lino/utils/constants/routes.dart';
 import 'package:vibration/vibration.dart';
-import 'package:Lino_app/l10n/app_localizations.dart';
+import 'package:lino/l10n/app_localizations.dart';
 
 class QRScannerPage extends StatefulWidget {
   const QRScannerPage({super.key});
@@ -276,7 +276,7 @@ class QrScannerOverlayShape extends ShapeBorder {
 
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    Path _getLeftTopPath(Rect rect) {
+    Path getLeftTopPath(Rect rect) {
       return Path()
         ..moveTo(rect.left, rect.bottom)
         ..lineTo(rect.left, rect.top + borderRadius)
@@ -284,7 +284,7 @@ class QrScannerOverlayShape extends ShapeBorder {
         ..lineTo(rect.right, rect.top);
     }
 
-    return _getLeftTopPath(rect)
+    return getLeftTopPath(rect)
       ..lineTo(rect.right, rect.bottom)
       ..lineTo(rect.left, rect.bottom)
       ..lineTo(rect.left, rect.top);
@@ -296,14 +296,14 @@ class QrScannerOverlayShape extends ShapeBorder {
     final borderWidthSize = width / 2;
     final height = rect.height;
     final borderOffset = borderWidth / 2;
-    final _cutOutSize = cutOutSize < width && cutOutSize < height
+    final effectiveCutOutSize = cutOutSize < width && cutOutSize < height
         ? cutOutSize
         : (width < height ? width : height) - borderWidthSize;
-    final _cutOutRect = Rect.fromLTWH(
-      rect.left + width / 2 - _cutOutSize / 2 + borderOffset,
-      rect.top + height / 2 - _cutOutSize / 2 + borderOffset,
-      _cutOutSize - borderOffset * 2,
-      _cutOutSize - borderOffset * 2,
+    final cutOutRect = Rect.fromLTWH(
+      rect.left + width / 2 - effectiveCutOutSize / 2 + borderOffset,
+      rect.top + height / 2 - effectiveCutOutSize / 2 + borderOffset,
+      effectiveCutOutSize - borderOffset * 2,
+      effectiveCutOutSize - borderOffset * 2,
     );
 
     final backgroundPaint = Paint()
@@ -312,7 +312,7 @@ class QrScannerOverlayShape extends ShapeBorder {
 
     final backgroundPath = Path()
       ..addRect(rect)
-      ..addRRect(RRect.fromRectAndRadius(_cutOutRect, Radius.circular(borderRadius)))
+      ..addRRect(RRect.fromRectAndRadius(cutOutRect, Radius.circular(borderRadius)))
       ..fillType = PathFillType.evenOdd;
 
     canvas.drawPath(backgroundPath, backgroundPaint);
@@ -325,32 +325,32 @@ class QrScannerOverlayShape extends ShapeBorder {
     final borderPath = Path();
 
     // Top-left corner
-    borderPath.moveTo(_cutOutRect.left - borderOffset, _cutOutRect.top + borderLength);
-    borderPath.lineTo(_cutOutRect.left - borderOffset, _cutOutRect.top + borderRadius);
-    borderPath.quadraticBezierTo(_cutOutRect.left - borderOffset, _cutOutRect.top - borderOffset,
-        _cutOutRect.left + borderRadius, _cutOutRect.top - borderOffset);
-    borderPath.lineTo(_cutOutRect.left + borderLength, _cutOutRect.top - borderOffset);
+    borderPath.moveTo(cutOutRect.left - borderOffset, cutOutRect.top + borderLength);
+    borderPath.lineTo(cutOutRect.left - borderOffset, cutOutRect.top + borderRadius);
+    borderPath.quadraticBezierTo(cutOutRect.left - borderOffset, cutOutRect.top - borderOffset,
+        cutOutRect.left + borderRadius, cutOutRect.top - borderOffset);
+    borderPath.lineTo(cutOutRect.left + borderLength, cutOutRect.top - borderOffset);
 
     // Top-right corner
-    borderPath.moveTo(_cutOutRect.right - borderLength, _cutOutRect.top - borderOffset);
-    borderPath.lineTo(_cutOutRect.right - borderRadius, _cutOutRect.top - borderOffset);
-    borderPath.quadraticBezierTo(_cutOutRect.right + borderOffset, _cutOutRect.top - borderOffset,
-        _cutOutRect.right + borderOffset, _cutOutRect.top + borderRadius);
-    borderPath.lineTo(_cutOutRect.right + borderOffset, _cutOutRect.top + borderLength);
+    borderPath.moveTo(cutOutRect.right - borderLength, cutOutRect.top - borderOffset);
+    borderPath.lineTo(cutOutRect.right - borderRadius, cutOutRect.top - borderOffset);
+    borderPath.quadraticBezierTo(cutOutRect.right + borderOffset, cutOutRect.top - borderOffset,
+        cutOutRect.right + borderOffset, cutOutRect.top + borderRadius);
+    borderPath.lineTo(cutOutRect.right + borderOffset, cutOutRect.top + borderLength);
 
     // Bottom-right corner
-    borderPath.moveTo(_cutOutRect.right + borderOffset, _cutOutRect.bottom - borderLength);
-    borderPath.lineTo(_cutOutRect.right + borderOffset, _cutOutRect.bottom - borderRadius);
-    borderPath.quadraticBezierTo(_cutOutRect.right + borderOffset, _cutOutRect.bottom + borderOffset,
-        _cutOutRect.right - borderRadius, _cutOutRect.bottom + borderOffset);
-    borderPath.lineTo(_cutOutRect.right - borderLength, _cutOutRect.bottom + borderOffset);
+    borderPath.moveTo(cutOutRect.right + borderOffset, cutOutRect.bottom - borderLength);
+    borderPath.lineTo(cutOutRect.right + borderOffset, cutOutRect.bottom - borderRadius);
+    borderPath.quadraticBezierTo(cutOutRect.right + borderOffset, cutOutRect.bottom + borderOffset,
+        cutOutRect.right - borderRadius, cutOutRect.bottom + borderOffset);
+    borderPath.lineTo(cutOutRect.right - borderLength, cutOutRect.bottom + borderOffset);
 
     // Bottom-left corner
-    borderPath.moveTo(_cutOutRect.left + borderLength, _cutOutRect.bottom + borderOffset);
-    borderPath.lineTo(_cutOutRect.left + borderRadius, _cutOutRect.bottom + borderOffset);
-    borderPath.quadraticBezierTo(_cutOutRect.left - borderOffset, _cutOutRect.bottom + borderOffset,
-        _cutOutRect.left - borderOffset, _cutOutRect.bottom - borderRadius);
-    borderPath.lineTo(_cutOutRect.left - borderOffset, _cutOutRect.bottom - borderLength);
+    borderPath.moveTo(cutOutRect.left + borderLength, cutOutRect.bottom + borderOffset);
+    borderPath.lineTo(cutOutRect.left + borderRadius, cutOutRect.bottom + borderOffset);
+    borderPath.quadraticBezierTo(cutOutRect.left - borderOffset, cutOutRect.bottom + borderOffset,
+        cutOutRect.left - borderOffset, cutOutRect.bottom - borderRadius);
+    borderPath.lineTo(cutOutRect.left - borderOffset, cutOutRect.bottom - borderLength);
 
     canvas.drawPath(borderPath, borderPaint);
   }

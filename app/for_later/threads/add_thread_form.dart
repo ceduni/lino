@@ -1,17 +1,17 @@
 import 'dart:async';
 
-import 'package:Lino_app/models/book_model.dart';
-import 'package:Lino_app/services/search_services.dart';
+import 'package:lino/models/book_model.dart';
+import 'package:lino/services/search_services.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Lino_app/services/thread_services.dart';
+import 'package:lino/services/thread_services.dart';
 
 class AddThreadForm extends StatefulWidget {
   final VoidCallback onThreadCreated;
 
-  const AddThreadForm({required this.onThreadCreated, Key? key}) : super(key: key);
+  const AddThreadForm({required this.onThreadCreated, super.key});
 
   @override
   _AddThreadFormState createState() => _AddThreadFormState();
@@ -116,7 +116,7 @@ class _AddThreadFormState extends State<AddThreadForm> {
               decoration: InputDecoration(labelText: 'Search for a book'),
             ),
             if (books.isNotEmpty)
-              Container(
+              SizedBox(
                 height: 120,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
